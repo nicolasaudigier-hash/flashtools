@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Éditeur Photo | FlashTools</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #0a0e27;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        /* HEADER */
+        .header {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #64748b;
+            font-size: 1.1em;
+        }
+        
+        /* LAYOUT */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+        }
+        
+        .panel {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        /* SIDEBAR */
+        .tool-btn {
+            width: 100%;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            text-align: left;
+            transition: all 0.3s;
+            color: #1a202c;
+        }
+        
+        .tool-btn:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+        
+        .tool-btn.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            color: #667eea;
+        }
+        
+        /* UPLOAD ZONE */
+        .upload-zone {
+            border: 3px dashed #e2e8f0;
+            border-radius: 16px;
+            padding: 80px 40px;
+            text-align: center;
+            cursor: pointer;
+            background: #f7fafc;
+            transition: all 0.3s;
+        }
+        
+        .upload-zone:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .upload-zone.dragover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        /* CANVAS */
+        .canvas-container {
+            background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
+                        linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
+                        linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
+                        linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 500px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        #mainCanvas {
+            max-width: 100%;
+            max-height: 600px;
+            display: block;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        #cropCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: auto;
+            display: none;
+            touch-action: none;
+            cursor: move;
+        }
+        
+        /* TOOL PANELS */
+        .tool-panel {
+            display: none;
+            background: #f7fafc;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+        
+        .tool-panel.active {
+            display: block;
+        }
+        
+        .tool-panel h3 {
+            color: #1a202c;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+        
+        /* BUTTONS */
+        .btn {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        /* INFO BOX */
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 0.9em;
+            line-height: 1.6;
+            color: #1e40af;
+        }
+        
+        /* STATS */
+        .stats {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        .stat-value {
+            font-weight: 700;
+            color: #1a202c;
+        }
+        
+        /* CROP FORMAT BUTTONS */
+        .format-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .format-btn {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: #1a202c;
+        }
+        
+        .format-btn:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .format-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        
+        .crop-controls {
+            display: none;
+            margin-top: 15px;
+        }
+        
+        .crop-controls.active {
+            display: block;
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 968px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>🎨 Éditeur Photo</h1>
+            <p>Éditez vos images facilement</p>
+        </div>
+
+        <div class="main-grid">
+            <!-- SIDEBAR -->
+            <div class="panel">
+                <h3 style="margin-bottom: 20px; color: #1a202c;">Outils</h3>
+                <button class="tool-btn active" onclick="switchTool('crop')">Recadrer</button>
+                <button class="tool-btn" onclick="switchTool('resize')">Redimensionner</button>
+                <button class="tool-btn" onclick="switchTool('adjust')">Ajuster</button>
+                <button class="tool-btn" onclick="switchTool('rotate')">Rotation</button>
+                <button class="tool-btn" onclick="switchTool('filters')">Filtres</button>
+                <button class="tool-btn" onclick="switchTool('compress')">Compresser</button>
+                <button class="tool-btn" onclick="switchTool('convert')">Convertir</button>
+                <button class="tool-btn" onclick="switchTool('download')">Télécharger</button>
+                
+                <div class="info-box" style="margin-top: 30px;">
+                    🔒 <strong>100% Privé</strong><br>
+                    Vos images restent sur votre appareil
+                </div>
+            </div>
+
+            <!-- MAIN CONTENT -->
+            <div class="panel">
+                <!-- UPLOAD ZONE -->
+                <div id="uploadZone" class="upload-zone">
+                    <div class="upload-icon">📷</div>
+                    <h2 style="margin-bottom: 10px; color: #1a202c;">Glissez votre image ici</h2>
+                    <p style="color: #64748b;">ou cliquez pour sélectionner</p>
+                    <input type="file" id="fileInput" accept="image/*">
+                </div>
+
+                <!-- CANVAS AREA -->
+                <div id="canvasArea">
+                    <div class="canvas-container" id="canvasContainer">
+                        <canvas id="mainCanvas"></canvas>
+                        <canvas id="cropCanvas"></canvas>
+                    </div>
+
+                    <!-- TOOL: CROP -->
+                    <div id="panel-crop" class="tool-panel active">
+                        <h3>Recadrer l'image</h3>
+                        <div class="stats">
+                            <div class="stat-row">
+                                <span class="stat-label">Dimensions actuelles</span>
+                                <span class="stat-value" id="currentDims">-</span>
+                            </div>
+                        </div>
+                        
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #1a202c;">Format de recadrage</label>
+                        <div class="format-grid">
+                            <button class="format-btn" onclick="startCrop('square')">Carré 1:1</button>
+                            <button class="format-btn" onclick="startCrop('169')">16:9 Paysage</button>
+                            <button class="format-btn" onclick="startCrop('916')">9:16 Portrait</button>
+                            <button class="format-btn" onclick="startCrop('43')">4:3</button>
+                        </div>
+                        
+                        <div class="crop-controls" id="cropControls">
+                            <div class="info-box">
+                                <strong>Instructions :</strong><br>
+                                - Déplacez le cadre avec la souris<br>
+                                - Redimensionnez depuis les coins<br>
+                                - Cliquez "Appliquer" pour recadrer
+                            </div>
+                            
+                            <label style="display: block; margin: 15px 0;">
+                                <input type="checkbox" id="lockRatio" checked style="margin-right: 8px;">
+                                <span id="lockText">Verrouiller proportions</span>
+                            </label>
+                            
+                            <button class="btn btn-primary" onclick="applyCrop()">Appliquer le recadrage</button>
+                            <button class="btn btn-secondary" onclick="cancelCrop()">Annuler</button>
+                        </div>
+                        
+                        <button class="btn btn-secondary" style="margin-top: 20px;" onclick="resetImage()">Annuler toutes les modifications</button>
+                        <button class="btn btn-secondary" onclick="reset()">Changer d'image</button>
+                    </div>
+
+                    <!-- TOOL: RESIZE -->
+                    <div id="panel-resize" class="tool-panel">
+                        <h3>Redimensionner</h3>
+                        <div class="stats">
+                            <div class="stat-row">
+                                <span class="stat-label">Taille actuelle</span>
+                                <span class="stat-value" id="currentSize">-</span>
+                            </div>
+                        </div>
+                        
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #1a202c;">Presets populaires</label>
+                        <div class="format-grid">
+                            <button class="format-btn" onclick="setSize(800, 600)">800×600</button>
+                            <button class="format-btn" onclick="setSize(1920, 1080)">1920×1080</button>
+                            <button class="format-btn" onclick="setSize(1080, 1080)">1080×1080</button>
+                            <button class="format-btn" onclick="setSize(1200, 630)">1200×630</button>
+                        </div>
+                        
+                        <label style="display: block; margin: 20px 0 10px; font-weight: 600; color: #1a202c;">Dimensions personnalisées</label>
+                        
+                        <label style="display: block; margin-bottom: 15px;">
+                            <input type="checkbox" id="lockRatioResize" checked onchange="toggleLockResize()" style="margin-right: 8px;">
+                            <span id="lockTextResize">Conserver les proportions</span>
+                        </label>
+                        
+                        <div class="info-box" style="margin-bottom: 15px; background: #f0f9ff; border-color: #0ea5e9;">
+                            <span id="resizeModeText">Redimensionnement proportionnel - L'image garde son aspect d'origine</span>
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-size: 0.9em; color: #64748b;">Largeur (px)</label>
+                            <input type="number" id="resizeWidth" min="1" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1em;" oninput="onResizeWidthChange()">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-size: 0.9em; color: #64748b;">Hauteur (px)</label>
+                            <input type="number" id="resizeHeight" min="1" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1em;" oninput="onResizeHeightChange()">
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="applyResize()">Appliquer le redimensionnement</button>
+                        <button class="btn btn-secondary" onclick="resetImage()">Annuler toutes les modifications</button>
+                        <button class="btn btn-secondary" onclick="reset()">Changer d'image</button>
+                    </div>
+
+                    <!-- TOOL: ADJUST -->
+                    <div id="panel-adjust" class="tool-panel">
+                        <h3>Ajuster l'image</h3>
+                        
+                        <div style="margin-bottom: 25px;">
+                            <label style="display: block; margin-bottom: 10px; color: #1a202c;">
+                                <strong>Luminosité</strong>
+                                <span id="brightnessValue" style="float: right; color: #667eea; font-weight: 700;">0</span>
+                            </label>
+                            <input type="range" id="brightness" min="-100" max="100" value="0" style="width: 100%;" oninput="updateAdjustments()">
+                        </div>
+                        
+                        <div style="margin-bottom: 25px;">
+                            <label style="display: block; margin-bottom: 10px; color: #1a202c;">
+                                <strong>Contraste</strong>
+                                <span id="contrastValue" style="float: right; color: #667eea; font-weight: 700;">0</span>
+                            </label>
+                            <input type="range" id="contrast" min="-100" max="100" value="0" style="width: 100%;" oninput="updateAdjustments()">
+                        </div>
+                        
+                        <div style="margin-bottom: 25px;">
+                            <label style="display: block; margin-bottom: 10px; color: #1a202c;">
+                                <strong>Saturation</strong>
+                                <span id="saturationValue" style="float: right; color: #667eea; font-weight: 700;">0</span>
+                            </label>
+                            <input type="range" id="saturation" min="-100" max="100" value="0" style="width: 100%;" oninput="updateAdjustments()">
+                        </div>
+                        
+                        <div style="margin-bottom: 25px;">
+                            <label style="display: block; margin-bottom: 10px; color: #1a202c;">
+                                <strong>Netteté</strong>
+                                <span id="sharpnessValue" style="float: right; color: #667eea; font-weight: 700;">0</span>
+                            </label>
+                            <input type="range" id="sharpness" min="0" max="100" value="0" style="width: 100%;" oninput="updateAdjustments()">
+                        </div>
+                        
+                        <div class="info-box">
+                            Les ajustements sont appliqués en temps réel sur l'image
+                        </div>
+                        
+                        <button class="btn btn-secondary" onclick="resetAdjustments()">Réinitialiser les ajustements</button>
+                        <button class="btn btn-secondary" onclick="resetImage()">Annuler toutes les modifications</button>
+                        <button class="btn btn-secondary" onclick="reset()">Changer d'image</button>
+                    </div>
+
+                    <!-- TOOL: ROTATE -->
+                    <div id="panel-rotate" class="tool-panel">
+                        <h3>Rotation et Retournement</h3>
+                        
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #1a202c;">Rotation</label>
+                        <div class="format-grid">
+                            <button class="format-btn" onclick="rotate(90)">90° Droite</button>
+                            <button class="format-btn" onclick="rotate(-90)">90° Gauche</button>
+                            <button class="format-btn" onclick="rotate(180)">180°</button>
+                        </div>
+                        
+                        <label style="display: block; margin: 20px 0 10px; font-weight: 600; color: #1a202c;">Retournement</label>
+                        <div class="format-grid">
+                            <button class="format-btn" onclick="flipHorizontal()">Horizontal</button>
+                            <button class="format-btn" onclick="flipVertical()">Vertical</button>
+                        </div>
+                        
+                        <div class="info-box">
+                            Les rotations et retournements sont appliqués immédiatement et définitivement sur l'image
+                        </div>
+                        
+                        <button class="btn btn-secondary" onclick="resetImage()">Annuler toutes les modifications</button>
+                        <button class="btn btn-secondary" onclick="reset()">Changer d'image</button>
+                    </div>
+
+                    <!-- TOOL: FILTERS -->
+                    <div id="panel-filters" class="tool-panel">
+                        <h3>Filtres créatifs</h3>
+                        
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #1a202c;">Appliquer un filtre</label>
+                        <div class="format-grid" style="grid-template-columns: repeat(2, 1fr);">
+                            <button class="format-btn active" onclick="applyFilter('none')">Original</button>
+                            <button class="format-btn" onclick="applyFilter('grayscale')">Noir & Blanc</button>
+                            <button class="format-btn" onclick="applyFilter('sepia')">Sépia</button>
+                            <button class="format-btn" onclick="applyFilter('invert')">Inversion</button>
+                            <button class="format-btn" onclick="applyFilter('vintage')">Vintage</button>
+                            <button class="format-btn" onclick="applyFilter('warm')">Chaleureux</button>
+                            <button class="format-btn" onclick="applyFilter('cool')">Froid</button>
+                            <button class="format-btn" onclick="applyFilter('contrast')">Contraste+</button>
+                        </div>
+                        
+                        <div class="info-box" style="margin-top: 20px;">
+                            <strong>Filtre actif :</strong> <span id="activeFilter">Original</span><br>
+                            Les filtres sont appliqués en temps réel
+                        </div>
+                        
+                        <button class="btn btn-secondary" onclick="resetImage()">Annuler toutes les modifications</button>
+                        <button class="btn btn-secondary" onclick="reset()">Changer d'image</button>
+                    </div>
+
+                    <!-- TOOL: COMPRESS -->
+                    <div id="panel-compress" class="tool-panel">
+                        <h3>Compresser l'image</h3>
+                        
+                        <div class="stats">
+                            <div class="stat-row">
+                                <span class="stat-label">Taille originale</span>
+                                <span class="stat-value" id="originalSize">-</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Taille compressée</span>
+                                <span class="stat-value" id="compressedSize">-</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Gain</span>
+                                <span class="stat-value" id="compressionGain" style="color: #10b981;">-</span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin: 25px 0;">
+                            <label style="display: block; margin-bottom: 10px; color: #1a202c;">
+                                <strong>Qualité JPEG</strong>
+                                <span id="qualityValue" style="float: right; color: #667eea; font-weight: 700;">85%</span>
+                            </label>
+                            <input type="range" id="quality" min="1" max="100" value="85" style="width: 100%;" oninput="updateCompression()">
+                        </div>
+                        
+                        <div class="info-box" style="margin-bottom: 20px; background: #f0f9ff; border-color: #0ea5e9;">
+                            <strong>Recommandations :</strong><br>
+                            • Web : 75-85%<br>
+                            • Réseaux sociaux : 70-80%<br>
+                            • Impression : 90-95%
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="downloadCompressed()">Télécharger image compressée</button>
+                        <button class="btn btn-secondary" onclick="resetImage()">Annuler toutes les modifications</button>
+                        <button class="btn btn-secondary" onclick="reset()">Changer d'image</button>
+                    </div>
+
+                    <!-- TOOL: CONVERT -->
+                    <div id="panel-convert" class="tool-panel">
+                        <h3>Convertir le format</h3>
+                        
+                        <div class="stats">
+                            <div class="stat-row">
+                                <span class="stat-label">Format actuel</span>
+                                <span class="stat-value">PNG</span>
+                            </div>
+                        </div>
+                        
+                        <label style="display: block; margin: 20px 0 10px; font-weight: 600; color: #1a202c;">Convertir vers</label>
+                        <div class="format-grid">
+                            <button class="format-btn" onclick="selectFormat('png')">PNG</button>
+                            <button class="format-btn" onclick="selectFormat('jpg')">JPG</button>
+                            <button class="format-btn" onclick="selectFormat('webp')">WebP</button>
+                        </div>
+                        
+                        <div id="jpgQualitySection" style="display: none; margin: 20px 0;">
+                            <label style="display: block; margin-bottom: 10px; color: #1a202c;">
+                                <strong>Qualité JPG</strong>
+                                <span id="convertQualityValue" style="float: right; color: #667eea; font-weight: 700;">85%</span>
+                            </label>
+                            <input type="range" id="convertQuality" min="1" max="100" value="85" style="width: 100%;" oninput="updateConvertQuality()">
+                        </div>
+                        
+                        <div class="info-box">
+                            <strong>Formats :</strong><br>
+                            • <strong>PNG</strong> : Qualité maximale, transparence, fichier plus lourd<br>
+                            • <strong>JPG</strong> : Bon compromis, pas de transparence<br>
+                            • <strong>WebP</strong> : Moderne, léger, bonne qualité
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="downloadConverted()">Télécharger au format choisi</button>
+                        <button class="btn btn-secondary" onclick="resetImage()">Annuler toutes les modifications</button>
+                        <button class="btn btn-secondary" onclick="reset()">Changer d'image</button>
+                    </div>
+
+                    <!-- TOOL: DOWNLOAD -->
+                    <div id="panel-download" class="tool-panel">
+                        <h3>💾 Télécharger</h3>
+                        <button class="btn btn-primary" onclick="download()">💾 Télécharger l'image</button>
+                        <button class="btn btn-secondary" onclick="reset()">🔄 Nouvelle image</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let canvas, ctx, cropCanvas, cropCtx;
+        let originalImage = null;
+        let currentImage = null;
+        
+        // Variables crop
+        let cropActive = false;
+        let cropRect = { x: 0, y: 0, width: 0, height: 0 };
+        let cropRatio = 1;
+        let isDragging = false;
+        let isResizing = false;
+        let resizeHandle = null;
+        let dragStartX = 0, dragStartY = 0;
+        let cropStartX = 0, cropStartY = 0;
+        let cropStartWidth = 0, cropStartHeight = 0;
+        
+        // Variables ajustements
+        let currentBrightness = 0;
+        let currentContrast = 0;
+        let currentSaturation = 0;
+        let currentSharpness = 0;
+        let currentFilter = 'none';
+        let selectedFormat = 'png';
+
+        // Initialisation
+        window.onload = function() {
+            canvas = document.getElementById('mainCanvas');
+            ctx = canvas.getContext('2d');
+            cropCanvas = document.getElementById('cropCanvas');
+            cropCtx = cropCanvas.getContext('2d');
+
+            // Upload par clic
+            document.getElementById('uploadZone').onclick = function() {
+                document.getElementById('fileInput').click();
+            };
+
+            document.getElementById('fileInput').onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) loadImage(file);
+            };
+
+            // Drag & Drop
+            const uploadZone = document.getElementById('uploadZone');
+            
+            uploadZone.ondragover = function(e) {
+                e.preventDefault();
+                uploadZone.classList.add('dragover');
+            };
+
+            uploadZone.ondragleave = function() {
+                uploadZone.classList.remove('dragover');
+            };
+
+            uploadZone.ondrop = function(e) {
+                e.preventDefault();
+                uploadZone.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    loadImage(file);
+                }
+            };
+        };
+
+        // Charger une image
+        function loadImage(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    originalImage = img;
+                    currentImage = img;
+                    drawImage(img);
+                    
+                    // Afficher le canvas, masquer l'upload
+                    document.getElementById('uploadZone').style.display = 'none';
+                    document.getElementById('canvasContainer').style.display = 'flex';
+                    
+                    updateStats();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Dessiner l'image sur le canvas
+        function drawImage(img) {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Créer canvas temporaire pour ajustements
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = img.width;
+            tempCanvas.height = img.height;
+            tempCtx.drawImage(img, 0, 0);
+            
+            // Appliquer ajustements si nécessaires
+            if (currentBrightness !== 0 || currentContrast !== 0 || currentSaturation !== 0 || currentSharpness !== 0) {
+                let imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+                let data = imageData.data;
+                
+                // Luminosité et Contraste
+                const brightness = currentBrightness * 2.55;
+                const contrastFactor = (259 * (currentContrast + 255)) / (255 * (259 - currentContrast));
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    // Luminosité
+                    let r = data[i] + brightness;
+                    let g = data[i + 1] + brightness;
+                    let b = data[i + 2] + brightness;
+                    
+                    // Contraste
+                    r = contrastFactor * (r - 128) + 128;
+                    g = contrastFactor * (g - 128) + 128;
+                    b = contrastFactor * (b - 128) + 128;
+                    
+                    // Saturation
+                    if (currentSaturation !== 0) {
+                        const gray = 0.2989 * r + 0.5870 * g + 0.1140 * b;
+                        const satFactor = 1 + (currentSaturation / 100);
+                        r = gray + (r - gray) * satFactor;
+                        g = gray + (g - gray) * satFactor;
+                        b = gray + (b - gray) * satFactor;
+                    }
+                    
+                    data[i] = Math.max(0, Math.min(255, r));
+                    data[i + 1] = Math.max(0, Math.min(255, g));
+                    data[i + 2] = Math.max(0, Math.min(255, b));
+                }
+                
+                // Netteté
+                if (currentSharpness > 0) {
+                    const strength = currentSharpness / 100;
+                    const original = new Uint8ClampedArray(data);
+                    
+                    for (let y = 1; y < tempCanvas.height - 1; y++) {
+                        for (let x = 1; x < tempCanvas.width - 1; x++) {
+                            for (let c = 0; c < 3; c++) {
+                                const idx = (y * tempCanvas.width + x) * 4 + c;
+                                const center = original[idx];
+                                const top = original[((y - 1) * tempCanvas.width + x) * 4 + c];
+                                const bottom = original[((y + 1) * tempCanvas.width + x) * 4 + c];
+                                const left = original[(y * tempCanvas.width + (x - 1)) * 4 + c];
+                                const right = original[(y * tempCanvas.width + (x + 1)) * 4 + c];
+                                const avg = (top + bottom + left + right) / 4;
+                                data[idx] = Math.max(0, Math.min(255, center + (center - avg) * strength));
+                            }
+                        }
+                    }
+                }
+                
+                tempCtx.putImageData(imageData, 0, 0);
+            }
+            
+            // Appliquer filtre si nécessaire
+            if (currentFilter !== 'none') {
+                let imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+                let data = imageData.data;
+                
+                if (currentFilter === 'grayscale') {
+                    for (let i = 0; i < data.length; i += 4) {
+                        const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                        data[i] = data[i + 1] = data[i + 2] = avg;
+                    }
+                } else if (currentFilter === 'sepia') {
+                    for (let i = 0; i < data.length; i += 4) {
+                        const r = data[i], g = data[i + 1], b = data[i + 2];
+                        data[i] = Math.min(255, r * 0.393 + g * 0.769 + b * 0.189);
+                        data[i + 1] = Math.min(255, r * 0.349 + g * 0.686 + b * 0.168);
+                        data[i + 2] = Math.min(255, r * 0.272 + g * 0.534 + b * 0.131);
+                    }
+                } else if (currentFilter === 'invert') {
+                    for (let i = 0; i < data.length; i += 4) {
+                        data[i] = 255 - data[i];
+                        data[i + 1] = 255 - data[i + 1];
+                        data[i + 2] = 255 - data[i + 2];
+                    }
+                } else if (currentFilter === 'vintage') {
+                    for (let i = 0; i < data.length; i += 4) {
+                        const r = data[i], g = data[i + 1], b = data[i + 2];
+                        data[i] = Math.min(255, r * 0.9 + 40);
+                        data[i + 1] = Math.min(255, g * 0.85 + 20);
+                        data[i + 2] = Math.min(255, b * 0.7);
+                    }
+                } else if (currentFilter === 'warm') {
+                    for (let i = 0; i < data.length; i += 4) {
+                        data[i] = Math.min(255, data[i] * 1.1);
+                        data[i + 2] = Math.min(255, data[i + 2] * 0.9);
+                    }
+                } else if (currentFilter === 'cool') {
+                    for (let i = 0; i < data.length; i += 4) {
+                        data[i] = Math.min(255, data[i] * 0.9);
+                        data[i + 2] = Math.min(255, data[i + 2] * 1.1);
+                    }
+                } else if (currentFilter === 'contrast') {
+                    for (let i = 0; i < data.length; i += 4) {
+                        const factor = 1.3;
+                        data[i] = Math.max(0, Math.min(255, factor * (data[i] - 128) + 128));
+                        data[i + 1] = Math.max(0, Math.min(255, factor * (data[i + 1] - 128) + 128));
+                        data[i + 2] = Math.max(0, Math.min(255, factor * (data[i + 2] - 128) + 128));
+                    }
+                }
+                
+                tempCtx.putImageData(imageData, 0, 0);
+            }
+            
+            ctx.drawImage(tempCanvas, 0, 0);
+            currentImage = img;
+        }
+
+        // Mettre à jour les stats
+        function updateStats() {
+            const dims = `${currentImage.width} × ${currentImage.height} px`;
+            document.getElementById('currentDims').textContent = dims;
+            document.getElementById('currentSize').textContent = dims;
+            
+            // Initialiser inputs resize
+            document.getElementById('resizeWidth').value = currentImage.width;
+            document.getElementById('resizeHeight').value = currentImage.height;
+        }
+
+        // Changer d'outil
+        function switchTool(tool) {
+            // Désactiver tous les boutons
+            document.querySelectorAll('.tool-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Activer le bouton cliqué
+            event.target.classList.add('active');
+            
+            // Masquer tous les panels
+            document.querySelectorAll('.tool-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            
+            // Afficher le panel correspondant
+            document.getElementById('panel-' + tool).classList.add('active');
+            
+            // Si on va sur compress, mettre à jour les stats
+            if (tool === 'compress') {
+                updateCompression();
+            }
+        }
+
+        // Télécharger l'image
+        function download() {
+            if (!canvas || !currentImage) return;
+            
+            const link = document.createElement('a');
+            link.download = 'image-editee-' + Date.now() + '.png';
+            link.href = canvas.toDataURL();
+            
+            // Ajouter au DOM, cliquer, puis retirer
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Réinitialiser
+        function reset() {
+            document.getElementById('uploadZone').style.display = 'block';
+            document.getElementById('canvasContainer').style.display = 'none';
+            document.getElementById('fileInput').value = '';
+            originalImage = null;
+            currentImage = null;
+            
+            // Réactiver le premier outil
+            document.querySelectorAll('.tool-btn').forEach((btn, i) => {
+                btn.classList.remove('active');
+                if (i === 0) btn.classList.add('active');
+            });
+            
+            document.querySelectorAll('.tool-panel').forEach((panel, i) => {
+                panel.classList.remove('active');
+                if (i === 0) panel.classList.add('active');
+            });
+        }
+        
+        // CROP FUNCTIONS
+        function startCrop(format) {
+            if (!currentImage) return;
+            
+            cropActive = true;
+            document.getElementById('cropControls').classList.add('active');
+            
+            // Activer bouton format
+            document.querySelectorAll('.format-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Définir ratio
+            if (format === 'square') cropRatio = 1;
+            else if (format === '169') cropRatio = 16/9;
+            else if (format === '916') cropRatio = 9/16;
+            else if (format === '43') cropRatio = 4/3;
+            
+            // Positionner le cropCanvas sur le mainCanvas
+            const canvasRect = canvas.getBoundingClientRect();
+            const containerRect = canvas.parentElement.getBoundingClientRect();
+            
+            cropCanvas.width = canvasRect.width;
+            cropCanvas.height = canvasRect.height;
+            cropCanvas.style.width = canvasRect.width + 'px';
+            cropCanvas.style.height = canvasRect.height + 'px';
+            cropCanvas.style.left = (canvasRect.left - containerRect.left) + 'px';
+            cropCanvas.style.top = (canvasRect.top - containerRect.top) + 'px';
+            cropCanvas.style.display = 'block';
+            
+            // Calculer taille cadre
+            const scaleX = canvasRect.width / currentImage.width;
+            const scaleY = canvasRect.height / currentImage.height;
+            const scale = Math.min(scaleX, scaleY);
+            
+            let cropWidth, cropHeight;
+            if (cropRatio >= 1) {
+                cropWidth = Math.min(currentImage.width * 0.8, currentImage.width) * scale;
+                cropHeight = cropWidth / cropRatio;
+            } else {
+                cropHeight = Math.min(currentImage.height * 0.8, currentImage.height) * scale;
+                cropWidth = cropHeight * cropRatio;
+            }
+            
+            cropRect = {
+                x: (cropCanvas.width - cropWidth) / 2,
+                y: (cropCanvas.height - cropHeight) / 2,
+                width: cropWidth,
+                height: cropHeight
+            };
+            
+            drawCropOverlay();
+            setupCropEvents();
+        }
+        
+        function setupCropEvents() {
+            cropCanvas.onmousedown = handleCropMouseDown;
+            cropCanvas.onmousemove = handleCropMouseMove;
+            cropCanvas.onmouseup = handleCropMouseUp;
+            cropCanvas.onmouseleave = handleCropMouseUp;
+        }
+        
+        function drawCropOverlay() {
+            cropCtx.clearRect(0, 0, cropCanvas.width, cropCanvas.height);
+            
+            // Overlay sombre
+            cropCtx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            cropCtx.fillRect(0, 0, cropCanvas.width, cropCanvas.height);
+            
+            // Zone claire
+            cropCtx.clearRect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
+            
+            // Bordure
+            cropCtx.strokeStyle = '#667eea';
+            cropCtx.lineWidth = 3;
+            cropCtx.strokeRect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
+            
+            // Grille règle des tiers
+            cropCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            cropCtx.lineWidth = 1;
+            cropCtx.beginPath();
+            cropCtx.moveTo(cropRect.x + cropRect.width / 3, cropRect.y);
+            cropCtx.lineTo(cropRect.x + cropRect.width / 3, cropRect.y + cropRect.height);
+            cropCtx.moveTo(cropRect.x + (cropRect.width * 2) / 3, cropRect.y);
+            cropCtx.lineTo(cropRect.x + (cropRect.width * 2) / 3, cropRect.y + cropRect.height);
+            cropCtx.moveTo(cropRect.x, cropRect.y + cropRect.height / 3);
+            cropCtx.lineTo(cropRect.x + cropRect.width, cropRect.y + cropRect.height / 3);
+            cropCtx.moveTo(cropRect.x, cropRect.y + (cropRect.height * 2) / 3);
+            cropCtx.lineTo(cropRect.x + cropRect.width, cropRect.y + (cropRect.height * 2) / 3);
+            cropCtx.stroke();
+            
+            // 8 Poignées (4 coins + 4 bords)
+            const handleSize = 12;
+            cropCtx.fillStyle = '#667eea';
+            cropCtx.strokeStyle = 'white';
+            cropCtx.lineWidth = 2;
+            
+            function drawHandle(x, y) {
+                cropCtx.beginPath();
+                cropCtx.arc(x, y, handleSize/2, 0, Math.PI * 2);
+                cropCtx.fill();
+                cropCtx.stroke();
+            }
+            
+            // 4 coins
+            drawHandle(cropRect.x, cropRect.y);
+            drawHandle(cropRect.x + cropRect.width, cropRect.y);
+            drawHandle(cropRect.x, cropRect.y + cropRect.height);
+            drawHandle(cropRect.x + cropRect.width, cropRect.y + cropRect.height);
+            
+            // 4 bords (milieu)
+            drawHandle(cropRect.x + cropRect.width / 2, cropRect.y); // haut
+            drawHandle(cropRect.x + cropRect.width, cropRect.y + cropRect.height / 2); // droite
+            drawHandle(cropRect.x + cropRect.width / 2, cropRect.y + cropRect.height); // bas
+            drawHandle(cropRect.x, cropRect.y + cropRect.height / 2); // gauche
+        }
+        
+        function getResizeHandle(x, y) {
+            const tolerance = 20;
+            
+            // 4 coins
+            if (Math.abs(x - cropRect.x) < tolerance && Math.abs(y - cropRect.y) < tolerance) return 'tl';
+            if (Math.abs(x - (cropRect.x + cropRect.width)) < tolerance && Math.abs(y - cropRect.y) < tolerance) return 'tr';
+            if (Math.abs(x - cropRect.x) < tolerance && Math.abs(y - (cropRect.y + cropRect.height)) < tolerance) return 'bl';
+            if (Math.abs(x - (cropRect.x + cropRect.width)) < tolerance && Math.abs(y - (cropRect.y + cropRect.height)) < tolerance) return 'br';
+            
+            // 4 bords
+            if (Math.abs(x - (cropRect.x + cropRect.width / 2)) < tolerance && Math.abs(y - cropRect.y) < tolerance) return 't';
+            if (Math.abs(x - (cropRect.x + cropRect.width)) < tolerance && Math.abs(y - (cropRect.y + cropRect.height / 2)) < tolerance) return 'r';
+            if (Math.abs(x - (cropRect.x + cropRect.width / 2)) < tolerance && Math.abs(y - (cropRect.y + cropRect.height)) < tolerance) return 'b';
+            if (Math.abs(x - cropRect.x) < tolerance && Math.abs(y - (cropRect.y + cropRect.height / 2)) < tolerance) return 'l';
+            
+            return null;
+        }
+        
+        function handleCropMouseDown(e) {
+            if (!cropActive) return;
+            const rect = cropCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            resizeHandle = getResizeHandle(x, y);
+            
+            if (resizeHandle) {
+                isResizing = true;
+                dragStartX = x;
+                dragStartY = y;
+                cropStartX = cropRect.x;
+                cropStartY = cropRect.y;
+                cropStartWidth = cropRect.width;
+                cropStartHeight = cropRect.height;
+            } else if (x >= cropRect.x && x <= cropRect.x + cropRect.width &&
+                       y >= cropRect.y && y <= cropRect.y + cropRect.height) {
+                isDragging = true;
+                dragStartX = x;
+                dragStartY = y;
+                cropStartX = cropRect.x;
+                cropStartY = cropRect.y;
+            }
+        }
+        
+        function handleCropMouseMove(e) {
+            if (!cropActive) return;
+            const rect = cropCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            if (isResizing) {
+                const dx = x - dragStartX;
+                const dy = y - dragStartY;
+                const lockRatio = document.getElementById('lockRatio').checked;
+                
+                let newX = cropStartX;
+                let newY = cropStartY;
+                let newWidth = cropStartWidth;
+                let newHeight = cropStartHeight;
+                
+                if (resizeHandle.includes('l')) {
+                    newX = cropStartX + dx;
+                    newWidth = cropStartWidth - dx;
+                }
+                if (resizeHandle.includes('r')) {
+                    newWidth = cropStartWidth + dx;
+                }
+                if (resizeHandle.includes('t')) {
+                    newY = cropStartY + dy;
+                    newHeight = cropStartHeight - dy;
+                }
+                if (resizeHandle.includes('b')) {
+                    newHeight = cropStartHeight + dy;
+                }
+                
+                if (lockRatio) {
+                    if (Math.abs(dx) > Math.abs(dy)) {
+                        newHeight = newWidth / cropRatio;
+                        if (resizeHandle.includes('t')) {
+                            newY = cropStartY + cropStartHeight - newHeight;
+                        }
+                    } else {
+                        newWidth = newHeight * cropRatio;
+                        if (resizeHandle.includes('l')) {
+                            newX = cropStartX + cropStartWidth - newWidth;
+                        }
+                    }
+                }
+                
+                const minSize = 50;
+                if (newWidth < minSize) newWidth = minSize;
+                if (newHeight < minSize) newHeight = minSize;
+                
+                if (newX < 0) newX = 0;
+                if (newY < 0) newY = 0;
+                if (newX + newWidth > cropCanvas.width) newWidth = cropCanvas.width - newX;
+                if (newY + newHeight > cropCanvas.height) newHeight = cropCanvas.height - newY;
+                
+                cropRect.x = newX;
+                cropRect.y = newY;
+                cropRect.width = newWidth;
+                cropRect.height = newHeight;
+                
+                drawCropOverlay();
+                
+            } else if (isDragging) {
+                const dx = x - dragStartX;
+                const dy = y - dragStartY;
+                
+                cropRect.x = cropStartX + dx;
+                cropRect.y = cropStartY + dy;
+                
+                cropRect.x = Math.max(0, Math.min(cropRect.x, cropCanvas.width - cropRect.width));
+                cropRect.y = Math.max(0, Math.min(cropRect.y, cropCanvas.height - cropRect.height));
+                
+                drawCropOverlay();
+            } else {
+                const handle = getResizeHandle(x, y);
+                if (handle) {
+                    const cursors = {
+                        'tl': 'nw-resize', 'tr': 'ne-resize', 'bl': 'sw-resize', 'br': 'se-resize',
+                        't': 'n-resize', 'r': 'e-resize', 'b': 's-resize', 'l': 'w-resize'
+                    };
+                    cropCanvas.style.cursor = cursors[handle];
+                } else if (x >= cropRect.x && x <= cropRect.x + cropRect.width &&
+                           y >= cropRect.y && y <= cropRect.y + cropRect.height) {
+                    cropCanvas.style.cursor = 'move';
+                } else {
+                    cropCanvas.style.cursor = 'default';
+                }
+            }
+        }
+        
+        function handleCropMouseUp() {
+            isDragging = false;
+            isResizing = false;
+            resizeHandle = null;
+        }
+        
+        function applyCrop() {
+            if (!cropActive) return;
+            
+            const canvasRect = canvas.getBoundingClientRect();
+            const scaleX = currentImage.width / canvasRect.width;
+            const scaleY = currentImage.height / canvasRect.height;
+            
+            const realX = cropRect.x * scaleX;
+            const realY = cropRect.y * scaleY;
+            const realWidth = cropRect.width * scaleX;
+            const realHeight = cropRect.height * scaleY;
+            
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = realWidth;
+            tempCanvas.height = realHeight;
+            
+            tempCtx.drawImage(currentImage, realX, realY, realWidth, realHeight, 0, 0, realWidth, realHeight);
+            
+            const newImg = new Image();
+            newImg.onload = function() {
+                currentImage = newImg;
+                drawImage(newImg);
+                updateStats();
+                cancelCrop();
+            };
+            newImg.src = tempCanvas.toDataURL();
+        }
+        
+        function cancelCrop() {
+            cropActive = false;
+            isDragging = false;
+            isResizing = false;
+            resizeHandle = null;
+            cropCanvas.style.display = 'none';
+            document.getElementById('cropControls').classList.remove('active');
+            document.querySelectorAll('.format-btn').forEach(btn => btn.classList.remove('active'));
+        }
+        
+        function resetImage() {
+            if (!originalImage) return;
+            currentImage = originalImage;
+            
+            // Réinitialiser tous les ajustements et filtres
+            currentBrightness = 0;
+            currentContrast = 0;
+            currentSaturation = 0;
+            currentSharpness = 0;
+            currentFilter = 'none';
+            
+            // Réinitialiser les inputs si on est sur la page ajustements
+            if (document.getElementById('brightness')) {
+                document.getElementById('brightness').value = 0;
+                document.getElementById('contrast').value = 0;
+                document.getElementById('saturation').value = 0;
+                document.getElementById('sharpness').value = 0;
+                document.getElementById('brightnessValue').textContent = '0';
+                document.getElementById('contrastValue').textContent = '0';
+                document.getElementById('saturationValue').textContent = '0';
+                document.getElementById('sharpnessValue').textContent = '0';
+            }
+            
+            // Réinitialiser le bouton filtre actif
+            document.querySelectorAll('#panel-filters .format-btn').forEach((btn, i) => {
+                btn.classList.remove('active');
+                if (i === 0) btn.classList.add('active');
+            });
+            if (document.getElementById('activeFilter')) {
+                document.getElementById('activeFilter').textContent = 'Original';
+            }
+            
+            drawImage(originalImage);
+            updateStats();
+            cancelCrop();
+        }
+        
+        // RESIZE FUNCTIONS
+        function setSize(width, height) {
+            document.getElementById('resizeWidth').value = width;
+            document.getElementById('resizeHeight').value = height;
+            
+            // Activer visuellement le bouton cliqué
+            document.querySelectorAll('#panel-resize .format-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        
+        function toggleLockResize() {
+            const locked = document.getElementById('lockRatioResize').checked;
+            document.getElementById('lockTextResize').textContent = locked ? 'Conserver les proportions' : 'Zoom intelligent (crop auto)';
+            document.getElementById('resizeModeText').textContent = locked ? 
+                'Redimensionnement proportionnel - L\'image garde son aspect d\'origine' : 
+                'Zoom intelligent - Remplit exactement les dimensions en coupant les bords si nécessaire';
+        }
+        
+        function onResizeWidthChange() {
+            // Désactiver preset visuel
+            document.querySelectorAll('#panel-resize .format-btn').forEach(btn => btn.classList.remove('active'));
+            
+            if (!document.getElementById('lockRatioResize').checked) return;
+            if (!currentImage) return;
+            
+            const width = parseInt(document.getElementById('resizeWidth').value);
+            if (width > 0) {
+                const ratio = currentImage.height / currentImage.width;
+                document.getElementById('resizeHeight').value = Math.round(width * ratio);
+            }
+        }
+        
+        function onResizeHeightChange() {
+            // Désactiver preset visuel
+            document.querySelectorAll('#panel-resize .format-btn').forEach(btn => btn.classList.remove('active'));
+            
+            if (!document.getElementById('lockRatioResize').checked) return;
+            if (!currentImage) return;
+            
+            const height = parseInt(document.getElementById('resizeHeight').value);
+            if (height > 0) {
+                const ratio = currentImage.width / currentImage.height;
+                document.getElementById('resizeWidth').value = Math.round(height * ratio);
+            }
+        }
+        
+        function applyResize() {
+            const targetWidth = parseInt(document.getElementById('resizeWidth').value);
+            const targetHeight = parseInt(document.getElementById('resizeHeight').value);
+            
+            if (!targetWidth || !targetHeight || targetWidth < 1 || targetHeight < 1) {
+                alert('Veuillez entrer des dimensions valides');
+                return;
+            }
+            
+            const locked = document.getElementById('lockRatioResize').checked;
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = targetWidth;
+            tempCanvas.height = targetHeight;
+            
+            if (locked) {
+                // Mode simple : redimensionnement proportionnel
+                tempCtx.drawImage(currentImage, 0, 0, targetWidth, targetHeight);
+            } else {
+                // Mode zoom intelligent : remplit en coupant
+                const srcRatio = currentImage.width / currentImage.height;
+                const dstRatio = targetWidth / targetHeight;
+                let sx, sy, sw, sh;
+                
+                if (srcRatio > dstRatio) {
+                    // Image plus large : couper les bords gauche/droite
+                    sh = currentImage.height;
+                    sw = sh * dstRatio;
+                    sx = (currentImage.width - sw) / 2;
+                    sy = 0;
+                } else {
+                    // Image plus haute : couper les bords haut/bas
+                    sw = currentImage.width;
+                    sh = sw / dstRatio;
+                    sx = 0;
+                    sy = (currentImage.height - sh) / 2;
+                }
+                
+                tempCtx.drawImage(currentImage, sx, sy, sw, sh, 0, 0, targetWidth, targetHeight);
+            }
+            
+            const newImg = new Image();
+            newImg.onload = function() {
+                currentImage = newImg;
+                drawImage(newImg);
+                updateStats();
+            };
+            newImg.src = tempCanvas.toDataURL();
+        }
+        
+        // ADJUST FUNCTIONS
+        function updateAdjustments() {
+            currentBrightness = parseInt(document.getElementById('brightness').value);
+            currentContrast = parseInt(document.getElementById('contrast').value);
+            currentSaturation = parseInt(document.getElementById('saturation').value);
+            currentSharpness = parseInt(document.getElementById('sharpness').value);
+            
+            document.getElementById('brightnessValue').textContent = currentBrightness;
+            document.getElementById('contrastValue').textContent = currentContrast;
+            document.getElementById('saturationValue').textContent = currentSaturation;
+            document.getElementById('sharpnessValue').textContent = currentSharpness;
+            
+            drawImage(currentImage);
+        }
+        
+        function resetAdjustments() {
+            currentBrightness = 0;
+            currentContrast = 0;
+            currentSaturation = 0;
+            currentSharpness = 0;
+            // NE PAS réinitialiser currentFilter ici
+            
+            document.getElementById('brightness').value = 0;
+            document.getElementById('contrast').value = 0;
+            document.getElementById('saturation').value = 0;
+            document.getElementById('sharpness').value = 0;
+            
+            document.getElementById('brightnessValue').textContent = '0';
+            document.getElementById('contrastValue').textContent = '0';
+            document.getElementById('saturationValue').textContent = '0';
+            document.getElementById('sharpnessValue').textContent = '0';
+            
+            drawImage(currentImage);
+        }
+        
+        // ROTATE AND FLIP FUNCTIONS
+        function rotate(degrees) {
+            if (!currentImage) return;
+            
+            // IMPORTANT : Appliquer définitivement les ajustements/filtres avant rotation
+            // Créer une nouvelle image avec ajustements intégrés
+            const baseCanvas = document.createElement('canvas');
+            const baseCtx = baseCanvas.getContext('2d');
+            baseCanvas.width = currentImage.width;
+            baseCanvas.height = currentImage.height;
+            baseCtx.drawImage(canvas, 0, 0); // Copier le canvas avec ajustements appliqués
+            
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // Pour rotations de 90° ou -90°, inverser largeur et hauteur
+            if (Math.abs(degrees) === 90) {
+                tempCanvas.width = currentImage.height;
+                tempCanvas.height = currentImage.width;
+            } else {
+                tempCanvas.width = currentImage.width;
+                tempCanvas.height = currentImage.height;
+            }
+            
+            // Appliquer la rotation sur l'image avec ajustements
+            tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
+            tempCtx.rotate(degrees * Math.PI / 180);
+            tempCtx.drawImage(baseCanvas, -currentImage.width / 2, -currentImage.height / 2);
+            
+            // Créer nouvelle image
+            const newImg = new Image();
+            newImg.onload = function() {
+                currentImage = newImg;
+                // Réinitialiser les ajustements car ils sont maintenant intégrés à l'image
+                currentBrightness = 0;
+                currentContrast = 0;
+                currentSaturation = 0;
+                currentSharpness = 0;
+                currentFilter = 'none';
+                
+                // Mettre à jour les sliders
+                if (document.getElementById('brightness')) {
+                    document.getElementById('brightness').value = 0;
+                    document.getElementById('contrast').value = 0;
+                    document.getElementById('saturation').value = 0;
+                    document.getElementById('sharpness').value = 0;
+                    document.getElementById('brightnessValue').textContent = '0';
+                    document.getElementById('contrastValue').textContent = '0';
+                    document.getElementById('saturationValue').textContent = '0';
+                    document.getElementById('sharpnessValue').textContent = '0';
+                }
+                
+                // Réinitialiser le bouton filtre
+                document.querySelectorAll('#panel-filters .format-btn').forEach((btn, i) => {
+                    btn.classList.remove('active');
+                    if (i === 0) btn.classList.add('active');
+                });
+                if (document.getElementById('activeFilter')) {
+                    document.getElementById('activeFilter').textContent = 'Original';
+                }
+                
+                drawImage(newImg);
+                updateStats();
+            };
+            newImg.src = tempCanvas.toDataURL();
+        }
+        
+        function flipHorizontal() {
+            if (!currentImage) return;
+            
+            // Appliquer définitivement les ajustements/filtres avant flip
+            const baseCanvas = document.createElement('canvas');
+            const baseCtx = baseCanvas.getContext('2d');
+            baseCanvas.width = currentImage.width;
+            baseCanvas.height = currentImage.height;
+            baseCtx.drawImage(canvas, 0, 0);
+            
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = currentImage.width;
+            tempCanvas.height = currentImage.height;
+            
+            // Flip horizontal
+            tempCtx.translate(tempCanvas.width, 0);
+            tempCtx.scale(-1, 1);
+            tempCtx.drawImage(baseCanvas, 0, 0);
+            
+            const newImg = new Image();
+            newImg.onload = function() {
+                currentImage = newImg;
+                
+                // Réinitialiser les ajustements car intégrés
+                currentBrightness = 0;
+                currentContrast = 0;
+                currentSaturation = 0;
+                currentSharpness = 0;
+                currentFilter = 'none';
+                
+                // Mettre à jour les sliders
+                if (document.getElementById('brightness')) {
+                    document.getElementById('brightness').value = 0;
+                    document.getElementById('contrast').value = 0;
+                    document.getElementById('saturation').value = 0;
+                    document.getElementById('sharpness').value = 0;
+                    document.getElementById('brightnessValue').textContent = '0';
+                    document.getElementById('contrastValue').textContent = '0';
+                    document.getElementById('saturationValue').textContent = '0';
+                    document.getElementById('sharpnessValue').textContent = '0';
+                }
+                
+                // Réinitialiser filtre
+                document.querySelectorAll('#panel-filters .format-btn').forEach((btn, i) => {
+                    btn.classList.remove('active');
+                    if (i === 0) btn.classList.add('active');
+                });
+                if (document.getElementById('activeFilter')) {
+                    document.getElementById('activeFilter').textContent = 'Original';
+                }
+                
+                drawImage(newImg);
+                updateStats();
+            };
+            newImg.src = tempCanvas.toDataURL();
+        }
+        
+        function flipVertical() {
+            if (!currentImage) return;
+            
+            // Appliquer définitivement les ajustements/filtres avant flip
+            const baseCanvas = document.createElement('canvas');
+            const baseCtx = baseCanvas.getContext('2d');
+            baseCanvas.width = currentImage.width;
+            baseCanvas.height = currentImage.height;
+            baseCtx.drawImage(canvas, 0, 0);
+            
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = currentImage.width;
+            tempCanvas.height = currentImage.height;
+            
+            // Flip vertical
+            tempCtx.translate(0, tempCanvas.height);
+            tempCtx.scale(1, -1);
+            tempCtx.drawImage(baseCanvas, 0, 0);
+            
+            const newImg = new Image();
+            newImg.onload = function() {
+                currentImage = newImg;
+                
+                // Réinitialiser les ajustements car intégrés
+                currentBrightness = 0;
+                currentContrast = 0;
+                currentSaturation = 0;
+                currentSharpness = 0;
+                currentFilter = 'none';
+                
+                // Mettre à jour les sliders
+                if (document.getElementById('brightness')) {
+                    document.getElementById('brightness').value = 0;
+                    document.getElementById('contrast').value = 0;
+                    document.getElementById('saturation').value = 0;
+                    document.getElementById('sharpness').value = 0;
+                    document.getElementById('brightnessValue').textContent = '0';
+                    document.getElementById('contrastValue').textContent = '0';
+                    document.getElementById('saturationValue').textContent = '0';
+                    document.getElementById('sharpnessValue').textContent = '0';
+                }
+                
+                // Réinitialiser filtre
+                document.querySelectorAll('#panel-filters .format-btn').forEach((btn, i) => {
+                    btn.classList.remove('active');
+                    if (i === 0) btn.classList.add('active');
+                });
+                if (document.getElementById('activeFilter')) {
+                    document.getElementById('activeFilter').textContent = 'Original';
+                }
+                
+                drawImage(newImg);
+                updateStats();
+            };
+            newImg.src = tempCanvas.toDataURL();
+        }
+        
+        // COMPRESS FUNCTIONS
+        function updateCompression() {
+            if (!canvas || !currentImage) return;
+            
+            const quality = parseInt(document.getElementById('quality').value);
+            document.getElementById('qualityValue').textContent = quality + '%';
+            
+            // Taille originale (PNG)
+            const originalDataUrl = canvas.toDataURL('image/png');
+            const originalSize = Math.round((originalDataUrl.length * 3) / 4);
+            
+            // Taille compressée (JPEG avec qualité)
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', quality / 100);
+            const compressedSize = Math.round((compressedDataUrl.length * 3) / 4);
+            
+            // Calcul du gain
+            const gain = Math.round(((originalSize - compressedSize) / originalSize) * 100);
+            
+            document.getElementById('originalSize').textContent = formatBytes(originalSize);
+            document.getElementById('compressedSize').textContent = formatBytes(compressedSize);
+            document.getElementById('compressionGain').textContent = gain >= 0 ? gain + '% économisés' : '0%';
+        }
+        
+        function downloadCompressed() {
+            if (!canvas || !currentImage) return;
+            
+            const quality = parseInt(document.getElementById('quality').value) / 100;
+            const link = document.createElement('a');
+            link.download = 'image-compressed-' + Date.now() + '.jpg';
+            link.href = canvas.toDataURL('image/jpeg', quality);
+            
+            // Ajouter au DOM, cliquer, puis retirer
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+        }
+        
+        // FILTER FUNCTIONS
+        function applyFilter(filterName) {
+            if (!currentImage) return;
+            
+            currentFilter = filterName;
+            
+            // Activer visuellement le bouton
+            document.querySelectorAll('#panel-filters .format-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Mettre à jour le nom du filtre actif
+            const filterNames = {
+                'none': 'Original',
+                'grayscale': 'Noir & Blanc',
+                'sepia': 'Sépia',
+                'invert': 'Inversion',
+                'vintage': 'Vintage',
+                'warm': 'Chaleureux',
+                'cool': 'Froid',
+                'contrast': 'Contraste+'
+            };
+            document.getElementById('activeFilter').textContent = filterNames[filterName];
+            
+            // Redessiner avec le filtre
+            drawImage(currentImage);
+        }
+        
+        // CONVERT FUNCTIONS
+        function selectFormat(format) {
+            selectedFormat = format;
+            
+            // Activer visuellement le bouton
+            document.querySelectorAll('#panel-convert .format-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Afficher section qualité uniquement pour JPG
+            if (format === 'jpg') {
+                document.getElementById('jpgQualitySection').style.display = 'block';
+            } else {
+                document.getElementById('jpgQualitySection').style.display = 'none';
+            }
+        }
+        
+        function updateConvertQuality() {
+            const quality = document.getElementById('convertQuality').value;
+            document.getElementById('convertQualityValue').textContent = quality + '%';
+        }
+        
+        function downloadConverted() {
+            if (!canvas || !currentImage) return;
+            
+            const link = document.createElement('a');
+            let mimeType, extension;
+            
+            if (selectedFormat === 'png') {
+                mimeType = 'image/png';
+                extension = 'png';
+                link.href = canvas.toDataURL(mimeType);
+            } else if (selectedFormat === 'jpg') {
+                mimeType = 'image/jpeg';
+                extension = 'jpg';
+                const quality = parseInt(document.getElementById('convertQuality').value) / 100;
+                link.href = canvas.toDataURL(mimeType, quality);
+            } else if (selectedFormat === 'webp') {
+                mimeType = 'image/webp';
+                extension = 'webp';
+                link.href = canvas.toDataURL(mimeType, 0.9);
+            }
+            
+            link.download = 'image-converted-' + Date.now() + '.' + extension;
+            
+            // Ajouter au DOM, cliquer, puis retirer
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
