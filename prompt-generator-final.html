@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Prompts Copywriting AI</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e40af;
+            --success: #10b981;
+            --gray-200: #e5e7eb;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+            --dark-bg: #0a0e27;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background: var(--dark-bg);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2em; font-weight: 700; margin-bottom: 10px; }
+        .header p { font-size: 1.1em; opacity: 0.95; }
+        .content { padding: 40px; }
+        
+        .type-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        .type-card {
+            padding: 25px 15px;
+            border: 3px solid var(--gray-200);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+        .type-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.2);
+        }
+        .type-card.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #2563eb15 0%, #1e40af15 100%);
+        }
+        .type-icon { font-size: 2em; margin-bottom: 10px; }
+        .type-label { font-weight: 600; font-size: 0.95em; }
+        
+        .form-section { display: none; margin-top: 30px; }
+        .form-section.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group { margin-bottom: 25px; }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--gray-800);
+        }
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .form-group textarea { min-height: 100px; resize: vertical; }
+        .help-text { font-size: 0.85em; color: var(--gray-600); margin-top: 5px; }
+        
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .radio-option { position: relative; }
+        .radio-option input[type="radio"] { position: absolute; opacity: 0; }
+        .radio-option label {
+            display: block;
+            padding: 12px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+        .radio-option input[type="radio"]:checked + label {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #2563eb15 0%, #1e40af15 100%);
+            color: var(--primary);
+        }
+        
+        .btn {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+        }
+        
+        .result-section { display: none; margin-top: 30px; }
+        .result-section.active { display: block; animation: fadeIn 0.3s; }
+        
+        .prompt-box {
+            background: #f9fafb;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            position: relative;
+        }
+        .prompt-text {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            color: var(--gray-800);
+        }
+        .copy-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .copy-btn:hover { background: var(--secondary); }
+        .copy-btn.copied { background: var(--success); }
+        
+        .ai-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .ai-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #2563eb15 0%, #1e40af15 100%);
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .ai-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+        }
+        .ai-icon { font-size: 1.5em; }
+        
+        .instructions {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .instructions h3 { color: #92400e; margin-bottom: 10px; }
+        .instructions ol { margin-left: 20px; color: #78350f; }
+        .instructions li { margin: 8px 0; }
+        
+        .tip-box {
+            background: #dbeafe;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .tip-box h3 { color: #1e40af; margin-bottom: 10px; }
+        .tip-box ul { color: #1e3a8a; margin-left: 20px; line-height: 1.8; }
+        
+        .pro-tip {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .pro-tip h3 { color: #065f46; margin-bottom: 10px; font-size: 1.1em; }
+        .pro-tip p { color: #047857; line-height: 1.6; margin: 8px 0; }
+        .pro-tip ul { color: #047857; margin-left: 20px; line-height: 1.8; margin-top: 10px; }
+        
+        @media (max-width: 768px) {
+            .header { padding: 30px 20px; }
+            .header h1 { font-size: 1.5em; }
+            .content { padding: 25px 20px; }
+            .type-selector { grid-template-columns: repeat(2, 1fr); }
+            .ai-links { grid-template-columns: 1fr; }
+            .copy-btn { position: static; width: 100%; margin-top: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>Générateur de Prompts Copywriting AI</h1>
+                <p>Créez des prompts optimisés pour générer du contenu marketing professionnel</p>
+            </div>
+
+            <div class="content">
+                <!-- Type Selection -->
+                <div id="typeSelection">
+                    <h2 style="margin-bottom: 25px; color: var(--gray-800);">Quel type de contenu voulez-vous créer ?</h2>
+                    
+                    <div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                        <h3 style="color: #92400e; margin-bottom: 10px;">💡 Conseil Important</h3>
+                        <p style="color: #78350f; margin: 0;">Plus votre formulaire sera précis et détaillé, meilleur sera le prompt généré. Cliquez sur un type pour commencer !</p>
+                    </div>
+                    
+                    <div class="type-selector">
+                        <div class="type-card" data-type="email">
+                            <div class="type-icon">📧</div>
+                            <div class="type-label">Email Marketing</div>
+                        </div>
+                        <div class="type-card" data-type="post">
+                            <div class="type-icon">📱</div>
+                            <div class="type-label">Post Réseaux</div>
+                        </div>
+                        <div class="type-card" data-type="newsletter">
+                            <div class="type-icon">📰</div>
+                            <div class="type-label">Newsletter</div>
+                        </div>
+                        <div class="type-card" data-type="ad">
+                            <div class="type-icon">🎯</div>
+                            <div class="type-label">Publicité</div>
+                        </div>
+                        <div class="type-card" data-type="pitch">
+                            <div class="type-icon">🎤</div>
+                            <div class="type-label">Pitch Elevator</div>
+                        </div>
+                        <div class="type-card" data-type="sales">
+                            <div class="type-icon">📄</div>
+                            <div class="type-label">Page de Vente</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Form -->
+                <div id="emailForm" class="form-section">
+                    <h2 style="margin-bottom: 25px;">📧 Email Marketing</h2>
+                    
+                    <div class="tip-box">
+                        <h3>✨ Astuces pour un email performant</h3>
+                        <ul>
+                            <li><strong>Audience :</strong> Soyez ultra-précis (âge, secteur, CA, problème spécifique)</li>
+                            <li><strong>Bénéfice :</strong> Chiffrez si possible (+X%, économie de X€, X temps gagné)</li>
+                            <li><strong>CTA :</strong> Action claire et immédiate (ex: "Télécharger le PDF" plutôt que "En savoir plus")</li>
+                            <li><strong>Ton éducatif :</strong> Pour nurturing et fidélisation</li>
+                            <li><strong>Ton persuasif :</strong> Pour vente directe ou inscription payante</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Objectif de l'email :</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="obj1" name="emailObjective" value="educatif" checked>
+                                <label for="obj1">Éducatif</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="obj2" name="emailObjective" value="promo">
+                                <label for="obj2">Promotionnel</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="obj3" name="emailObjective" value="engagement">
+                                <label for="obj3">Engagement</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>À qui s'adresse cet email ?</label>
+                        <input type="text" id="emailTarget" placeholder="Ex: Artisans entrepreneurs, CA 50-150k€" required>
+                        <div class="help-text">Décrivez votre audience cible</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Sujet principal de l'email :</label>
+                        <input type="text" id="emailSubject" placeholder="Ex: Nouvelle stratégie email marketing" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Quel est le message clé / bénéfice principal ?</label>
+                        <textarea id="emailBenefit" placeholder="Ex: Augmenter vos ventes de 35% grâce à l'email storytelling" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Action souhaitée (CTA) :</label>
+                        <input type="text" id="emailCTA" placeholder="Ex: Télécharger le guide, S'inscrire au webinar" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ton souhaité :</label>
+                        <select id="emailTone">
+                            <option value="educatif">Éducatif / Informatif</option>
+                            <option value="persuasif">Persuasif / Commercial</option>
+                            <option value="inspirant">Inspirant / Motivant</option>
+                            <option value="urgent">Direct / Urgence</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="generatePrompt('email')">Générer le Prompt 🚀</button>
+                </div>
+
+                <!-- Post Form -->
+                <div id="postForm" class="form-section">
+                    <h2 style="margin-bottom: 25px;">📱 Post Réseaux Sociaux</h2>
+                    
+                    <div class="tip-box">
+                        <h3>✨ Astuces pour un post viral</h3>
+                        <ul>
+                            <li><strong>LinkedIn :</strong> Storytelling professionnel, insights métier, format long (1300+ caractères)</li>
+                            <li><strong>Instagram :</strong> Visuel d'abord, texte court, hashtags stratégiques, ton accessible</li>
+                            <li><strong>Facebook :</strong> Conversationnel, questions ouvertes, encourage partages et commentaires</li>
+                            <li><strong>Hook :</strong> Première ligne CRUCIALE - question, chiffre choc, ou affirmation audacieuse</li>
+                            <li><strong>Valeur :</strong> Conseils actionnables, pas de blabla générique</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Plateforme :</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="plat1" name="platform" value="linkedin" checked>
+                                <label for="plat1">LinkedIn</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="plat2" name="platform" value="instagram">
+                                <label for="plat2">Instagram</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="plat3" name="platform" value="facebook">
+                                <label for="plat3">Facebook</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Sujet du post :</label>
+                        <input type="text" id="postSubject" placeholder="Ex: Lancer son entreprise à 40 ans" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Message clé / Valeur apportée :</label>
+                        <textarea id="postValue" placeholder="Ex: 5 conseils pour réussir sa reconversion" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>À qui vous vous adressez :</label>
+                        <input type="text" id="postTarget" placeholder="Ex: Entrepreneurs en reconversion" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ton souhaité :</label>
+                        <select id="postTone">
+                            <option value="educatif">Éducatif / Informatif</option>
+                            <option value="inspirant">Inspirant / Motivant</option>
+                            <option value="personnel">Personnel / Storytelling</option>
+                            <option value="provocateur">Provocateur / Contrarian</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="generatePrompt('post')">Générer le Prompt 🚀</button>
+                </div>
+
+                <!-- Newsletter Form -->
+                <div id="newsletterForm" class="form-section">
+                    <h2 style="margin-bottom: 25px;">📰 Newsletter</h2>
+                    
+                    <div class="tip-box">
+                        <h3>✨ Astuces pour une newsletter attendue</h3>
+                        <ul>
+                            <li><strong>Thème :</strong> Spécifique et actionnable (ex: "5 outils IA de janvier 2025" plutôt que "Actualités IA")</li>
+                            <li><strong>Sections :</strong> 3 idéal (scannable), 4-5 si expertise approfondie</li>
+                            <li><strong>Valeur :</strong> Mix actualité + conseil pratique + outil/ressource</li>
+                            <li><strong>Scannable :</strong> Titres clairs, listes, gras sur mots-clés</li>
+                            <li><strong>Régularité :</strong> Mentionnez fréquence (hebdo, bimensuel) pour fidéliser</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Thème principal :</label>
+                        <input type="text" id="newsTheme" placeholder="Ex: Les outils indispensables pour 2025" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nombre de sections / sujets :</label>
+                        <input type="number" id="newsSections" value="3" min="2" max="5" required>
+                        <div class="help-text">Entre 2 et 5 sections</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Audience :</label>
+                        <input type="text" id="newsTarget" placeholder="Ex: Micro-entrepreneurs du digital" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Valeur apportée :</label>
+                        <textarea id="newsValue" placeholder="Ex: Actualités secteur + outils pratiques + retour d'expérience" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ton souhaité :</label>
+                        <select id="newsTone">
+                            <option value="educatif">Éducatif / Informatif</option>
+                            <option value="expert">Expert / Analyse</option>
+                            <option value="casual">Casual / Conversationnel</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="generatePrompt('newsletter')">Générer le Prompt 🚀</button>
+                </div>
+
+                <!-- Ad Form -->
+                <div id="adForm" class="form-section">
+                    <h2 style="margin-bottom: 25px;">🎯 Publicité</h2>
+                    
+                    <div class="tip-box">
+                        <h3>✨ Astuces pour une pub qui convertit</h3>
+                        <ul>
+                            <li><strong>Audience :</strong> Ultra-ciblée (âge, profession, centres d'intérêt, comportements)</li>
+                            <li><strong>Bénéfice :</strong> Chiffré et immédiat ("+35% ventes", "Économisez 2h/jour")</li>
+                            <li><strong>Offre :</strong> Créer urgence (-50% expire dimanche, 20 places restantes)</li>
+                            <li><strong>Angle Problème :</strong> Pour audience consciente du problème</li>
+                            <li><strong>Angle Bénéfice :</strong> Pour produit aspirationnel/désirable</li>
+                            <li><strong>Test A/B :</strong> Ce prompt génère plusieurs variantes à tester</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Plateforme publicitaire :</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="adplat1" name="adPlatform" value="meta" checked>
+                                <label for="adplat1">Meta (FB/IG)</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="adplat2" name="adPlatform" value="google">
+                                <label for="adplat2">Google Ads</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="adplat3" name="adPlatform" value="linkedin">
+                                <label for="adplat3">LinkedIn Ads</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Produit / Service :</label>
+                        <input type="text" id="adProduct" placeholder="Ex: Formation copywriting" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Audience cible :</label>
+                        <input type="text" id="adTarget" placeholder="Ex: Entrepreneurs, 30-50 ans, intéressés par le marketing" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Problème résolu / Bénéfice principal :</label>
+                        <textarea id="adBenefit" placeholder="Ex: Doubler vos ventes grâce à des emails percutants" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Offre / Promotion :</label>
+                        <input type="text" id="adOffer" placeholder="Ex: -40% jusqu'à dimanche, Essai gratuit 14 jours" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Angle créatif :</label>
+                        <select id="adAngle">
+                            <option value="probleme">Problème → Solution</option>
+                            <option value="benefice">Bénéfice immédiat</option>
+                            <option value="urgence">Urgence / FOMO</option>
+                            <option value="preuve">Preuve sociale</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="generatePrompt('ad')">Générer le Prompt 🚀</button>
+                </div>
+
+                <!-- Pitch Form -->
+                <div id="pitchForm" class="form-section">
+                    <h2 style="margin-bottom: 25px;">🎤 Pitch Elevator</h2>
+                    
+                    <div class="tip-box">
+                        <h3>✨ Astuces pour un pitch mémorable</h3>
+                        <ul>
+                            <li><strong>Client idéal :</strong> Niche précise (secteur, taille CA, problème spécifique)</li>
+                            <li><strong>Problème :</strong> Formuler le coût (temps perdu, argent, opportunités ratées)</li>
+                            <li><strong>Solution :</strong> Votre méthode unique, pas ce que tout le monde fait</li>
+                            <li><strong>Résultat :</strong> TOUJOURS chiffré (+X%, X€ économisés, X temps gagné)</li>
+                            <li><strong>15s :</strong> Networking rapide, format pub</li>
+                            <li><strong>30s :</strong> Rencontre professionnelle, conversationnel</li>
+                            <li><strong>60s :</strong> Présentation approfondie, storytelling complet</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Votre activité :</label>
+                        <input type="text" id="pitchActivity" placeholder="Ex: Copywriter email marketing" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Client idéal :</label>
+                        <input type="text" id="pitchTarget" placeholder="Ex: Artisans fait-main, CA 50-150k€" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Problème résolu :</label>
+                        <textarea id="pitchProblem" placeholder="Ex: Ventes irrégulières, pas de stratégie email" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Votre solution :</label>
+                        <textarea id="pitchSolution" placeholder="Ex: Email storytelling pour produits artisanaux" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Résultat obtenu :</label>
+                        <input type="text" id="pitchResult" placeholder="Ex: +35% de ventes en 3 mois" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Durée du pitch :</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="dur1" name="pitchDuration" value="15" checked>
+                                <label for="dur1">15 secondes</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="dur2" name="pitchDuration" value="30">
+                                <label for="dur2">30 secondes</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="dur3" name="pitchDuration" value="60">
+                                <label for="dur3">60 secondes</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="generatePrompt('pitch')">Générer le Prompt 🚀</button>
+                </div>
+
+                <!-- Sales Form -->
+                <div id="salesForm" class="form-section">
+                    <h2 style="margin-bottom: 25px;">📄 Page de Vente</h2>
+                    
+                    <div class="tip-box">
+                        <h3>✨ Astuces pour une page qui vend</h3>
+                        <ul>
+                            <li><strong>Audience :</strong> Avatar précis (âge, revenus, problèmes, objections)</li>
+                            <li><strong>Problème :</strong> Décrire le coût émotionnel + financier de l'inaction</li>
+                            <li><strong>Transformation :</strong> Avant/après très visuel et spécifique</li>
+                            <li><strong>Offre :</strong> Détailler TOUS les éléments (modules, bonus, accès, support)</li>
+                            <li><strong>Garantie :</strong> Plus elle est forte, plus elle rassure (30j, 60j, 90j)</li>
+                            <li><strong>Page courte :</strong> Produit < 200€, audience chaude, peu d'objections</li>
+                            <li><strong>Page longue :</strong> Produit > 500€, audience froide, beaucoup d'objections</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Produit / Service :</label>
+                        <input type="text" id="salesProduct" placeholder="Ex: Formation email marketing" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Prix :</label>
+                        <input type="text" id="salesPrice" placeholder="Ex: 297€" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Audience cible :</label>
+                        <input type="text" id="salesTarget" placeholder="Ex: Entrepreneurs e-commerce, 0-2 ans d'activité" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Problème principal résolu :</label>
+                        <textarea id="salesProblem" placeholder="Ex: Chiffre d'affaires irrégulier, dépendance aux publicités" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Transformation promise :</label>
+                        <textarea id="salesTransform" placeholder="Ex: De 0 à 5000€/mois de revenus email récurrents" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Éléments de l'offre :</label>
+                        <textarea id="salesOffer" placeholder="Ex: 8 modules vidéo + templates emails + accès groupe privé" required></textarea>
+                        <div class="help-text">Listez tous les éléments inclus</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Garantie :</label>
+                        <input type="text" id="salesGuarantee" placeholder="Ex: Satisfait ou remboursé 30 jours" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Type de page :</label>
+                        <select id="salesType">
+                            <option value="courte">Courte (produit simple)</option>
+                            <option value="longue">Longue (produit premium)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="generatePrompt('sales')">Générer le Prompt 🚀</button>
+                </div>
+
+                <!-- Newsletter, Ad, Pitch, Sales forms - Je les abrège pour la longueur, mais structure identique -->
+
+                <!-- Result Section -->
+                <div id="resultSection" class="result-section">
+                    <h2 style="margin-bottom: 20px; color: var(--success);">✅ Votre Prompt est Prêt !</h2>
+
+                    <div class="instructions">
+                        <h3>📋 Comment utiliser ce prompt :</h3>
+                        <ol>
+                            <li>Cliquez sur "📋 Copier le Prompt" ci-dessous</li>
+                            <li>Ouvrez Claude.ai ou ChatGPT via les liens</li>
+                            <li>Collez le prompt dans la conversation</li>
+                            <li>L'IA générera votre contenu professionnel !</li>
+                        </ol>
+                    </div>
+
+                    <div class="prompt-box">
+                        <button class="copy-btn" onclick="copyPrompt()">📋 Copier le Prompt</button>
+                        <div class="prompt-text" id="generatedPrompt"></div>
+                    </div>
+
+                    <div class="pro-tip">
+                        <h3>💡 OPTIMISEZ VOTRE RÉSULTAT</h3>
+                        <p>L'IA va générer un contenu professionnel complet.</p>
+                        <p><strong>Pour l'améliorer :</strong></p>
+                        <ul>
+                            <li>Demandez 2-3 variantes et combinez le meilleur</li>
+                            <li>Personnalisez avec vos exemples concrets</li>
+                            <li>Affinez : "Rends le hook plus percutant", "Raccourcis de 20%"</li>
+                        </ul>
+                        <p style="margin-top: 10px;">💬 <strong>Poursuivez la conversation avec l'IA pour affiner !</strong></p>
+                    </div>
+
+                    <div class="ai-links">
+                        <a href="https://claude.ai" target="_blank" class="ai-link">
+                            <span class="ai-icon">🤖</span>
+                            <span>Essayer sur Claude.ai</span>
+                        </a>
+                        <a href="https://chat.openai.com" target="_blank" class="ai-link">
+                            <span class="ai-icon">💬</span>
+                            <span>Essayer sur ChatGPT</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var currentType = '';
+
+        document.querySelectorAll('.type-card').forEach(function(card) {
+            card.addEventListener('click', function() {
+                var type = this.getAttribute('data-type');
+                selectType(type);
+            });
+        });
+
+        function selectType(type) {
+            currentType = type;
+            
+            document.querySelectorAll('.type-card').forEach(function(card) {
+                card.classList.remove('active');
+            });
+            document.querySelector('.type-card[data-type="' + type + '"]').classList.add('active');
+            
+            document.querySelectorAll('.form-section').forEach(function(form) {
+                form.classList.remove('active');
+            });
+            
+            document.getElementById('resultSection').classList.remove('active');
+            
+            document.getElementById(type + 'Form').classList.add('active');
+            
+            window.scrollTo({ top: 300, behavior: 'smooth' });
+        }
+
+        function generatePrompt(type) {
+            var prompt = '';
+            
+            if (type === 'email') {
+                var objective = document.querySelector('input[name="emailObjective"]:checked').value;
+                var target = document.getElementById('emailTarget').value;
+                var subject = document.getElementById('emailSubject').value;
+                var benefit = document.getElementById('emailBenefit').value;
+                var cta = document.getElementById('emailCTA').value;
+                var tone = document.getElementById('emailTone').value;
+                
+                var toneDesc = {
+                    'educatif': 'éducatif et informatif, apporte de la valeur sans pression commerciale',
+                    'persuasif': 'persuasif et commercial, pousse à l\'action avec des techniques de copywriting',
+                    'inspirant': 'inspirant et motivant, crée l\'émotion et l\'engagement',
+                    'urgent': 'direct avec urgence, appel à l\'action immédiat'
+                };
+                
+                prompt = `Tu es un expert en copywriting email marketing. Rédige un email professionnel avec cette structure :
+
+CONTEXTE :
+- Audience cible : ${target}
+- Objectif : ${objective}
+- Sujet principal : ${subject}
+- Bénéfice clé : ${benefit}
+- Action souhaitée : ${cta}
+- Ton : ${toneDesc[tone]}
+
+STRUCTURE À RESPECTER (AIDA) :
+1. OBJET : Accrocheur, spécifique, crée la curiosité (max 50 caractères)
+2. HOOK : Première phrase qui capte l'attention (question, statistique, ou affirmation forte)
+3. PROBLÈME : Identifier la douleur/frustration de l'audience (2-3 phrases)
+4. SOLUTION : Présenter le bénéfice/valeur apportée (3-4 phrases)
+5. PREUVE : Ajouter crédibilité (témoignage court, chiffre, ou garantie)
+6. CTA : Appel à l'action clair et spécifique
+7. PS : Rappel urgence ou bénéfice oublié
+
+RÈGLES COPYWRITING :
+- Phrases courtes et percutantes
+- Utiliser "vous" (tutoiement ou vouvoiement selon la cible)
+- Spécificité > généralité (chiffres précis)
+- Bénéfices > caractéristiques
+- Un seul objectif par email
+- Grammaire et orthographe parfaites
+
+LONGUEUR : 150-250 mots maximum
+
+Génère l'email complet maintenant.`;
+            } else if (type === 'post') {
+                var platform = document.querySelector('input[name="platform"]:checked').value;
+                var subject = document.getElementById('postSubject').value;
+                var value = document.getElementById('postValue').value;
+                var target = document.getElementById('postTarget').value;
+                var tone = document.getElementById('postTone').value;
+                
+                prompt = `Tu es un expert en copywriting pour ${platform}. Crée un post viral sur : ${subject}
+
+AUDIENCE: ${target}
+VALEUR: ${value}
+TON: ${tone}
+
+Génère le post complet avec hook percutant.`;
+            } else if (type === 'newsletter') {
+                var theme = document.getElementById('newsTheme').value;
+                var sections = document.getElementById('newsSections').value;
+                var target = document.getElementById('newsTarget').value;
+                var value = document.getElementById('newsValue').value;
+                var tone = document.getElementById('newsTone').value;
+                
+                var toneDesc = {
+                    'educatif': 'éducatif et informatif, apporte de la valeur concrète',
+                    'expert': 'expert et analytique, insights poussés',
+                    'casual': 'casual et conversationnel, accessible et engageant'
+                };
+                
+                prompt = `Tu es un expert en rédaction de newsletters professionnelles. Crée une newsletter complète et engageante.
+
+CONTEXTE :
+- Thème principal : ${theme}
+- Nombre de sections : ${sections}
+- Audience : ${target}
+- Valeur apportée : ${value}
+- Ton : ${toneDesc[tone]}
+
+STRUCTURE NEWSLETTER :
+1. INTRO ACCROCHEUSE : 2-3 phrases qui contextualise le thème et crée l'intérêt
+2. ${sections} SECTIONS DISTINCTES :
+   - Chaque section avec titre clair
+   - Contenu de valeur (conseil, actualité, outil, insight)
+   - 50-100 mots par section
+3. CONCLUSION : Synthèse et invitation à l'action
+4. PS : Rappel ou teasing prochaine édition
+
+RÈGLES COPYWRITING :
+- Titres de section accrocheurs et spécifiques
+- Contenu scannable (bullets, listes, gras)
+- Ton cohérent ${toneDesc[tone]}
+- Valeur immédiate et actionnable
+
+LONGUEUR TOTALE : 400-600 mots
+
+Génère la newsletter complète maintenant.`;
+            } else if (type === 'ad') {
+                var platform = document.querySelector('input[name="adPlatform"]:checked').value;
+                var product = document.getElementById('adProduct').value;
+                var target = document.getElementById('adTarget').value;
+                var benefit = document.getElementById('adBenefit').value;
+                var offer = document.getElementById('adOffer').value;
+                var angle = document.getElementById('adAngle').value;
+                
+                var platformSpecs = {
+                    'meta': 'Meta Ads (Facebook/Instagram) - Titre 40 caractères, texte principal 125 caractères',
+                    'google': 'Google Ads - 3 titres de 30 caractères, 2 descriptions de 90 caractères',
+                    'linkedin': 'LinkedIn Ads - Titre 70 caractères, texte introductif 150 caractères'
+                };
+                
+                var angleDesc = {
+                    'probleme': 'Angle Problème → Solution : Agiter la douleur puis présenter la solution',
+                    'benefice': 'Angle Bénéfice : Focus sur le résultat/transformation immédiate',
+                    'urgence': 'Angle Urgence/FOMO : Créer la peur de rater l\'opportunité',
+                    'preuve': 'Angle Preuve Sociale : Mettre en avant résultats et témoignages'
+                };
+                
+                prompt = `Tu es un expert en copywriting publicitaire. Crée une publicité optimisée pour ${platformSpecs[platform]}.
+
+CONTEXTE :
+- Plateforme : ${platform}
+- Produit/Service : ${product}
+- Audience : ${target}
+- Bénéfice principal : ${benefit}
+- Offre/Promotion : ${offer}
+- Angle créatif : ${angleDesc[angle]}
+
+RÈGLES COPYWRITING PUB :
+- Spécificité maximale (chiffres, délais, résultats)
+- Bénéfice immédiat et tangible
+- Urgence/rareté intégrée
+- CTA clair et orienté action
+- Respect strict des limites de caractères
+
+Génère toutes les variantes de pub maintenant.`;
+            } else if (type === 'pitch') {
+                var activity = document.getElementById('pitchActivity').value;
+                var target = document.getElementById('pitchTarget').value;
+                var problem = document.getElementById('pitchProblem').value;
+                var solution = document.getElementById('pitchSolution').value;
+                var result = document.getElementById('pitchResult').value;
+                var duration = document.querySelector('input[name="pitchDuration"]:checked').value;
+                
+                prompt = `Tu es un expert en création de pitchs elevator professionnels. Crée un pitch de ${duration} secondes (~${Math.floor(duration * 2.5)} mots).
+
+CONTEXTE :
+- Activité : ${activity}
+- Client idéal : ${target}
+- Problème résolu : ${problem}
+- Solution proposée : ${solution}
+- Résultat obtenu : ${result}
+- Durée : ${duration} secondes
+
+STRUCTURE PITCH ${duration}s :
+${duration === '15' ? `1. QUI : Client cible + problème (1 phrase)
+2. SOLUTION : Ce que tu fais (1 phrase)
+3. RÉSULTAT : Bénéfice chiffré (1 phrase)
+4. CTA : Appel à l'échange` : ''}
+${duration === '30' ? `1. CIBLE & PROBLÈME : Qui tu aides + leur défi (2 phrases)
+2. SOLUTION : Comment tu les aides de façon unique (2 phrases)
+3. RÉSULTAT : Transformation/chiffres (1-2 phrases)
+4. CTA : Invitation à échanger` : ''}
+${duration === '60' ? `1. CONTEXTE : Qui sont tes clients + leur situation (2-3 phrases)
+2. PROBLÈME : Le défi qu'ils rencontrent et son coût (2 phrases)
+3. SOLUTION : Ta méthode/approche unique (2-3 phrases)
+4. RÉSULTATS : Transformation concrète avec chiffres (2 phrases)
+5. DIFFÉRENCIATION : Ce qui te rend unique (1-2 phrases)
+6. CTA : Proposition d'échange clair` : ''}
+
+RÈGLES COPYWRITING PITCH :
+- Phrases courtes et percutantes
+- Spécificité maximale (chiffres, délais, secteurs)
+- Fluide à l'oral
+- ${duration === '15' ? 'Ultra-concis, format pub' : duration === '30' ? 'Conversationnel et engageant' : 'Storytelling avec détails'}
+
+LONGUEUR : ~${Math.floor(duration * 2.5)} mots (respecter strictement)
+
+Génère le pitch complet maintenant.`;
+            } else if (type === 'sales') {
+                var product = document.getElementById('salesProduct').value;
+                var price = document.getElementById('salesPrice').value;
+                var target = document.getElementById('salesTarget').value;
+                var problem = document.getElementById('salesProblem').value;
+                var transform = document.getElementById('salesTransform').value;
+                var offer = document.getElementById('salesOffer').value;
+                var guarantee = document.getElementById('salesGuarantee').value;
+                var salesType = document.getElementById('salesType').value;
+                
+                prompt = `Tu es un expert en copywriting de pages de vente. Crée une page de vente ${salesType === 'courte' ? 'courte (1000-1500 mots)' : 'longue (2500-3500 mots)'} avec structure complète.
+
+CONTEXTE PRODUIT :
+- Produit/Service : ${product}
+- Prix : ${price}
+- Audience : ${target}
+- Problème résolu : ${problem}
+- Transformation : ${transform}
+- Éléments inclus : ${offer}
+- Garantie : ${guarantee}
+
+STRUCTURE PAGE DE VENTE (12 SECTIONS) :
+1. HOOK + URGENCE : Barre urgence + titre accrocheur + sous-titre avec preuve sociale
+2. AGITATION PROBLÈME : Identifier douleurs et frustrations (3-4 bullets)
+3. VISION TRANSFORMÉE : Projection future détaillée (scénario "imaginez-vous...")
+4. CRÉDIBILITÉ : Qui tu es + pourquoi tu peux aider
+5. RÉVÉLATION : Le "secret" ou insight que peu connaissent
+6. PRÉSENTATION SOLUTION : Nom produit + comment ça marche
+7. CONTENU DÉTAILLÉ : Modules/éléments avec bénéfices spécifiques
+8. PREUVES SOCIALES : 2-3 témoignages détaillés avec résultats
+9. OFFRE COMPLÈTE : Prix + stack value + bonus éventuels
+10. GARANTIE : Renverser risque + rassurer
+11. FAQ : 5-7 objections majeures avec réponses
+12. CLÔTURE : Alternative binaire + urgence finale + CTA
+
+RÈGLES COPYWRITING PAGE DE VENTE :
+- Titre avec promesse spécifique et mesurable
+- Hook émotionnel fort
+- Spécificité > généralité (chiffres partout)
+- CTA répété 3-4 fois minimum
+- Langage bénéfices pas caractéristiques
+- ${salesType === 'courte' ? 'Concis et direct, focus bénéfices' : 'Détaillé avec storytelling, lever toutes objections'}
+
+LONGUEUR : ${salesType === 'courte' ? '1000-1500 mots' : '2500-3500 mots'}
+
+Génère la page de vente complète maintenant.`;
+            }
+            
+            document.querySelectorAll('.form-section').forEach(function(form) {
+                form.classList.remove('active');
+            });
+            document.getElementById('resultSection').classList.add('active');
+            document.getElementById('generatedPrompt').textContent = prompt;
+            
+            window.scrollTo({ top: 300, behavior: 'smooth' });
+        }
+
+        function copyPrompt() {
+            var promptText = document.getElementById('generatedPrompt').textContent;
+            var copyBtn = document.querySelector('.copy-btn');
+            
+            navigator.clipboard.writeText(promptText).then(function() {
+                var originalText = copyBtn.textContent;
+                copyBtn.textContent = '✓ Copié !';
+                copyBtn.classList.add('copied');
+                
+                setTimeout(function() {
+                    copyBtn.textContent = originalText;
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
