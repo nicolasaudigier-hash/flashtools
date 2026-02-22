@@ -211,6 +211,55 @@
             transform: translateY(-2px);
         }
 
+        .file-card.dragging {
+            opacity: 0.5;
+            border-color: var(--accent-violet);
+            transform: scale(0.95);
+        }
+
+        .file-card.drag-over {
+            border-color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.1);
+            transform: scale(1.02);
+        }
+
+        .file-card .drag-handle {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            color: var(--text-secondary);
+            cursor: grab;
+            font-size: 1.1em;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .file-card .drag-handle:hover {
+            color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        .file-card .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .file-order {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            font-size: 0.7em;
+            font-weight: 700;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .file-thumbnail {
             width: 100%;
             height: 100px;
@@ -709,8 +758,8 @@
                     <h2><span>🔗</span> Fusionner PDF</h2>
                     
                     <div class="info-box">
-                        <strong>Astuce pour garder l'ordre</strong>
-                        <p>Renommez vos PDFs : 1.pdf, 2.pdf, 3.pdf... puis sélectionnez-les tous. Ils seront fusionnés dans l'ordre alphabétique.</p>
+                        <strong>Réorganisez vos fichiers</strong>
+                        <p>Glissez-déposez les vignettes pour changer l'ordre de fusion. Le numéro indique la position dans le PDF final.</p>
                     </div>
                     
                     <div class="upload-zone" onclick="document.getElementById('merge-input').click()" id="merge-zone">
@@ -856,6 +905,11 @@
                 <!-- OUTIL 4: IMAGES → PDF -->
                 <div id="tool-image-to-pdf" class="tool-panel">
                     <h2><span>🖼️</span> Images → PDF</h2>
+                    
+                    <div class="info-box">
+                        <strong>Réorganisez vos images</strong>
+                        <p>Glissez-déposez les vignettes pour changer l'ordre des pages dans le PDF final.</p>
+                    </div>
                     
                     <div class="upload-zone" onclick="document.getElementById('image-input').click()">
                         <div class="upload-icon">📤</div>
@@ -1159,13 +1213,11 @@
                 </div>
 
                 <div class="guide-section">
-                    <h4>Méthode recommandée</h4>
-                    <p>Pour garder le bon ordre :</p>
+                    <h4>Comment réorganiser l'ordre ?</h4>
                     <ul>
-                        <li>Créez un dossier temporaire</li>
-                        <li>Renommez vos PDFs : 1.pdf, 2.pdf, 3.pdf...</li>
-                        <li>Sélectionnez tout (Ctrl+A)</li>
-                        <li>L'ordre alphabétique = ordre de fusion</li>
+                        <li><strong>Glisser-déposer</strong> : Maintenez le bouton ⋮⋮ et déplacez la vignette</li>
+                        <li><strong>Numéro</strong> : Le badge indique la position dans le PDF final</li>
+                        <li><strong>Supprimer</strong> : Cliquez sur × pour retirer un fichier</li>
                     </ul>
                 </div>
 
@@ -1450,14 +1502,76 @@
             mergeFiles.forEach((file, index) => {
                 const card = document.createElement('div');
                 card.className = 'file-card';
+                card.draggable = true;
+                card.dataset.index = index;
                 card.innerHTML = `
+                    <span class="drag-handle" title="Glisser pour réorganiser">⋮⋮</span>
+                    <span class="file-order">${index + 1}</span>
                     <div class="file-thumbnail">📄</div>
                     <div class="file-name">${file.name}</div>
                     <div class="file-size">${formatBytes(file.size)}</div>
                     <button class="file-remove" onclick="removeMergeFile(${index})">×</button>
                 `;
+                
+                // Drag events
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+                card.addEventListener('dragover', handleDragOver);
+                card.addEventListener('dragenter', handleDragEnter);
+                card.addEventListener('dragleave', handleDragLeave);
+                card.addEventListener('drop', handleDrop);
+                
                 container.appendChild(card);
             });
+        }
+
+        let draggedIndex = null;
+
+        function handleDragStart(e) {
+            draggedIndex = parseInt(this.dataset.index);
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', draggedIndex);
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            document.querySelectorAll('.file-card').forEach(card => {
+                card.classList.remove('drag-over');
+            });
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleDragEnter(e) {
+            e.preventDefault();
+            this.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            
+            const targetIndex = parseInt(this.dataset.index);
+            
+            if (draggedIndex === null || draggedIndex === targetIndex) return;
+            
+            // Réorganiser le tableau mergeFiles
+            const draggedFile = mergeFiles[draggedIndex];
+            mergeFiles.splice(draggedIndex, 1);
+            mergeFiles.splice(targetIndex, 0, draggedFile);
+            
+            // Mettre à jour l'affichage
+            displayMergeFiles();
+            
+            draggedIndex = null;
         }
 
         function removeMergeFile(index) {
@@ -1740,16 +1854,77 @@
                 reader.onload = function(e) {
                     const card = document.createElement('div');
                     card.className = 'file-card';
+                    card.draggable = true;
+                    card.dataset.index = index;
                     card.innerHTML = `
+                        <span class="drag-handle" title="Glisser pour réorganiser">⋮⋮</span>
+                        <span class="file-order">${index + 1}</span>
                         <img src="${e.target.result}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;">
                         <div class="file-name">${file.name}</div>
                         <div class="file-size">${formatBytes(file.size)}</div>
                         <button class="file-remove" onclick="removeImageFile(${index})">×</button>
                     `;
+                    
+                    // Drag events pour images
+                    card.addEventListener('dragstart', handleImageDragStart);
+                    card.addEventListener('dragend', handleImageDragEnd);
+                    card.addEventListener('dragover', handleImageDragOver);
+                    card.addEventListener('dragenter', handleImageDragEnter);
+                    card.addEventListener('dragleave', handleImageDragLeave);
+                    card.addEventListener('drop', handleImageDrop);
+                    
                     container.appendChild(card);
                 };
                 reader.readAsDataURL(file);
             });
+        }
+
+        let draggedImageIndex = null;
+
+        function handleImageDragStart(e) {
+            draggedImageIndex = parseInt(this.dataset.index);
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleImageDragEnd(e) {
+            this.classList.remove('dragging');
+            document.querySelectorAll('#image-files .file-card').forEach(card => {
+                card.classList.remove('drag-over');
+            });
+        }
+
+        function handleImageDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleImageDragEnter(e) {
+            e.preventDefault();
+            this.classList.add('drag-over');
+        }
+
+        function handleImageDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleImageDrop(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            
+            const targetIndex = parseInt(this.dataset.index);
+            
+            if (draggedImageIndex === null || draggedImageIndex === targetIndex) return;
+            
+            // Réorganiser le tableau imageFiles
+            const draggedFile = imageFiles[draggedImageIndex];
+            imageFiles.splice(draggedImageIndex, 1);
+            imageFiles.splice(targetIndex, 0, draggedFile);
+            
+            // Mettre à jour l'affichage
+            displayImageFiles();
+            
+            draggedImageIndex = null;
         }
 
         function removeImageFile(index) {
