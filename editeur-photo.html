@@ -5,11 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Éditeur Photo | FlashTools</title>
     <style>
+        :root {
+            --primary: #06b6d4;
+            --secondary: #8b5cf6;
+            --dark: #0f172a;
+            --darker: #020617;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+        }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background: #0a0e27;
+            background: var(--darker);
+            color: var(--text);
             min-height: 100vh;
             padding: 20px;
         }
@@ -18,25 +29,26 @@
         
         /* HEADER */
         .header {
-            background: white;
+            background: var(--dark);
             padding: 40px 30px;
-            border-radius: 20px;
+            border-radius: 16px;
             margin-bottom: 30px;
             text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
         }
         
         .header h1 {
             font-size: 2.5em;
-            font-weight: 800;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 10px;
         }
         
         .header p {
-            color: #64748b;
+            color: var(--text-muted);
             font-size: 1.1em;
         }
         
@@ -48,10 +60,10 @@
         }
         
         .panel {
-            background: white;
+            background: var(--dark);
             padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border-radius: 16px;
+            border: 1px solid var(--border);
         }
         
         /* SIDEBAR */
@@ -59,47 +71,48 @@
             width: 100%;
             padding: 15px 20px;
             margin-bottom: 12px;
-            border: 2px solid #e2e8f0;
+            border: 1px solid var(--border);
             border-radius: 12px;
-            background: white;
+            background: transparent;
             cursor: pointer;
             font-size: 1em;
             font-weight: 600;
             text-align: left;
             transition: all 0.3s;
-            color: #1a202c;
+            color: var(--text);
         }
         
         .tool-btn:hover {
-            border-color: #667eea;
+            border-color: var(--primary);
+            background: rgba(6, 182, 212, 0.1);
             transform: translateX(5px);
         }
         
         .tool-btn.active {
-            border-color: #667eea;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-            color: #667eea;
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(139, 92, 246, 0.2));
+            color: var(--primary);
         }
         
         /* UPLOAD ZONE */
         .upload-zone {
-            border: 3px dashed #e2e8f0;
+            border: 2px dashed var(--border);
             border-radius: 16px;
             padding: 80px 40px;
             text-align: center;
             cursor: pointer;
-            background: #f7fafc;
+            background: rgba(6, 182, 212, 0.05);
             transition: all 0.3s;
         }
         
         .upload-zone:hover {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.05);
+            border-color: var(--primary);
+            background: rgba(6, 182, 212, 0.1);
         }
         
         .upload-zone.dragover {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.1);
+            border-color: var(--primary);
+            background: rgba(6, 182, 212, 0.15);
         }
         
         .upload-icon {
@@ -109,6 +122,55 @@
         
         input[type="file"] {
             display: none;
+        }
+        
+        /* INPUTS */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--border);
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            cursor: pointer;
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            cursor: pointer;
+            border: none;
+        }
+        
+        input[type="number"] {
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 8px;
+        }
+        
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        input[type="checkbox"] {
+            accent-color: var(--primary);
+        }
+        
+        label {
+            color: var(--text);
         }
         
         /* CANVAS */
@@ -150,10 +212,11 @@
         /* TOOL PANELS */
         .tool-panel {
             display: none;
-            background: #f7fafc;
+            background: rgba(6, 182, 212, 0.05);
             padding: 25px;
             border-radius: 12px;
             margin-top: 20px;
+            border: 1px solid var(--border);
         }
         
         .tool-panel.active {
@@ -161,7 +224,7 @@
         }
         
         .tool-panel h3 {
-            color: #1a202c;
+            color: var(--text);
             margin-bottom: 20px;
             font-size: 1.2em;
         }
@@ -180,51 +243,53 @@
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
+            border: none;
         }
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 25px rgba(6, 182, 212, 0.3);
         }
         
         .btn-secondary {
-            background: white;
-            color: #667eea;
-            border: 2px solid #667eea;
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
         }
         
         .btn-secondary:hover {
-            background: #667eea;
-            color: white;
+            background: rgba(6, 182, 212, 0.1);
+            border-color: var(--primary);
         }
         
         /* INFO BOX */
         .info-box {
-            background: #eff6ff;
-            border-left: 4px solid #3b82f6;
+            background: rgba(6, 182, 212, 0.1);
+            border-left: 4px solid var(--primary);
             padding: 15px;
             border-radius: 8px;
             margin: 15px 0;
             font-size: 0.9em;
             line-height: 1.6;
-            color: #1e40af;
+            color: var(--text-muted);
         }
         
         /* STATS */
         .stats {
-            background: white;
+            background: rgba(139, 92, 246, 0.1);
             padding: 20px;
             border-radius: 12px;
             margin-bottom: 20px;
+            border: 1px solid var(--border);
         }
         
         .stat-row {
             display: flex;
             justify-content: space-between;
             padding: 10px 0;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border);
         }
         
         .stat-row:last-child {
@@ -232,13 +297,13 @@
         }
         
         .stat-label {
-            color: #64748b;
+            color: var(--text-muted);
             font-weight: 500;
         }
         
         .stat-value {
             font-weight: 700;
-            color: #1a202c;
+            color: var(--text);
         }
         
         /* CROP FORMAT BUTTONS */
@@ -251,23 +316,23 @@
         
         .format-btn {
             padding: 12px;
-            border: 2px solid #e2e8f0;
+            border: 1px solid var(--border);
             border-radius: 8px;
-            background: white;
+            background: transparent;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s;
-            color: #1a202c;
+            color: var(--text);
         }
         
         .format-btn:hover {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.05);
+            border-color: var(--primary);
+            background: rgba(6, 182, 212, 0.1);
         }
         
         .format-btn.active {
-            border-color: #667eea;
-            background: #667eea;
+            border-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
         }
         
@@ -292,14 +357,14 @@
     <div class="container">
         <!-- HEADER -->
         <div class="header">
-            <h1>🎨 Éditeur Photo</h1>
+            <h1>Éditeur Photo</h1>
             <p>Éditez vos images facilement</p>
         </div>
 
         <div class="main-grid">
             <!-- SIDEBAR -->
             <div class="panel">
-                <h3 style="margin-bottom: 20px; color: #1a202c;">Outils</h3>
+                <h3 style="margin-bottom: 20px; color: var(--text);">Outils</h3>
                 <button class="tool-btn active" onclick="switchTool('crop')">Recadrer</button>
                 <button class="tool-btn" onclick="switchTool('resize')">Redimensionner</button>
                 <button class="tool-btn" onclick="switchTool('adjust')">Ajuster</button>
@@ -320,8 +385,8 @@
                 <!-- UPLOAD ZONE -->
                 <div id="uploadZone" class="upload-zone">
                     <div class="upload-icon">📷</div>
-                    <h2 style="margin-bottom: 10px; color: #1a202c;">Glissez votre image ici</h2>
-                    <p style="color: #64748b;">ou cliquez pour sélectionner</p>
+                    <h2 style="margin-bottom: 10px; color: var(--text);">Glissez votre image ici</h2>
+                    <p style="color: var(--text-muted);">ou cliquez pour sélectionner</p>
                     <input type="file" id="fileInput" accept="image/*">
                 </div>
 
@@ -342,7 +407,7 @@
                             </div>
                         </div>
                         
-                        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #1a202c;">Format de recadrage</label>
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: var(--text);">Format de recadrage</label>
                         <div class="format-grid">
                             <button class="format-btn" onclick="startCrop('square')">Carré 1:1</button>
                             <button class="format-btn" onclick="startCrop('169')">16:9 Paysage</button>
@@ -381,7 +446,7 @@
                             </div>
                         </div>
                         
-                        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #1a202c;">Presets populaires</label>
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: var(--text);">Presets populaires</label>
                         <div class="format-grid">
                             <button class="format-btn" onclick="setSize(800, 600)">800×600</button>
                             <button class="format-btn" onclick="setSize(1920, 1080)">1920×1080</button>
@@ -389,7 +454,7 @@
                             <button class="format-btn" onclick="setSize(1200, 630)">1200×630</button>
                         </div>
                         
-                        <label style="display: block; margin: 20px 0 10px; font-weight: 600; color: #1a202c;">Dimensions personnalisées</label>
+                        <label style="display: block; margin: 20px 0 10px; font-weight: 600; color: var(--text);">Dimensions personnalisées</label>
                         
                         <label style="display: block; margin-bottom: 15px;">
                             <input type="checkbox" id="lockRatioResize" checked onchange="toggleLockResize()" style="margin-right: 8px;">
@@ -401,12 +466,12 @@
                         </div>
                         
                         <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-size: 0.9em; color: #64748b;">Largeur (px)</label>
+                            <label style="display: block; margin-bottom: 5px; font-size: 0.9em; color: var(--text-muted);">Largeur (px)</label>
                             <input type="number" id="resizeWidth" min="1" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1em;" oninput="onResizeWidthChange()">
                         </div>
                         
                         <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 5px; font-size: 0.9em; color: #64748b;">Hauteur (px)</label>
+                            <label style="display: block; margin-bottom: 5px; font-size: 0.9em; color: var(--text-muted);">Hauteur (px)</label>
                             <input type="number" id="resizeHeight" min="1" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1em;" oninput="onResizeHeightChange()">
                         </div>
                         
@@ -420,33 +485,33 @@
                         <h3>Ajuster l'image</h3>
                         
                         <div style="margin-bottom: 25px;">
-                            <label style="display: block; margin-bottom: 10px; color: #1a202c;">
+                            <label style="display: block; margin-bottom: 10px; color: var(--text);">
                                 <strong>Luminosité</strong>
-                                <span id="brightnessValue" style="float: right; color: #667eea; font-weight: 700;">0</span>
+                                <span id="brightnessValue" style="float: right; color: var(--primary); font-weight: 700;">0</span>
                             </label>
                             <input type="range" id="brightness" min="-100" max="100" value="0" style="width: 100%;" oninput="updateAdjustments()">
                         </div>
                         
                         <div style="margin-bottom: 25px;">
-                            <label style="display: block; margin-bottom: 10px; color: #1a202c;">
+                            <label style="display: block; margin-bottom: 10px; color: var(--text);">
                                 <strong>Contraste</strong>
-                                <span id="contrastValue" style="float: right; color: #667eea; font-weight: 700;">0</span>
+                                <span id="contrastValue" style="float: right; color: var(--primary); font-weight: 700;">0</span>
                             </label>
                             <input type="range" id="contrast" min="-100" max="100" value="0" style="width: 100%;" oninput="updateAdjustments()">
                         </div>
                         
                         <div style="margin-bottom: 25px;">
-                            <label style="display: block; margin-bottom: 10px; color: #1a202c;">
+                            <label style="display: block; margin-bottom: 10px; color: var(--text);">
                                 <strong>Saturation</strong>
-                                <span id="saturationValue" style="float: right; color: #667eea; font-weight: 700;">0</span>
+                                <span id="saturationValue" style="float: right; color: var(--primary); font-weight: 700;">0</span>
                             </label>
                             <input type="range" id="saturation" min="-100" max="100" value="0" style="width: 100%;" oninput="updateAdjustments()">
                         </div>
                         
                         <div style="margin-bottom: 25px;">
-                            <label style="display: block; margin-bottom: 10px; color: #1a202c;">
+                            <label style="display: block; margin-bottom: 10px; color: var(--text);">
                                 <strong>Netteté</strong>
-                                <span id="sharpnessValue" style="float: right; color: #667eea; font-weight: 700;">0</span>
+                                <span id="sharpnessValue" style="float: right; color: var(--primary); font-weight: 700;">0</span>
                             </label>
                             <input type="range" id="sharpness" min="0" max="100" value="0" style="width: 100%;" oninput="updateAdjustments()">
                         </div>
@@ -464,14 +529,14 @@
                     <div id="panel-rotate" class="tool-panel">
                         <h3>Rotation et Retournement</h3>
                         
-                        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #1a202c;">Rotation</label>
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: var(--text);">Rotation</label>
                         <div class="format-grid">
                             <button class="format-btn" onclick="rotate(90)">90° Droite</button>
                             <button class="format-btn" onclick="rotate(-90)">90° Gauche</button>
                             <button class="format-btn" onclick="rotate(180)">180°</button>
                         </div>
                         
-                        <label style="display: block; margin: 20px 0 10px; font-weight: 600; color: #1a202c;">Retournement</label>
+                        <label style="display: block; margin: 20px 0 10px; font-weight: 600; color: var(--text);">Retournement</label>
                         <div class="format-grid">
                             <button class="format-btn" onclick="flipHorizontal()">Horizontal</button>
                             <button class="format-btn" onclick="flipVertical()">Vertical</button>
@@ -489,7 +554,7 @@
                     <div id="panel-filters" class="tool-panel">
                         <h3>Filtres créatifs</h3>
                         
-                        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #1a202c;">Appliquer un filtre</label>
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: var(--text);">Appliquer un filtre</label>
                         <div class="format-grid" style="grid-template-columns: repeat(2, 1fr);">
                             <button class="format-btn active" onclick="applyFilter('none')">Original</button>
                             <button class="format-btn" onclick="applyFilter('grayscale')">Noir & Blanc</button>
@@ -530,9 +595,9 @@
                         </div>
                         
                         <div style="margin: 25px 0;">
-                            <label style="display: block; margin-bottom: 10px; color: #1a202c;">
+                            <label style="display: block; margin-bottom: 10px; color: var(--text);">
                                 <strong>Qualité JPEG</strong>
-                                <span id="qualityValue" style="float: right; color: #667eea; font-weight: 700;">85%</span>
+                                <span id="qualityValue" style="float: right; color: var(--primary); font-weight: 700;">85%</span>
                             </label>
                             <input type="range" id="quality" min="1" max="100" value="85" style="width: 100%;" oninput="updateCompression()">
                         </div>
@@ -560,7 +625,7 @@
                             </div>
                         </div>
                         
-                        <label style="display: block; margin: 20px 0 10px; font-weight: 600; color: #1a202c;">Convertir vers</label>
+                        <label style="display: block; margin: 20px 0 10px; font-weight: 600; color: var(--text);">Convertir vers</label>
                         <div class="format-grid">
                             <button class="format-btn" onclick="selectFormat('png')">PNG</button>
                             <button class="format-btn" onclick="selectFormat('jpg')">JPG</button>
@@ -568,9 +633,9 @@
                         </div>
                         
                         <div id="jpgQualitySection" style="display: none; margin: 20px 0;">
-                            <label style="display: block; margin-bottom: 10px; color: #1a202c;">
+                            <label style="display: block; margin-bottom: 10px; color: var(--text);">
                                 <strong>Qualité JPG</strong>
-                                <span id="convertQualityValue" style="float: right; color: #667eea; font-weight: 700;">85%</span>
+                                <span id="convertQualityValue" style="float: right; color: var(--primary); font-weight: 700;">85%</span>
                             </label>
                             <input type="range" id="convertQuality" min="1" max="100" value="85" style="width: 100%;" oninput="updateConvertQuality()">
                         </div>
@@ -951,7 +1016,7 @@
             cropCtx.clearRect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
             
             // Bordure
-            cropCtx.strokeStyle = '#667eea';
+            cropCtx.strokeStyle = '#06b6d4';
             cropCtx.lineWidth = 3;
             cropCtx.strokeRect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
             
@@ -971,7 +1036,7 @@
             
             // 8 Poignées (4 coins + 4 bords)
             const handleSize = 12;
-            cropCtx.fillStyle = '#667eea';
+            cropCtx.fillStyle = '#06b6d4';
             cropCtx.strokeStyle = 'white';
             cropCtx.lineWidth = 2;
             
