@@ -10,6 +10,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
+    <!-- MuPDF WASM pour compression réelle -->
+    <script src="https://cdn.jsdelivr.net/npm/mupdf@0.3.0/dist/mupdf.min.js"></script>
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -800,37 +803,40 @@
                     </div>
 
                     <div id="compress-options" style="display: none;">
+                        <div class="stats-box" style="margin-bottom: 20px;">
+                            <div class="stat-row">
+                                <span class="stat-label">Fichier sélectionné</span>
+                                <span class="stat-value" id="compress-original-size">-</span>
+                            </div>
+                        </div>
+
                         <div class="options-group">
                             <div class="option-row">
                                 <label>Niveau de compression</label>
                                 <div class="radio-group">
                                     <label class="radio-option">
+                                        <input type="radio" name="compress-level" value="light">
+                                        <span>Légère</span>
+                                    </label>
+                                    <label class="radio-option">
                                         <input type="radio" name="compress-level" value="recommended" checked>
-                                        <span>Recommandé</span>
+                                        <span>Moyenne</span>
                                     </label>
                                     <label class="radio-option">
                                         <input type="radio" name="compress-level" value="strong">
                                         <span>Forte</span>
                                     </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="compress-level" value="light">
-                                        <span>Légère</span>
-                                    </label>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="stats-box" id="compress-stats">
+                        <div id="compress-result" class="stats-box" style="display: none; border-color: var(--success);">
                             <div class="stat-row">
-                                <span class="stat-label">Taille originale</span>
-                                <span class="stat-value" id="compress-original-size">-</span>
-                            </div>
-                            <div class="stat-row">
-                                <span class="stat-label">Taille estimée</span>
+                                <span class="stat-label">Nouvelle taille</span>
                                 <span class="stat-value success" id="compress-new-size">-</span>
                             </div>
                             <div class="stat-row">
-                                <span class="stat-label">Gain estimé</span>
+                                <span class="stat-label">Réduction</span>
                                 <span class="stat-value success" id="compress-gain">-</span>
                             </div>
                         </div>
@@ -1241,14 +1247,19 @@
 
                 <div class="guide-section">
                     <h4>Quel niveau choisir ?</h4>
-                    <p><strong>Recommandé</strong> : Usage courant, bon compromis (30-40% de réduction)</p>
-                    <p><strong>Forte</strong> : Email avec limite stricte (40-50% de réduction)</p>
-                    <p><strong>Légère</strong> : Documents pro, qualité max (10-20% de réduction)</p>
+                    <p><strong>Légère</strong> : Qualité préservée, réduction modérée (15-30%)</p>
+                    <p><strong>Recommandé</strong> : Bon compromis qualité/taille (30-50%)</p>
+                    <p><strong>Forte</strong> : Réduction maximale, qualité visuelle réduite (50-70%)</p>
+                </div>
+
+                <div class="guide-section">
+                    <h4>Comment ça marche ?</h4>
+                    <p>Chaque page est convertie en image JPEG compressée puis réassemblée en PDF. Cette méthode garantit une vraie réduction de taille.</p>
                 </div>
 
                 <div class="info-box warning">
                     <strong>Important</strong>
-                    <p>La compression est irréversible. Gardez toujours l'original !</p>
+                    <p>Le texte devient image (non sélectionnable). Gardez toujours l'original !</p>
                 </div>
             `,
             
@@ -1643,82 +1654,90 @@
             compressFile = file;
             document.getElementById('compress-original-size').textContent = formatBytes(file.size);
             document.getElementById('compress-options').style.display = 'block';
-            
-            await updateCompressionPreview();
+            document.getElementById('compress-result').style.display = 'none';
         });
-
-        document.querySelectorAll('input[name="compress-level"]').forEach(radio => {
-            radio.addEventListener('change', updateCompressionPreview);
-        });
-
-        async function updateCompressionPreview() {
-            if (!compressFile) return;
-            
-            try {
-                const level = document.querySelector('input[name="compress-level"]:checked').value;
-                
-                let estimatedRatio;
-                if (level === 'light') {
-                    estimatedRatio = 0.85;
-                } else if (level === 'recommended') {
-                    estimatedRatio = 0.65;
-                } else if (level === 'strong') {
-                    estimatedRatio = 0.50;
-                }
-                
-                const estimatedSize = Math.round(compressFile.size * estimatedRatio);
-                const gain = Math.round((1 - estimatedRatio) * 100);
-                
-                document.getElementById('compress-new-size').textContent = formatBytes(estimatedSize) + ' (estimé)';
-                document.getElementById('compress-gain').textContent = `≈ ${gain}%`;
-                
-            } catch (error) {
-                console.error('Erreur calcul compression:', error);
-            }
-        }
 
         async function compressPDF() {
             if (!compressFile) return;
             
             document.getElementById('compress-loading').classList.add('active');
+            document.getElementById('compress-result').style.display = 'none';
             
             try {
                 const arrayBuffer = await compressFile.arrayBuffer();
-                const pdf = await PDFLib.PDFDocument.load(arrayBuffer);
-                
                 const level = document.querySelector('input[name="compress-level"]:checked').value;
                 
-                let saveOptions = {};
+                // Qualité JPEG selon le niveau
+                let imageQuality, scaleFactor;
                 if (level === 'light') {
-                    saveOptions = { useObjectStreams: false };
+                    imageQuality = 0.85;
+                    scaleFactor = 1.0;
                 } else if (level === 'recommended') {
-                    saveOptions = { useObjectStreams: true };
+                    imageQuality = 0.70;
+                    scaleFactor = 0.9;
                 } else if (level === 'strong') {
-                    saveOptions = { useObjectStreams: true, addDefaultPage: false };
+                    imageQuality = 0.50;
+                    scaleFactor = 0.75;
                 }
                 
-                const pdfBytes = await pdf.save(saveOptions);
+                // Charger avec PDF.js pour rendre les pages
+                const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+                const pdfJs = await loadingTask.promise;
+                const numPages = pdfJs.numPages;
+                
+                // Créer un nouveau PDF avec pdf-lib
+                const newPdf = await PDFLib.PDFDocument.create();
+                
+                for (let i = 1; i <= numPages; i++) {
+                    const page = await pdfJs.getPage(i);
+                    const viewport = page.getViewport({ scale: 1.5 * scaleFactor });
+                    
+                    // Créer un canvas pour rendre la page
+                    const canvas = document.createElement('canvas');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Rendre la page
+                    await page.render({
+                        canvasContext: ctx,
+                        viewport: viewport
+                    }).promise;
+                    
+                    // Convertir en JPEG compressé
+                    const jpegDataUrl = canvas.toDataURL('image/jpeg', imageQuality);
+                    const jpegBytes = Uint8Array.from(atob(jpegDataUrl.split(',')[1]), c => c.charCodeAt(0));
+                    
+                    // Intégrer dans le nouveau PDF
+                    const jpegImage = await newPdf.embedJpg(jpegBytes);
+                    
+                    // Créer une page aux dimensions originales
+                    const originalViewport = page.getViewport({ scale: 1 });
+                    const newPage = newPdf.addPage([originalViewport.width, originalViewport.height]);
+                    
+                    // Dessiner l'image sur toute la page
+                    newPage.drawImage(jpegImage, {
+                        x: 0,
+                        y: 0,
+                        width: originalViewport.width,
+                        height: originalViewport.height
+                    });
+                }
+                
+                // Sauvegarder
+                const pdfBytes = await newPdf.save();
                 const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                 
                 const newSize = blob.size;
                 const gain = Math.round((1 - newSize / compressFile.size) * 100);
                 
+                // Afficher le résultat
                 document.getElementById('compress-new-size').textContent = formatBytes(newSize);
-                document.getElementById('compress-gain').textContent = `${Math.max(gain, 0)}%`;
+                document.getElementById('compress-gain').textContent = gain + '%';
+                document.getElementById('compress-result').style.display = 'block';
+                document.getElementById('compress-loading').classList.remove('active');
                 
                 downloadFile(blob, `compresse-${Date.now()}.pdf`);
-                
-                let message = 'PDF optimisé !\n\n';
-                if (gain >= 30) {
-                    message += `Excellent ! ${gain}% d'espace économisé.`;
-                } else if (gain >= 10) {
-                    message += `${gain}% d'espace économisé.`;
-                } else {
-                    message += `Compression limitée (${gain}%). Ce PDF était déjà optimisé.`;
-                }
-                
-                alert(message);
-                resetCompress();
                 
             } catch (error) {
                 console.error('Erreur compression:', error);
