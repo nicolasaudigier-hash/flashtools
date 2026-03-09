@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Prompts Copywriting — FlashTools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cyan: #06B6D4;
+            --cyan-dim: rgba(6,182,212,0.12);
+            --cyan-glow: rgba(6,182,212,0.35);
+            --violet: #8B5CF6;
+            --violet-dim: rgba(139,92,246,0.12);
+            --violet-glow: rgba(139,92,246,0.35);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #080d1e;
+            --bg2: #0d1530;
+            --bg3: #111827;
+            --border: rgba(255,255,255,0.08);
+            --border-active: rgba(6,182,212,0.5);
+            --text: #e2e8f0;
+            --text-muted: #64748b;
+            --text-dim: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 24px 16px;
+            background-image:
+                radial-gradient(ellipse 800px 500px at 20% 0%, rgba(6,182,212,0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 600px 400px at 80% 100%, rgba(139,92,246,0.07) 0%, transparent 70%);
+        }
+
+        .container { max-width: 860px; margin: 0 auto; }
+
+        /* HEADER */
+        .header {
+            text-align: center;
+            padding: 48px 0 40px;
+            position: relative;
+        }
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--cyan-dim);
+            border: 1px solid var(--border-active);
+            border-radius: 100px;
+            padding: 6px 16px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--cyan);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            margin-bottom: 14px;
+        }
+        .header h1 span {
+            background: linear-gradient(135deg, var(--cyan), var(--violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header p {
+            color: var(--text-dim);
+            font-size: 1rem;
+            max-width: 480px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* CARD */
+        .card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+        .card-body { padding: 32px; }
+
+        /* NOTICE */
+        .notice {
+            display: flex;
+            gap: 14px;
+            background: rgba(245,158,11,0.08);
+            border: 1px solid rgba(245,158,11,0.25);
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 32px;
+            font-size: 0.88rem;
+            color: #fcd34d;
+            line-height: 1.6;
+        }
+        .notice-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+        .notice strong { color: #fbbf24; }
+
+        .notice-info {
+            background: var(--cyan-dim);
+            border-color: var(--border-active);
+            color: #67e8f9;
+        }
+        .notice-info strong { color: var(--cyan); }
+
+        /* SECTION TITLE */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* TYPE GRID */
+        .type-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        @media (max-width: 560px) { .type-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        .type-card {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 22px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .type-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--cyan-dim), var(--violet-dim));
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+        .type-card:hover { border-color: var(--border-active); transform: translateY(-3px); }
+        .type-card:hover::before { opacity: 1; }
+        .type-card.active {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 1px var(--cyan), 0 8px 30px var(--cyan-glow);
+        }
+        .type-card.active::before { opacity: 1; }
+        .type-icon { font-size: 1.8rem; margin-bottom: 10px; display: block; position: relative; }
+        .type-label { font-size: 0.85rem; font-weight: 600; color: var(--text-dim); position: relative; }
+        .type-card.active .type-label { color: var(--cyan); }
+
+        /* FORM SECTIONS */
+        .form-section { display: none; animation: slideUp 0.3s ease; }
+        .form-section.active { display: block; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* FORM ELEMENTS */
+        .form-group { margin-bottom: 22px; }
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            letter-spacing: 0.02em;
+        }
+        .required-star { color: var(--cyan); }
+
+        .form-control {
+            width: 100%;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.92rem;
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--text);
+            transition: all 0.2s;
+            outline: none;
+        }
+        .form-control::placeholder { color: var(--text-muted); }
+        .form-control:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px var(--cyan-dim);
+        }
+        .form-control.error {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(239,68,68,0.15);
+        }
+        textarea.form-control { min-height: 90px; resize: vertical; }
+        select.form-control { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
+
+        .help-text { font-size: 0.78rem; color: var(--text-muted); margin-top: 5px; }
+        .error-msg { font-size: 0.78rem; color: var(--danger); margin-top: 5px; display: none; }
+        .form-control.error + .error-msg { display: block; }
+
+        /* RADIO PILLS */
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .radio-pill { position: relative; }
+        .radio-pill input { position: absolute; opacity: 0; width: 0; height: 0; }
+        .radio-pill label {
+            display: block;
+            padding: 8px 16px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 0.83rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .radio-pill label:hover { border-color: var(--border-active); color: var(--text); }
+        .radio-pill input:checked + label {
+            background: var(--cyan-dim);
+            border-color: var(--cyan);
+            color: var(--cyan);
+        }
+
+        /* BUTTONS */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+            cursor: pointer;
+            transition: all 0.25s;
+            letter-spacing: 0.01em;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--cyan), #0891b2);
+            color: #fff;
+            box-shadow: 0 4px 20px var(--cyan-glow);
+            width: 100%;
+            justify-content: center;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--cyan-glow);
+        }
+        .btn-back {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 9px 18px;
+            font-size: 0.85rem;
+            margin-bottom: 24px;
+        }
+        .btn-back:hover { border-color: var(--border-active); color: var(--text); }
+
+        /* FORM HEADER */
+        .form-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .form-header-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--cyan-dim);
+            border: 1px solid var(--border-active);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+        .form-header h2 { font-size: 1.3rem; font-weight: 700; }
+        .form-header p { font-size: 0.82rem; color: var(--text-muted); margin-top: 2px; }
+
+        /* RESULT */
+        .result-section { display: none; animation: slideUp 0.3s ease; }
+        .result-section.active { display: block; }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .result-badge {
+            background: rgba(16,185,129,0.15);
+            border: 1px solid rgba(16,185,129,0.4);
+            color: var(--success);
+            border-radius: 100px;
+            padding: 5px 14px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .prompt-box {
+            background: #05080f;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+            margin: 20px 0;
+            position: relative;
+        }
+        .prompt-box-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+        .prompt-box-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .prompt-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            line-height: 1.85;
+            white-space: pre-wrap;
+            color: #a5f3fc;
+            max-height: 420px;
+            overflow-y: auto;
+        }
+        .prompt-text::-webkit-scrollbar { width: 4px; }
+        .prompt-text::-webkit-scrollbar-track { background: transparent; }
+        .prompt-text::-webkit-scrollbar-thumb { background: var(--border-active); border-radius: 4px; }
+
+        /* ACTION BUTTONS */
+        .action-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        @media (max-width: 500px) { .action-row { grid-template-columns: 1fr; } }
+
+        .btn-copy {
+            background: var(--cyan-dim);
+            border: 1px solid var(--border-active);
+            color: var(--cyan);
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-copy:hover { background: rgba(6,182,212,0.2); box-shadow: 0 4px 16px var(--cyan-glow); }
+        .btn-copy.copied {
+            background: rgba(16,185,129,0.15);
+            border-color: rgba(16,185,129,0.4);
+            color: var(--success);
+        }
+
+        .btn-open {
+            background: var(--violet-dim);
+            border: 1px solid rgba(139,92,246,0.4);
+            color: var(--violet);
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .btn-open:hover { background: rgba(139,92,246,0.2); box-shadow: 0 4px 16px var(--violet-glow); }
+
+        /* AI LINKS */
+        .ai-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        @media (max-width: 500px) { .ai-links { grid-template-columns: 1fr; } }
+
+        .ai-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 18px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-dim);
+            font-size: 0.88rem;
+            font-weight: 600;
+            transition: all 0.25s;
+        }
+        .ai-link:hover { border-color: var(--border-active); color: var(--text); transform: translateY(-2px); }
+        .ai-link-icon { font-size: 1.2rem; }
+
+        /* CHAR COUNTER */
+        .char-counter {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 4px;
+        }
+        .char-counter.warn { color: var(--warning); }
+
+        /* STEPS */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 28px;
+        }
+        @media (max-width: 560px) { .steps { grid-template-columns: repeat(2, 1fr); } }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 10px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .step-num {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--cyan), var(--violet));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: white;
+        }
+        .step-text { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; }
+
+        /* DIVIDER */
+        .divider {
+            border: none;
+            height: 1px;
+            background: var(--border);
+            margin: 28px 0;
+        }
+
+        /* GLOBAL FIELD */
+        .global-field {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 24px;
+        }
+        .global-field .form-label { color: var(--cyan); margin-bottom: 6px; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-badge">⚡ FlashTools · Copywriting</div>
+        <h1>Générez des <span>Prompts Copywriting</span><br>Prêts à l'Emploi</h1>
+        <p>Remplissez le formulaire, obtenez un prompt professionnel optimisé pour Claude ou ChatGPT.</p>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+
+            <!-- SELECTION -->
+            <div id="typeSelection" class="form-section active">
+                    <div class="notice">
+                    <span class="notice-icon">💡</span>
+                    <div><strong>Conseil :</strong> Plus vos informations sont précises et chiffrées, plus le prompt généré sera efficace. Prenez 2 minutes supplémentaires pour détailler — ça change tout.</div>
+                </div>
+
+                <div class="notice" style="background:rgba(139,92,246,0.08); border-color:rgba(139,92,246,0.3); color:#c4b5fd;">
+                    <span class="notice-icon">🎯</span>
+                    <div>
+                        <strong style="color:#a78bfa;">Ce que cet outil est — et ce qu'il n'est pas.</strong><br>
+                        Ce générateur vous permet de <strong>vous initier sérieusement au marketing</strong> en produisant 
+                        des prompts structurés sur des bases copywriting solides. Il ne remplace pas un copywriter 
+                        professionnel qui connaît votre marché, votre avatar et votre tonalité de marque. 
+                        Pour un projet à fort enjeu, l'expertise humaine reste irremplaçable.
+                    </div>
+                </div>
+
+                <p class="section-title">Quel type de contenu souhaitez-vous créer ?</p>
+
+                <!-- FAMILLE : COMMUNICATION -->
+                <div style="margin-bottom:8px;">
+                    <span style="font-size:0.72rem; font-weight:700; color:var(--cyan); letter-spacing:0.1em; text-transform:uppercase;">📡 Communication</span>
+                </div>
+                <div class="type-grid" style="margin-bottom:20px;">
+                    <div class="type-card" data-type="email"><span class="type-icon">📧</span><span class="type-label">Email Marketing</span></div>
+                    <div class="type-card" data-type="sequence"><span class="type-icon">🔁</span><span class="type-label">Séquence Email</span></div>
+                    <div class="type-card" data-type="newsletter"><span class="type-icon">📰</span><span class="type-label">Newsletter</span></div>
+                    <div class="type-card" data-type="post"><span class="type-icon">📱</span><span class="type-label">Post Réseaux</span></div>
+                </div>
+
+                <!-- FAMILLE : VENTE -->
+                <div style="margin-bottom:8px;">
+                    <span style="font-size:0.72rem; font-weight:700; color:var(--violet); letter-spacing:0.1em; text-transform:uppercase;">💰 Vente</span>
+                </div>
+                <div class="type-grid" style="margin-bottom:20px;">
+                    <div class="type-card" data-type="pitch"><span class="type-icon">🎤</span><span class="type-label">Pitch Elevator</span></div>
+                    <div class="type-card" data-type="ad"><span class="type-icon">🎯</span><span class="type-label">Publicité</span></div>
+                    <div class="type-card" data-type="sales"><span class="type-icon">📄</span><span class="type-label">Page de Vente</span></div>
+                </div>
+
+                <!-- FAMILLE : ACCROCHE -->
+                <div style="margin-bottom:8px;">
+                    <span style="font-size:0.72rem; font-weight:700; color:#f59e0b; letter-spacing:0.1em; text-transform:uppercase;">⚡ Accroche</span>
+                </div>
+                <div class="type-grid" style="margin-bottom:0;">
+                    <div class="type-card" data-type="hooks" style="border-color:rgba(245,158,11,0.3);">
+                        <span class="type-icon">🪝</span>
+                        <span class="type-label" style="color:#fbbf24;">Générateur de Hooks</span>
+                        <span style="display:block; font-size:0.7rem; color:#92400e; background:rgba(245,158,11,0.15); border-radius:6px; padding:2px 8px; margin-top:6px; position:relative;">80% de la perf</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EMAIL FORM -->
+            <div id="emailForm" class="form-section">
+                <button class="btn btn-back" onclick="backToSelection()">← Retour</button>
+                <div class="form-header">
+                    <div class="form-header-icon">📧</div>
+                    <div><h2>Email Marketing</h2><p>Structure AIDA · Objet + corps + CTA optimisés</p></div>
+                </div>
+
+                <div class="notice notice-info">
+                    <span class="notice-icon">✨</span>
+                    <div><strong>Tips :</strong> Chiffrez vos bénéfices (+35% ventes, 2h/jour économisées). Un CTA précis ("Télécharger le guide PDF") surpasse toujours "En savoir plus".</div>
+                </div>
+
+                <div class="global-field">
+                    <label class="form-label">🏷️ Nom de marque / Signature <span style="color:var(--text-muted); font-weight:400">(optionnel)</span></label>
+                    <input type="text" class="form-control" id="emailBrand" placeholder="Ex: Nicolas — FlashTools.fr">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Objectif de l'email</label>
+                    <div class="radio-group">
+                        <div class="radio-pill"><input type="radio" id="obj1" name="emailObjective" value="educatif" checked><label for="obj1">Éducatif</label></div>
+                        <div class="radio-pill"><input type="radio" id="obj2" name="emailObjective" value="promo"><label for="obj2">Promotionnel</label></div>
+                        <div class="radio-pill"><input type="radio" id="obj3" name="emailObjective" value="engagement"><label for="obj3">Engagement</label></div>
+                        <div class="radio-pill"><input type="radio" id="obj4" name="emailObjective" value="reactivation"><label for="obj4">Réactivation</label></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Audience cible <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="emailTarget" placeholder="Ex: Artisans indépendants, CA 50–150k€, peu à l'aise avec le digital" maxlength="150">
+                    <div class="char-counter" id="emailTargetCount">0/150</div>
+                    <div class="help-text">Soyez ultra-précis : secteur, CA, problème spécifique</div>
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Sujet principal <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="emailSubject" placeholder="Ex: Relance client automne avec l'email storytelling" maxlength="100">
+                    <div class="char-counter" id="emailSubjectCount">0/100</div>
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Bénéfice / message clé <span class="required-star">*</span></label>
+                    <textarea class="form-control required" id="emailBenefit" placeholder="Ex: Montrer comment 3 emails mensuels peuvent augmenter les ventes de 30% sans pub payante" maxlength="300"></textarea>
+                    <div class="char-counter" id="emailBenefitCount">0/300</div>
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Action souhaitée (CTA) <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="emailCTA" placeholder="Ex: Télécharger le guide gratuit, Réserver un appel découverte" maxlength="100">
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Ton souhaité</label>
+                    <select class="form-control" id="emailTone">
+                        <option value="educatif">Éducatif / Informatif</option>
+                        <option value="persuasif">Persuasif / Commercial</option>
+                        <option value="inspirant">Inspirant / Motivant</option>
+                        <option value="urgent">Direct / Urgence</option>
+                        <option value="storytelling">Storytelling / Narratif</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">IA cible</label>
+                    <div class="radio-group">
+                        <div class="radio-pill"><input type="radio" id="ai_email1" name="emailAI" value="claude" checked><label for="ai_email1">Claude (Anthropic)</label></div>
+                        <div class="radio-pill"><input type="radio" id="ai_email2" name="emailAI" value="chatgpt"><label for="ai_email2">ChatGPT (OpenAI)</label></div>
+                        <div class="radio-pill"><input type="radio" id="ai_email3" name="emailAI" value="universel"><label for="ai_email3">Universel</label></div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="generatePrompt('email')">Générer le Prompt ⚡</button>
+            </div>
+
+            <!-- POST FORM -->
+            <div id="postForm" class="form-section">
+                <button class="btn btn-back" onclick="backToSelection()">← Retour</button>
+                <div class="form-header">
+                    <div class="form-header-icon">📱</div>
+                    <div><h2>Post Réseaux Sociaux</h2><p>Hook · Valeur · Engagement · CTA</p></div>
+                </div>
+                <div class="notice notice-info">
+                    <span class="notice-icon">✨</span>
+                    <div><strong>Tips :</strong> La première ligne est cruciale — question, chiffre choc ou affirmation audacieuse. Sur LinkedIn : 1300+ caractères. Instagram : 150–200 mots + hashtags.</div>
+                </div>
+
+                <div class="global-field">
+                    <label class="form-label">🏷️ Nom de marque / Auteur <span style="color:var(--text-muted); font-weight:400">(optionnel)</span></label>
+                    <input type="text" class="form-control" id="postBrand" placeholder="Ex: Nicolas Dupont · Copywriter artisans">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Plateforme</label>
+                    <div class="radio-group">
+                        <div class="radio-pill"><input type="radio" id="plat1" name="platform" value="linkedin" checked><label for="plat1">LinkedIn</label></div>
+                        <div class="radio-pill"><input type="radio" id="plat2" name="platform" value="instagram"><label for="plat2">Instagram</label></div>
+                        <div class="radio-pill"><input type="radio" id="plat3" name="platform" value="facebook"><label for="plat3">Facebook</label></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Sujet du post <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="postSubject" placeholder="Ex: Pourquoi vos clients artisans ne reviennent pas — et comment y remédier" maxlength="150">
+                    <div class="char-counter" id="postSubjectCount">0/150</div>
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Valeur / message clé <span class="required-star">*</span></label>
+                    <textarea class="form-control required" id="postValue" placeholder="Ex: 3 erreurs d'email post-achat qui tuent la fidélisation, avec les corrections concrètes" maxlength="300"></textarea>
+                    <div class="char-counter" id="postValueCount">0/300</div>
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Audience <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="postTarget" placeholder="Ex: Artisans et créateurs indépendants" maxlength="100">
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Ton souhaité</label>
+                    <select class="form-control" id="postTone">
+                        <option value="educatif">Éducatif / Informatif</option>
+                        <option value="inspirant">Inspirant / Motivant</option>
+                        <option value="personnel">Personnel / Storytelling</option>
+                        <option value="provocateur">Provocateur / Contrarian</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">IA cible</label>
+                    <div class="radio-group">
+                        <div class="radio-pill"><input type="radio" id="ai_post1" name="postAI" value="claude" checked><label for="ai_post1">Claude</label></div>
+                        <div class="radio-pill"><input type="radio" id="ai_post2" name="postAI" value="chatgpt"><label for="ai_post2">ChatGPT</label></div>
+                        <div class="radio-pill"><input type="radio" id="ai_post3" name="postAI" value="universel"><label for="ai_post3">Universel</label></div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="generatePrompt('post')">Générer le Prompt ⚡</button>
+            </div>
+
+            <!-- NEWSLETTER FORM -->
+            <div id="newsletterForm" class="form-section">
+                <button class="btn btn-back" onclick="backToSelection()">← Retour</button>
+                <div class="form-header">
+                    <div class="form-header-icon">📰</div>
+                    <div><h2>Newsletter</h2><p>Structure scannable · Valeur immédiate · Fidélisation</p></div>
+                </div>
+                <div class="notice notice-info">
+                    <span class="notice-icon">✨</span>
+                    <div><strong>Tips :</strong> Thème spécifique et actionnable. 3 sections = idéal pour la lisibilité. Mix actualité + conseil + outil/ressource.</div>
+                </div>
+
+                <div class="global-field">
+                    <label class="form-label">🏷️ Nom de la newsletter / marque <span style="color:var(--text-muted); font-weight:400">(optionnel)</span></label>
+                    <input type="text" class="form-control" id="newsBrand" placeholder="Ex: La Flash — par FlashTools">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Thème principal <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="newsTheme" placeholder="Ex: Les 5 outils IA indispensables pour artisans en 2025" maxlength="150">
+                    <div class="char-counter" id="newsThemeCount">0/150</div>
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Nombre de sections</label>
+                    <div class="radio-group">
+                        <div class="radio-pill"><input type="radio" id="sec2" name="newsSections" value="2"><label for="sec2">2</label></div>
+                        <div class="radio-pill"><input type="radio" id="sec3" name="newsSections" value="3" checked><label for="sec3">3</label></div>
+                        <div class="radio-pill"><input type="radio" id="sec4" name="newsSections" value="4"><label for="sec4">4</label></div>
+                        <div class="radio-pill"><input type="radio" id="sec5" name="newsSections" value="5"><label for="sec5">5</label></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Audience <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="newsTarget" placeholder="Ex: Micro-entrepreneurs artisans, 30–55 ans" maxlength="100">
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Valeur apportée <span class="required-star">*</span></label>
+                    <textarea class="form-control required" id="newsValue" placeholder="Ex: Actualités du secteur artisanal + outils pratiques + retour d'expérience terrain" maxlength="250"></textarea>
+                    <div class="char-counter" id="newsValueCount">0/250</div>
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Ton souhaité</label>
+                    <select class="form-control" id="newsTone">
+                        <option value="educatif">Éducatif / Informatif</option>
+                        <option value="expert">Expert / Analyse approfondie</option>
+                        <option value="casual">Casual / Conversationnel</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">IA cible</label>
+                    <div class="radio-group">
+                        <div class="radio-pill"><input type="radio" id="ai_news1" name="newsAI" value="claude" checked><label for="ai_news1">Claude</label></div>
+                        <div class="radio-pill"><input type="radio" id="ai_news2" name="newsAI" value="chatgpt"><label for="ai_news2">ChatGPT</label></div>
+                        <div class="radio-pill"><input type="radio" id="ai_news3" name="newsAI" value="universel"><label for="ai_news3">Universel</label></div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="generatePrompt('newsletter')">Générer le Prompt ⚡</button>
+            </div>
+
+            <!-- AD FORM -->
+            <div id="adForm" class="form-section">
+                <button class="btn btn-back" onclick="backToSelection()">← Retour</button>
+                <div class="form-header">
+                    <div class="form-header-icon">🎯</div>
+                    <div><h2>Publicité</h2><p>Multi-variantes · Respect limites caractères · A/B test ready</p></div>
+                </div>
+                <div class="notice notice-info">
+                    <span class="notice-icon">✨</span>
+                    <div><strong>Tips :</strong> Bénéfice chiffré = taux de clic doublé. Créez de l'urgence réelle (date, places, quantité). Ce prompt génère plusieurs variantes à tester.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Plateforme publicitaire</label>
+                    <div class="radio-group">
+                        <div class="radio-pill"><input type="radio" id="adplat1" name="adPlatform" value="meta" checked><label for="adplat1">Meta (FB/IG)</label></div>
+                        <div class="radio-pill"><input type="radio" id="adplat2" name="adPlatform" value="google"><label for="adplat2">Google Ads</label></div>
+                        <div class="radio-pill"><input type="radio" id="adplat3" name="adPlatform" value="linkedin"><label for="adplat3">LinkedIn Ads</label></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Produit / Service <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="adProduct" placeholder="Ex: Formation email marketing pour artisans" maxlength="100">
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Audience cible <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="adTarget" placeholder="Ex: Artisans 30–55 ans, CA < 100k€, pas de stratégie email" maxlength="150">
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Bénéfice principal <span class="required-star">*</span></label>
+                    <textarea class="form-control required" id="adBenefit" placeholder="Ex: Gagner 30% de CA supplémentaire avec 3 emails par mois, sans publicité payante" maxlength="250"></textarea>
+                    <div class="char-counter" id="adBenefitCount">0/250</div>
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Offre / Promotion <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="adOffer" placeholder="Ex: -40% jusqu'à dimanche / Essai 14 jours offerts / 20 places restantes" maxlength="120">
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Angle créatif</label>
+                    <select class="form-control" id="adAngle">
+                        <option value="probleme">Problème → Solution</option>
+                        <option value="benefice">Bénéfice immédiat</option>
+                        <option value="urgence">Urgence / FOMO</option>
+                        <option value="preuve">Preuve sociale</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">IA cible</label>
+                    <div class="radio-group">
+                        <div class="radio-pill"><input type="radio" id="ai_ad1" name="adAI" value="claude" checked><label for="ai_ad1">Claude</label></div>
+                        <div class="radio-pill"><input type="radio" id="ai_ad2" name="adAI" value="chatgpt"><label for="ai_ad2">ChatGPT</label></div>
+                        <div class="radio-pill"><input type="radio" id="ai_ad3" name="adAI" value="universel"><label for="ai_ad3">Universel</label></div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="generatePrompt('ad')">Générer le Prompt ⚡</button>
+            </div>
+
+            <!-- PITCH FORM -->
+            <div id="pitchForm" class="form-section">
+                <button class="btn btn-back" onclick="backToSelection()">← Retour</button>
+                <div class="form-header">
+                    <div class="form-header-icon">🎤</div>
+                    <div><h2>Pitch Elevator</h2><p>15s · 30s · 60s — mémorable et fluide à l'oral</p></div>
+                </div>
+                <div class="notice notice-info">
+                    <span class="notice-icon">✨</span>
+                    <div><strong>Tips :</strong> Résultat TOUJOURS chiffré. 15s = format pub, 30s = réseau pro, 60s = storytelling. Formulez le coût du problème (temps, argent, opportunités).</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Votre activité <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="pitchActivity" placeholder="Ex: Copywriter email marketing spécialisé artisans" maxlength="100">
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Client idéal <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="pitchTarget" placeholder="Ex: Artisans fait-main, CA 50–150k€" maxlength="120">
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Problème résolu <span class="required-star">*</span></label>
+                    <textarea class="form-control required" id="pitchProblem" placeholder="Ex: Ventes irrégulières, zéro stratégie email, dépendance aux marchés physiques" maxlength="250"></textarea>
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Votre solution <span class="required-star">*</span></label>
+                    <textarea class="form-control required" id="pitchSolution" placeholder="Ex: Séquences email storytelling qui valorisent le savoir-faire et créent de la fidélité" maxlength="250"></textarea>
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Résultat obtenu <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="pitchResult" placeholder="Ex: +35% de CA en 3 mois pour un céramiste breton" maxlength="120">
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Durée du pitch</label>
+                    <div class="radio-group">
+                        <div class="radio-pill"><input type="radio" id="dur1" name="pitchDuration" value="15" checked><label for="dur1">15 secondes</label></div>
+                        <div class="radio-pill"><input type="radio" id="dur2" name="pitchDuration" value="30"><label for="dur2">30 secondes</label></div>
+                        <div class="radio-pill"><input type="radio" id="dur3" name="pitchDuration" value="60"><label for="dur3">60 secondes</label></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">IA cible</label>
+                    <div class="radio-group">
+                        <div class="radio-pill"><input type="radio" id="ai_pitch1" name="pitchAI" value="claude" checked><label for="ai_pitch1">Claude</label></div>
+                        <div class="radio-pill"><input type="radio" id="ai_pitch2" name="pitchAI" value="chatgpt"><label for="ai_pitch2">ChatGPT</label></div>
+                        <div class="radio-pill"><input type="radio" id="ai_pitch3" name="pitchAI" value="universel"><label for="ai_pitch3">Universel</label></div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="generatePrompt('pitch')">Générer le Prompt ⚡</button>
+            </div>
+
+            <!-- SALES FORM -->
+            <div id="salesForm" class="form-section">
+                <button class="btn btn-back" onclick="backToSelection()">← Retour</button>
+                <div class="form-header">
+                    <div class="form-header-icon">📄</div>
+                    <div><h2>Page de Vente</h2><p>12 sections · Storytelling · Lever toutes les objections</p></div>
+                </div>
+                <div class="notice notice-info">
+                    <span class="notice-icon">✨</span>
+                    <div><strong>Tips :</strong> Décrivez la transformation avant/après. Listez TOUS les éléments de l'offre. Plus la garantie est forte, plus elle rassure. Page courte (&lt;200€), longue (&gt;500€).</div>
+                </div>
+
+                <div class="global-field">
+                    <label class="form-label">🏷️ Nom de marque / Auteur <span style="color:var(--text-muted); font-weight:400">(optionnel)</span></label>
+                    <input type="text" class="form-control" id="salesBrand" placeholder="Ex: Nicolas — FlashTools.fr">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Produit / Service <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="salesProduct" placeholder="Ex: Formation Email Artisan Pro" maxlength="100">
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Prix <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="salesPrice" placeholder="Ex: 297€ / 3 × 99€" maxlength="50">
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Audience cible <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="salesTarget" placeholder="Ex: Artisans indépendants, 0–3 ans d'activité, CA < 80k€" maxlength="150">
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Problème principal résolu <span class="required-star">*</span></label>
+                    <textarea class="form-control required" id="salesProblem" placeholder="Ex: CA irrégulier, dépendance aux marchés physiques, aucune base client fidèle" maxlength="300"></textarea>
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Transformation promise <span class="required-star">*</span></label>
+                    <textarea class="form-control required" id="salesTransform" placeholder="Ex: De zéro email à une base de 500 abonnés actifs générant 2000€/mois supplémentaires" maxlength="300"></textarea>
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Éléments de l'offre <span class="required-star">*</span></label>
+                    <textarea class="form-control required" id="salesOffer" placeholder="Ex: 8 modules vidéo + 15 templates email + accès groupe privé 12 mois + 2 appels coaching" maxlength="350"></textarea>
+                    <div class="help-text">Listez tout ce qui est inclus, avec les bonus si applicable</div>
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Garantie <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="salesGuarantee" placeholder="Ex: Satisfait ou remboursé 30 jours sans justification" maxlength="120">
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Type de page</label>
+                    <div class="radio-group">
+                        <div class="radio-pill"><input type="radio" id="st1" name="salesType" value="courte" checked><label for="st1">Courte (produit simple)</label></div>
+                        <div class="radio-pill"><input type="radio" id="st2" name="salesType" value="longue"><label for="st2">Longue (premium / objections)</label></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">IA cible</label>
+                    <div class="radio-group">
+                        <div class="radio-pill"><input type="radio" id="ai_sales1" name="salesAI" value="claude" checked><label for="ai_sales1">Claude</label></div>
+                        <div class="radio-pill"><input type="radio" id="ai_sales2" name="salesAI" value="chatgpt"><label for="ai_sales2">ChatGPT</label></div>
+                        <div class="radio-pill"><input type="radio" id="ai_sales3" name="salesAI" value="universel"><label for="ai_sales3">Universel</label></div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="generatePrompt('sales')">Générer le Prompt ⚡</button>
+            </div>
+
+            <!-- HOOKS FORM -->
+            <div id="hooksForm" class="form-section">
+                <button class="btn btn-back" onclick="backToSelection()">← Retour</button>
+                <div class="form-header">
+                    <div class="form-header-icon">🪝</div>
+                    <div><h2>Générateur de Hooks</h2><p>Le hook = 80% de la performance · 5 formats · Multi-usages</p></div>
+                </div>
+
+                <div class="notice notice-info">
+                    <span class="notice-icon">⚡</span>
+                    <div><strong>Rappel fondamental :</strong> Le hook est la seule phrase que votre audience lira avant de décider si elle continue. Une seule idée. Aucun contexte. Aucune explication. Juste l'accroche.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Usage cible du hook</label>
+                    <div class="radio-group">
+                        <div class="radio-pill"><input type="radio" id="hu1" name="hookUsage" value="email" checked><label for="hu1">Email / Objet</label></div>
+                        <div class="radio-pill"><input type="radio" id="hu2" name="hookUsage" value="post"><label for="hu2">Post réseaux</label></div>
+                        <div class="radio-pill"><input type="radio" id="hu3" name="hookUsage" value="pub"><label for="hu3">Publicité</label></div>
+                        <div class="radio-pill"><input type="radio" id="hu4" name="hookUsage" value="vente"><label for="hu4">Page de vente</label></div>
+                        <div class="radio-pill"><input type="radio" id="hu5" name="hookUsage" value="universel"><label for="hu5">Universel</label></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Audience cible <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="hookTarget" placeholder="Ex: Artisans indépendants qui veulent plus de clients réguliers" maxlength="150">
+                    <div class="char-counter" id="hookTargetCount">0/150</div>
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Sujet / thème de l'accroche <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="hookSubject" placeholder="Ex: L'email marketing pour artisans, La prospection sans pub payante" maxlength="150">
+                    <div class="char-counter" id="hookSubjectCount">0/150</div>
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Problème principal de l'audience <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="hookProblem" placeholder="Ex: Ventes irrégulières, CA qui chute hors saison, zéro fidélisation client" maxlength="200">
+                    <div class="char-counter" id="hookProblemCount">0/200</div>
+                    <div class="help-text">Plus il est précis et douloureux, plus le hook accroche.</div>
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Bénéfice ou résultat concret (si disponible)</label>
+                    <input type="text" class="form-control" id="hookBenefit" placeholder="Ex: +35% de CA en 3 mois, 2h/semaine économisées" maxlength="150">
+                    <div class="help-text">Un chiffre réel décuple la force du hook.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Formats de hooks à générer</label>
+                    <div class="radio-group">
+                        <div class="radio-pill"><input type="radio" id="hf1" name="hookFormat" value="tous" checked><label for="hf1">Tous les formats (5)</label></div>
+                        <div class="radio-pill"><input type="radio" id="hf2" name="hookFormat" value="curiosite"><label for="hf2">Curiosité</label></div>
+                        <div class="radio-pill"><input type="radio" id="hf3" name="hookFormat" value="statistique"><label for="hf3">Statistique</label></div>
+                        <div class="radio-pill"><input type="radio" id="hf4" name="hookFormat" value="erreur"><label for="hf4">Erreur fréquente</label></div>
+                        <div class="radio-pill"><input type="radio" id="hf5" name="hookFormat" value="promesse"><label for="hf5">Promesse directe</label></div>
+                        <div class="radio-pill"><input type="radio" id="hf6" name="hookFormat" value="storytelling"><label for="hf6">Storytelling</label></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">IA cible</label>
+                    <div class="radio-group">
+                        <div class="radio-pill"><input type="radio" id="ai_hooks1" name="hooksAI" value="claude" checked><label for="ai_hooks1">Claude</label></div>
+                        <div class="radio-pill"><input type="radio" id="ai_hooks2" name="hooksAI" value="chatgpt"><label for="ai_hooks2">ChatGPT</label></div>
+                        <div class="radio-pill"><input type="radio" id="ai_hooks3" name="hooksAI" value="universel"><label for="ai_hooks3">Universel</label></div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="generatePrompt('hooks')">Générer le Prompt ⚡</button>
+            </div>
+
+            <!-- SEQUENCE EMAIL FORM -->
+            <div id="sequenceForm" class="form-section">
+                <button class="btn btn-back" onclick="backToSelection()">← Retour</button>
+                <div class="form-header">
+                    <div class="form-header-icon">🔁</div>
+                    <div><h2>Séquence Email</h2><p>Arc narratif complet · 4 à 8 emails · Progression psychologique</p></div>
+                </div>
+
+                <div class="notice notice-info">
+                    <span class="notice-icon">⚠️</span>
+                    <div><strong>Différence clé :</strong> Un email = un message ponctuel. Une séquence = un arc narratif avec une progression psychologique : Éveil → Éducation → Révélation → Projection → Preuve → Objections → Urgence → Fermeture. Chaque email prépare le suivant.</div>
+                </div>
+
+                <div class="global-field">
+                    <label class="form-label">🏷️ Nom de marque / Auteur <span style="color:var(--text-muted); font-weight:400">(optionnel)</span></label>
+                    <input type="text" class="form-control" id="seqBrand" placeholder="Ex: Nicolas — FlashTools.fr">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Type de séquence</label>
+                    <div class="radio-group">
+                        <div class="radio-pill"><input type="radio" id="st_type1" name="seqType" value="bienvenue" checked><label for="st_type1">Bienvenue / Onboarding</label></div>
+                        <div class="radio-pill"><input type="radio" id="st_type2" name="seqType" value="lancement"><label for="st_type2">Lancement produit</label></div>
+                        <div class="radio-pill"><input type="radio" id="st_type3" name="seqType" value="nurturing"><label for="st_type3">Nurturing / Éducation</label></div>
+                        <div class="radio-pill"><input type="radio" id="st_type4" name="seqType" value="reactivation"><label for="st_type4">Réactivation</label></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Nombre d'emails</label>
+                    <div class="radio-group">
+                        <div class="radio-pill"><input type="radio" id="sn1" name="seqNb" value="4"><label for="sn1">4 emails</label></div>
+                        <div class="radio-pill"><input type="radio" id="sn2" name="seqNb" value="6" checked><label for="sn2">6 emails</label></div>
+                        <div class="radio-pill"><input type="radio" id="sn3" name="seqNb" value="8"><label for="sn3">8 emails</label></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Audience / Avatar <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="seqTarget" placeholder="Ex: Artisans indépendants, 35–55 ans, CA irrégulier, peu à l'aise avec le digital" maxlength="200">
+                    <div class="char-counter" id="seqTargetCount">0/200</div>
+                    <div class="help-text">Précisez : secteur, âge, problème quotidien, niveau de conscience.</div>
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Produit / Service proposé <span class="required-star">*</span></label>
+                    <input type="text" class="form-control required" id="seqProduct" placeholder="Ex: Formation email marketing pour artisans — 297€" maxlength="150">
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Problème principal résolu <span class="required-star">*</span></label>
+                    <textarea class="form-control required" id="seqProblem" placeholder="Ex: CA irrégulier, dépendance aux marchés physiques, aucune base client fidèle, zéro stratégie email" maxlength="300"></textarea>
+                    <div class="char-counter" id="seqProblemCount">0/300</div>
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Transformation promise <span class="required-star">*</span></label>
+                    <textarea class="form-control required" id="seqTransform" placeholder="Ex: De zéro email à 500 abonnés actifs générant 2000€/mois supplémentaires en 90 jours" maxlength="300"></textarea>
+                    <div class="char-counter" id="seqTransformCount">0/300</div>
+                    <div class="error-msg">Ce champ est requis.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Objections principales anticipées</label>
+                    <textarea class="form-control" id="seqObjections" placeholder="Ex: Pas le temps, trop technique, déjà essayé sans résultat, trop cher" maxlength="250"></textarea>
+                    <div class="help-text">Ces objections seront traitées aux bons moments de la séquence.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Urgence / offre de clôture (si applicable)</label>
+                    <input type="text" class="form-control" id="seqUrgency" placeholder="Ex: -40% jusqu'au dimanche, 20 places disponibles, bonus offert jusqu'au vendredi" maxlength="150">
+                    <div class="help-text">⚠️ Uniquement si l'urgence est réelle. Une urgence inventée détruit la confiance.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">IA cible</label>
+                    <div class="radio-group">
+                        <div class="radio-pill"><input type="radio" id="ai_seq1" name="seqAI" value="claude" checked><label for="ai_seq1">Claude</label></div>
+                        <div class="radio-pill"><input type="radio" id="ai_seq2" name="seqAI" value="chatgpt"><label for="ai_seq2">ChatGPT</label></div>
+                        <div class="radio-pill"><input type="radio" id="ai_seq3" name="seqAI" value="universel"><label for="ai_seq3">Universel</label></div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="generatePrompt('sequence')">Générer le Prompt ⚡</button>
+            </div>
+
+            <!-- RESULT -->
+            <div id="resultSection" class="result-section">
+                <button class="btn btn-back" onclick="backToSelection()">← Créer un autre prompt</button>
+
+                <div class="result-header">
+                    <span class="result-badge">✓ Prompt généré</span>
+                    <span style="font-size:0.82rem; color:var(--text-muted)">Copiez et collez dans votre IA</span>
+                </div>
+
+                <div class="steps">
+                    <div class="step"><div class="step-num">1</div><div class="step-text">Copiez le prompt ci-dessous</div></div>
+                    <div class="step"><div class="step-num">2</div><div class="step-text">Ouvrez Claude ou ChatGPT</div></div>
+                    <div class="step"><div class="step-num">3</div><div class="step-text">Collez dans la conversation</div></div>
+                    <div class="step"><div class="step-num">4</div><div class="step-text">Obtenez votre contenu pro !</div></div>
+                </div>
+
+                <div class="prompt-box">
+                    <div class="prompt-box-header">
+                        <span class="prompt-box-label">🤖 Prompt optimisé</span>
+                        <span id="promptWordCount" style="font-size:0.75rem; color:var(--text-muted);"></span>
+                    </div>
+                    <div class="prompt-text" id="generatedPrompt"></div>
+                </div>
+
+                <div class="action-row">
+                    <button class="btn-copy" id="copyBtn" onclick="copyPrompt()">📋 Copier le Prompt</button>
+                    <button class="btn-copy" id="copyOpenBtn" onclick="copyAndOpen()">⚡ Copier + Ouvrir Claude</button>
+                </div>
+
+                <hr class="divider">
+
+                <p class="section-title">Ouvrir dans une IA</p>
+                <div class="ai-links">
+                    <a href="https://claude.ai" target="_blank" class="ai-link"><span class="ai-link-icon">🤖</span><span>Claude.ai (Anthropic)</span></a>
+                    <a href="https://chat.openai.com" target="_blank" class="ai-link"><span class="ai-link-icon">💬</span><span>ChatGPT (OpenAI)</span></a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+var currentType = '';
+var formData = {}; // Mémoire des champs entre navigations
+
+// Type selection
+document.querySelectorAll('.type-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+        selectType(this.getAttribute('data-type'));
+    });
+});
+
+function selectType(type) {
+    currentType = type;
+    hideAll();
+    document.getElementById(type + 'Form').classList.add('active');
+    restoreFormData(type);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function hideAll() {
+    document.querySelectorAll('.form-section, .result-section').forEach(function(el) {
+        el.classList.remove('active');
+    });
+}
+
+function backToSelection() {
+    if (currentType) saveFormData(currentType);
+    hideAll();
+    document.getElementById('typeSelection').classList.add('active');
+    currentType = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Save/restore form state
+function saveFormData(type) {
+    var fields = document.querySelectorAll('#' + type + 'Form input[type="text"], #' + type + 'Form textarea, #' + type + 'Form select, #' + type + 'Form input[type="number"]');
+    formData[type] = formData[type] || {};
+    fields.forEach(function(f) { if (f.id) formData[type][f.id] = f.value; });
+
+    var radios = document.querySelectorAll('#' + type + 'Form input[type="radio"]:checked');
+    radios.forEach(function(r) { formData[type][r.name] = r.value; });
+}
+
+function restoreFormData(type) {
+    if (!formData[type]) return;
+    Object.keys(formData[type]).forEach(function(key) {
+        var el = document.getElementById(key);
+        if (el) { el.value = formData[type][key]; updateCharCount(el); }
+
+        // Restore radio
+        var radio = document.querySelector('#' + type + 'Form input[name="' + key + '"][value="' + formData[type][key] + '"]');
+        if (radio) radio.checked = true;
+    });
+}
+
+// Char counters
+function initCharCounters() {
+    document.querySelectorAll('[maxlength]').forEach(function(el) {
+        el.addEventListener('input', function() { updateCharCount(this); });
+    });
+}
+
+function updateCharCount(el) {
+    if (!el.maxLength) return;
+    var countEl = document.getElementById(el.id + 'Count');
+    if (!countEl) return;
+    var len = el.value.length;
+    var max = el.maxLength;
+    countEl.textContent = len + '/' + max;
+    countEl.classList.toggle('warn', len > max * 0.85);
+}
+
+// Validation
+function validateForm(type) {
+    var formEl = document.getElementById(type + 'Form');
+    var fields = formEl.querySelectorAll('.required');
+    var valid = true;
+
+    fields.forEach(function(field) {
+        var isEmpty = field.value.trim() === '';
+        field.classList.toggle('error', isEmpty);
+        if (isEmpty) valid = false;
+    });
+
+    if (!valid) {
+        var firstError = formEl.querySelector('.required.error');
+        if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return valid;
+}
+
+// Clear errors on input
+document.querySelectorAll('.required').forEach(function(el) {
+    el.addEventListener('input', function() {
+        if (this.value.trim() !== '') this.classList.remove('error');
+    });
+});
+
+// AI target labels
+var aiLabels = {
+    claude: 'Optimisé pour Claude (Anthropic) — style analytique, structuré, nuancé',
+    chatgpt: 'Optimisé pour ChatGPT (OpenAI) — style direct, listes claires',
+    universel: 'Compatible tous modèles IA — instructions explicites et neutres'
+};
+
+function getAI(prefix) {
+    var el = document.querySelector('input[name="' + prefix + 'AI"]:checked');
+    return el ? el.value : 'claude';
+}
+function getAINote(prefix) { return aiLabels[getAI(prefix)] || ''; }
+
+function val(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+function radio(name) { var el = document.querySelector('input[name="' + name + '"]:checked'); return el ? el.value : ''; }
+
+// GENERATE
+function generatePrompt(type) {
+    if (!validateForm(type)) return;
+    saveFormData(type);
+
+    var prompt = '';
+    if (type === 'email') prompt = buildEmailPrompt();
+    else if (type === 'post') prompt = buildPostPrompt();
+    else if (type === 'newsletter') prompt = buildNewsletterPrompt();
+    else if (type === 'ad') prompt = buildAdPrompt();
+    else if (type === 'pitch') prompt = buildPitchPrompt();
+    else if (type === 'sales') prompt = buildSalesPrompt();
+    else if (type === 'hooks') prompt = buildHooksPrompt();
+    else if (type === 'sequence') prompt = buildSequencePrompt();
+
+    hideAll();
+    document.getElementById('resultSection').classList.add('active');
+    document.getElementById('generatedPrompt').textContent = prompt;
+
+    var wordCount = prompt.split(/\s+/).filter(Boolean).length;
+    document.getElementById('promptWordCount').textContent = wordCount + ' mots';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ---- SOCLE COMMUN — injecté dans TOUS les prompts ----
+
+var SOCLE_COPYWRITING = `
+## SOCLE COPYWRITING — RÈGLES FONDAMENTALES À APPLIQUER EN PERMANENCE
+
+### PRINCIPES DE RÉDACTION (micro-copywriting)
+- UNE PHRASE = UNE IDÉE. Jamais deux idées dans la même phrase.
+- Varier la longueur des phrases : courte pour l'impact, longue pour l'immersion. Mix = rythme.
+- Exemple de rythme : "Il a tout perdu en 6 mois. Pas son argent. Sa confiance."
+- Bénéfices > caractéristiques. Appliquer la méthode "Et alors ?" à chaque argument :
+  Caractéristique → Et alors ? → Bénéfice → Et alors ? → Émotion → Et alors ? → Transformation de vie.
+- Spécificité absolue : "+35% en 3 mois" > "améliorer vos résultats". Chiffres partout où c'est possible.
+- Mots actifs, verbes d'action. Bannir le passif et les formules molles.
+- RÈGLE ANTI-BLABLA : Si une phrase peut être supprimée sans changer le sens, elle doit être supprimée.
+  Appliquer ce test à chaque phrase avant validation.
+
+### RÈGLES DES BULLET POINTS
+- Chaque bullet commence par un verbe d'action fort.
+- Structure : verbe + bénéfice concret + émotion ou chiffre.
+- ❌ "Des outils pour gérer votre temps"
+- ✅ "Libérez 3h par semaine grâce à notre système de priorisation — sans sacrifier la qualité"
+
+### RÈGLES DES TÉMOIGNAGES ET PREUVES SOCIALES
+⚠️ AVERTISSEMENT ÉTHIQUE IMPORTANT :
+- N'invente JAMAIS de témoignages. Un faux témoignage est une fraude commerciale.
+- Si l'utilisateur n'a pas encore de vrais clients : utiliser des résultats personnels, des cas d'étude,
+  des données sectorielles sourcées, ou indiquer clairement [TÉMOIGNAGE À COMPLÉTER].
+- Un témoignage authentique faible vaut infiniment mieux qu'un témoignage inventé parfait.
+- Format témoignage crédible : Prénom + secteur + problème initial + résultat chiffré + citation courte.
+- Les chiffres d'une urgence (places restantes, deadline) doivent être réels. Une urgence inventée
+  détruit la confiance dès que le prospect s'en rend compte.
+
+### RÈGLES DES CTA
+- Spécifique > générique. "Télécharger le guide PDF" > "En savoir plus" > "Cliquez ici".
+- Orienté bénéfice, pas action : "Je veux +35% de ventes" > "S'inscrire".
+- Un seul CTA principal par email / section. Ne pas diluer l'attention.
+
+### RÈGLE DU 80/20 EN COPYWRITING
+- 20% des éléments produisent 80% de la conversion : hook, titre, premier paragraphe, CTA principal.
+- Sur-optimiser ces 4 points en priorité absolue avant de peaufiner le reste.
+
+### L'ENNEMI COMMUN
+- Identifier ce contre quoi le lecteur se bat (système, idée reçue, concurrent, situation) 
+  renforce l'alliance avec lui. Ex : "Pas vous le problème — la façon dont on vous a appris à prospecter."
+
+### CE QUE CET OUTIL NE REMPLACE PAS
+Ce prompt est un tremplin pour s'initier sérieusement au marketing de contenu.
+Il ne remplace pas un copywriter professionnel qui connaît votre marché, votre avatar,
+votre tonalité de marque, et qui peut affiner chaque mot en fonction de vrais tests A/B.
+Pour des projets à fort enjeu (lancement, page de vente premium, séquence email longue),
+faire appel à un copywriter spécialisé reste le meilleur investissement.
+`;
+
+var INSTRUCTION_PARTENAIRE = `
+## RÔLE DE L'IA DANS CETTE SESSION
+
+Tu n'es pas un générateur automatique. Tu es un partenaire copywriting exigeant.
+
+AVANT de rédiger quoi que ce soit, tu dois :
+
+1. DIAGNOSTIQUER les informations fournies. Si un champ est vague, trop générique, ou manquant,
+   SIGNALE-LE clairement avant de commencer. Ex : "Ton bénéfice clé manque de spécificité —
+   peux-tu me donner un chiffre ou un résultat concret ?"
+
+2. ALERTER sur les risques éthiques ou d'efficacité :
+   - Témoignages non sourcés ou invérifiables → demander confirmation qu'ils sont réels
+   - Urgence ou rareté non justifiée → signaler que ça peut détruire la confiance
+   - Promesses non prouvées → proposer de les reformuler en promesse conditionnelle honnête
+   - Avatar trop flou → poser 2 questions de clarification sur l'audience
+
+3. PROPOSER, ne pas subir : si une information semble sous-exploitée (un chiffre fort enterré,
+   une transformation puissante mal formulée), le signaler et proposer une meilleure mise en valeur.
+
+4. FINIR chaque livrable par une section "🔍 Points à vérifier avant publication" :
+   liste des éléments que l'utilisateur doit confirmer, compléter ou tester.
+
+Format de ta réponse :
+— D'abord : ton diagnostic en 3–5 points (ce qui est fort, ce qui manque, ce qui risque de nuire)
+— Ensuite : le contenu demandé, complet et prêt à l'emploi
+— Enfin : la section "Points à vérifier"
+`;
+
+// ---- PROMPT BUILDERS ----
+
+function buildEmailPrompt() {
+    var toneMap = {
+        educatif: 'éducatif et informatif — valeur concrète, zéro pression commerciale',
+        persuasif: 'persuasif et commercial — copywriting avancé, urgence mesurée et justifiée',
+        inspirant: 'inspirant et motivant — émotion d\'abord, logique ensuite',
+        urgent: 'direct avec urgence réelle — économie de mots, chaque phrase compte',
+        storytelling: 'narratif — une micro-histoire (2–4 phrases) qui contextualise le message avant l\'offre'
+    };
+    var brand = val('emailBrand');
+    var brandLine = brand ? '\n- Signature / marque : ' + brand : '';
+
+    return '# PROMPT : Email Marketing\n' +
+'# ' + getAINote('email') + '\n\n' +
+INSTRUCTION_PARTENAIRE +
+'\n## CONTEXTE FOURNI\n' +
+'- Audience : ' + val('emailTarget') + '\n' +
+'- Objectif : ' + radio('emailObjective') + '\n' +
+'- Sujet : ' + val('emailSubject') + '\n' +
+'- Bénéfice clé : ' + val('emailBenefit') + '\n' +
+'- CTA souhaité : ' + val('emailCTA') + '\n' +
+'- Ton : ' + toneMap[val('emailTone') || 'educatif'] + brandLine + '\n\n' +
+'## STRUCTURE À RESPECTER (AIDA)\n' +
+'1. OBJET — 3 variantes : spécifique, curiosité ou bénéfice clair (max 50 car. chacun)\n' +
+'2. HOOK — 1 phrase. Une seule idée. Arrête la lecture de la boîte mail.\n' +
+'   Types possibles : question directe / statistique choc / affirmation contre-intuitive\n' +
+'3. PROBLÈME — 2–3 phrases. Une idée par phrase. Empathique, jamais condescendant.\n' +
+'4. SOLUTION — 3–4 phrases. Bénéfice concret + chiffre si disponible. Méthode "Et alors ?" appliquée.\n' +
+'5. PREUVE — 1 élément : témoignage RÉEL (prénom + résultat chiffré), donnée sourcée, ou cas concret.\n' +
+'   ⚠️ Si aucune preuve réelle n\'est disponible : écrire [PREUVE À COMPLÉTER] et expliquer pourquoi c\'est non-négociable.\n' +
+'6. CTA — 1 seul. Orienté bénéfice. Format : "Je veux [bénéfice]" ou "[Action] + [résultat]".\n' +
+'7. PS — Rappel urgence réelle, bénéfice secondaire, ou question qui relance.\n\n' +
+'## RÈGLE DU 80/20 POUR CET EMAIL\n' +
+'Sur-optimiser dans cet ordre : objet → hook → CTA → preuve. Le reste suit.\n\n' +
+SOCLE_COPYWRITING;
+}
+
+function buildPostPrompt() {
+    var platMap = {
+        linkedin: 'LinkedIn — 1300–1500 car., professionnel, sauts de ligne aérés, emojis sobres',
+        instagram: 'Instagram — 150–200 mots, accessible, 10–15 hashtags mix large + niche à la fin',
+        facebook: 'Facebook — 200–300 mots, conversationnel, questions ouvertes, invite aux commentaires'
+    };
+    var toneMap = {
+        educatif: 'éducatif — conseils actionnables et spécifiques, zéro blabla générique',
+        inspirant: 'inspirant — émotion d\'abord, projection positive, ancrage sensoriel',
+        personnel: 'personnel / storytelling — anecdote vraie, vécu terrain, vulnérabilité calculée',
+        provocateur: 'provocateur / contrarian — remet en question une idée reçue du secteur, constructif'
+    };
+    var plat = radio('platform') || 'linkedin';
+    var brand = val('postBrand');
+    var brandLine = brand ? '\n- Auteur / signature : ' + brand : '';
+
+    return '# PROMPT : Post ' + plat.charAt(0).toUpperCase() + plat.slice(1) + '\n' +
+'# ' + getAINote('post') + '\n\n' +
+INSTRUCTION_PARTENAIRE +
+'\n## CONTEXTE FOURNI\n' +
+'- Plateforme : ' + platMap[plat] + '\n' +
+'- Sujet : ' + val('postSubject') + '\n' +
+'- Valeur apportée : ' + val('postValue') + '\n' +
+'- Audience : ' + val('postTarget') + '\n' +
+'- Ton : ' + toneMap[val('postTone') || 'educatif'] + brandLine + '\n\n' +
+'## STRUCTURE DU POST\n' +
+'1. HOOK — 3 variantes à proposer.\n' +
+'   La première ligne est le seul critère pour que le post soit lu. Une seule idée. Pas de virgule.\n' +
+'   Types : question directe / chiffre choc / affirmation contre-intuitive / phrase incomplète qui oblige à lire la suite.\n' +
+'   ❌ "Dans cet article, je vais vous parler de..." → ✅ "J\'ai perdu 3 clients en 1 semaine. Voilà ce que j\'ai appris."\n' +
+'2. DÉVELOPPEMENT — Rythme varié. Une idée par phrase ou par ligne.\n' +
+'   Règle de lisibilité : jamais plus de 3 lignes sans saut de ligne sur ' + plat + '.\n' +
+'3. VALEUR CONCRÈTE — Conseil actionnable, insight terrain, ou liste courte.\n' +
+'   Chaque point avec verbe d\'action + bénéfice + chiffre si possible.\n' +
+'4. ENGAGEMENT — 1 question ouverte qui invite à commenter (pas "Qu\'en pensez-vous ?" — trop générique).\n' +
+'5. CTA — Optionnel. Naturel, non-intrusif.' +
+(plat === 'instagram' ? '\n6. HASHTAGS — 10–15 : mix mots-clés larges + niche + marque.' : '') + '\n\n' +
+'## BIG IDEA DU POST\n' +
+'Avant de rédiger, identifier LA grande idée centrale — le fil rouge que le lecteur doit retenir\n' +
+'en 1 phrase s\'il ne lit que le hook et la conclusion.\n\n' +
+'## LONGUEUR CIBLE : ' + (plat === 'linkedin' ? '1300–1500 car.' : plat === 'instagram' ? '150–200 mots' : '200–300 mots') + '\n\n' +
+SOCLE_COPYWRITING;
+}
+
+function buildNewsletterPrompt() {
+    var toneMap = {
+        educatif: 'éducatif — valeur concrète, conseils actionnables, exemples terrain',
+        expert: 'expert et analytique — insights poussés, angle de fond, opinion assumée',
+        casual: 'casual et conversationnel — humour possible, proximité, comme une lettre à un ami'
+    };
+    var sections = radio('newsSections') || '3';
+    var brand = val('newsBrand');
+    var brandLine = brand ? '\n- Nom de la newsletter : ' + brand : '';
+
+    return '# PROMPT : Newsletter\n' +
+'# ' + getAINote('news') + '\n\n' +
+INSTRUCTION_PARTENAIRE +
+'\n## CONTEXTE FOURNI\n' +
+'- Thème : ' + val('newsTheme') + '\n' +
+'- Nombre de sections : ' + sections + '\n' +
+'- Audience : ' + val('newsTarget') + '\n' +
+'- Valeur apportée : ' + val('newsValue') + '\n' +
+'- Ton : ' + toneMap[val('newsTone') || 'educatif'] + brandLine + '\n\n' +
+'## STRUCTURE\n' +
+'1. LIGNE D\'OBJET — 3 variantes. Spécifique, bénéfice immédiat ou curiosité forte.\n' +
+'   Règle : l\'objet doit donner envie d\'ouvrir MÊME si le lecteur a 40 autres emails non lus.\n' +
+'2. INTRO — 2–3 phrases. Une idée par phrase. Contextualise et crée l\'envie de lire.\n' +
+'   Peut s\'ouvrir sur une anecdote courte, un chiffre surprenant, ou une question directe.\n' +
+'3. ' + sections + ' SECTIONS :\n' +
+'   — Titre de section : accrocheur, spécifique, pas générique ("Section 1" = interdit)\n' +
+'   — Corps : 60–100 mots. Une idée principale. Conseil actionnable ou insight terrain.\n' +
+'   — Chaque section doit avoir de la valeur indépendamment des autres.\n' +
+'4. CONCLUSION — 2 phrases max. Synthèse + invitation à agir ou à répondre.\n' +
+'5. PS — Teasing prochain numéro OU ressource bonus OU question qui ouvre la conversation.\n\n' +
+'## L\'ENNEMI COMMUN DE CETTE NEWSLETTER\n' +
+'Identifier contre quoi se bat votre lecteur (idée reçue, système, problème récurrent).\n' +
+'Le nommer renforce l\'alliance entre l\'auteur et le lecteur. Ex : "Pas vous le problème — les outils qu\'on vous a imposés."\n\n' +
+'## LONGUEUR TOTALE : 400–600 mots\n\n' +
+SOCLE_COPYWRITING;
+}
+
+function buildAdPrompt() {
+    var platMap = {
+        meta: 'Meta Ads (Facebook/Instagram)\n   Titre : 40 car. max | Texte principal : 125 car. max | Description : 30 car. max',
+        google: 'Google Ads\n   3 titres : 30 car. chacun | 2 descriptions : 90 car. chacune',
+        linkedin: 'LinkedIn Ads\n   Titre : 70 car. max | Texte introductif : 150 car. max'
+    };
+    var angleMap = {
+        probleme: 'Problème → Solution : Agiter la douleur de l\'avatar, nommer l\'ennemi commun, puis révéler la solution',
+        benefice: 'Bénéfice immédiat : Focus transformation visible, avant/après chiffré',
+        urgence: 'Urgence / FOMO : Deadline ou rareté RÉELLE uniquement — une urgence inventée tue la confiance',
+        preuve: 'Preuve sociale : Chiffres vérifiables, témoignages authentiques, autorité sectorielle'
+    };
+    var plat = radio('adPlatform') || 'meta';
+
+    return '# PROMPT : Publicité ' + plat.toUpperCase() + '\n' +
+'# ' + getAINote('ad') + '\n\n' +
+INSTRUCTION_PARTENAIRE +
+'\n## CONTEXTE FOURNI\n' +
+'- Plateforme : ' + platMap[plat] + '\n' +
+'- Produit / Service : ' + val('adProduct') + '\n' +
+'- Audience : ' + val('adTarget') + '\n' +
+'- Bénéfice principal : ' + val('adBenefit') + '\n' +
+'- Offre / Promotion : ' + val('adOffer') + '\n' +
+'- Angle : ' + angleMap[val('adAngle') || 'probleme'] + '\n\n' +
+'## À GÉNÉRER — 3 VARIANTES A/B/C\n' +
+(plat === 'meta' ?
+'Pour chaque variante :\n- Titre (40 car. max)\n- Texte principal (125 car. max)\n- Description (30 car. max)\n- Version longue optionnelle (250 car.)' :
+plat === 'google' ?
+'Pour chaque variante :\n- Titre 1 (30 car.)\n- Titre 2 (30 car.)\n- Titre 3 (30 car.)\n- Description 1 (90 car.)\n- Description 2 (90 car.)' :
+'Pour chaque variante :\n- Titre (70 car.)\n- Texte introductif (150 car.)') + '\n' +
+'Indiquer le nombre de caractères entre parenthèses après chaque élément.\n\n' +
+'## RÈGLES PUB\n' +
+'- UNE idée par titre. Jamais deux promesses dans une même ligne.\n' +
+'- Bénéfice chiffré > promesse vague dans chaque variante si possible.\n' +
+'- Urgence : NE PAS inventer de deadline. Si l\'offre fournie n\'en a pas, le signaler.\n' +
+'- Mots de pouvoir contextuels : gratuit, prouvé, garanti, exclusif — SEULEMENT si justifiés.\n' +
+'- Chaque variante teste UN angle différent (problème / bénéfice / preuve / ennemi commun).\n\n' +
+'## MÉTHODE "ET ALORS ?" APPLIQUÉE À CET ANGLE\n' +
+'Avant de rédiger, appliquer la chaîne : Caractéristique → Et alors ? → Bénéfice → Et alors ? → Émotion.\n' +
+'Écrire le résultat final de cette chaîne en commentaire avant chaque variante.\n\n' +
+SOCLE_COPYWRITING;
+}
+
+function buildPitchPrompt() {
+    var dur = radio('pitchDuration') || '15';
+    var words = Math.round(parseInt(dur) * 2.3);
+    var structureMap = {
+        '15': '1. CIBLE + DOULEUR — 1 phrase. Nommer précisément qui et leur problème coûteux.\n2. SOLUTION — 1 phrase. Ce que tu fais, pas comment tu le fais.\n3. RÉSULTAT CHIFFRÉ — 1 phrase. Toujours un nombre ou un délai.\n4. CTA — 1 phrase. Invite à l\'échange, pas à l\'achat.',
+        '30': '1. ACCROCHE — 1 phrase choc. Chiffre ou question déstabilisatrice.\n2. CIBLE & DOULEUR — 2 phrases. Qui + leur problème + son coût réel (temps, argent, opportunités).\n3. SOLUTION UNIQUE — 2 phrases. Ta méthode différenciante, pas ce que tout le monde fait.\n4. RÉSULTAT CHIFFRÉ — 1 phrase. Exemple concret si possible.\n5. CTA — 1 phrase. Invitation naturelle à continuer la conversation.',
+        '60': '1. CONTEXTE — 2 phrases. Qui sont tes clients, leur situation avant toi.\n2. DOULEUR + COÛT — 2 phrases. Le problème nommé + son coût financier ou émotionnel.\n3. SOLUTION UNIQUE — 2–3 phrases. Ta méthode, ton angle différenciant, ton "ennemi commun".\n4. RÉSULTATS PROUVÉS — 2 phrases. Transformation chiffrée + exemple client réel si disponible.\n5. DIFFÉRENCIATION — 1–2 phrases. Ce que tu fais que personne d\'autre ne fait ainsi.\n6. CTA — 1 phrase. Proposition d\'échange clair et sans pression.'
+    };
+
+    return '# PROMPT : Pitch Elevator ' + dur + ' secondes\n' +
+'# ' + getAINote('pitch') + '\n\n' +
+INSTRUCTION_PARTENAIRE +
+'\n## CONTEXTE FOURNI\n' +
+'- Activité : ' + val('pitchActivity') + '\n' +
+'- Client idéal : ' + val('pitchTarget') + '\n' +
+'- Problème résolu : ' + val('pitchProblem') + '\n' +
+'- Solution proposée : ' + val('pitchSolution') + '\n' +
+'- Résultat obtenu : ' + val('pitchResult') + '\n\n' +
+'## STRUCTURE ' + dur + 's (~' + words + ' mots)\n' +
+structureMap[dur] + '\n\n' +
+'## RÈGLES DU PITCH\n' +
+'- Contrainte dure : ~' + words + ' mots. Compter et ajuster.\n' +
+'- Une idée par phrase. Rythme oral, pas écrit.\n' +
+'- Le résultat doit toujours être chiffré (%, €, temps, délai).\n' +
+'- Si le résultat fourni n\'est pas chiffré, demander à l\'utilisateur de le préciser avant de rédiger.\n' +
+'- Tester la fluidité à voix haute : si une phrase accroche en lecture, elle accrochera à l\'oral.\n' +
+'- Générer 2 variantes avec approche différente (ex : une émotionnelle, une factuelle).\n\n' +
+'## USP / MUP DU PITCH\n' +
+'Identifier en 1 ligne : qu\'est-ce que cette activité promet d\'UNIQUE que personne d\'autre ne peut revendiquer ainsi ?\n' +
+'Ce MUP (Most Unique Promise) doit être visible dans les 2 variantes.\n\n' +
+SOCLE_COPYWRITING;
+}
+
+function buildSalesPrompt() {
+    var salesType = radio('salesType') || 'courte';
+    var wordTarget = salesType === 'courte' ? '1000–1500 mots' : '2500–3500 mots';
+    var brand = val('salesBrand');
+    var brandLine = brand ? '\n- Auteur / marque : ' + brand : '';
+
+    return '# PROMPT : Page de Vente (' + salesType + ')\n' +
+'# ' + getAINote('sales') + '\n\n' +
+INSTRUCTION_PARTENAIRE +
+'\n## CONTEXTE FOURNI\n' +
+'- Produit / Service : ' + val('salesProduct') + '\n' +
+'- Prix : ' + val('salesPrice') + '\n' +
+'- Audience : ' + val('salesTarget') + '\n' +
+'- Problème résolu : ' + val('salesProblem') + '\n' +
+'- Transformation : ' + val('salesTransform') + '\n' +
+'- Contenu de l\'offre : ' + val('salesOffer') + '\n' +
+'- Garantie : ' + val('salesGuarantee') + brandLine + '\n\n' +
+'## ANALYSE MACRO AVANT RÉDACTION\n' +
+'Avant d\'écrire une ligne, poser le cadre stratégique :\n' +
+'1. LA BIG IDEA — Quelle est l\'idée centrale mémorable qui différencie cette offre ?\n' +
+'   Une Big Idea n\'est pas un bénéfice. C\'est un angle de vue inattendu sur le problème.\n' +
+'   Ex : non pas "formation email" mais "Les artisans perdent 30% de leur CA parce qu\'ils oublient leurs anciens clients"\n' +
+'2. L\'ENNEMI COMMUN — Ce contre quoi le prospect se bat (idée reçue, système, habitude).\n' +
+'   Le nommer crée une alliance immédiate. Ex : "Pas vous le problème — le marketing agressif qu\'on vous a appris."\n' +
+'3. L\'AVATAR PRÉCIS — Si l\'audience fournie est trop vague, demander 3 précisions :\n' +
+'   âge approximatif / revenu / problème quotidien n°1.\n\n' +
+'## STRUCTURE (13 SECTIONS)\n' +
+'1. BARRE D\'URGENCE — 1 ligne. Uniquement si deadline ou rareté RÉELLE.\n' +
+'   ⚠️ Si aucun élément d\'urgence réel n\'est fourni, ne pas inventer. Signaler à l\'utilisateur.\n' +
+'2. HEADLINE + SOUS-TITRE — Promesse spécifique + chiffre + preuve sociale (format : "Comment [cible] obtient [résultat chiffré] sans [objection principale]")\n' +
+'3. AGITATION PROBLÈME — 4–5 bullets. Structure : verbe d\'action négatif + douleur concrète + coût émotionnel/financier.\n' +
+'4. VISION TRANSFORMÉE — Scénario projection "Imaginez-vous dans 90 jours...". Ancrage sensoriel et émotionnel.\n' +
+'5. CRÉDIBILITÉ — Qui tu es + pourquoi tu es légitime. Histoire courte, vécu terrain, résultat prouvé.\n' +
+'   ⚠️ Pas de crédibilité inventée. Écrire [À COMPLÉTER] si le contexte manque.\n' +
+'6. RÉVÉLATION (Big Idea) — L\'insight contre-intuitif que peu connaissent. Nommer l\'ennemi commun ici.\n' +
+'7. PRÉSENTATION SOLUTION — Nom du produit + méthode unique + comment ça fonctionne en termes simples.\n' +
+'8. CONTENU DÉTAILLÉ — Modules / éléments avec bénéfices. Structure bullet : verbe + bénéfice + résultat chiffré si possible.\n' +
+'9. PREUVES SOCIALES — 2–3 témoignages RÉELS.\n' +
+'   ⚠️ FORMAT OBLIGATOIRE : Prénom + contexte ("céramiste de 3 ans") + problème initial + résultat chiffré + citation courte.\n' +
+'   ⚠️ Si pas de vrais témoignages : écrire [TÉMOIGNAGE RÉEL À INSÉRER] et ne JAMAIS en inventer.\n' +
+'10. FAUSSE CLOSE — Technique avancée : simuler une conclusion, puis relancer avec un bénéfice oublié.\n' +
+'    Ex : "Vous pourriez vous arrêter là et avoir déjà une base solide. Mais il y a un élément que la plupart ratent..."\n' +
+'11. OFFRE COMPLÈTE — Stack de valeur : lister chaque élément avec sa valeur perçue en €, puis prix total vs prix demandé.\n' +
+'12. GARANTIE — Renverser le risque. Plus la garantie est forte et précise, plus elle rassure.\n' +
+'    Ex : "Si dans 30 jours vous n\'avez pas [résultat concret], je vous rembourse intégralement — sans question."\n' +
+'13. FAQ — 5–7 objections réelles (pas génériques). Format : objection formulée comme une vraie pensée du prospect → réponse directe et honnête.\n' +
+'14. CLÔTURE — Alternative binaire : "Soit vous continuez comme avant et [conséquence concrète]. Soit vous [action] et [résultat]."\n' +
+'    CTA final : répété 3 fois minimum dans la page, orienté bénéfice.\n\n' +
+'## ANALYSE MICRO APRÈS RÉDACTION\n' +
+'Sur chaque section rédigée, vérifier :\n' +
+'— Chaque phrase contient-elle UNE seule idée ?\n' +
+'— Les bénéfices sont-ils chiffrés ou illustrés par un exemple concret ?\n' +
+'— Y a-t-il des formules génériques IA à supprimer ?\n' +
+'— La méthode "Et alors ?" a-t-elle été appliquée aux arguments clés ?\n\n' +
+'## LONGUEUR : ' + wordTarget + '\n' +
+'Mettre [PHOTO], [VIDÉO TÉMOIGNAGE], [CAPTURE RÉSULTAT] pour les éléments visuels.\n\n' +
+SOCLE_COPYWRITING;
+}
+
+function buildHooksPrompt() {
+    var usageMap = {
+        email: 'objet d\'email — max 50 caractères, doit déclencher l\'ouverture parmi 40 autres emails non lus',
+        post: 'première ligne de post réseaux sociaux — doit arrêter le scroll en moins de 2 secondes',
+        pub: 'titre publicitaire — doit capter l\'attention d\'une audience qui ne vous connaît pas',
+        vente: 'headline de page de vente — doit qualifier et accrocher en même temps',
+        universel: 'multi-usage — adaptable email, post, pub et page de vente'
+    };
+    var formatMap = {
+        tous: 'les 5 formats : Curiosité, Statistique, Erreur fréquente, Promesse directe, Storytelling',
+        curiosite: 'Curiosité — crée un vide d\'information que le lecteur veut combler. Ne jamais révéler la réponse dans le hook.',
+        statistique: 'Statistique — chiffre précis + contre-intuitif ou surprenant. Le chiffre doit faire mal ou étonner.',
+        erreur: 'Erreur fréquente — nommer une erreur que fait l\'audience. Déclenche la peur de se reconnaître.',
+        promesse: 'Promesse directe — résultat chiffré + délai + sans [objection principale]. Ultra-spécifique.',
+        storytelling: 'Storytelling — 1 phrase d\'amorce narrative. Situation concrète qui crée une tension immédiate.'
+    };
+    var usage = radio('hookUsage') || 'universel';
+    var format = radio('hookFormat') || 'tous';
+    var benefit = val('hookBenefit');
+    var benefitLine = benefit ? '\n- Résultat / bénéfice disponible : ' + benefit : '\n- Résultat chiffré : NON FOURNI — demander à l\'utilisateur avant de rédiger les hooks statistique et promesse.';
+
+    return '# PROMPT : Générateur de Hooks\n' +
+'# ' + getAINote('hooks') + '\n\n' +
+INSTRUCTION_PARTENAIRE +
+'\n## CONTEXTE FOURNI\n' +
+'- Usage cible : ' + usageMap[usage] + '\n' +
+'- Audience : ' + val('hookTarget') + '\n' +
+'- Sujet / thème : ' + val('hookSubject') + '\n' +
+'- Problème principal : ' + val('hookProblem') + benefitLine + '\n' +
+'- Format(s) demandé(s) : ' + formatMap[format] + '\n\n' +
+'## CE QU\'EST UN BON HOOK — CRITÈRES ABSOLUS\n' +
+'Un hook réussi remplit TOUS ces critères :\n' +
+'1. UNE seule idée. Pas de virgule qui relie deux pensées.\n' +
+'2. Zéro contexte, zéro explication. L\'explication vient après.\n' +
+'3. Crée un état : curiosité, inconfort, surprise, ou reconnaissance immédiate ("c\'est exactement mon problème").\n' +
+'4. Peut être lu en moins de 3 secondes.\n' +
+'5. Ne peut pas commencer par "Dans cet article", "Aujourd\'hui je vais vous parler de", ou toute autre intro générique.\n\n' +
+'## À GÉNÉRER\n' +
+(format === 'tous' ?
+'Pour chaque format, générer 3 variantes (= 15 hooks au total).\n\n' +
+'### FORMAT 1 — CURIOSITÉ\n' +
+'Principe : créer un vide d\'information irrésistible. Ne JAMAIS donner la réponse dans le hook.\n' +
+'❌ "Voici pourquoi vos emails ne convertissent pas"\n' +
+'✅ "La vraie raison pour laquelle vos clients n\'ouvrent plus vos emails."\n\n' +
+'### FORMAT 2 — STATISTIQUE\n' +
+'Principe : chiffre précis + contre-intuitif ou alarmant.\n' +
+'❌ "Beaucoup d\'artisans perdent des clients"\n' +
+'✅ "73% des artisans n\'ont aucun système pour fidéliser leurs clients — et ne le savent pas."\n' +
+'⚠️ Si aucun chiffre réel n\'est disponible : proposer des structures à remplir plutôt qu\'inventer.\n\n' +
+'### FORMAT 3 — ERREUR FRÉQUENTE\n' +
+'Principe : nommer une erreur que fait l\'audience. Déclencher la peur de se reconnaître.\n' +
+'❌ "Évitez les erreurs marketing"\n' +
+'✅ "L\'erreur que font 9 artisans sur 10 quand ils cherchent de nouveaux clients."\n\n' +
+'### FORMAT 4 — PROMESSE DIRECTE\n' +
+'Principe : résultat + délai + sans [objection]. Ultra-spécifique, jamais vague.\n' +
+'❌ "Améliorez vos ventes avec l\'email"\n' +
+'✅ "Comment passer de 0 à 3 commandes régulières par semaine — sans publicité payante."\n\n' +
+'### FORMAT 5 — STORYTELLING\n' +
+'Principe : 1 phrase d\'amorce narrative. Situation + tension. Pas de résolution.\n' +
+'❌ "Voici l\'histoire d\'un artisan qui a réussi"\n' +
+'✅ "En novembre 2023, Mathieu a failli fermer son atelier. Voilà ce qui s\'est passé ensuite."\n'
+:
+'Générer 5 variantes du format : ' + formatMap[format] + '\n' +
+'Appliquer les critères absolus ci-dessus à chaque variante.\n') +
+'\n## APRÈS GÉNÉRATION\n' +
+'Pour chaque hook, noter en 1 ligne :\n' +
+'— Quel état émotionnel il déclenche (curiosité / inconfort / surprise / reconnaissance)\n' +
+'— Pour quel usage il est le plus efficace (email / post / pub / vente)\n\n' +
+SOCLE_COPYWRITING;
+}
+
+function buildSequencePrompt() {
+    var typeMap = {
+        bienvenue: 'Bienvenue / Onboarding — accueillir un nouvel abonné, créer la relation, positionner l\'expertise',
+        lancement: 'Lancement produit — accompagner le prospect de la découverte à l\'achat avec escalade psychologique',
+        nurturing: 'Nurturing / Éducation — apporter de la valeur régulière, renforcer la confiance, préparer une future offre',
+        reactivation: 'Réactivation — re-engager une liste froide, rappeler la valeur, proposer une raison de revenir'
+    };
+    var nb = radio('seqNb') || '6';
+    var brand = val('seqBrand');
+    var brandLine = brand ? '\n- Auteur / marque : ' + brand : '';
+    var urgency = val('seqUrgency');
+    var urgencyLine = urgency
+        ? '\n- Urgence de clôture : ' + urgency
+        : '\n- Urgence : NON FOURNIE — si c\'est une séquence de lancement, demander à l\'utilisateur s\'il a une deadline réelle avant de rédiger les derniers emails.';
+    var objections = val('seqObjections');
+    var objLine = objections ? '\n- Objections anticipées : ' + objections : '';
+
+    var seqType = radio('seqType') || 'bienvenue';
+
+    var arcMap = {
+        '4': 'Email 1 — Éveil / accroche (hook fort + problème nommé)\nEmail 2 — Éducation / révélation (insight contre-intuitif, ennemi commun)\nEmail 3 — Preuve / projection (témoignage réel + vision transformée)\nEmail 4 — Offre / CTA (présentation solution + urgence si applicable)',
+        '6': 'Email 1 — Éveil (hook + problème nommé précisément)\nEmail 2 — Éducation (insight clé, méthode "Et alors ?", ennemi commun)\nEmail 3 — Révélation (la Big Idea, ce que peu de gens savent)\nEmail 4 — Projection + Preuve (témoignage RÉEL + vision "dans 90 jours...")\nEmail 5 — Objections (FAQ anticipée, renversement du risque)\nEmail 6 — Urgence + Fermeture (alternative binaire, CTA final)',
+        '8': 'Email 1 — Éveil désir (hook + problème + retournement positif)\nEmail 2 — Positionnement expert (qui tu es, pourquoi tu es légitime)\nEmail 3 — Révélation solution (Big Idea + nom du produit + premier CTA)\nEmail 4 — Immersion émotionnelle (projection détaillée + impact entourage)\nEmail 5 — Case study (histoire complète, transformation chiffrée, prix révélé)\nEmail 6 — Objections massives (FAQ exhaustive, témoignages variés, garantie)\nEmail 7 — Ultimatum (alternative finale, récapitulatif, urgence max)\nEmail 8 — Fermeture (dernières heures, choix identitaire, CTA émotionnel)'
+    };
+
+    return '# PROMPT : Séquence Email (' + nb + ' emails)\n' +
+'# ' + getAINote('sequence') + '\n\n' +
+INSTRUCTION_PARTENAIRE +
+'\n## CONTEXTE FOURNI\n' +
+'- Type de séquence : ' + typeMap[seqType] + '\n' +
+'- Nombre d\'emails : ' + nb + '\n' +
+'- Avatar / Audience : ' + val('seqTarget') + '\n' +
+'- Produit / Service : ' + val('seqProduct') + '\n' +
+'- Problème résolu : ' + val('seqProblem') + '\n' +
+'- Transformation promise : ' + val('seqTransform') + objLine + urgencyLine + brandLine + '\n\n' +
+'## DIFFÉRENCE EMAIL PONCTUEL vs SÉQUENCE\n' +
+'Un email seul cherche à déclencher une action immédiate.\n' +
+'Une séquence construit un arc narratif : chaque email prépare le suivant psychologiquement.\n' +
+'La progression est : Éveil → Éducation → Révélation → Projection → Preuve → Objections → Urgence → Fermeture.\n' +
+'Ne jamais vendre dès l\'email 1 dans une séquence froide.\n\n' +
+'## ARC NARRATIF — ' + nb + ' EMAILS\n' +
+arcMap[nb] + '\n\n' +
+'## POUR CHAQUE EMAIL, GÉNÉRER\n' +
+'1. OBJET — 2 variantes (max 50 car.). Une seule idée. Pas de ponctuation superflue.\n' +
+'2. HOOK (1ère phrase) — Applique les règles des hooks : 1 idée, 0 contexte, crée un état.\n' +
+'3. CORPS — Structure AIDA adaptée à la phase de l\'arc. Rythme varié (1 phrase = 1 idée).\n' +
+'4. CTA — Adapté à la phase : soft (email 1-2), progressif (3-4), direct (5-8).\n' +
+'5. PS — Teasing du prochain email OU rappel urgence OU bénéfice secondaire.\n\n' +
+'## RÈGLES TÉMOIGNAGES DANS CETTE SÉQUENCE\n' +
+'⚠️ Les témoignages doivent être RÉELS.\n' +
+'Format : Prénom + secteur + problème initial + résultat chiffré + citation courte.\n' +
+'Si l\'utilisateur n\'en a pas encore : écrire [TÉMOIGNAGE RÉEL À INSÉRER] et expliquer son importance.\n' +
+'Un témoignage inventé parfait vaut moins qu\'un témoignage réel imparfait.\n\n' +
+'## ESCALADE D\'URGENCE (si séquence de lancement)\n' +
+'Email 1-3 : temporel vague ("bientôt disponible", "cette semaine")\n' +
+'Email 4-5 : précision croissante ("dans 48h", "places limitées")\n' +
+'Email 6-7 : double contrainte (temps + rareté réelle)\n' +
+'Email 8 : urgence max avec conséquences concrètes de l\'inaction\n' +
+'⚠️ Toute urgence doit être RÉELLE. Une urgence inventée = perte de confiance définitive.\n\n' +
+'## LONGUEUR PAR EMAIL : 150–250 mots (corps hors objet)\n\n' +
+SOCLE_COPYWRITING;
+}
+
+// COPY FUNCTIONS
+function copyPrompt() {
+    var text = document.getElementById('generatedPrompt').textContent;
+    var btn = document.getElementById('copyBtn');
+    copyToClipboard(text, btn, '📋 Copier le Prompt', '✓ Copié !');
+}
+
+function copyAndOpen() {
+    var text = document.getElementById('generatedPrompt').textContent;
+    var btn = document.getElementById('copyOpenBtn');
+    copyToClipboard(text, btn, '⚡ Copier + Ouvrir Claude', '✓ Copié — ouverture...');
+    setTimeout(function() { window.open('https://claude.ai', '_blank'); }, 600);
+}
+
+function copyToClipboard(text, btn, originalLabel, successLabel) {
+    var original = btn.innerHTML;
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(function() {
+            btn.innerHTML = successLabel;
+            setTimeout(function() { btn.innerHTML = original; }, 2500);
+        }).catch(function() { fallbackCopy(text, btn, original, successLabel); });
+    } else {
+        fallbackCopy(text, btn, original, successLabel);
+    }
+}
+
+function fallbackCopy(text, btn, original, successLabel) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:-999px;left:-999px;opacity:0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try {
+        document.execCommand('copy');
+        btn.innerHTML = successLabel;
+        setTimeout(function() { btn.innerHTML = original; }, 2500);
+    } catch(e) {
+        btn.innerHTML = '⚠ Copiez manuellement';
+        setTimeout(function() { btn.innerHTML = original; }, 3000);
+    }
+    document.body.removeChild(ta);
+}
+
+// INIT
+initCharCounters();
+</script>
+</body>
+</html>
