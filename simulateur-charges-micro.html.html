@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulateur Charges Micro-Entreprise 2026 | FlashTools</title>
+    <meta name="description" content="Calculez vos cotisations sociales de micro-entrepreneur en 2026. Taux officiels URSSAF, ACRE, versement libératoire. Gratuit et instantané.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:          #0a0e27;
+            --surface:     #111827;
+            --card:        #1e293b;
+            --border:      #334155;
+            --text:        #f1f5f9;
+            --muted:       #94a3b8;
+            --cyan:        #06b6d4;
+            --violet:      #8b5cf6;
+            --green:       #10b981;
+            --orange:      #f59e0b;
+            --red:         #ef4444;
+            --cyan-glow:   rgba(6,182,212,0.18);
+            --violet-glow: rgba(139,92,246,0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 24px 16px 60px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(6,182,212,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(6,182,212,0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        .header { text-align: center; padding: 40px 20px 32px; }
+
+        .logo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(6,182,212,0.1);
+            border: 1px solid rgba(6,182,212,0.3);
+            border-radius: 100px;
+            padding: 6px 16px;
+            font-size: 0.78em;
+            font-weight: 600;
+            color: var(--cyan);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .logo-badge::before {
+            content: '';
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--cyan);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%,100% { opacity:1; transform:scale(1); }
+            50%      { opacity:0.5; transform:scale(0.8); }
+        }
+
+        .header h1 {
+            font-size: clamp(1.8em, 5vw, 2.8em);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+
+        .header h1 span {
+            background: linear-gradient(135deg, var(--cyan), var(--violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p { color: var(--muted); font-size: 1.05em; }
+
+        /* LAYOUT */
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        /* CARD */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--cyan), var(--violet));
+        }
+
+        .card-title {
+            font-size: 1em;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 24px;
+        }
+
+        /* FIELD */
+        .field { margin-bottom: 20px; }
+
+        .field label {
+            display: block;
+            font-size: 0.88em;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 8px;
+        }
+
+        .input-wrap { position: relative; }
+
+        .input-wrap input,
+        .input-wrap select {
+            width: 100%;
+            background: var(--card);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 48px 14px 16px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.2s;
+            appearance: none;
+        }
+
+        .input-wrap select {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        .input-wrap input:focus,
+        .input-wrap select:focus {
+            outline: none;
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px var(--cyan-glow);
+        }
+
+        .input-suffix {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 700;
+            color: var(--muted);
+            font-size: 0.95em;
+            pointer-events: none;
+        }
+
+        .field-hint {
+            font-size: 0.8em;
+            color: var(--muted);
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+
+        /* QUICK */
+        .quick {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .quick-btn {
+            padding: 8px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            background: var(--cyan-glow);
+        }
+
+        /* TOGGLE OPTIONS */
+        .toggle-group { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+
+        .toggle-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px;
+            background: var(--card);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toggle-item:hover { border-color: var(--cyan); }
+        .toggle-item.active { border-color: var(--cyan); background: rgba(6,182,212,0.06); }
+
+        .toggle-item input[type="checkbox"] {
+            width: 18px; height: 18px;
+            accent-color: var(--cyan);
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .toggle-label { font-size: 0.9em; font-weight: 600; color: var(--text); }
+        .toggle-sub   { font-size: 0.78em; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+
+        /* RESULT */
+        .result {
+            background: var(--card);
+            border: 1px solid rgba(6,182,212,0.3);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 24px;
+            display: none;
+        }
+
+        .result.visible { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity:0; transform:translateY(8px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        /* MAIN NET */
+        .result-main {
+            text-align: center;
+            padding: 20px;
+            background: var(--surface);
+            border-radius: 10px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .result-main-label {
+            font-size: 0.82em;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 8px;
+        }
+
+        .result-main-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.4em;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--green), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .result-main-sub {
+            font-size: 0.8em;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+
+        /* RESULT ROWS */
+        .result-rows { display: flex; flex-direction: column; gap: 8px; }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 14px;
+            background: var(--surface);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .result-row.highlight {
+            border-color: rgba(16,185,129,0.4);
+            background: rgba(16,185,129,0.06);
+        }
+
+        .rr-label { font-size: 0.88em; color: var(--muted); }
+        .rr-label strong { color: var(--text); }
+
+        .rr-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1em;
+            color: var(--text);
+        }
+
+        .rr-val.negative { color: var(--red); }
+        .rr-val.positive { color: var(--green); }
+
+        .badge-rate {
+            display: inline-block;
+            background: rgba(6,182,212,0.15);
+            color: var(--cyan);
+            font-size: 0.75em;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 5px;
+            margin-left: 8px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* STAT GRID */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .stat-cell {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 14px 10px;
+            text-align: center;
+        }
+
+        .stat-cell-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--cyan);
+            margin-bottom: 4px;
+        }
+
+        .stat-cell:nth-child(2) .stat-cell-val { color: var(--violet); }
+        .stat-cell:nth-child(3) .stat-cell-val { color: var(--green); }
+
+        .stat-cell-label {
+            font-size: 0.73em;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* PERIOD TABS */
+        .period-tabs {
+            display: flex;
+            background: var(--card);
+            border-radius: 8px;
+            padding: 3px;
+            gap: 3px;
+        }
+
+        .period-tab {
+            padding: 5px 14px;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--muted);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.82em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .period-tab.active {
+            background: linear-gradient(135deg, var(--cyan), var(--violet));
+            color: white;
+        }
+
+        .period-tab:hover:not(.active) { color: var(--text); }
+
+        /* ACTIONS */
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .btn {
+            padding: 12px;
+            border-radius: 9px;
+            border: none;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.88em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--cyan), var(--violet));
+            color: white;
+        }
+
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px var(--cyan-glow); }
+
+        .btn-ghost {
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--muted);
+        }
+
+        .btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); }
+
+        /* GUIDE PANEL */
+        .guide-panel { display: flex; flex-direction: column; gap: 16px; }
+
+        .info-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .info-card h3 {
+            font-size: 0.95em;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--cyan);
+            flex-shrink: 0;
+        }
+
+        /* RATES TABLE */
+        .rates-table { width: 100%; border-collapse: collapse; }
+
+        .rates-table th {
+            font-size: 0.75em;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 8px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .rates-table td {
+            font-size: 0.85em;
+            padding: 11px 10px;
+            border-bottom: 1px solid rgba(51,65,85,0.5);
+            color: var(--muted);
+            line-height: 1.4;
+        }
+
+        .rates-table tr:last-child td { border-bottom: none; }
+
+        .rates-table td:last-child,
+        .rates-table td:nth-child(2) {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .rates-table td:nth-child(2) { color: var(--cyan); }
+        .rates-table td:last-child   { color: var(--violet); font-size: 0.8em; }
+
+        .rates-table tr.changed td { color: var(--text); }
+        .rates-table tr.changed td:nth-child(2) { color: var(--orange); }
+
+        .tag-new {
+            display: inline-block;
+            background: rgba(245,158,11,0.15);
+            color: var(--orange);
+            font-size: 0.7em;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 4px;
+            margin-left: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* PLAFONDS */
+        .plafond-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.88em;
+        }
+
+        .plafond-row:last-child { border-bottom: none; }
+        .plafond-label { color: var(--muted); }
+        .plafond-val   { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--green); }
+
+        /* FULL CARD */
+        .full-card { margin-top: 24px; }
+
+        /* FAQ */
+        .faq-item { border-bottom: 1px solid var(--border); }
+
+        .faq-q {
+            width: 100%;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.92em;
+            font-weight: 600;
+            padding: 16px 0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+            gap: 12px;
+        }
+
+        .faq-q .arrow { color: var(--muted); font-size: 0.85em; transition: transform 0.2s; flex-shrink: 0; }
+        .faq-item.open .arrow { transform: rotate(180deg); color: var(--cyan); }
+
+        .faq-a {
+            display: none;
+            padding: 0 0 16px;
+            color: var(--muted);
+            font-size: 0.88em;
+            line-height: 1.7;
+        }
+
+        .faq-item.open .faq-a { display: block; animation: fadeIn 0.2s; }
+        .faq-a strong { color: var(--text); }
+
+        .faq-highlight {
+            background: var(--card);
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-top: 10px;
+            border-left: 3px solid var(--cyan);
+            font-size: 0.95em;
+        }
+
+        .faq-highlight.orange { border-left-color: var(--orange); }
+        .faq-highlight.green  { border-left-color: var(--green); }
+
+        /* COTISATIONS INCLUSES */
+        .cotis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .cotis-item {
+            background: var(--card);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.82em;
+            color: var(--muted);
+            border-left: 3px solid var(--cyan);
+        }
+
+        .cotis-item:nth-child(2) { border-left-color: var(--violet); }
+        .cotis-item:nth-child(3) { border-left-color: var(--green); }
+        .cotis-item:nth-child(4) { border-left-color: var(--orange); }
+        .cotis-item:nth-child(5) { border-left-color: var(--red); }
+        .cotis-item:nth-child(6) { border-left-color: var(--muted); }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background: var(--green);
+            color: white;
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-size: 0.9em;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.25s;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        /* RESPONSIVE */
+        @media (max-width: 860px) {
+            .layout { grid-template-columns: 1fr; }
+            .stat-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (max-width: 480px) {
+            .card { padding: 20px; }
+            .quick { grid-template-columns: repeat(4, 1fr); }
+            .stat-grid { grid-template-columns: repeat(3, 1fr); }
+            .cotis-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="logo-badge">FlashTools · Micro-Entreprise</div>
+        <h1>Simulateur <span>charges 2026</span></h1>
+        <p>Taux officiels URSSAF · ACRE · Versement libératoire · Plafonds CA</p>
+    </div>
+
+    <div class="layout">
+
+        <!-- CALCULATOR -->
+        <div class="card">
+            <p class="card-title">Simulateur</p>
+
+            <div class="field">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <label style="margin-bottom:0" id="ca-label">Chiffre d'affaires mensuel</label>
+                    <div class="period-tabs">
+                        <button class="period-tab active" id="tab-mensuel" onclick="setPeriod('mensuel')">Mensuel</button>
+                        <button class="period-tab" id="tab-annuel" onclick="setPeriod('annuel')">Annuel</button>
+                    </div>
+                </div>
+                <div class="input-wrap">
+                    <input type="number" id="ca" placeholder="0.00" step="0.01" min="0" oninput="calc()">
+                    <span class="input-suffix">€</span>
+                </div>
+                <div class="quick" id="quick-mensuel">
+                    <button class="quick-btn" onclick="setCA(1000)">1 000</button>
+                    <button class="quick-btn" onclick="setCA(2000)">2 000</button>
+                    <button class="quick-btn" onclick="setCA(3000)">3 000</button>
+                    <button class="quick-btn" onclick="setCA(5000)">5 000</button>
+                </div>
+                <div class="quick" id="quick-annuel" style="display:none">
+                    <button class="quick-btn" onclick="setCA(20000)">20 000</button>
+                    <button class="quick-btn" onclick="setCA(36000)">36 000</button>
+                    <button class="quick-btn" onclick="setCA(50000)">50 000</button>
+                    <button class="quick-btn" onclick="setCA(80000)">80 000</button>
+                </div>
+                <p class="field-hint" id="ca-hint">Factures encaissées du mois — 0€ encaissé = 0€ à payer</p>
+            </div>
+
+            <div class="field">
+                <label>Type d'activité</label>
+                <div class="input-wrap">
+                    <select id="activity" onchange="calc()">
+                        <option value="vente">Ventes de marchandises (BIC) — 12,3%</option>
+                        <option value="service-bic">Services commerciaux / artisanaux (BIC) — 21,2%</option>
+                        <option value="service-bnc" selected>Libéral / conseil / formation (BNC) — 25,6%</option>
+                        <option value="cipav">Libéral CIPAV (architecte, ostéo...) — 23,2%</option>
+                    </select>
+                </div>
+                <p class="field-hint" id="activity-hint">Professions libérales, conseil, coaching, freelance — taux 2026</p>
+            </div>
+
+            <div class="field">
+                <label>Options</label>
+                <div class="toggle-group">
+                    <div class="toggle-item" id="acre-item" onclick="toggleCheck('acre', 'acre-item')">
+                        <input type="checkbox" id="acre" onchange="calc()">
+                        <div>
+                            <div class="toggle-label">Bénéficiaire ACRE</div>
+                            <div class="toggle-sub">Exonération 50% jusqu'au 3e trimestre civil suivant la création — à partir du 1er juillet 2026 : exonération réduite à 25%</div>
+                        </div>
+                    </div>
+                    <div class="toggle-item" id="vfl-item" onclick="toggleCheck('vfl', 'vfl-item')">
+                        <input type="checkbox" id="vfl" onchange="calc()">
+                        <div>
+                            <div class="toggle-label">Versement libératoire de l'impôt</div>
+                            <div class="toggle-sub">Payer IR en même temps que les cotisations — conditions de revenus requises</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESULT -->
+            <div class="result" id="result">
+                <div class="result-main">
+                    <div class="result-main-label">Revenu net après cotisations</div>
+                    <div class="result-main-value" id="r-net">—</div>
+                    <div class="result-main-sub" id="r-sub">Ce qu'il vous reste — avant IR et charges pro</div>
+                </div>
+
+                <div class="result-rows">
+                    <div class="result-row">
+                        <span class="rr-label">Chiffre d'affaires</span>
+                        <span class="rr-val" id="r-ca">—</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="rr-label">
+                            Cotisations sociales
+                            <span class="badge-rate" id="r-rate-badge">—</span>
+                        </span>
+                        <span class="rr-val negative" id="r-cotis">—</span>
+                    </div>
+                    <div class="result-row" id="r-vfl-row" style="display:none">
+                        <span class="rr-label">Versement libératoire IR <span class="badge-rate" id="r-vfl-badge">—</span></span>
+                        <span class="rr-val negative" id="r-vfl-val">—</span>
+                    </div>
+                    <div class="result-row highlight">
+                        <span class="rr-label"><strong>Revenu net</strong></span>
+                        <span class="rr-val positive" id="r-net2">—</span>
+                    </div>
+                </div>
+
+                <div class="stat-grid">
+                    <div class="stat-cell">
+                        <div class="stat-cell-val" id="r-mensuel">—</div>
+                        <div class="stat-cell-label">Net / mois</div>
+                    </div>
+                    <div class="stat-cell">
+                        <div class="stat-cell-val" id="r-annual">—</div>
+                        <div class="stat-cell-label">Net / an</div>
+                    </div>
+                    <div class="stat-cell">
+                        <div class="stat-cell-val" id="r-pct-keep">—</div>
+                        <div class="stat-cell-label">Vous gardez</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" onclick="copyResult()">Copier</button>
+                <button class="btn btn-ghost" onclick="resetAll()">Effacer</button>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="guide-panel">
+
+            <!-- TAUX 2026 -->
+            <div class="info-card">
+                <h3><span class="dot"></span>Taux cotisations 2026</h3>
+                <table class="rates-table">
+                    <thead>
+                        <tr>
+                            <th>Activité</th>
+                            <th>Taux</th>
+                            <th>Avec ACRE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Ventes marchandises (BIC)</td>
+                            <td>12,3%</td>
+                            <td>6,15%</td>
+                        </tr>
+                        <tr>
+                            <td>Services commerciaux (BIC)</td>
+                            <td>21,2%</td>
+                            <td>10,6%</td>
+                        </tr>
+                        <tr class="changed">
+                            <td>Libéral BNC <span class="tag-new">+4,5pts</span></td>
+                            <td>25,6%</td>
+                            <td>12,8%</td>
+                        </tr>
+                        <tr>
+                            <td>Libéral CIPAV</td>
+                            <td>23,2%</td>
+                            <td>11,6%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size:0.75em;color:var(--muted);margin-top:10px;">Source : URSSAF — mis à jour janvier 2026. Le taux BNC est passé de 21,1% (2024) à 25,6% (2026) en augmentation progressive.</p>
+            </div>
+
+            <!-- PLAFONDS CA -->
+            <div class="info-card">
+                <h3><span class="dot" style="background:var(--green)"></span>Plafonds CA 2026</h3>
+                <div class="plafond-row">
+                    <span class="plafond-label">Ventes de marchandises</span>
+                    <span class="plafond-val">203 100 €</span>
+                </div>
+                <div class="plafond-row">
+                    <span class="plafond-label">Prestations de services</span>
+                    <span class="plafond-val">83 600 €</span>
+                </div>
+                <div class="plafond-row">
+                    <span class="plafond-label">Professions libérales (BNC)</span>
+                    <span class="plafond-val">83 600 €</span>
+                </div>
+                <p style="font-size:0.75em;color:var(--muted);margin-top:10px;">Au-delà de ces plafonds sur 2 années consécutives, vous basculez au régime réel des indépendants.</p>
+            </div>
+
+            <!-- COTISATIONS INCLUSES -->
+            <div class="info-card">
+                <h3><span class="dot" style="background:var(--violet)"></span>Ce que couvrent ces cotisations</h3>
+                <div class="cotis-grid">
+                    <div class="cotis-item">Assurance maladie-maternité</div>
+                    <div class="cotis-item">Retraite de base</div>
+                    <div class="cotis-item">Retraite complémentaire</div>
+                    <div class="cotis-item">Allocations familiales</div>
+                    <div class="cotis-item">CSG-CRDS</div>
+                    <div class="cotis-item">Invalidité-décès</div>
+                </div>
+                <p style="font-size:0.75em;color:var(--muted);margin-top:12px;">Non inclus : contribution à la formation pro (0,1% à 0,3% selon activité) et CFE (taxe locale annuelle, exonération 1ère année).</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="card full-card">
+        <p class="card-title">Questions fréquentes</p>
+        <div>
+
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    Pourquoi le taux BNC a-t-il autant augmenté ?
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-a">
+                    Le taux BNC (professions libérales hors CIPAV) est passé de 21,1% en 2024 à 25,6% en 2026, soit +4,5 points en deux ans. Cette augmentation progressive est due à un décret de 2024 visant à aligner la protection sociale des micro-entrepreneurs libéraux sur celle des autres travailleurs indépendants, notamment pour améliorer les droits à la retraite complémentaire et les prestations invalidité-décès. En contrepartie, ces cotisations supplémentaires génèrent des droits supplémentaires.
+                    <div class="faq-highlight orange">
+                        Si vous étiez freelance BNC avec 3 000€/mois en 2024 : vous payiez 633€ de cotisations. En 2026 : 768€. Soit 135€ de plus par mois à anticiper dans votre tarification.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    Quand et comment déclarer mes cotisations ?
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-a">
+                    La déclaration se fait en ligne sur <strong>autoentrepreneur.urssaf.fr</strong>, mensuellement ou trimestriellement selon votre choix à la création. Le paiement est automatique après déclaration. Règle fondamentale : <strong>si votre CA est 0€, vous déclarez "0" quand même</strong> — ne pas déclarer entraîne des pénalités et peut entraîner une taxation forfaitaire.
+                    <div class="faq-highlight">
+                        Astuce : optez pour la déclaration mensuelle si votre CA est variable — vous lissez la trésorerie. Trimestrielle si vous préférez moins de démarches.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    Le versement libératoire de l'impôt, c'est intéressant ?
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-a">
+                    Le versement libératoire (VFL) vous permet de payer votre impôt sur le revenu en même temps que vos cotisations, à un taux fixe sur votre CA : 1% (ventes), 1,7% (services BIC), 2,2% (BNC). C'est intéressant si votre revenu fiscal de référence N-2 ne dépasse pas 27 478€ pour une part. <strong>Avantage</strong> : pas de mauvaise surprise en fin d'année. <strong>Inconvénient</strong> : vous payez même si votre revenu net est très faible, ce qui peut être désavantageux en cas de charges professionnelles élevées ou de revenus globaux bas.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    L'ACRE : qui peut en bénéficier en 2026 ?
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-a">
+                    Depuis janvier 2026, le champ de l'ACRE est restreint. Peuvent en bénéficier : demandeurs d'emploi indemnisés ou non indemnisés inscrits à France Travail depuis au moins 6 mois sur les 18 derniers, bénéficiaires RSA ou ASS, personnes créant en ZFU, salariés reprenant une entreprise en difficulté. <strong>Attention :</strong> à partir du 1er juillet 2026, l'exonération passe de 50% à 25% des cotisations (contre 50% actuellement). Si vous créez avant juillet 2026, vous bénéficiez encore du taux à 50%.
+                    <div class="faq-highlight orange">
+                        La demande ACRE doit être faite à l'URSSAF lors de la création — impossible de la demander après coup.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    Ce calcul inclut-il l'impôt sur le revenu ?
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-a">
+                    Non, sauf si vous cochez l'option "Versement libératoire". Sans cette option, l'IR se calcule séparément sur votre revenu net fiscal, qui bénéficie d'un abattement forfaitaire selon votre activité : 71% pour les ventes, 50% pour les services BIC, 34% pour les BNC. Ce revenu s'ajoute à vos autres revenus du foyer fiscal et est imposé selon le barème progressif. D'autres charges restent également à prévoir : CFE (taxe locale annuelle, exonération la 1ère année) et contribution à la formation professionnelle.
+                    <div class="faq-highlight green">
+                        Règle pratique : provisionnez environ 10 à 15% de votre CA pour l'IR si vous n'optez pas pour le versement libératoire — ajustez selon votre tranche marginale d'imposition.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    Je dépasse les plafonds : que se passe-t-il ?
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-a">
+                    Si vous dépassez le plafond une première année, vous restez micro-entrepreneur jusqu'à la fin de l'année suivante — c'est la période de tolérance. Si vous dépassez deux années consécutives, vous basculez automatiquement au régime réel simplifié ou normal des travailleurs indépendants, avec des obligations comptables plus lourdes mais la possibilité de déduire vos charges réelles. Anticipez ce passage : ouvrez un compte bancaire pro dédié, commencez à tenir une comptabilité rigoureuse, et consultez un expert-comptable.
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    const RATES = {
+        'vente':       { normal: 12.3,  acre: 6.15,  vfl: 1.0,  hint: 'Achat/revente, restauration, hébergement — taux inchangé 2026' },
+        'service-bic': { normal: 21.2,  acre: 10.6,  vfl: 1.7,  hint: 'Services commerciaux, artisanaux, location meublée — taux inchangé 2026' },
+        'service-bnc': { normal: 25.6,  acre: 12.8,  vfl: 2.2,  hint: 'Professions libérales, conseil, coaching, freelance — taux 2026 (+4,5pts vs 2024)' },
+        'cipav':       { normal: 23.2,  acre: 11.6,  vfl: 2.2,  hint: 'Architecte, ostéopathe, psychologue, expert... — vérifiez votre affiliation CIPAV' }
+    };
+
+    let lastResult = null;
+    let period = 'mensuel'; // 'mensuel' ou 'annuel'
+
+    function setPeriod(p) {
+        period = p;
+        document.getElementById('tab-mensuel').classList.toggle('active', p === 'mensuel');
+        document.getElementById('tab-annuel').classList.toggle('active',  p === 'annuel');
+        document.getElementById('quick-mensuel').style.display = p === 'mensuel' ? 'grid' : 'none';
+        document.getElementById('quick-annuel').style.display  = p === 'annuel'  ? 'grid' : 'none';
+        document.getElementById('ca-label').textContent = p === 'mensuel'
+            ? 'Chiffre d\'affaires mensuel'
+            : 'Chiffre d\'affaires annuel';
+        document.getElementById('ca-hint').textContent = p === 'mensuel'
+            ? 'Factures encaissées du mois — 0€ encaissé = 0€ à payer'
+            : 'CA annuel total — divisé par 12 pour le calcul mensuel';
+        document.getElementById('ca').value = '';
+        document.getElementById('result').classList.remove('visible');
+    }
+
+    function setCA(v) {
+        document.getElementById('ca').value = v;
+        calc();
+    }
+
+    function toggleCheck(id, itemId) {
+        const cb   = document.getElementById(id);
+        const item = document.getElementById(itemId);
+        cb.checked = !cb.checked;
+        item.classList.toggle('active', cb.checked);
+        calc();
+    }
+
+    function calc() {
+        const caInput  = parseFloat(document.getElementById('ca').value) || 0;
+        const activity = document.getElementById('activity').value;
+        const hasAcre  = document.getElementById('acre').checked;
+        const hasVfl   = document.getElementById('vfl').checked;
+
+        document.getElementById('activity-hint').textContent = RATES[activity].hint;
+
+        if (!caInput) { document.getElementById('result').classList.remove('visible'); return; }
+
+        // Normaliser en mensuel pour les calculs
+        const caMensuel = period === 'annuel' ? caInput / 12 : caInput;
+        const caAnnuel  = period === 'annuel' ? caInput      : caInput * 12;
+
+        const r         = RATES[activity];
+        const cotisRate = hasAcre ? r.acre : r.normal;
+        const vflRate   = hasVfl  ? r.vfl  : 0;
+
+        const cotisMensuel = caMensuel * cotisRate / 100;
+        const vflMensuel   = caMensuel * vflRate   / 100;
+        const netMensuel   = caMensuel - cotisMensuel - vflMensuel;
+        const netAnnuel    = netMensuel * 12;
+        const pctKeep      = ((netMensuel / caMensuel) * 100).toFixed(1);
+
+        // Affichage CA selon période saisie
+        document.getElementById('r-ca').textContent         = period === 'annuel'
+            ? fmt(caAnnuel) + ' /an (' + fmt(caMensuel) + '/mois)'
+            : fmt(caMensuel) + ' /mois';
+
+        document.getElementById('r-cotis').textContent      = '−' + fmt(cotisMensuel) + ' /mois';
+        document.getElementById('r-rate-badge').textContent = cotisRate.toFixed(1) + '%';
+
+        // Résultat principal = net mensuel toujours
+        document.getElementById('r-net').textContent        = fmt(netMensuel) + ' /mois';
+        document.getElementById('r-net2').textContent       = fmt(netMensuel) + ' /mois';
+
+        // Stats doubles
+        document.getElementById('r-mensuel').textContent    = fmt(netMensuel);
+        document.getElementById('r-annual').textContent     = fmt(netAnnuel);
+        document.getElementById('r-pct-keep').textContent   = pctKeep + '%';
+
+        const vflRow = document.getElementById('r-vfl-row');
+        if (hasVfl) {
+            vflRow.style.display = 'flex';
+            document.getElementById('r-vfl-val').textContent   = '−' + fmt(vflMensuel) + ' /mois';
+            document.getElementById('r-vfl-badge').textContent = vflRate + '%';
+        } else {
+            vflRow.style.display = 'none';
+        }
+
+        document.getElementById('r-sub').textContent = hasVfl
+            ? 'Après cotisations + IR versement libératoire'
+            : 'Avant IR — provisionnez 10-15% pour l\'impôt';
+
+        document.getElementById('result').classList.add('visible');
+
+        lastResult = { caMensuel, caAnnuel, cotisMensuel, vflMensuel, netMensuel, netAnnuel, cotisRate, vflRate, hasVfl };
+    }
+
+    function fmt(n) {
+        return new Intl.NumberFormat('fr-FR', {
+            style: 'currency', currency: 'EUR',
+            minimumFractionDigits: 0, maximumFractionDigits: 0
+        }).format(n);
+    }
+
+    function copyResult() {
+        if (!lastResult) { showToast('Aucun résultat à copier'); return; }
+        const r = lastResult;
+        let txt = `CA mensuel : ${fmt(r.caMensuel)}\nCA annuel : ${fmt(r.caAnnuel)}\nCotisations (${r.cotisRate}%) : −${fmt(r.cotisMensuel)}/mois`;
+        if (r.hasVfl) txt += `\nVersement libératoire IR (${r.vflRate}%) : −${fmt(r.vflMensuel)}/mois`;
+        txt += `\nRevenu net mensuel : ${fmt(r.netMensuel)}\nRevenu net annuel : ${fmt(r.netAnnuel)}`;
+        navigator.clipboard.writeText(txt)
+            .then(()  => showToast('Résultat copié'))
+            .catch(()  => showToast('Erreur de copie'));
+    }
+
+    function resetAll() {
+        document.getElementById('ca').value = '';
+        document.getElementById('activity').value = 'service-bnc';
+        document.getElementById('acre').checked = false;
+        document.getElementById('vfl').checked  = false;
+        document.getElementById('acre-item').classList.remove('active');
+        document.getElementById('vfl-item').classList.remove('active');
+        document.getElementById('result').classList.remove('visible');
+        lastResult = null;
+        setPeriod('mensuel');
+        document.getElementById('activity-hint').textContent = RATES['service-bnc'].hint;
+    }
+
+    function toggleFaq(btn) {
+        const item = btn.closest('.faq-item');
+        const was  = item.classList.contains('open');
+        document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+        if (!was) item.classList.add('open');
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2800);
+    }
+</script>
+</body>
+</html>
