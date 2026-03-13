@@ -20,8 +20,7 @@ header{border-bottom:1px solid var(--border);padding:16px 32px;display:flex;alig
 .tab:hover{color:var(--text)}
 .tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
 main{max-width:1300px;margin:0 auto;padding:32px}
-.section{display:none}
-.section.active{display:block}
+.section{display:none}.section.active{display:block}
 .section-header{margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--border)}
 .section-header h1{font-family:var(--display);font-size:32px;letter-spacing:2px;background:linear-gradient(135deg,var(--text) 60%,var(--muted));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
 .section-header p{font-family:var(--mono);font-size:12px;color:var(--muted)}
@@ -41,8 +40,8 @@ main{max-width:1300px;margin:0 auto;padding:32px}
 .toggle input{opacity:0;width:0;height:0}
 .toggle-slider{position:absolute;inset:0;background:var(--surface2);border:1px solid var(--border);border-radius:11px;cursor:pointer;transition:.2s}
 .toggle-slider::before{content:'';position:absolute;width:16px;height:16px;left:2px;top:2px;background:var(--muted);border-radius:50%;transition:.2s}
-.toggle input:checked + .toggle-slider{background:rgba(6,182,212,.2);border-color:var(--cyan)}
-.toggle input:checked + .toggle-slider::before{transform:translateX(18px);background:var(--cyan)}
+.toggle input:checked+.toggle-slider{background:rgba(6,182,212,.2);border-color:var(--cyan)}
+.toggle input:checked+.toggle-slider::before{transform:translateX(18px);background:var(--cyan)}
 .btn-generate{width:100%;padding:16px;background:linear-gradient(135deg,var(--cyan),var(--violet));color:#fff;font-family:var(--display);font-size:22px;letter-spacing:2px;border:none;border-radius:4px;cursor:pointer;transition:opacity .2s,transform .1s}
 .btn-generate:hover{opacity:.9;transform:translateY(-1px)}
 .btn-generate:active{transform:translateY(0)}
@@ -53,14 +52,20 @@ main{max-width:1300px;margin:0 auto;padding:32px}
 .summary-item{background:var(--surface);border:1px solid var(--border);padding:14px;border-radius:4px;text-align:center}
 .summary-num{font-family:var(--display);font-size:30px;letter-spacing:1px}
 .summary-label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+/* CALENDRIER */
 .calendar-year{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px}
 .month-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:border-color .2s}
 .month-card:hover{border-color:var(--muted)}
+.month-card.past{opacity:.45;filter:grayscale(.6)}
+.month-card.current-month{border-color:var(--cyan);box-shadow:0 0 0 1px rgba(6,182,212,.25)}
 .month-header{background:var(--surface2);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
 .month-name{font-family:var(--display);font-size:17px;letter-spacing:1px}
 .month-num{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.current-badge{font-family:var(--mono);font-size:9px;background:var(--cyan);color:#000;padding:2px 6px;border-radius:2px;font-weight:700;letter-spacing:.5px}
 .month-events{padding:10px;display:flex;flex-direction:column;gap:5px;min-height:70px}
 .event{display:flex;align-items:flex-start;gap:7px;padding:6px 8px;border-radius:3px;border-left:3px solid;background:rgba(255,255,255,.025);animation:fadeIn .3s ease}
+.event.past-event{opacity:.5;text-decoration:line-through;text-decoration-color:rgba(255,255,255,.2)}
+.event.past-event .event-date::after{content:' ✓';font-size:9px}
 @keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
 .event.tva{border-color:var(--cyan)}.event.urssaf{border-color:var(--violet)}.event.impots{border-color:var(--amber)}.event.cfe{border-color:var(--red)}.event.info{border-color:var(--green)}
 .event-date{font-family:var(--mono);font-size:10px;font-weight:500;min-width:32px;padding-top:2px;flex-shrink:0;line-height:1.2}
@@ -68,6 +73,14 @@ main{max-width:1300px;margin:0 auto;padding:32px}
 .event-content{flex:1;min-width:0}
 .event-title{font-size:11px;font-weight:600;line-height:1.3}
 .event-desc{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4}
+/* MOIS EN COURS — bandeau urgent */
+.current-month-banner{background:rgba(6,182,212,.07);border:1px solid rgba(6,182,212,.3);border-radius:4px;padding:16px 20px;margin-bottom:20px;display:none}
+.current-month-banner.show{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.cmb-title{font-family:var(--display);font-size:20px;color:var(--cyan);letter-spacing:1px;margin-bottom:8px}
+.cmb-events{display:flex;flex-direction:column;gap:6px;flex:1}
+.cmb-event{font-family:var(--mono);font-size:11px;display:flex;align-items:center;gap:8px}
+.cmb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.cmb-done{opacity:.5;text-decoration:line-through}
 .empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
 .empty-state .emoji{font-size:48px;margin-bottom:16px}
 .empty-state h3{font-family:var(--display);font-size:24px;letter-spacing:1px;margin-bottom:8px;color:var(--text)}
@@ -89,8 +102,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
 .jauge-bar-wrap{background:var(--surface2);border-radius:3px;height:8px;overflow:hidden}
 .jauge-bar-fill{height:100%;border-radius:3px;transition:width 1s ease,background .3s}
 .jauge-info{display:flex;justify-content:space-between;margin-top:6px;font-family:var(--mono);font-size:11px}
-.jauge-ca{color:var(--text);font-weight:500}
-.jauge-max{color:var(--muted)}
+.jauge-ca{color:var(--text);font-weight:500}.jauge-max{color:var(--muted)}
 .jauge-status{font-family:var(--mono);font-size:11px;margin-top:6px;font-weight:500}
 .tips-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px}
 .tip-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:20px}
@@ -117,7 +129,80 @@ main{max-width:1300px;margin:0 auto;padding:32px}
 .ok{color:var(--green);font-weight:600}.no{color:var(--red);font-weight:600}
 .tag{display:inline-block;padding:2px 7px;border-radius:2px;font-family:var(--mono);font-size:11px;margin:1px}
 .tc{background:rgba(6,182,212,.15);color:var(--cyan)}.tv{background:rgba(139,92,246,.15);color:var(--violet)}.ta{background:rgba(245,158,11,.15);color:var(--amber)}.tr{background:rgba(239,68,68,.15);color:var(--red)}.tg{background:rgba(34,197,94,.15);color:var(--green)}
-.amber-notice{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:4px;padding:12px 16px;margin-bottom:16px;font-family:var(--mono);font-size:12px;color:var(--amber);display:flex;align-items:flex-start;gap:10px;line-height:1.5}
+/* VFL */
+.vfl-calc{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:24px;margin-bottom:24px}
+.vfl-calc-title{font-family:var(--display);font-size:22px;letter-spacing:1px;color:var(--cyan);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.vfl-calc-title::before{content:'';width:3px;height:18px;background:var(--cyan);border-radius:2px;flex-shrink:0}
+.vfl-inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px}
+.vfl-input-group{display:flex;flex-direction:column;gap:6px}
+.vfl-input-group label{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
+.vfl-input-group input,.vfl-input-group select{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 14px;font-family:var(--mono);font-size:13px;border-radius:3px;outline:none;transition:border-color .2s;appearance:none;-webkit-appearance:none;width:100%}
+.vfl-input-group input:focus,.vfl-input-group select:focus{border-color:var(--cyan)}
+.btn-calc-vfl{padding:12px 28px;background:linear-gradient(135deg,var(--cyan),var(--violet));color:#fff;font-family:var(--display);font-size:18px;letter-spacing:1px;border:none;border-radius:4px;cursor:pointer;transition:opacity .2s}
+.btn-calc-vfl:hover{opacity:.9}
+.vfl-result{margin-top:20px;display:none}.vfl-result.show{display:block}
+.vfl-result-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.vfl-result-card{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:16px}
+.vfl-result-card-title{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.vfl-result-card-val{font-family:var(--display);font-size:28px;letter-spacing:1px}
+.vfl-result-card-sub{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px}
+.vfl-verdict{border-radius:4px;padding:16px 20px;font-size:14px;line-height:1.7;margin-top:12px}
+.vfl-verdict.eligible{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#86efac}
+.vfl-verdict.non-eligible{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
+.vfl-verdict.limite{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:#fcd34d}
+.vfl-verdict strong{color:inherit}
+.parts-table-wrap{overflow-x:auto}
+.parts-table{width:100%;border-collapse:collapse;font-size:13px}
+.parts-table th{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:8px 12px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+.parts-table td{padding:10px 12px;border-bottom:1px solid rgba(42,47,53,.5);vertical-align:top;color:var(--muted);line-height:1.5}
+.parts-table tr:last-child td{border-bottom:none}
+.parts-table td:first-child{color:var(--text);font-weight:500}
+.parts-table td.parts-val{color:var(--cyan);font-family:var(--mono);font-weight:600}
+.parts-table tr.section-row td{background:rgba(6,182,212,.05);color:var(--cyan);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.5px;padding:6px 12px;border-bottom:1px solid var(--border)}
+.event-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:16px}
+.event-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:16px}
+.event-card-age{font-family:var(--display);font-size:28px;color:var(--amber);letter-spacing:1px;margin-bottom:4px}
+.event-card-title{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--text);margin-bottom:8px}
+.event-card-body{font-size:12px;color:var(--muted);line-height:1.6}
+.event-card-impact{margin-top:8px;padding:6px 10px;border-radius:2px;font-family:var(--mono);font-size:11px;line-height:1.5}
+.impact-fiscal{background:rgba(245,158,11,.1);border-left:3px solid var(--amber);color:#fcd34d}
+.impact-social{background:rgba(139,92,246,.1);border-left:3px solid var(--violet);color:#c4b5fd}
+.impact-info{background:rgba(6,182,212,.08);border-left:3px solid var(--cyan);color:#67e8f9}
+.tva-suivi-paliers{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px}
+.tva-palier{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px}
+.tva-palier-montant{font-family:var(--display);font-size:26px;color:var(--cyan);margin-bottom:4px}
+.tva-palier-label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.tva-palier-desc{font-size:12px;color:var(--muted);line-height:1.5}
+/* ONGLET DÉMARRAGE */
+.checklist-steps{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.checklist-step{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:18px 20px;display:flex;gap:16px;align-items:flex-start;cursor:pointer;transition:border-color .2s}
+.checklist-step:hover{border-color:var(--muted)}
+.checklist-step.done{opacity:.55;border-color:var(--green)}
+.checklist-step.done .step-check{background:var(--green);border-color:var(--green);color:#000}
+.step-num{font-family:var(--display);font-size:28px;color:var(--cyan);letter-spacing:1px;min-width:36px;line-height:1}
+.step-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:3px;transition:all .2s}
+.step-body{flex:1}
+.step-title{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text);margin-bottom:6px;letter-spacing:.3px}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.7}
+.step-desc strong{color:var(--text)}
+.step-tag{display:inline-block;font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:2px;margin-top:8px}
+.step-tag.j0{background:rgba(239,68,68,.15);color:#fca5a5}
+.step-tag.j30{background:rgba(245,158,11,.15);color:#fcd34d}
+.step-tag.j60{background:rgba(6,182,212,.15);color:var(--cyan)}
+.step-tag.ongoing{background:rgba(34,197,94,.15);color:#86efac}
+.checklist-progress{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:16px}
+.progress-bar-wrap{flex:1;background:var(--border);border-radius:3px;height:6px;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--violet));border-radius:3px;transition:width .5s ease}
+.progress-label{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.depart-now{background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.2);border-radius:4px;padding:20px;margin-bottom:24px}
+.depart-now-title{font-family:var(--display);font-size:20px;color:var(--cyan);letter-spacing:1px;margin-bottom:12px}
+.month-grid-mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:12px}
+.month-mini{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:10px 12px;font-family:var(--mono);font-size:11px}
+.month-mini.active-now{border-color:var(--cyan);background:rgba(6,182,212,.06)}
+.month-mini.past-mini{opacity:.4}
+.month-mini-name{color:var(--text);font-weight:500;margin-bottom:4px}
+.month-mini-status{font-size:10px;color:var(--muted)}
+/* Responsive */
 @media(max-width:1100px){.calendar-year{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:768px){
   .calendar-year{grid-template-columns:repeat(2,1fr)}
@@ -127,41 +212,27 @@ main{max-width:1300px;margin:0 auto;padding:32px}
   .tabs{padding:0 8px}
   .tab{padding:10px 10px;font-size:10px;letter-spacing:0}
   .section-header h1{font-size:24px}
-  .section-header{margin-bottom:18px;padding-bottom:12px}
   .provision-grid{grid-template-columns:repeat(2,1fr);gap:10px}
-  .provision-card{padding:14px}
-  .provision-percent{font-size:28px}
   .btn-generate{font-size:17px;padding:14px}
   .export-bar{flex-direction:column;align-items:stretch;gap:8px}
-  .btn-export{justify-content:center;padding:12px 14px}
-  .export-label{text-align:center;margin-left:0}
   .tips-grid{grid-template-columns:1fr}
   .jauge-seuils{flex-direction:column}
-  .ca-banner{gap:10px}
-  .ca-banner input{width:120px;font-size:14px}
-  .summary-bar{grid-template-columns:repeat(5,1fr);gap:8px}
-  .summary-item{padding:10px 6px}
-  .summary-num{font-size:22px}
+  .vfl-inputs{grid-template-columns:1fr 1fr}
+  .vfl-result-grid{grid-template-columns:1fr}
+  .event-cards{grid-template-columns:1fr}
+  .tva-suivi-paliers{grid-template-columns:1fr 1fr}
 }
 @media(max-width:480px){
   .calendar-year{grid-template-columns:1fr}
   .logo{font-size:16px}
-  .year-badge{font-size:11px;padding:3px 8px}
-  .provision-grid{grid-template-columns:1fr}
-  .summary-bar{grid-template-columns:repeat(3,1fr)}
-  .legend{gap:8px;padding:10px 12px}
-  .legend-item{font-size:10px}
-  .tab{padding:10px 8px;font-size:9px}
+  .vfl-inputs{grid-template-columns:1fr}
+  .tva-suivi-paliers{grid-template-columns:1fr}
 }
 .export-bar{display:none;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
 .export-bar.visible{display:flex}
 .btn-export{display:flex;align-items:center;gap:7px;padding:9px 18px;font-family:var(--mono);font-size:12px;letter-spacing:.5px;border-radius:3px;border:1px solid;cursor:pointer;transition:all .2s;background:transparent}
-.btn-export:hover{transform:translateY(-1px)}
-.btn-export.dark{color:#06B6D4;border-color:#06B6D4}
-.btn-export.dark:hover{background:rgba(6,182,212,.1)}
-.btn-export.light{color:#F59E0B;border-color:#F59E0B}
-.btn-export.light:hover{background:rgba(245,158,11,.1)}
-.btn-export:disabled{opacity:.5;cursor:wait;transform:none}
+.btn-export.dark{color:#06B6D4;border-color:#06B6D4}.btn-export.dark:hover{background:rgba(6,182,212,.1)}
+.btn-export.light{color:#F59E0B;border-color:#F59E0B}.btn-export.light:hover{background:rgba(245,158,11,.1)}
 .export-label{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:4px}
 @media print{body::before{display:none}header,.tabs,.btn-generate,.profil-grid,#summary-bar,.export-bar{display:none!important}.calendar-year{grid-template-columns:repeat(3,1fr)}.month-card{break-inside:avoid}body{background:#fff;color:#000}.month-card,.card{border:1px solid #ccc}}
 </style>
@@ -177,6 +248,8 @@ main{max-width:1300px;margin:0 auto;padding:32px}
   <button class="tab" onclick="showTab('provisions',this)">💰 Provisions</button>
   <button class="tab" onclick="showTab('guide',this)">📖 Guide Fiscal</button>
   <button class="tab" onclick="showTab('conseils',this)">💡 Astuces &amp; Pièges</button>
+  <button class="tab" onclick="showTab('vfl',this)">🧮 VFL &amp; Famille</button>
+  <button class="tab" onclick="showTab('demarrage',this)">🚀 Je démarre</button>
 </nav>
 <main>
 
@@ -235,7 +308,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
           <label class="toggle"><input type="checkbox" id="cma" checked onchange="updateProvisions()"><span class="toggle-slider"></span></label>
         </div>
         <div class="toggle-row">
-          <div><div class="toggle-label">1ère année d'activité</div><div class="toggle-sub">Exonération CFE + ACRE possible</div></div>
+          <div><div class="toggle-label">1ère année d'activité</div><div class="toggle-sub">Exonération CFE + vérifier éligibilité ACRE</div></div>
           <label class="toggle"><input type="checkbox" id="premiere_annee"><span class="toggle-slider"></span></label>
         </div>
       </div>
@@ -248,6 +321,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
 <section class="section" id="tab-calendrier">
   <div class="section-header"><h1>CALENDRIER FISCAL <span id="cal-year-title">2026</span></h1><p>Zones de sécurité recommandées — déclarez en avance, provisionnez sans stress</p></div>
   <div id="summary-bar" class="summary-bar" style="display:none"></div>
+  <div class="current-month-banner" id="current-month-banner"></div>
   <div class="export-bar" id="export-bar">
     <button class="btn-export dark" onclick="exportDoc('dark',this)">🌑 Thème Sombre</button>
     <button class="btn-export light" onclick="exportDoc('light',this)">☀️ Thème Clair</button>
@@ -259,6 +333,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
     <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Impôts / IR</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>CFE</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Conseils &amp; Rappels</div>
+    <div class="legend-item" style="opacity:.5"><div class="legend-dot" style="background:var(--muted)"></div>Mois passé</div>
   </div>
   <div id="calendar-container">
     <div class="empty-state"><div class="emoji">📅</div><h3>Calendrier non généré</h3><p>Configurez votre profil et cliquez sur "Générer mon calendrier"</p></div>
@@ -279,8 +354,8 @@ main{max-width:1300px;margin:0 auto;padding:32px}
     <div class="card-title">💡 La Règle des 3 Enveloppes</div>
     <div style="font-size:13px;line-height:1.9;color:var(--muted)">
       <p>À chaque encaissement, provisionnez <strong style="color:var(--text)">immédiatement</strong> sur des sous-comptes dédiés :</p><br>
-      <p><strong style="color:var(--cyan)">Enveloppe 1 — TVA</strong> : Ce n'est pas votre argent. Virez le montant exact de TVA collecté vers un sous-compte "TVA — NE PAS TOUCHER". Vous pourrez le reverser à partir du 1er du mois suivant.</p><br>
-      <p><strong style="color:var(--violet)">Enveloppe 2 — URSSAF + Versement Libératoire</strong> : Pour un artisan BIC services avec Versement Libératoire, provisionnez ~23,7% du CA HT (cotisations 21,2% + CFP 0,3% + CMA 0,48% + Versement Libératoire IR 1,7%).</p><br>
+      <p><strong style="color:var(--cyan)">Enveloppe 1 — TVA</strong> : Ce n'est pas votre argent. Virez le montant exact de TVA collecté vers un sous-compte "TVA — NE PAS TOUCHER".</p><br>
+      <p><strong style="color:var(--violet)">Enveloppe 2 — URSSAF + Versement Libératoire</strong> : Pour un artisan BIC services avec VFL, provisionnez ~23,7% du CA HT (cotisations 21,2% + CFP 0,3% + CMA 0,48% + VFL IR 1,7%).</p><br>
       <p><strong style="color:var(--amber)">Enveloppe 3 — CFE + Divers</strong> : CFE annuelle, abonnements pro, imprévus. Environ 2 à 3% du CA.</p><br>
       <p style="color:var(--text);font-weight:600">Le reste = votre revenu net réellement disponible. Ne jamais toucher aux enveloppes entre les échéances.</p>
     </div>
@@ -296,124 +371,140 @@ main{max-width:1300px;margin:0 auto;padding:32px}
     <div class="guide-block">
       <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 Taux 2026 officiels — micro-entrepreneur</span><span>▼</span></button>
       <div class="guide-block-body">
-        <strong>Taux au 01/01/2026 (BIC stables depuis oct. 2022) :</strong><br><br>
+        <strong>Taux au 01/01/2026 :</strong><br><br>
         <span class="tag tc">BIC Vente / achat-revente</span> 12,3% · avec VFL : 13,3%<br>
-        <span class="tag tv">BIC Services (artisans, consultants, freelances…)</span> 21,2% · avec VFL : 22,9%<br>
-        <span class="tag ta">Location meublée classique</span> 21,2%<br>
-        <span class="tag ta">Location meublée tourisme classé</span> 6%<br>
-        <span class="tag tr">BNC non réglementé (SSI)</span> 25,6% (hausse au 01/01/2026) · avec VFL : 27,8%<br>
+        <span class="tag tv">BIC Services (consultants, freelances, artisans…)</span> 21,2% · avec VFL : 22,9%<br>
+        <span class="tag ta">Location meublée classique</span> 21,2% · <span class="tag ta">Tourisme classé</span> 6%<br>
+        <span class="tag tr">BNC non réglementé (SSI)</span> 25,6% · avec VFL : 27,8%<br>
         <span class="tag tg">BNC réglementé (Cipav)</span> 23,2% · avec VFL : 25,4%<br><br>
         <strong>À ajouter :</strong> CFP (0,1 à 0,3%) + CMA si artisan (0,22 ou 0,48%)<br><br>
-        <strong>Taux total réel artisan BIC services + VFL :</strong><br>
+        <strong>Taux total réel artisan BIC services + VFL :</strong>
         <span class="hl">21,2% + 0,3% + 0,48% + 1,7% = 23,68% du CA HT</span><br><br>
-        <span class="tag ta">⚠ ACRE dès 07/2026</span> Le taux minoré passe de 50% à 75% de réduction (exonération réduite à 25%).
+        <span class="tag ta">⚠ ACRE dès 07/2026</span> Exonération réduite de 50% à 25% — et n'est plus automatique (voir section ACRE ci-dessous). Source : décret n°2026-69 du 6 février 2026 / service-public.fr
+      </div>
+    </div>
+    <div class="guide-block">
+      <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 ACRE 2026 — ce qui a changé, ce n'est plus automatique</span><span>▼</span></button>
+      <div class="guide-block-body">
+        <div style="padding:10px 14px;background:rgba(239,68,68,.08);border-left:3px solid var(--red);border-radius:2px;margin-bottom:14px;font-size:12px;color:#fca5a5;line-height:1.5">
+          ⚠ L'ACRE a profondément changé en 2026. Ce n'est plus une aide automatique ni accessible à tous. Si vous créez en 2026, vérifiez votre éligibilité avant de compter dessus.
+        </div>
+        <strong>Deux changements majeurs (décret n°2026-69 du 6 février 2026) :</strong><br><br>
+        <span class="tag tr">1. Exonération divisée par 2</span> À partir du 1er juillet 2026, le taux d'exonération passe de 50% à 25% pour les micro-entrepreneurs. Créer avant le 1er juillet = encore 50% d'exonération.<br><br>
+        <span class="tag tr">2. Demande obligatoire dans les 60 jours</span> Depuis le 1er janvier 2026, l'ACRE n'est plus accordée automatiquement. Vous devez faire la demande auprès de l'URSSAF <strong>dans les 60 jours suivant l'ouverture de l'activité</strong>. Passé ce délai, l'aide est définitivement perdue.<br><br>
+        <strong>Profils éligibles (liste resserrée) :</strong><br>
+        → Demandeurs d'emploi indemnisés (ARE) ou inscrits 6 mois sur les 18 derniers<br>
+        → Allocataires RSA ou ASS<br>
+        → Jeunes de 18 à 25 ans révolus<br>
+        → Implantation en Zone France Ruralités Revitalisation (ZFRR/ZFRR+)<br><br>
+        <span class="tag tg">✓ Démarche</span> Formulaire ACRE simplifié disponible sur <strong>autoentrepreneur.urssaf.fr</strong> — à déposer dans les 60 jours. Source : service-public.fr / economie.gouv.fr
       </div>
     </div>
     <div class="guide-block">
       <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 CFP — Contribution Formation Professionnelle</span><span>▼</span></button>
       <div class="guide-block-body">
-        Incluse automatiquement dans chaque prélèvement URSSAF mensuel. Aucune démarche, aucune ligne séparée visible dans votre déclaration — elle fait partie du calcul global.<br><br>
-        <span class="tag tc">Commerçants / BNC non réglementé</span> 0,1% du CA · <span class="tag tv">BIC Services</span> 0,3% du CA<br><br>
-        <span class="tag tg">ℹ️</span> Cette cotisation ouvre un droit à la formation professionnelle. Pour en bénéficier, renseignez-vous auprès du <strong>FAFCEA</strong> (artisans) ou de l'<strong>AGEFICE</strong> (commerçants).
+        Incluse automatiquement dans chaque prélèvement URSSAF mensuel.<br><br>
+        <span class="tag tc">Commerçants / BNC</span> 0,1% du CA · <span class="tag tv">BIC Services</span> 0,3% du CA<br><br>
+        <span class="tag tg">ℹ️</span> Ouvre un droit à la formation professionnelle. Renseignez-vous auprès du <strong>FAFCEA</strong> (artisans) ou de l'<strong>AGEFICE</strong> (commerçants).
       </div>
     </div>
     <div class="guide-block">
       <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 CMA — Taxe Chambre des Métiers</span><span>▼</span></button>
       <div class="guide-block-body">
         Prélevée avec l'URSSAF pour les artisans inscrits au registre des métiers.<br><br>
-        <span class="tag tv">Prestations de services artisanales</span> 0,48% du CA · <span class="tag tc">Achat-revente artisanal</span> 0,22% du CA<br><br>
+        <span class="tag tv">Prestations de services artisanales</span> 0,48% · <span class="tag tc">Achat-revente artisanal</span> 0,22%<br><br>
         <strong>Exonération :</strong> CA annuel ≤ 5 000 €
       </div>
     </div>
     <div class="guide-block">
       <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 Dates de déclaration — zones de sécurité</span><span>▼</span></button>
       <div class="guide-block-body">
-        <strong>Mensuel :</strong> Déclarez le CA du mois précédent dès le 1er du mois suivant. La fenêtre est ouverte tout le mois.<br>
-        Zone de sécurité : <span class="hl">déclarez dès le 1er — ne repoussez pas à la fin du mois</span><br><br>
+        <strong>Mensuel :</strong> Déclarez dès le 1er du mois suivant. Zone de sécurité : <span class="hl">déclarez dès le 1er</span><br><br>
         <strong>Trimestriel :</strong><br>
-        <span class="tag tv">T1 (jan-mar)</span> → dès le 1er avril, avant le 30 avril<br>
-        <span class="tag tv">T2 (avr-jun)</span> → dès le 1er juillet, avant le 31 juillet<br>
-        <span class="tag tv">T3 (jul-sep)</span> → dès le 1er octobre, avant le 31 octobre<br>
-        <span class="tag tv">T4 (oct-déc)</span> → dès le 1er janvier N+1, avant le 31 janvier N+1<br>
-        Zone de sécurité : <span class="hl">déclarez dans les premiers jours du mois suivant la fin du trimestre</span><br><br>
-        <strong>CA = 0 ?</strong> Déclarez quand même. Pénalité si oubli : <strong>58,90 €</strong> + mise en demeure.
+        <span class="tag tv">T1</span> → avant le 30 avril · <span class="tag tv">T2</span> → avant le 31 juillet · <span class="tag tv">T3</span> → avant le 31 octobre · <span class="tag tv">T4</span> → avant le 31 janvier N+1<br><br>
+        <strong>CA = 0 ?</strong> Déclarez quand même "néant". Pénalité si oubli : <strong>58,90 €</strong><br><br>
+        <span class="tag tg">📞</span> URSSAF : messagerie sur <strong>autoentrepreneur.urssaf.fr</strong> ou 3698
       </div>
     </div>
 
     <h2>📋 TVA — TAXE SUR LA VALEUR AJOUTÉE</h2>
     <div class="guide-block">
-      <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 Franchise TVA — seuils 2026</span><span>▼</span></button>
+      <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 Franchise TVA — seuils 2026 et suivi mensuel</span><span>▼</span></button>
       <div class="guide-block-body">
         <span class="tag tc">Services</span> Seuil limite 37 500 € · Seuil majoré 41 250 €<br>
         <span class="tag tv">Ventes / livraisons</span> Seuil limite 85 000 € · Seuil majoré 93 500 €<br><br>
         Dépassement du seuil majoré → assujettissement <strong>dès le 1er jour du mois</strong>, rétroactivement.<br>
-        Mention sur factures : <em>"TVA non applicable — article 293 B du CGI"</em><br><br>
-        <span class="tag tg">ℹ️</span> La réforme proposant un seuil unique à 25 000 € a été <strong>définitivement abandonnée</strong> (vote AN juin 2025).
+        Mention obligatoire sur factures : <em>"TVA non applicable — article 293 B du CGI"</em><br><br>
+        <span class="tag tg">ℹ️</span> La réforme proposant un seuil unique à 25 000 € a été <strong>définitivement abandonnée</strong> (vote AN juin 2025). Source : impots.gouv.fr<br><br>
+        <span class="tag ta">⚠ Palier 30 000 €</span> Commencez à surveiller chaque mois.<br>
+        <span class="tag tr">⚠ Palier 37 500 €</span> Contactez immédiatement les impôts professionnels.<br>
+        <span class="tag tr">🔴 Palier 41 250 €</span> Assujettissement rétroactif au 1er du mois — impôts + expert-comptable en urgence.<br><br>
+        <strong>Compte bancaire dédié :</strong> Légalement, un compte courant personnel avec la mention "EI" suffit — un compte pro n'est pas obligatoire. En pratique, certaines banques refusent et orientent vers leur offre pro payante. En cas de refus, elles doivent remettre une <strong>attestation écrite</strong> permettant de saisir la Banque de France (droit au compte). Les néobanques pro (Shine, Qonto, Revolut Business) sont souvent moins chères (~7 à 15 €/mois). Source : service-public.fr / legalstart<br><br>
+        <span class="tag tg">📞</span> Impôts professionnels : <strong>impots.gouv.fr → Espace Pro → Messagerie</strong> ou 0809 401 401
       </div>
     </div>
     <div class="guide-block">
-      <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 Seuils micro-entreprise 2026 (2026-2027-2028)</span><span>▼</span></button>
+      <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 TVA nulle — déclarer même à zéro</span><span>▼</span></button>
       <div class="guide-block-body">
-        <span class="tag tc">Vente de marchandises</span> 203 100 € CA HT<br>
-        <span class="tag tv">Prestations de services BIC/BNC</span> 83 600 € CA HT<br>
-        <span class="tag ta">Activité mixte</span> Max 203 100 € dont max 83 600 € services<br><br>
-        <strong>Règle des 2 ans :</strong> Le dépassement doit être constaté deux années consécutives pour sortir du régime micro.<br><br>
-        <span class="tag ta">⚠</span> Seuils TVA et seuils micro sont indépendants — vous pouvez être assujetti TVA tout en restant micro.
+        Si vous êtes assujetti TVA et n'avez encaissé <strong>aucun CA</strong> sur la période, déposez quand même votre CA3 avec la mention <strong>"néant"</strong>.<br><br>
+        <span class="tag tr">⚠ Oubli = pénalité automatique</span> + mise en demeure, même si vous ne deviez rien.<br><br>
+        Démarche : <strong>impots.gouv.fr → Espace Professionnel → Déclarer → TVA</strong>
       </div>
     </div>
     <div class="guide-block">
-      <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 Déclaration TVA mensuelle — calendrier exact</span><span>▼</span></button>
+      <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 Seuils micro-entreprise 2026-2028</span><span>▼</span></button>
       <div class="guide-block-body">
-        <strong>Quand déclarer ?</strong> Dès le 1er du mois suivant, la déclaration est disponible sur votre espace professionnel impots.gouv.fr. Vous déclarez le CA HT du mois précédent et le montant de TVA à reverser.<br>
-        Zone de sécurité déclaration : <span class="hl">déclarez entre le 1er et le 15 du mois</span><br><br>
-        <strong>Quand payer ?</strong> La date limite de paiement dépend du dernier chiffre de votre SIREN :<br>
-        <span class="tag tc">SIREN finit par 0, 1, 2, 3 ou 4</span> → entre le 15 et le 19 du mois<br>
-        <span class="tag tv">SIREN finit par 5, 6, 7, 8 ou 9</span> → entre le 20 et le 24 du mois<br><br>
-        <span class="tag tg">✓ Conseil</span> Déclarez et payez en une seule visite sur impots.gouv.fr dès le début du mois. Pas besoin de faire deux connexions séparées.<br><br>
-        <strong>Comment activer le prélèvement automatique (compte 08) ?</strong><br>
-        Le "compte 08" est un identifiant de prélèvement fiscal attribué par la DGFiP — ce n'est pas un compte bancaire classique. Pour l'activer :<br>
-        1. Connectez-vous sur impots.gouv.fr → Espace Professionnel<br>
-        2. Rubrique "Mes contrats de prélèvement"<br>
-        3. Téléchargez le formulaire de mandat SEPA proposé<br>
-        4. Transmettez-le à votre banquier avec un RIB de votre compte professionnel<br>
-        5. Délai d'activation : environ 15 jours<br><br>
-        Une fois actif, la DGFiP prélève automatiquement après votre déclaration — zéro risque d'oubli.
+        <span class="tag tc">Vente de marchandises</span> 203 100 € CA HT · <span class="tag tv">Prestations de services BIC/BNC</span> 83 600 € CA HT<br><br>
+        <strong>Règle des 2 ans :</strong> Dépassement deux années consécutives requis pour sortir du régime micro.<br><br>
+        <span class="tag ta">⚠</span> Seuils TVA et seuils micro sont indépendants. Source : economie.gouv.fr
+      </div>
+    </div>
+    <div class="guide-block">
+      <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 Déclaration TVA mensuelle — calendrier et mandat B2B</span><span>▼</span></button>
+      <div class="guide-block-body">
+        <strong>Quand déclarer ?</strong> Dès le 1er du mois suivant. Zone de sécurité : <span class="hl">déclarez entre le 1er et le 15</span><br><br>
+        <strong>Quand payer ?</strong><br>
+        <span class="tag tc">SIREN finit par 0-4</span> → entre le 15 et le 19 · <span class="tag tv">SIREN finit par 5-9</span> → entre le 20 et le 24<br><br>
+        <span class="tag tg">✓</span> Déclarez et payez en une seule visite sur impots.gouv.fr. Avec prélèvement automatique : +5 jours de trésorerie supplémentaires.<br><br>
+        <strong>Activer le prélèvement automatique (mandat B2B) :</strong><br>
+        Le mandat est <strong>pré-rempli</strong> directement dans votre espace professionnel — SIREN, RUM et coordonnées déjà renseignés, pas de formulaire à compléter manuellement.<br><br>
+        1. <strong>impots.gouv.fr → Espace Professionnel → "Gérer mes comptes bancaires" → "Éditer le mandat"</strong><br>
+        2. Imprimez, signez, envoyez à votre banque (courrier + mail pour avoir une trace)<br>
+        3. Délai d'activation : ~15 jours. Source : impots.gouv.fr (fiche "Éditer le mandat B2B depuis l'espace professionnel")
       </div>
     </div>
     <div class="guide-block">
       <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 TVA récupérable — tableau complet</span><span>▼</span></button>
       <div class="guide-block-body">
+        <div style="padding:8px 12px;background:rgba(6,182,212,.08);border-left:3px solid var(--cyan);border-radius:2px;margin-bottom:14px;font-size:12px;color:#67e8f9;line-height:1.5">
+          ℹ️ Ce tableau s'adresse aux micro-entrepreneurs <strong>déjà assujettis à la TVA</strong>. En franchise de base, vous ne facturez pas de TVA et vous ne pouvez pas en récupérer.
+        </div>
         <table class="tva-table">
           <tr><th>Dépense</th><th>TVA récupérable ?</th></tr>
           <tr><td>Matériel professionnel, outillage</td><td class="ok">✓ OUI</td></tr>
           <tr><td>Fournitures, consommables pro</td><td class="ok">✓ OUI</td></tr>
           <tr><td>Logiciels, abonnements professionnels</td><td class="ok">✓ OUI</td></tr>
           <tr><td>Téléphone / Internet (prorata pro)</td><td class="ok">✓ OUI (au prorata)</td></tr>
-          <tr><td>Carburant véhicule utilitaire (CTTE ou CAM sur carte grise)</td><td class="ok">✓ OUI (100%)</td></tr>
+          <tr><td>Carburant véhicule utilitaire (CTTE/CAM)</td><td class="ok">✓ OUI (100%)</td></tr>
           <tr><td>Péages autoroute</td><td class="ok">✓ OUI</td></tr>
           <tr><td>Frais de transport (bus, train, avion)</td><td class="no">✗ NON</td></tr>
-          <tr><td>Hébergement / hôtel en déplacement</td><td class="no">✗ NON</td></tr>
-          <tr><td>Achat / location / entretien véhicule de tourisme (VP sur carte grise)</td><td class="no">✗ NON</td></tr>
-          <tr><td>Essence véhicule de tourisme (VP sur carte grise)</td><td class="no">✗ NON (80% gazole, 100% GPL/électrique)</td></tr>
+          <tr><td>Hébergement / hôtel</td><td class="no">✗ NON</td></tr>
+          <tr><td>Véhicule de tourisme (VP)</td><td class="no">✗ NON</td></tr>
+          <tr><td>Essence VP</td><td class="no">✗ NON (80% gazole, 100% GPL/électrique)</td></tr>
           <tr><td>Cadeaux clients &gt; 69 €</td><td class="no">✗ NON</td></tr>
-        </table><br>
-        <span class="tag ta">ℹ️</span> Vous pouvez être assujetti TVA sans récupérer sur vos achats — c'est ce qu'on appelle être "assujetti passif". Vous facturez et reversez la TVA, mais ne la déduisez sur rien. Choix valide et courant quand vous avez peu d'achats éligibles (pas de véhicule utilitaire, peu de matériel, pas de locaux).<br><br>
-        Dans ce cas, posez-vous la question : le gain de TVA récupérable couvre-t-il le coût d'un expert-comptable (souvent 800 à 1 500 €/an) ? Si non, gérer vous-même la déclaration mensuelle reste une option — elle prend 15 minutes par mois une fois la prise en main faite.
+        </table>
       </div>
     </div>
 
     <h2>📊 IR — IMPÔT SUR LES REVENUS</h2>
     <div class="guide-block">
-      <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 Versement Libératoire (VFL) — fonctionnement</span><span>▼</span></button>
+      <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 Versement Libératoire (VFL) — fonctionnement complet</span><span>▼</span></button>
       <div class="guide-block-body">
-        <span class="tag tc">BIC Vente</span> 1% du CA · <span class="tag tv">BIC Services</span> 1,7% · <span class="tag ta">BNC</span> 2,2%<br><br>
-        <strong>Condition 2026 :</strong> RFR (Revenu Fiscal de Référence) N-2 &lt; 29 315 € par part de quotient familial.<br>
-        Le RFR est le revenu annuel retenu par le fisc pour calculer vos droits et plafonds. Vous le trouvez sur la première page de votre avis d'imposition, rubrique "Revenu fiscal de référence". N-2 signifie l'année d'imposition d'il y a deux ans (ex. pour 2026, c'est votre RFR de 2024).<br><br>
-        <strong>Avec VFL activé :</strong> IR soldé chaque mois avec l'URSSAF. La déclaration de revenus en mai/juin (2042-C-PRO) est une <strong>formalité sans paiement supplémentaire</strong>.<br><br>
-        <strong>C'est quoi le formulaire 2042-C-PRO ?</strong><br>
-        C'est le volet professionnel de votre déclaration de revenus annuelle. Vous le remplissez en même temps que votre déclaration principale sur impots.gouv.fr, en mai/juin. Vous y renseignez votre CA de l'année. L'administration l'utilise pour calculer vos droits sociaux (retraite, maladie) et vérifier l'éligibilité au VFL pour l'année suivante. Avec le VFL, <strong>aucun montant supplémentaire n'est à payer</strong> — tout a déjà été réglé mois par mois via l'URSSAF.<br><br>
-        <strong>Sans VFL :</strong> Abattement forfaitaire (50% BIC services) puis barème progressif. Régularisation éventuelle en septembre via prélèvement à la source.<br><br>
-        <span class="tag tr">⚠ Piège annuel</span> L'URSSAF ne vous prévient pas si votre RFR dépasse le seuil. Vérifiez chaque année avant d'opter.
+        <span class="tag tc">BIC Vente</span> 1% · <span class="tag tv">BIC Services</span> 1,7% · <span class="tag ta">BNC</span> 2,2%<br><br>
+        <strong>Principe :</strong> Payer l'IR chaque mois avec l'URSSAF — pourcentage fixe du CA, sans régularisation annuelle.<br><br>
+        <strong>Condition 2026 :</strong> RFR N-2 &lt; 29 315 € par part. Le RFR se trouve page 1 de votre avis d'imposition.<br><br>
+        <strong>Le VFL se renouvelle automatiquement</strong> tant que vous restez éligible — pas besoin de redemander chaque année. Mais si votre RFR N-2 dépasse le seuil, vous devez demander la sortie avant le 30 septembre. <strong>L'URSSAF ne vous préviendra pas.</strong> Source : autoentrepreneur.urssaf.fr / impots.gouv.fr<br><br>
+        <span class="tag tr">⚠ Piège annuel</span> Vérifiez votre RFR chaque été à réception de votre avis d'imposition. → Onglet VFL &amp; Famille pour simuler.
       </div>
     </div>
 
@@ -423,31 +514,41 @@ main{max-width:1300px;margin:0 auto;padding:32px}
       <div class="guide-block-body">
         <span class="tag tg">Exonération totale l'année de création</span><br><br>
         <span class="tag tr">15 juin</span> Acompte 50% si CFE N-1 &gt; 3 000 €<br>
-        <span class="tag ta">octobre</span> Consulter son avis CFE sur impots.gouv.fr<br>
+        <span class="tag ta">octobre</span> Consulter son avis sur impots.gouv.fr<br>
         <span class="tag tr">15 décembre</span> Paiement total (ou solde)<br><br>
         Montant : 200 € à plusieurs milliers € selon commune et surface.<br>
-        Paiement via compte 08 (prélèvement automatique recommandé).<br><br>
-        <span class="tag tg">✓ Conseil</span> Provisionnez 25 à 40 €/mois dès la 1ère année pour absorber le choc de la 2ème.
+        <span class="tag tg">✓</span> Provisionnez 25 à 40 €/mois dès la 1ère année.
       </div>
     </div>
 
-    <h2>📧 FACTURATION ÉLECTRONIQUE — À SURVEILLER</h2>
+    <h2>📁 ORGANISATION — JUSTIFICATIFS ET DOSSIERS</h2>
+    <div class="guide-block">
+      <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 Télécharger systématiquement après chaque déclaration</span><span>▼</span></button>
+      <div class="guide-block-body">
+        Après chaque déclaration ou paiement, <strong>téléchargez immédiatement le justificatif</strong>.<br><br>
+        <span class="tag tc">URSSAF</span> autoentrepreneur.urssaf.fr → "Mes déclarations" → accusé + reçu de paiement<br>
+        <span class="tag tv">Impôts</span> impots.gouv.fr → Espace Pro → "Mes paiements" → chaque CA3 validé<br><br>
+        <strong>Structure de dossiers recommandée :</strong><br>
+        📁 URSSAF 2026/ → 01_Janvier … (ou T1 T2 T3 T4)<br>
+        📁 IMPOTS ENTREPRISE 2026/ → TVA_CA3 / CFE / IR_2042CPRO<br>
+        📁 FACTURES 2026/ → Clients / Fournisseurs<br><br>
+        <span class="tag tg">✓ Conservation</span> 10 ans minimum
+      </div>
+    </div>
+
+    <h2>📧 FACTURATION ÉLECTRONIQUE</h2>
     <div class="guide-block">
       <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 Calendrier et obligations 2026-2027</span><span>▼</span></button>
       <div class="guide-block-body">
         <div style="padding:10px 14px;background:rgba(245,158,11,.08);border-left:3px solid var(--amber);border-radius:2px;margin-bottom:14px;font-size:12px;color:var(--amber);line-height:1.5">
-          📋 Sujet encore anecdotique pour la plupart des micro-entrepreneurs en 2026. Déjà reporté deux fois. Surveillez sans paniquer.
+          📋 Déjà reporté deux fois. Surveillez sans paniquer.
         </div>
-        <strong>1er sept. 2026 :</strong> Obligation de <em>recevoir</em> des e-factures pour toutes les entreprises (y compris micro et franchise TVA).<br>
+        <strong>1er sept. 2026 :</strong> Obligation de <em>recevoir</em> des e-factures (toutes entreprises).<br>
         <strong>1er sept. 2027 :</strong> Obligation d'<em>émettre</em> pour les micro-entrepreneurs et TPE.<br><br>
         <span class="tag tr">⚠ PDF par email ≠ e-facture</span> Doit transiter par une plateforme agréée (PDP).<br><br>
-        Si vous facturez surtout des particuliers → impact quasi nul avant 2027.<br>
-        Si vous facturez des professionnels assujettis → prévoir une PDP dès 2027.<br><br>
-        <strong>Option gratuite :</strong> Ordre des experts-comptables → jefacture.com<br>
-        Liste officielle : <span style="color:var(--cyan);font-family:var(--mono);font-size:11px">impots.gouv.fr/facturation-electronique-et-plateformes-agreees</span>
+        <strong>Option gratuite :</strong> jefacture.com (Ordre des experts-comptables)
       </div>
     </div>
-
   </div>
 </section>
 
@@ -455,55 +556,196 @@ main{max-width:1300px;margin:0 auto;padding:32px}
 <section class="section" id="tab-conseils">
   <div class="section-header"><h1>ASTUCES &amp; PIÈGES À ÉVITER</h1><p>Les erreurs les plus coûteuses et comment les éviter absolument</p></div>
   <div class="tips-grid">
-    <div class="tip-card">
-      <div class="tip-icon">💸</div>
-      <div class="tip-title">LA TVA N'EST PAS VOTRE ARGENT</div>
-      <div class="tip-body">Vous encaissez 12 000 € TTC → seuls 10 000 € vous appartiennent. Les 2 000 € de TVA appartiennent au fisc dès l'encaissement.<br><br><strong>Méthode infaillible :</strong> Virez immédiatement la TVA sur un sous-compte dédié "TVA — NE PAS TOUCHER".<div class="alert">⛔ Utiliser la TVA pour payer des charges = redressement fiscal + pénalités 10% + intérêts 0,2%/mois.</div></div>
+    <div class="tip-card"><div class="tip-icon">💸</div><div class="tip-title">LA TVA N'EST PAS VOTRE ARGENT</div><div class="tip-body">Vous encaissez 12 000 € TTC → seuls 10 000 € vous appartiennent. Les 2 000 € de TVA appartiennent au fisc dès l'encaissement.<br><br><strong>Méthode infaillible :</strong> Virez immédiatement la TVA sur un sous-compte dédié "TVA — NE PAS TOUCHER".<div class="alert">⛔ Utiliser la TVA pour payer des charges = redressement fiscal + pénalités 10% + intérêts 0,2%/mois.</div></div></div>
+    <div class="tip-card"><div class="tip-icon">📅</div><div class="tip-title">PRÉLÈVEMENT AUTO TVA = +5 JOURS DE TRÉSO</div><div class="tip-body">Avec prélèvement automatique (mandat B2B) : <strong>+5 jours supplémentaires</strong> + zéro risque d'oubli.<div class="success">✓ impots.gouv.fr → Espace Pro → "Gérer mes comptes bancaires" → "Éditer le mandat" — pré-rempli, 3 étapes, ~15 jours d'activation.</div></div></div>
+    <div class="tip-card"><div class="tip-icon">⚡</div><div class="tip-title">TAUX PAS — C'EST QUOI ET COMMENT LE MODULER ?</div><div class="tip-body"><strong>PAS = Prélèvement À la Source.</strong> Pour un micro-entrepreneur sans VFL, ce taux est calculé sur vos revenus N-2 et prélevé chaque mois.<br><br>Modulez votre taux sur impots.gouv.fr → "Gérer mon prélèvement à la source".<br><br>Hausse d'activité → Augmentez. Baisse d'activité → Réduisez.<div class="alert">⚠ Sous-estimation intentionnelle &gt; 10% = pénalité 10%.</div></div></div>
+    <div class="tip-card"><div class="tip-icon">🗓</div><div class="tip-title">DÉCLARER À ZÉRO — TOUJOURS OBLIGATOIRE</div><div class="tip-body">Si votre CA est nul, <strong>déclarez quand même zéro</strong> à l'URSSAF.<br><br>Ne pas déclarer = pénalité automatique de <strong>58,90 €</strong> + mise en demeure.<div class="success">✓ 2 minutes sur autoentrepreneur.urssaf.fr = zéro risque.</div></div></div>
+    <div class="tip-card"><div class="tip-icon">📊</div><div class="tip-title">SURVEILLER LE SEUIL DE FRANCHISE TVA</div><div class="tip-body">Suivez votre CA cumulé depuis le 1er janvier chaque mois. Dépassement du seuil majoré → assujettissement <strong>dès le 1er jour du mois</strong>, rétroactivement.<div class="alert">⛔ Anticipez 2 à 3 mois avant pour informer clients et adapter vos devis.</div></div></div>
+    <div class="tip-card"><div class="tip-icon">🏗</div><div class="tip-title">CFE — LE CHOC DE LA 2ÈME ANNÉE</div><div class="tip-body">La 1ère année est exonérée. La 2ème, la facture arrive et surprend beaucoup d'artisans.<br><br>Montants typiques : 200 € à 2 000 €+ selon commune.<div class="success">✓ Provisionnez 25 à 40 €/mois dès la 1ère année.</div></div></div>
+    <div class="tip-card"><div class="tip-icon">🚨</div><div class="tip-title">ACRE 2026 — PLUS AUTOMATIQUE, 60 JOURS</div><div class="tip-body">L'ACRE n'est plus accordée automatiquement depuis janvier 2026. Vous devez faire la demande dans les <strong>60 jours</strong> suivant la création.<br><br>Et ce n'est plus pour tous : demandeurs d'emploi, RSA, jeunes 18-25 ans, zones ZFRR.<div class="alert">⚠ Passé 60 jours = perte définitive. Vérifiez votre éligibilité sur autoentrepreneur.urssaf.fr dès la création. Source : décret 2026-69 / service-public.fr</div></div></div>
+    <div class="tip-card"><div class="tip-icon">💡</div><div class="tip-title">VERSEMENT LIBÉRATOIRE — VÉRIFIEZ CHAQUE ANNÉE</div><div class="tip-body">Condition 2026 : RFR N-2 &lt; <strong>29 315 € par part</strong>. Se renouvelle automatiquement — pas besoin de redemander. Mais si vous dépassez le seuil, signalez-le avant le 30 septembre. <strong>L'URSSAF ne préviendra pas.</strong><div class="alert">⚠ Vérifiez votre RFR chaque été sur votre avis d'imposition.</div></div></div>
+    <div class="tip-card"><div class="tip-icon">🔄</div><div class="tip-title">MENSUEL VS TRIMESTRIEL</div><div class="tip-body"><strong>Mensuel :</strong> Paiements lissés, meilleure visibilité. Recommandé si CA régulier &gt; 3 000 €/mois.<br><br><strong>Trimestriel :</strong> Moins de démarches, 4 gros prélèvements. Risque de "manger" la trésorerie.<div class="success">✓ CA régulier → mensuel. Saisonnier → trimestriel avec provisions rigoureuses.</div></div></div>
+    <div class="tip-card"><div class="tip-icon">📂</div><div class="tip-title">ARCHIVAGE &amp; JUSTIFICATIFS</div><div class="tip-body">Conservez tous vos justificatifs <strong>10 ans</strong>. Numérisez immédiatement.<br><br>Téléchargez systématiquement les accusés de déclaration et reçus après chaque échéance sur autoentrepreneur.urssaf.fr et impots.gouv.fr.<div class="success">✓ Deux dossiers clés : URSSAF 2026/ et IMPOTS ENTREPRISE 2026/</div></div></div>
+    <div class="tip-card"><div class="tip-icon">📞</div><div class="tip-title">CONTACTER LES SERVICES — C'EST FACILE</div><div class="tip-body"><strong>URSSAF :</strong> autoentrepreneur.urssaf.fr → Messagerie, ou 3698. Réponse 48-72h.<br><br><strong>Impôts professionnels :</strong> impots.gouv.fr → Espace Pro → Messagerie, ou 0809 401 401.<div class="success">✓ Poser une question par écrit crée une trace — utile en cas de litige.</div></div></div>
+  </div>
+</section>
+
+<!-- VFL & FAMILLE -->
+<section class="section" id="tab-vfl">
+  <div class="section-header"><h1>VFL &amp; OPTIMISATION FAMILIALE</h1><p>Simulez votre éligibilité au Versement Libératoire et comprenez l'impact des changements de situation familiale</p></div>
+  <div class="vfl-calc">
+    <div class="vfl-calc-title">🧮 Simulateur VFL 2026</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">L'éligibilité dépend du <strong style="color:var(--text)">Revenu Fiscal de Référence (RFR)</strong> de votre foyer de l'année N-2 — trouvez-le page 1 de votre avis d'imposition.</p>
+    <div class="vfl-inputs">
+      <div class="vfl-input-group"><label>CA annuel HT (€)</label><input type="number" id="vfl_ca" value="40000"></div>
+      <div class="vfl-input-group"><label>Type d'activité</label>
+        <select id="vfl_activite">
+          <option value="bic_vente">BIC Vente / Achat-revente</option>
+          <option value="bic_service" selected>BIC Services</option>
+          <option value="bnc">BNC (libéral)</option>
+        </select></div>
+      <div class="vfl-input-group"><label>RFR du foyer N-2 (€)</label><input type="number" id="vfl_rfr" value="35000"></div>
+      <div class="vfl-input-group"><label>Nombre de parts fiscales</label>
+        <select id="vfl_parts">
+          <option value="1">1 part — célibataire sans enfant</option>
+          <option value="1.5">1,5 parts — parent isolé 1 enfant</option>
+          <option value="2" selected>2 parts — couple sans enfant</option>
+          <option value="2.5">2,5 parts — couple + 1 enfant</option>
+          <option value="3">3 parts — couple + 2 enfants</option>
+          <option value="3.5">3,5 parts — couple + 3 enfants</option>
+          <option value="4">4 parts — couple + 4 enfants</option>
+        </select></div>
+      <div class="vfl-input-group"><label>Autres revenus du foyer (€/an)</label><input type="number" id="vfl_autres" value="0" placeholder="salaire conjoint, retraite…"></div>
+      <div class="vfl-input-group" style="justify-content:flex-end"><label style="opacity:0">.</label><button class="btn-calc-vfl" onclick="calcVFL()">▶ SIMULER</button></div>
     </div>
-    <div class="tip-card">
-      <div class="tip-icon">📅</div>
-      <div class="tip-title">PRÉLÈVEMENT AUTO TVA = +5 JOURS DE TRÉSO</div>
-      <div class="tip-body">Sans prélèvement : limite le <strong>15/19/24</strong> selon votre SIREN.<br>Avec prélèvement automatique : <strong>+5 jours supplémentaires</strong>.<br><br>5 jours de trésorerie en plus chaque mois + zéro risque d'oubli.<div class="success">✓ Activer sur impots.gouv.fr → Espace Pro → "Mes contrats de prélèvement". Prévoir 15 jours d'activation.</div></div>
+    <div class="vfl-result" id="vfl-result">
+      <div class="vfl-result-grid">
+        <div class="vfl-result-card"><div class="vfl-result-card-title">Plafond RFR autorisé (2026)</div><div class="vfl-result-card-val" id="vfl-plafond" style="color:var(--cyan)">—</div><div class="vfl-result-card-sub">29 315 € × parts</div></div>
+        <div class="vfl-result-card"><div class="vfl-result-card-title">RFR estimé de votre foyer</div><div class="vfl-result-card-val" id="vfl-rfr-calc" style="color:var(--amber)">—</div><div class="vfl-result-card-sub">RFR saisi + CA après abattement</div></div>
+        <div class="vfl-result-card"><div class="vfl-result-card-title">Impôt si VFL activé</div><div class="vfl-result-card-val" id="vfl-impot-vfl" style="color:var(--violet)">—</div><div class="vfl-result-card-sub" id="vfl-taux-label">% du CA HT / an</div></div>
+        <div class="vfl-result-card"><div class="vfl-result-card-title">Marge RFR restante</div><div class="vfl-result-card-val" id="vfl-marge">—</div><div class="vfl-result-card-sub">Avant dépassement du seuil</div></div>
+      </div>
+      <div class="vfl-verdict" id="vfl-verdict"></div>
     </div>
-    <div class="tip-card">
-      <div class="tip-icon">⚡</div>
-      <div class="tip-title">TAUX PAS — C'EST QUOI ET COMMENT LE MODULER ?</div>
-      <div class="tip-body"><strong>PAS = Prélèvement À la Source.</strong> C'est le système par lequel l'État prélève l'impôt sur le revenu directement chaque mois, sans attendre la déclaration annuelle. Pour un micro-entrepreneur sans VFL (Versement Libératoire), ce taux est calculé sur vos revenus N-2 et prélevé chaque mois sur votre compte.<br><br>Si votre activité varie fortement, <strong>modulez votre taux</strong> en cours d'année sur impots.gouv.fr → "Gérer mon prélèvement à la source".<br><br>Hausse d'activité → Augmentez pour éviter une régularisation lourde en septembre.<br>Baisse d'activité → Réduisez pour préserver votre trésorerie.<div class="alert">⚠ Sous-estimation intentionnelle &gt; 10% = pénalité 10% du montant.</div></div>
+  </div>
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-title" style="color:var(--violet)">👪 Tableau des parts fiscales</div>
+    <div class="parts-table-wrap">
+      <table class="parts-table">
+        <tr><th>Situation</th><th>Parts</th><th>Précisions</th></tr>
+        <tr class="section-row"><td colspan="3">— Situation de base —</td></tr>
+        <tr><td>Célibataire sans enfant</td><td class="parts-val">1</td><td>Référence</td></tr>
+        <tr><td>Couple marié ou pacsé sans enfant</td><td class="parts-val">2</td><td>Mariage ou PACS — pas le concubinage</td></tr>
+        <tr><td>Concubins sans enfant</td><td class="parts-val">1+1</td><td>Deux déclarations séparées — chacun déclare seul</td></tr>
+        <tr class="section-row"><td colspan="3">— Enfants à charge —</td></tr>
+        <tr><td>1er et 2ème enfant</td><td class="parts-val">+0,5</td><td>Chacun — foyer marié/pacsé ou parent principal</td></tr>
+        <tr><td>3ème enfant et suivants</td><td class="parts-val">+1</td><td>1 part entière chacun</td></tr>
+        <tr><td>Concubin, 1 enfant garde principale</td><td class="parts-val">1,5</td><td>1 part + 0,5 — déclaration séparée du conjoint</td></tr>
+        <tr><td>Concubin, 1 enfant garde alternée</td><td class="parts-val">1,25</td><td>1 part + 0,25 — l'autre parent a aussi 1,25</td></tr>
+        <tr class="section-row"><td colspan="3">— Parent isolé —</td></tr>
+        <tr><td>Parent isolé (1 enfant)</td><td class="parts-val">2</td><td>1 + 0,5 enfant + 0,5 parent isolé</td></tr>
+        <tr><td>Parent isolé (2 enfants)</td><td class="parts-val">2,5</td><td></td></tr>
+        <tr class="section-row"><td colspan="3">— Enfants majeurs rattachés —</td></tr>
+        <tr><td>Étudiant rattaché (18-25 ans)</td><td class="parts-val">+0,5</td><td>Sur demande annuelle obligatoire</td></tr>
+        <tr><td>Après 25 ans</td><td class="parts-val">0</td><td>Fin de rattachement — pension alimentaire possible</td></tr>
+      </table>
     </div>
-    <div class="tip-card">
-      <div class="tip-icon">🗓</div>
-      <div class="tip-title">DÉCLARER À ZÉRO — TOUJOURS OBLIGATOIRE</div>
-      <div class="tip-body">Si votre CA est nul (congés, creux), <strong>déclarez quand même zéro</strong> à l'URSSAF.<br><br>Ne pas déclarer = pénalité automatique de <strong>58,90 €</strong> + mise en demeure + risque de régularisation d'office.<div class="success">✓ 2 minutes sur autoentrepreneur.urssaf.fr pour déclarer zéro = zéro risque.</div></div>
+    <div style="margin-top:16px;padding:12px 16px;background:rgba(139,92,246,.08);border-left:3px solid var(--violet);border-radius:2px;font-size:12px;color:#c4b5fd;line-height:1.6">
+      <strong>Concubinage ≠ PACS ≠ Mariage :</strong> En concubinage, deux foyers fiscaux séparés. PACS ou mariage = fusion des foyers et cumul des parts — avantageux fiscalement mais peut impacter les aides CAF. Simulez les deux situations avant de décider.
     </div>
-    <div class="tip-card">
-      <div class="tip-icon">📊</div>
-      <div class="tip-title">SURVEILLER LE SEUIL DE FRANCHISE TVA</div>
-      <div class="tip-body">Suivez votre CA cumulé mois par mois. Dépassement du seuil majoré → assujettissement <strong>dès le 1er jour du mois</strong>, rétroactivement.<br><br>Toutes les factures du mois sans TVA devront être régularisées.<div class="alert">⛔ Anticipez 2 à 3 mois avant pour informer clients et adapter vos devis.</div></div>
+  </div>
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-title" style="color:var(--amber)">📅 Événements déclencheurs</div>
+    <div class="event-cards">
+      <div class="event-card"><div class="event-card-age">18 ans</div><div class="event-card-title">Majorité de l'enfant</div><div class="event-card-body">Peut rester rattaché à votre foyer — démarche à faire lors de la déclaration de revenus.</div><div class="event-card-impact impact-fiscal">📊 Aucun changement automatique si vous le rattachez.</div><div class="event-card-impact impact-social" style="margin-top:6px">💜 Allocations familiales continuent si étudiant sous conditions. Vérifiez CAF.</div></div>
+      <div class="event-card"><div class="event-card-age">21 ans</div><div class="event-card-title">Limite de rattachement automatique</div><div class="event-card-body">Rattachement non automatique — enfant doit être étudiant, demande annuelle obligatoire.</div><div class="event-card-impact impact-fiscal">📊 Perte de 0,5 part si vous ne demandez plus = plafond VFL réduit de 14 657 €.</div></div>
+      <div class="event-card"><div class="event-card-age">25 ans</div><div class="event-card-title">Fin de rattachement définitive</div><div class="event-card-body">Plus de rattachement possible même si encore étudiant ou à charge.</div><div class="event-card-impact impact-fiscal">📊 Perte définitive de 0,5 part → recalculez éligibilité VFL.</div><div class="event-card-impact impact-info" style="margin-top:6px">ℹ️ Si à votre charge financière, déduction pension alimentaire possible.</div></div>
+      <div class="event-card"><div class="event-card-age">PACS / Mariage</div><div class="event-card-title">Fusion des foyers fiscaux</div><div class="event-card-body">Revenus déclarés ensemble, parts additionnées — souvent avantageux fiscalement.</div><div class="event-card-impact impact-fiscal">📊 Plafond VFL plus élevé, impôt réduit si revenus déséquilibrés.</div><div class="event-card-impact impact-social" style="margin-top:6px">💜 Revenus combinés → possible perte APL, RSA, prime d'activité. Simulez sur caf.fr avant.</div></div>
+      <div class="event-card"><div class="event-card-age">Séparation</div><div class="event-card-title">Changement de garde et de parts</div><div class="event-card-body">Garde principale = 0,5 part par enfant. Garde alternée = 0,25 part chacun.</div><div class="event-card-impact impact-fiscal">📊 Recalcul immédiat des parts → impact VFL et quotient familial.</div></div>
+      <div class="event-card"><div class="event-card-age">30 sept.</div><div class="event-card-title">Date limite annuelle VFL</div><div class="event-card-body">Date limite pour modifier l'option VFL pour l'année suivante.<br><br>Le VFL se <strong>renouvelle automatiquement</strong> tant que vous êtes éligible. Si votre RFR N-2 dépasse le seuil, demandez la sortie avant cette date — <strong>l'URSSAF ne vous préviendra pas.</strong> Source : autoentrepreneur.urssaf.fr</div><div class="event-card-impact impact-fiscal">📊 Date ratée = attente d'un an. Aucune dérogation.</div><div class="event-card-impact impact-info" style="margin-top:6px">ℹ️ Démarche : autoentrepreneur.urssaf.fr → Messagerie → "versement libératoire"</div></div>
     </div>
-    <div class="tip-card">
-      <div class="tip-icon">🏗</div>
-      <div class="tip-title">CFE — LE CHOC DE LA 2ÈME ANNÉE</div>
-      <div class="tip-body">La 1ère année est exonérée. La 2ème, la facture arrive et surprend beaucoup d'artisans.<br><br>Montants typiques : 200 € à 2 000 €+ selon commune et surface. Consultez votre avis en octobre sur impots.gouv.fr.<div class="success">✓ Provisionnez 25 à 40 €/mois dès la 1ère année. Zéro surprise en année 2.</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="color:var(--green)">📈 Suivi seuil franchise TVA</div>
+    <div class="tva-suivi-paliers">
+      <div class="tva-palier"><div class="tva-palier-montant" style="color:var(--green)">0 → 20 000 €</div><div class="tva-palier-label">Zone sereine</div><div class="tva-palier-desc">Facturez sans TVA. Mention : <em>"TVA non applicable — art. 293 B CGI"</em></div></div>
+      <div class="tva-palier"><div class="tva-palier-montant" style="color:var(--cyan)">20 000 → 30 000 €</div><div class="tva-palier-label">Attention modérée</div><div class="tva-palier-desc">Suivez votre CA mensuel précisément. Calculez le mois potentiel de franchissement.</div></div>
+      <div class="tva-palier"><div class="tva-palier-montant" style="color:var(--amber)">30 000 → 37 500 €</div><div class="tva-palier-label">Vigilance — seuil limite proche</div><div class="tva-palier-desc">Contactez les impôts. Préparez vos clients à des factures avec TVA.</div></div>
+      <div class="tva-palier"><div class="tva-palier-montant" style="color:var(--red)">37 500 → 41 250 €</div><div class="tva-palier-label">Zone rouge</div><div class="tva-palier-desc">Seuil majoré = assujettissement rétroactif au 1er du mois. Impôts + expert-comptable en urgence.</div></div>
     </div>
-    <div class="tip-card">
-      <div class="tip-icon">💡</div>
-      <div class="tip-title">VERSEMENT LIBÉRATOIRE — VÉRIFIEZ L'ÉLIGIBILITÉ CHAQUE ANNÉE</div>
-      <div class="tip-body">Le Versement Libératoire (abrégé VFL) est une option qui permet de payer votre impôt sur le revenu chaque mois avec l'URSSAF, en pourcentage de votre CA. Simple, prévisible, sans surprise.<br><br>Condition 2026 : votre RFR (Revenu Fiscal de Référence, indiqué sur votre avis d'imposition) de l'année N-2 doit être inférieur à <strong>29 315 € par part</strong>. L'URSSAF <strong>ne vous prévient pas</strong> si vous dépassez ce seuil.<br><br>Si vous optez pour le Versement Libératoire sans être éligible : régularisation lors de la déclaration de revenus annuelle.<div class="alert">⚠ Vérifiez votre RFR N-2 sur votre avis d'imposition avant chaque option Versement Libératoire.</div></div>
+  </div>
+</section>
+
+<!-- DÉMARRAGE -->
+<section class="section" id="tab-demarrage">
+  <div class="section-header"><h1>JE DÉMARRE</h1><p>Checklist des premières semaines + que faire si vous arrivez en cours d'année</p></div>
+
+  <div class="depart-now" id="depart-now-section">
+    <div class="depart-now-title" id="depart-now-title">📍 Vous démarrez en cours d'année</div>
+    <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px" id="depart-now-text">Voici ce qui compte pour vous maintenant — les mois passés ne vous concernent pas, les échéances futures sont vos priorités immédiates.</p>
+    <div id="month-grid-mini" class="month-grid-mini"></div>
+  </div>
+
+  <div class="checklist-progress">
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+    <div class="progress-label" id="progress-label">0 / 7 étapes complétées</div>
+  </div>
+
+  <div class="checklist-steps" id="checklist-steps">
+
+    <div class="checklist-step" onclick="toggleStep(this)">
+      <div class="step-check">○</div>
+      <div class="step-body">
+        <div class="step-title">Créer votre espace professionnel impots.gouv.fr</div>
+        <div class="step-desc"><strong>impots.gouv.fr → Connexion → "Créer mon espace professionnel"</strong> → mode simplifié → renseignez votre SIREN.<br><br>Cet espace vous permet de déclarer et payer la TVA, consulter votre avis CFE, et activer le prélèvement automatique (mandat B2B). L'activation doit être faite sous 60 jours à compter de la création de l'espace, passé ce délai le code expire.</div>
+        <span class="step-tag j0">J+0 à J+7</span>
+      </div>
     </div>
-    <div class="tip-card">
-      <div class="tip-icon">🔄</div>
-      <div class="tip-title">MENSUEL VS TRIMESTRIEL — LEQUEL CHOISIR ?</div>
-      <div class="tip-body"><strong>TVA mensuelle :</strong> Meilleure visibilité, paiements lissés. Recommandé si CA régulier &gt; 3 000 €/mois.<br><br><strong>URSSAF trimestrielle :</strong> Moins de démarches mais 4 gros prélèvements. Risque de "manger" la trésorerie accumulée.<div class="success">✓ CA régulier → mensuel. Activité saisonnière marquée → trimestriel avec provisions rigoureuses.</div></div>
+
+    <div class="checklist-step" onclick="toggleStep(this)">
+      <div class="step-check">○</div>
+      <div class="step-body">
+        <div class="step-title">Créer votre compte autoentrepreneur.urssaf.fr</div>
+        <div class="step-desc">Votre espace URSSAF pour déclarer votre CA et payer vos cotisations chaque mois ou trimestre. Activez-le dès la création — c'est là que vous déclarerez votre premier CA.<br><br>Si vous souhaitez le <strong>Versement Libératoire (VFL)</strong>, la demande se fait ici : Messagerie → "J'ai une question sur le versement libératoire".</div>
+        <span class="step-tag j0">J+0 à J+7</span>
+      </div>
     </div>
-    <div class="tip-card">
-      <div class="tip-icon">📂</div>
-      <div class="tip-title">ARCHIVAGE &amp; JUSTIFICATIFS</div>
-      <div class="tip-body">Conservez tous vos justificatifs <strong>10 ans</strong>. Numérisez immédiatement — les factures papier s'effacent.<br><br>Pour la TVA déductible : facture à votre nom avec TVA apparente obligatoire. Un ticket de caisse ne suffit pas.<div class="success">✓ Dext, AutoEntrepreneur.fr ou un dossier cloud organisé par mois font très bien l'affaire.</div></div>
+
+    <div class="checklist-step" onclick="toggleStep(this)">
+      <div class="step-check">○</div>
+      <div class="step-body">
+        <div class="step-title">Vérifier l'éligibilité ACRE et faire la demande si eligible</div>
+        <div class="step-desc">Depuis 2026, l'ACRE <strong>n'est plus automatique</strong> — vous devez faire la demande. Délai : <strong>60 jours maximum</strong> après la date d'ouverture de l'activité. Passé ce délai, l'aide est définitivement perdue.<br><br>Profils éligibles : demandeurs d'emploi indemnisés, allocataires RSA/ASS, jeunes 18-25 ans, zones ZFRR.<br><br>Démarche : <strong>autoentrepreneur.urssaf.fr</strong> → formulaire ACRE simplifié. Source : décret n°2026-69 du 6 février 2026 / service-public.fr</div>
+        <span class="step-tag j0">⚠ Dans les 60 jours — impératif</span>
+      </div>
     </div>
-    <div class="tip-card">
-      <div class="tip-icon">📧</div>
-      <div class="tip-title">E-FACTURATION — À SURVEILLER, PAS PANIQUER</div>
-      <div class="tip-body">Déjà reportée deux fois. Obligation de réception : sept. 2026. Émission : sept. 2027.<br><br>Si vous facturez surtout des particuliers → impact quasi nul avant 2027.<div class="info-box">ℹ️ L'Ordre des experts-comptables prépare une PDP gratuite (jefacture.com). Pas d'urgence, mais inscrivez-vous avant l'automne 2026.</div></div>
+
+    <div class="checklist-step" onclick="toggleStep(this)">
+      <div class="step-check">○</div>
+      <div class="step-body">
+        <div class="step-title">Activer le mandat B2B (prélèvement automatique TVA / CFE)</div>
+        <div class="step-desc">Le mandat est <strong>pré-rempli</strong> dans votre espace professionnel — SIREN, RUM et coordonnées déjà renseignés.<br><br>1. <strong>impots.gouv.fr → Espace Pro → "Gérer mes comptes bancaires" → "Éditer le mandat"</strong><br>2. Imprimez, signez<br>3. Envoyez à votre banque (courrier + mail pour avoir une trace)<br>4. Délai d'activation : ~15 jours<br><br>Sans ce mandat, tout paiement d'impôt professionnel sera rejeté. Source : impots.gouv.fr</div>
+        <span class="step-tag j0">J+0 à J+15</span>
+      </div>
+    </div>
+
+    <div class="checklist-step" onclick="toggleStep(this)">
+      <div class="step-check">○</div>
+      <div class="step-body">
+        <div class="step-title">Déposer la déclaration initiale CFE (1ère année uniquement)</div>
+        <div class="step-desc">L'année de création, vous êtes exonéré de CFE. Mais vous devez quand même déposer la <strong>déclaration initiale de CFE (formulaire 1447-C)</strong> avant le <strong>31 décembre de l'année de création</strong>.<br><br>Démarche : impots.gouv.fr → Espace Pro → Déclarer → CFE → "Déclaration initiale".<br><br>Si vous oubliez ce dépôt, votre dossier CFE sera mal initialisé pour l'année suivante — vous serez exonéré quand même mais régularisation possible. Provisionnez 25 à 40 €/mois dès maintenant pour la CFE N+1.</div>
+        <span class="step-tag j30">Avant le 31 déc. de l'année de création</span>
+      </div>
+    </div>
+
+    <div class="checklist-step" onclick="toggleStep(this)">
+      <div class="step-check">○</div>
+      <div class="step-body">
+        <div class="step-title">Ouvrir un compte dédié à l'activité</div>
+        <div class="step-desc">Légalement obligatoire dès <strong>10 000 € de CA sur 2 ans consécutifs</strong>. Recommandé dès le premier jour pour séparer clairement vos flux et faciliter la comptabilité.<br><br><strong>Légalement</strong> : un compte courant personnel dédié avec la mention "EI" suffit — un compte pro n'est pas obligatoire. En pratique, certaines banques refusent et orientent vers leur offre pro payante. En cas de refus, elles doivent remettre une <strong>attestation écrite</strong> permettant de saisir la Banque de France (droit au compte). Source : service-public.fr<br><br>Néobanques pro moins chères : Shine, Qonto, Revolut Business (~7-15 €/mois).</div>
+        <span class="step-tag j30">J+0 à J+30</span>
+      </div>
+    </div>
+
+    <div class="checklist-step" onclick="toggleStep(this)">
+      <div class="step-check">○</div>
+      <div class="step-body">
+        <div class="step-title">Mettre en place vos provisions dès le 1er encaissement</div>
+        <div class="step-desc">Dès que vous encaissez votre première facture, provisionnez immédiatement sur des sous-comptes :<br><br>→ <strong>TVA collectée</strong> (si assujetti) : sous-compte "TVA — NE PAS TOUCHER"<br>→ <strong>URSSAF + VFL</strong> : ~21 à 24% du CA HT selon votre activité<br>→ <strong>CFE + divers</strong> : ~2 à 3% du CA<br><br>Le reste = votre revenu net disponible. Ne jamais toucher aux enveloppes entre les échéances. → Onglet Provisions pour calculer vos taux exacts.</div>
+        <span class="step-tag ongoing">Dès le 1er encaissement — permanent</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card" style="margin-top:24px">
+    <div class="card-title" style="color:var(--amber)">📅 Si vous arrivez en cours d'année — ce qui change</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.8">
+      <p><strong style="color:var(--text)">URSSAF :</strong> Vous déclarez votre CA à partir du mois de votre 1ère activité. Si vous créez en mars, votre première déclaration porte sur mars (mensuel) ou sur le T1 complet si vous avez démarré en janvier — sinon T2 dès avril.</p><br>
+      <p><strong style="color:var(--text)">Seuils TVA :</strong> Les seuils de franchise TVA sont <strong>proratisés à la durée d'activité sur l'année</strong> pour l'année de création. Ex : si vous créez en juillet (6 mois), le seuil applicable est la moitié du seuil annuel.</p><br>
+      <p><strong style="color:var(--text)">CFE :</strong> Exonéré l'année de création — peu importe le mois de démarrage. La CFE démarre en N+1.</p><br>
+      <p><strong style="color:var(--text)">ACRE :</strong> Si vous êtes éligible, l'exonération s'applique jusqu'à la fin du 3ème trimestre civil suivant la date de création. Créer en début de trimestre maximise la durée d'exonération.</p><br>
+      <p><strong style="color:var(--text)">Calendrier :</strong> Générez votre calendrier fiscal dans l'onglet Profil — il affiche automatiquement les mois passés en grisé et met en valeur le mois en cours.</p>
     </div>
   </div>
 </section>
@@ -523,6 +765,17 @@ function toggleGuide(btn){
   const b=btn.nextElementSibling;
   b.classList.toggle('open');
   btn.querySelector('span:last-child').textContent=b.classList.contains('open')?'▲':'▼';
+}
+function toggleStep(el){
+  el.classList.toggle('done');
+  updateProgress();
+}
+function updateProgress(){
+  const steps=document.querySelectorAll('.checklist-step');
+  const done=document.querySelectorAll('.checklist-step.done').length;
+  const pct=Math.round((done/steps.length)*100);
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('progress-label').textContent=done+' / '+steps.length+' étapes complétées';
 }
 function syncCA(src){
   if(src==='annual'){
@@ -573,7 +826,7 @@ function updateProvisions(){
   const items=[];
   if(rt!=='franchise') items.push({l:'TVA à reverser',p:tv+'%',a:tvaA,c:'var(--cyan)',b:tv,d:tv+'% du CA HT'});
   items.push({l:'URSSAF cotisations',p:Math.round(rates.urssaf*1000)/10+'%',a:uA,c:'var(--violet)',b:rates.urssaf*100,d:'Taux 2026 validé'});
-  if(rates.cfp>0) items.push({l:'CFP Formation',p:Math.round(rates.cfp*1000)/10+'%',a:cfpA,c:'#a78bfa',b:rates.cfp*500,d:'Incluse dans chaque prélèvement URSSAF mensuel'});
+  if(rates.cfp>0) items.push({l:'CFP Formation',p:Math.round(rates.cfp*1000)/10+'%',a:cfpA,c:'#a78bfa',b:rates.cfp*500,d:'Incluse dans le prélèvement URSSAF'});
   if(rates.cma>0) items.push({l:'Taxe CMA',p:Math.round(rates.cma*10000)/100+'%',a:cmaA,c:'#818cf8',b:rates.cma*1000,d:'Chambre des Métiers'});
   if(rates.hasVFL) items.push({l:'IR (Vers. Libératoire)',p:Math.round(rates.vfl*1000)/10+'%',a:vflA,c:'var(--amber)',b:rates.vfl*400,d:'Payé avec URSSAF — IR soldé'});
   else items.push({l:'IR estimé (provision)',p:'~5-15%',a:m*.08,c:'var(--amber)',b:8,d:'Variable selon TMI'});
@@ -599,20 +852,51 @@ function updateJauges(annual){
   const stm=isV?93500:41250;
   const pm=Math.min((annual/sm)*100,100);
   const pt=rt==='franchise'?Math.min((annual/stm)*100,100):null;
-  let h=`<div class="jauge-card">
-    <div class="jauge-card-title">Seuil micro-entreprise</div>
-    <div class="jauge-bar-wrap"><div class="jauge-bar-fill" style="width:${pm}%;background:${barColor(pm)}"></div></div>
-    <div class="jauge-info"><span class="jauge-ca">${Math.round(annual).toLocaleString('fr-FR')} €</span><span class="jauge-max">/ ${sm.toLocaleString('fr-FR')} €</span></div>
-    <div class="jauge-status" style="color:${barColor(pm)}">${pm<60?'✓ Serein':pm<85?'⚠ Surveiller':'🔴 Proche du seuil'}</div>
-  </div>`;
-  if(pt!==null) h+=`<div class="jauge-card">
-    <div class="jauge-card-title">Seuil franchise TVA (majoré)</div>
-    <div class="jauge-bar-wrap"><div class="jauge-bar-fill" style="width:${pt}%;background:${barColor(pt)}"></div></div>
-    <div class="jauge-info"><span class="jauge-ca">${Math.round(annual).toLocaleString('fr-FR')} €</span><span class="jauge-max">/ ${stm.toLocaleString('fr-FR')} €</span></div>
-    <div class="jauge-status" style="color:${barColor(pt)}">${pt<60?'✓ Franchise TVA ok':pt<85?'⚠ Surveiller le seuil TVA':'🔴 Dépassement TVA imminent'}</div>
-  </div>`;
+  let h=`<div class="jauge-card"><div class="jauge-card-title">Seuil micro-entreprise</div><div class="jauge-bar-wrap"><div class="jauge-bar-fill" style="width:${pm}%;background:${barColor(pm)}"></div></div><div class="jauge-info"><span class="jauge-ca">${Math.round(annual).toLocaleString('fr-FR')} €</span><span class="jauge-max">/ ${sm.toLocaleString('fr-FR')} €</span></div><div class="jauge-status" style="color:${barColor(pm)}">${pm<60?'✓ Serein':pm<85?'⚠ Surveiller':'🔴 Proche du seuil'}</div></div>`;
+  if(pt!==null) h+=`<div class="jauge-card"><div class="jauge-card-title">Seuil franchise TVA (majoré)</div><div class="jauge-bar-wrap"><div class="jauge-bar-fill" style="width:${pt}%;background:${barColor(pt)}"></div></div><div class="jauge-info"><span class="jauge-ca">${Math.round(annual).toLocaleString('fr-FR')} €</span><span class="jauge-max">/ ${stm.toLocaleString('fr-FR')} €</span></div><div class="jauge-status" style="color:${barColor(pt)}">${pt<60?'✓ Franchise TVA ok':pt<85?'⚠ Surveiller le seuil TVA':'🔴 Dépassement TVA imminent'}</div></div>`;
   jg.innerHTML=h;
 }
+
+// SIMULATEUR VFL
+function calcVFL(){
+  const ca=parseFloat(document.getElementById('vfl_ca').value)||0;
+  const act=document.getElementById('vfl_activite').value;
+  const rfrSaisi=parseFloat(document.getElementById('vfl_rfr').value)||0;
+  const parts=parseFloat(document.getElementById('vfl_parts').value)||1;
+  const autres=parseFloat(document.getElementById('vfl_autres').value)||0;
+  const tauxVFL={'bic_vente':0.010,'bic_service':0.017,'bnc':0.022}[act]||0.017;
+  const labelAct={'bic_vente':'BIC Vente (1%)','bic_service':'BIC Services (1,7%)','bnc':'BNC (2,2%)'}[act]||'';
+  const abat={'bic_vente':0.29,'bic_service':0.50,'bnc':0.34}[act]||0.50;
+  const rfrEstime=rfrSaisi+ca*(1-abat)+autres;
+  const plafond=29315*parts;
+  const marge=plafond-rfrEstime;
+  const impotVFL=ca*tauxVFL;
+  document.getElementById('vfl-plafond').textContent=Math.round(plafond).toLocaleString('fr-FR')+' €';
+  document.getElementById('vfl-rfr-calc').textContent=Math.round(rfrEstime).toLocaleString('fr-FR')+' €';
+  document.getElementById('vfl-rfr-calc').style.color=rfrEstime<=plafond?'var(--green)':'var(--red)';
+  document.getElementById('vfl-impot-vfl').textContent=Math.round(impotVFL).toLocaleString('fr-FR')+' €';
+  document.getElementById('vfl-taux-label').textContent=labelAct+' / an';
+  const margeEl=document.getElementById('vfl-marge');
+  margeEl.textContent=(marge>=0?'+':'')+Math.round(marge).toLocaleString('fr-FR')+' €';
+  margeEl.style.color=marge>5000?'var(--green)':marge>0?'var(--amber)':'var(--red)';
+  const v=document.getElementById('vfl-verdict');
+  if(rfrEstime<=plafond){
+    const ecartPct=Math.round((marge/plafond)*100);
+    if(ecartPct>20){
+      v.className='vfl-verdict eligible';
+      v.innerHTML=`<strong>✅ Éligible au VFL en 2026</strong><br>RFR estimé (${Math.round(rfrEstime).toLocaleString('fr-FR')} €) sous le plafond (${Math.round(plafond).toLocaleString('fr-FR')} €). Marge confortable de ${Math.round(marge).toLocaleString('fr-FR')} €.<br><br>→ Pour activer : <strong>autoentrepreneur.urssaf.fr</strong>`;
+    } else {
+      v.className='vfl-verdict limite';
+      v.innerHTML=`<strong>⚠ Éligible mais marge faible</strong><br>RFR estimé sous le plafond mais marge étroite (${Math.round(marge).toLocaleString('fr-FR')} €). Surveillez chaque année.`;
+    }
+  } else {
+    v.className='vfl-verdict non-eligible';
+    v.innerHTML=`<strong>❌ Non éligible au VFL en 2026</strong><br>RFR estimé (${Math.round(rfrEstime).toLocaleString('fr-FR')} €) dépasse le plafond de ${Math.round(-marge).toLocaleString('fr-FR')} €.<br><br>Si vous utilisez le VFL malgré tout, les versements deviennent un crédit d'impôt régularisé lors de la déclaration annuelle.<br><br>→ Contactez les <strong>impôts professionnels</strong> pour vérifier.`;
+  }
+  document.getElementById('vfl-result').classList.add('show');
+}
+
+// GÉNÉRATION CALENDRIER
 function generateAll(){
   const annee=parseInt(document.getElementById('annee').value);
   const rt=document.getElementById('regime_tva').value;
@@ -629,57 +913,56 @@ function generateAll(){
   updateProvisions();
   document.getElementById('export-bar').classList.add('visible');
   showTab('calendrier',document.querySelectorAll('.tab')[1]);
+  // scroll vers mois courant
+  setTimeout(()=>{
+    const cur=document.querySelector('.month-card.current-month');
+    if(cur) cur.scrollIntoView({behavior:'smooth',block:'center'});
+  },200);
 }
+
 function buildEvents(annee,rt,fu,vfl,pa,sl){
   const ev={};
   for(let i=0;i<12;i++) ev[i]=[];
   const add=(m,t,d,ti,de)=>{if(m>=0&&m<12)ev[m].push({type:t,date:d,title:ti,desc:de})};
-  const tvaZone=sl==='59'?'20→24':'15→19';
-  const tvaLim=sl==='59'?24:19;
-  const tvaAuto=tvaLim; // avec prélèv. auto on a déjà la plage haute
 
-  // TVA
   if(rt==='mensuel'){
     for(let m=0;m<12;m++){
       const prev=m===0?'Déc. N-1':MS[m-1];
-      add(m,'tva','1→15',`Déclarer + payer TVA (${prev})`,`Déclarez puis payez en une visite — impots.gouv.fr espace pro`);
+      add(m,'tva','1→15',`Déclarer + payer TVA (${prev})`,`Déclarez puis payez — impots.gouv.fr espace pro`);
     }
   }else if(rt==='trimestriel'){
     [[0,'T4 N-1'],[3,'T1'],[6,'T2'],[9,'T3']].forEach(([m,l])=>{
-      add(m,'tva','1→15',`Déclarer + payer TVA ${l}`,`Déclarez puis payez en une visite — impots.gouv.fr espace pro`);
+      add(m,'tva','1→15',`Déclarer + payer TVA ${l}`,`Déclarez puis payez — impots.gouv.fr espace pro`);
     });
   }else if(rt==='annuel_acomptes'){
     add(6,'tva','15','Acompte TVA 55%','55% de la TVA N-1 (si > 1 000 €)');
     add(11,'tva','15','Acompte TVA 40%','40% de la TVA N-1');
     add(4,'tva','mai','Dépôt CA12','Déclaration annuelle TVA + régularisation');
   }else{
-    add(0,'info','—','Franchise TVA active','Pas de TVA — surveiller CA cumulé');
-    add(5,'info','juin','Vérifier CA cumulé','Seuils : 37 500 € services / 85 000 € ventes');
+    add(0,'info','—','Franchise TVA active','Pas de TVA — surveiller CA cumulé depuis janvier');
+    add(5,'info','juin','Vérifier CA cumulé TVA','Seuils : 37 500 € services / 85 000 € ventes');
     add(11,'info','déc','Bilan CA annuel','Vérification avant dépassement éventuel en N+1');
   }
 
-  // URSSAF
   if(fu==='mensuel'){
     for(let m=0;m<12;m++){
       const prev=m===0?'Déc. N-1':MS[m-1];
-      add(m,'urssaf','1→fin',`Déclarer CA ${prev}`,'autoentrepreneur.urssaf.fr — même si CA = 0');
+      add(m,'urssaf','1→fin',`Déclarer CA ${prev}`,'autoentrepreneur.urssaf.fr — même si CA = 0 → "néant"');
     }
   }else{
     [[2,'T1 (jan-mar)'],[5,'T2 (avr-jun)'],[8,'T3 (jul-sep)'],[11,'T4 (oct-déc)']].forEach(([m,l])=>{
-      add(m,'urssaf','1→fin','Déclarer CA URSSAF',`Trimestriel ${l}`);
+      add(m,'urssaf','1→fin','Déclarer CA URSSAF',`Trimestriel ${l} — même si CA = 0`);
     });
   }
 
-  // IR
   if(vfl){
-    add(4,'impots','mai→juin','Déclaration revenus annuelle','Formulaire 2042-C-PRO — formalité si VFL actif, pas de paiement supplémentaire');
+    add(4,'impots','mai→juin','Déclaration revenus annuelle','2042-C-PRO — formalité si VFL actif, pas de paiement supplémentaire');
   }else{
     add(4,'impots','mai→juin','Déclaration revenus 2042-C','Déclaration annuelle — impots.gouv.fr');
     add(8,'impots','sept','Régularisation IR / PAS','Ajustement prélèvement à la source N-1');
     add(0,'info','jan','Moduler taux PAS','Vérifier/ajuster son taux si besoin — impots.gouv.fr');
   }
 
-  // CFE
   if(!pa){
     add(4,'cfe','15','Acompte CFE (si > 3 000 €)','50% en acompte si CFE N-1 > 3 000 € — compte 08');
   }
@@ -687,24 +970,47 @@ function buildEvents(annee,rt,fu,vfl,pa,sl){
   if(!pa){
     add(11,'cfe','15','Paiement CFE annuel','Cotisation Foncière des Entreprises — compte 08');
   }else{
-    add(11,'info','déc','Première CFE en N+1','Exonéré cette année — provisionnez 25-40 €/mois pour N+1');
+    add(11,'info','déc','Première CFE en N+1','Exonéré cette année — provisionnez 25-40 €/mois');
   }
 
-  // Rappels
-  add(0,'info','jan','Archivage N-1','Classer tous les justificatifs de l\'année écoulée');
+  add(0,'info','jan','Archivage N-1','Télécharger reçus URSSAF et impôts — conservation 10 ans');
   add(2,'info','mar','Point trésorerie T1','Réviser provisions si CA T1 diffère des prévisions');
+  add(8,'info','30 sept','Date limite VFL','Modifier l\'option VFL pour N+1 : avant le 30 septembre');
   add(11,'info','déc','Bilan fiscal annuel','Dernière chance pour optimiser avant clôture N');
 
-  // Facturation électronique
   if(annee>=2026){
-    add(7,'info','avant','E-facturation : choisir PDP','Choisir une plateforme agréée avant sept. 2026 (réception obligatoire)');
+    add(7,'info','avant sept','E-facturation : choisir PDP','Choisir une plateforme agréée avant sept. 2026 (réception obligatoire)');
   }
-
   return ev;
 }
-function renderCalendar(events,annee){
+
+// HELPERS DATE
+function isEventPast(annee, monthIndex, eventDate){
+  const today = new Date();
+  if(today.getFullYear() !== annee) return false;
+  if(monthIndex < today.getMonth()) return true;
+  if(monthIndex > today.getMonth()) return false;
+  // même mois — analyser la date texte
+  const d = eventDate.toString();
+  const day = today.getDate();
+  // formats : "15", "1→15", "1→fin", "mai→juin", "30 sept", "—"
+  const simpleNum = parseInt(d);
+  if(!isNaN(simpleNum)) return day > simpleNum;
+  if(d.includes('→')){
+    const parts = d.split('→');
+    const end = parseInt(parts[1]);
+    if(!isNaN(end)) return day > end;
+    if(parts[1]==='fin') return false; // fin du mois, pas encore passé
+  }
+  return false;
+}
+
+function renderCalendar(events, annee){
   const container=document.getElementById('calendar-container');
   const today=new Date();
+  const curYear=today.getFullYear();
+  const curMonth=today.getMonth();
+
   let totTVA=0,totU=0,totI=0,totC=0,totAll=0;
   Object.values(events).forEach(me=>me.forEach(e=>{
     totAll++;
@@ -713,147 +1019,164 @@ function renderCalendar(events,annee){
     if(e.type==='impots')totI++;
     if(e.type==='cfe')totC++;
   }));
+
   const sb=document.getElementById('summary-bar');
   sb.style.display='grid';
   sb.innerHTML=`
     <div class="summary-item"><div class="summary-num" style="color:var(--cyan)">${totTVA}</div><div class="summary-label">TVA</div></div>
     <div class="summary-item"><div class="summary-num" style="color:var(--violet)">${totU}</div><div class="summary-label">URSSAF</div></div>
-    <div class="summary-item"><div class="summary-num" style="color:var(--amber)">${totI}</div><div class="summary-label">Impôts/IR</div></div>
+    <div class="summary-item"><div class="summary-num" style="color:var(--amber)">${totI}</div><div class="summary-label">IR</div></div>
     <div class="summary-item"><div class="summary-num" style="color:var(--red)">${totC}</div><div class="summary-label">CFE</div></div>
     <div class="summary-item"><div class="summary-num" style="color:var(--text)">${totAll}</div><div class="summary-label">Total</div></div>`;
+
+  // Bandeau mois en cours
+  const banner=document.getElementById('current-month-banner');
+  if(curYear===annee && curMonth<12){
+    const curEvents=events[curMonth]||[];
+    const upcomingEvents=curEvents.filter(e=>!isEventPast(annee,curMonth,e.date));
+    const typeColor={tva:'var(--cyan)',urssaf:'var(--violet)',impots:'var(--amber)',cfe:'var(--red)',info:'var(--green)'};
+    if(upcomingEvents.length>0){
+      banner.className='current-month-banner show';
+      banner.innerHTML=`<div><div class="cmb-title">📍 ${MONTHS[curMonth].toUpperCase()} — CE MOIS</div>
+        <div class="cmb-events">${upcomingEvents.map(e=>`<div class="cmb-event"><div class="cmb-dot" style="background:${typeColor[e.type]||'var(--green)'}"></div><span style="color:${typeColor[e.type]||'var(--green)'};margin-right:4px">${e.date}</span><span>${e.title}</span></div>`).join('')}</div>
+      </div>`;
+    } else {
+      banner.className='current-month-banner show';
+      banner.innerHTML=`<div><div class="cmb-title">📍 ${MONTHS[curMonth].toUpperCase()} — CE MOIS</div><div style="font-family:var(--mono);font-size:12px;color:var(--green);margin-top:6px">✓ Toutes les échéances du mois sont passées</div></div>`;
+    }
+  } else {
+    banner.className='current-month-banner';
+  }
+
   const grid=document.createElement('div');
   grid.className='calendar-year';
+
   for(let m=0;m<12;m++){
-    const isCur=(today.getFullYear()===annee&&today.getMonth()===m);
+    const isPast=(curYear===annee && m<curMonth);
+    const isCur=(curYear===annee && m===curMonth);
     const me=events[m]||[];
+
     const evHTML=me.length===0
       ?'<div style="color:var(--muted);font-family:var(--mono);font-size:10px;padding:8px 0;text-align:center">Aucune échéance</div>'
-      :me.map(e=>`<div class="event ${e.type}">
-          <div class="event-date">${e.date}</div>
-          <div class="event-content"><div class="event-title">${e.title}</div><div class="event-desc">${e.desc}</div></div>
-        </div>`).join('');
+      :me.map(e=>{
+          const past=isEventPast(annee,m,e.date);
+          return`<div class="event ${e.type}${past?' past-event':''}">
+            <div class="event-date">${e.date}</div>
+            <div class="event-content"><div class="event-title">${e.title}</div><div class="event-desc">${e.desc}</div></div>
+          </div>`;
+        }).join('');
+
     const card=document.createElement('div');
-    card.className='month-card';
-    if(isCur) card.style.cssText='border-color:var(--cyan);box-shadow:0 0 0 1px rgba(6,182,212,.25)';
+    card.className='month-card'+(isPast?' past':'')+(isCur?' current-month':'');
+
     card.innerHTML=`<div class="month-header">
         <div class="month-name">${MONTHS[m].toUpperCase()}</div>
-        <div class="month-num">${String(m+1).padStart(2,'0')}/${annee}${isCur?' ◉':''}</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          ${isCur?'<span class="current-badge">EN COURS</span>':''}
+          <div class="month-num">${String(m+1).padStart(2,'0')}/${annee}</div>
+        </div>
       </div>
       <div class="month-events">${evHTML}</div>`;
     grid.appendChild(card);
   }
   container.innerHTML='';
   container.appendChild(grid);
+
+  // Mettre à jour mini-grille onglet démarrage
+  buildMiniGrid(annee);
 }
+
+function buildMiniGrid(annee){
+  const today=new Date();
+  const curYear=today.getFullYear();
+  const curMonth=today.getMonth();
+  const grid=document.getElementById('month-grid-mini');
+  if(!grid) return;
+  grid.innerHTML=MONTHS.map((name,i)=>{
+    const isPast=curYear===annee && i<curMonth;
+    const isCur=curYear===annee && i===curMonth;
+    const status=isPast?'Passé':isCur?'→ Maintenant':'À venir';
+    return`<div class="month-mini${isPast?' past-mini':''}${isCur?' active-now':''}">
+      <div class="month-mini-name">${name}</div>
+      <div class="month-mini-status">${status}</div>
+    </div>`;
+  }).join('');
+
+  // Texte dynamique
+  if(curYear===annee){
+    const monthsLeft=12-curMonth;
+    document.getElementById('depart-now-text').textContent=
+      `Nous sommes en ${MONTHS[curMonth]} — il reste ${monthsLeft} mois à l'année fiscale. Les mois grisés dans le calendrier sont passés. Vos premières échéances actives commencent maintenant.`;
+  }
+}
+
 window.addEventListener('load',()=>{
   const a=parseFloat(document.getElementById('ca_annuel').value)||40000;
   const el=document.getElementById('ca-provision');
   if(el) el.value=Math.round(a/12);
   updateProvisions();
+  // Mini grid par défaut sur l'année en cours
+  buildMiniGrid(new Date().getFullYear());
+  updateProgress();
 });
 
+// EXPORT PDF
 function exportDoc(theme,btn){
   if(!window._lastEvents){alert('Générez d\'abord votre calendrier.');return;}
   const ev=window._lastEvents;
   const annee=window._lastAnnee||2026;
   const isDark=theme==='dark';
-
-  const C={
-    bg:   isDark?'#0c0e10':'#f4f6f9',
-    card: isDark?'#141719':'#ffffff',
-    hdr:  isDark?'#1c2024':'#1a1f2e',
-    hdrT: isDark?'#e8eaed':'#ffffff',
-    bord: isDark?'#2a2f35':'#d1d8e0',
-    txt:  isDark?'#e8eaed':'#1a1f2e',
-    mute: isDark?'#6b7280':'#64748b',
-  };
-  const typeC={
-    tva:   {bar:'#06B6D4',bg:isDark?'#0a2428':'#dcf5fa'},
-    urssaf:{bar:'#8B5CF6',bg:isDark?'#1a1030':'#ede8fc'},
-    impots:{bar:'#F59E0B',bg:isDark?'#261e08':'#fdf3d8'},
-    cfe:   {bar:'#EF4444',bg:isDark?'#280e0e':'#fce6e6'},
-    info:  {bar:'#22C55E',bg:isDark?'#0c2412':'#e2f9e8'},
-  };
+  const C={bg:isDark?'#0c0e10':'#f4f6f9',card:isDark?'#141719':'#ffffff',hdr:isDark?'#1c2024':'#1a1f2e',hdrT:isDark?'#e8eaed':'#ffffff',bord:isDark?'#2a2f35':'#d1d8e0',txt:isDark?'#e8eaed':'#1a1f2e',mute:isDark?'#6b7280':'#64748b'};
+  const typeC={tva:{bar:'#06B6D4',bg:isDark?'#0a2428':'#dcf5fa'},urssaf:{bar:'#8B5CF6',bg:isDark?'#1a1030':'#ede8fc'},impots:{bar:'#F59E0B',bg:isDark?'#261e08':'#fdf3d8'},cfe:{bar:'#EF4444',bg:isDark?'#280e0e':'#fce6e6'},info:{bar:'#22C55E',bg:isDark?'#0c2412':'#e2f9e8'}};
   const MFR=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  const today=new Date();
+  const curY=today.getFullYear();
+  const curM=today.getMonth();
 
   let cardsHTML='';
   for(let m=0;m<12;m++){
     const me=ev[m]||[];
+    const isPast=curY===annee && m<curM;
+    const isCur=curY===annee && m===curM;
     let evHTML='';
     if(me.length===0){
       evHTML='<div style="color:'+C.mute+';font-size:8px;font-style:italic;text-align:center;padding:6px 0">Aucune échéance</div>';
     } else {
       me.forEach(function(e){
         const tc=typeC[e.type]||typeC.info;
-        evHTML+='<div style="display:flex;gap:4px;margin-bottom:3px;background:'+tc.bg+';border-left:2px solid '+tc.bar+';padding:3px 5px;border-radius:1px">'
+        const past=isEventPast(annee,m,e.date);
+        evHTML+='<div style="display:flex;gap:4px;margin-bottom:3px;background:'+tc.bg+';border-left:2px solid '+tc.bar+';padding:3px 5px;border-radius:1px'+(past?';opacity:.45;text-decoration:line-through':'')+'">'
           +'<div style="min-width:22px;font-size:7px;color:'+tc.bar+';font-weight:700;font-family:monospace;flex-shrink:0;padding-top:1px">'+e.date+'</div>'
-          +'<div>'
-          +'<div style="font-size:8px;font-weight:700;color:'+C.txt+';line-height:1.3">'+e.title+'</div>'
-          +'<div style="font-size:7px;color:'+C.mute+';line-height:1.3;margin-top:1px">'+e.desc+'</div>'
-          +'</div></div>';
+          +'<div><div style="font-size:8px;font-weight:700;color:'+C.txt+';line-height:1.3">'+e.title+'</div>'
+          +'<div style="font-size:7px;color:'+C.mute+';line-height:1.3;margin-top:1px">'+e.desc+'</div></div></div>';
       });
     }
-    cardsHTML+='<div style="background:'+C.card+';border:1px solid '+C.bord+';border-radius:4px;overflow:hidden;break-inside:avoid">'
+    const pastStyle=isPast?';opacity:.4;filter:grayscale(.6)':'';
+    const curBorder=isCur?';border-color:#06B6D4;box-shadow:0 0 0 1px rgba(6,182,212,.3)':'';
+    cardsHTML+='<div style="background:'+C.card+';border:1px solid '+C.bord+';border-radius:4px;overflow:hidden;break-inside:avoid'+pastStyle+curBorder+'">'
       +'<div style="background:'+C.hdr+';padding:5px 8px;display:flex;justify-content:space-between;align-items:center">'
       +'<span style="font-weight:900;font-size:11px;letter-spacing:1px;color:'+C.hdrT+'">'+MFR[m].toUpperCase()+'</span>'
-      +'<span style="font-size:8px;color:'+(isDark?'#4b5563':'rgba(255,255,255,0.6)')+'">'+String(m+1).padStart(2,'0')+'/'+annee+'</span>'
-      +'</div>'
-      +'<div style="padding:6px">'+evHTML+'</div>'
-      +'</div>';
+      +(isCur?'<span style="font-size:8px;background:#06B6D4;color:#000;padding:1px 5px;border-radius:2px;font-weight:700">EN COURS</span>':'<span style="font-size:8px;color:'+(isDark?'#4b5563':'rgba(255,255,255,0.6)')+'">'+String(m+1).padStart(2,'0')+'/'+annee+'</span>')
+      +'</div><div style="padding:6px">'+evHTML+'</div></div>';
   }
 
-  const themeLabel=isDark?'Thème Sombre':'Thème Clair';
   const guideColor=isDark?'#0f2a1a':'#e8f8ef';
   const guideBord=isDark?'#22C55E':'#16a34a';
   const guideTxt=isDark?'#86efac':'#15803d';
 
-  const html='<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">'
-    +'<title>FlashAgenda Fiscal '+annee+' — '+themeLabel+'</title>'
-    +'<style>'
-    +'*{margin:0;padding:0;box-sizing:border-box}'
-    +'body{background:'+C.bg+';font-family:Arial,Helvetica,sans-serif;padding:16px;color:'+C.txt+'}'
-    +'.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}'
-    +'@media print{'
-    +'  .no-print{display:none!important}'
-    +'  body{padding:6px;background:'+C.bg+'}'
-    +'  .grid{grid-template-columns:repeat(4,1fr);gap:7px}'
-    +'  @page{size:A4 landscape;margin:8mm}'
-    +'  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}'
-    +'}'
-    +'</style></head><body>'
-
-    // Bandeau instructions — masqué à l'impression
+  const html='<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>FlashAgenda Fiscal '+annee+'</title>'
+    +'<style>*{margin:0;padding:0;box-sizing:border-box}body{background:'+C.bg+';font-family:Arial,Helvetica,sans-serif;padding:16px;color:'+C.txt+'}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}@media print{.no-print{display:none!important}body{padding:6px;background:'+C.bg+'}.grid{grid-template-columns:repeat(4,1fr);gap:7px}@page{size:A4 landscape;margin:8mm}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body>'
     +'<div class="no-print" style="background:'+guideColor+';border:1.5px solid '+guideBord+';border-radius:6px;padding:14px 18px;margin-bottom:16px">'
-    +'<div style="font-weight:700;font-size:13px;color:'+guideTxt+';margin-bottom:8px">📄 Comment enregistrer ce calendrier en PDF ?</div>'
-    +'<div style="font-size:12px;color:'+guideTxt+';line-height:1.9">'
-    +'<strong>1.</strong> Appuyez sur <kbd style="background:'+C.card+';border:1px solid '+C.bord+';padding:1px 6px;border-radius:3px;font-family:monospace;font-size:11px">Ctrl+P</kbd> '
-    +'(Windows / Linux) ou <kbd style="background:'+C.card+';border:1px solid '+C.bord+';padding:1px 6px;border-radius:3px;font-family:monospace;font-size:11px">⌘+P</kbd> (Mac)<br>'
-    +'<strong>2.</strong> Dans la fenêtre qui s\'ouvre, cherchez le champ <strong>"Destination"</strong><br>'
-    +'<strong>3.</strong> Cliquez sur <strong>"Enregistrer en PDF"</strong> dans la liste<br>'
-    +'<strong>4.</strong> Dans les options, activez <strong>"Graphiques d\'arrière-plan"</strong> pour conserver les couleurs<br>'
-    +'<strong>5.</strong> Dans les options, décochez <strong>"En-têtes et pieds de page"</strong> — sinon le chemin du fichier s\'affiche dans le PDF<br>'
-    +'<strong>6.</strong> Cliquez sur <strong>"Enregistrer"</strong> — le PDF se pose sur votre bureau'
-    +'</div>'
-    +'<button onclick="window.print()" style="margin-top:10px;padding:8px 20px;background:#22C55E;color:#fff;border:none;border-radius:4px;font-weight:700;font-size:12px;cursor:pointer;letter-spacing:.5px">🖨 Ouvrir la fenêtre d\'impression</button>'
-    +'</div>'
-
-    // En-tête calendrier
+    +'<div style="font-weight:700;font-size:13px;color:'+guideTxt+';margin-bottom:8px">📄 Comment enregistrer en PDF ?</div>'
+    +'<div style="font-size:12px;color:'+guideTxt+';line-height:1.9"><strong>1.</strong> Ctrl+P (Win/Linux) ou ⌘+P (Mac)<br><strong>2.</strong> Destination → "Enregistrer en PDF"<br><strong>3.</strong> Options → activer "Graphiques d\'arrière-plan" + décocher "En-têtes et pieds de page"<br><strong>4.</strong> Enregistrer</div>'
+    +'<button onclick="window.print()" style="margin-top:10px;padding:8px 20px;background:#22C55E;color:#fff;border:none;border-radius:4px;font-weight:700;font-size:12px;cursor:pointer">🖨 Ouvrir l\'impression</button></div>'
     +'<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px;padding-bottom:7px;border-bottom:1px solid '+C.bord+'">'
-    +'<div>'
-    +'<div style="font-size:22px;font-weight:900;letter-spacing:2px;text-transform:uppercase">FLASHAGENDA FISCAL '+annee+'</div>'
-    +'<div style="font-size:9px;color:'+C.mute+';margin-top:3px;font-family:monospace">Calendrier des échéances · micro-entrepreneur</div>'
-    +'</div>'
+    +'<div><div style="font-size:22px;font-weight:900;letter-spacing:2px;text-transform:uppercase">FLASHAGENDA FISCAL '+annee+'</div><div style="font-size:9px;color:'+C.mute+';margin-top:3px;font-family:monospace">Calendrier des échéances · micro-entrepreneur</div></div>'
     +'<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">'
-    +[['TVA','#06B6D4'],['URSSAF','#8B5CF6'],['Impôts/IR','#F59E0B'],['CFE','#EF4444'],['Conseils','#22C55E']].map(function(l){
-      return '<div style="display:flex;align-items:center;gap:4px;font-size:8px;color:'+C.mute+'">'
-        +'<div style="width:7px;height:7px;border-radius:50%;background:'+l[1]+';flex-shrink:0"></div>'+l[0]+'</div>';
-    }).join('')
+    +[['TVA','#06B6D4'],['URSSAF','#8B5CF6'],['Impôts/IR','#F59E0B'],['CFE','#EF4444'],['Conseils','#22C55E']].map(function(l){return'<div style="display:flex;align-items:center;gap:4px;font-size:8px;color:'+C.mute+'"><div style="width:7px;height:7px;border-radius:50%;background:'+l[1]+';flex-shrink:0"></div>'+l[0]+'</div>';}).join('')
     +'</div></div>'
-
     +'<div class="grid">'+cardsHTML+'</div>'
-    +'<div style="margin-top:10px;font-size:7px;color:'+C.mute+';text-align:center;font-family:monospace">'
-    +'FlashTools.fr'
-    +'</div>'
+    +'<div style="margin-top:10px;font-size:7px;color:'+C.mute+';text-align:center;font-family:monospace">FlashTools.fr</div>'
     +'</body></html>';
 
   const blob=new Blob([html],{type:'text/html;charset=utf-8'});
@@ -861,12 +1184,9 @@ function exportDoc(theme,btn){
   const a=document.createElement('a');
   a.href=url;
   a.download='FlashAgenda-Fiscal-'+annee+'-'+(isDark?'sombre':'clair')+'.html';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
   setTimeout(function(){URL.revokeObjectURL(url);},15000);
 }
-
 </script>
 </body>
 </html>
