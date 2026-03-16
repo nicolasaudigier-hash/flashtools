@@ -3,330 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Générateur de Palettes - FlashTools</title>
+    <title>Générateur de Palettes — FlashTools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #f1f5f9;
-            background: #0a0e27;
-            min-height: 100vh;
-            padding: 20px;
+        :root {
+            --bg:#07090f; --surface:#0f1422; --surface2:#161c2e;
+            --border:#1e2a42; --border-bright:#2a3a5c;
+            --text:#e8edf8; --text-muted:#6b7a99;
+            --accent:#06b6d4; --accent2:#8b5cf6; --accent3:#f59e0b;
+            --success:#10b981; --warn:#ef4444; --radius:14px;
         }
-        
-        .container { max-width: 1400px; margin: 0 auto; }
-        
-        .card {
-            background: #1e293b;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            margin-bottom: 20px;
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:24px 16px;}
+        .container{max-width:1400px;margin:0 auto;}
+
+        /* HEADER */
+        .header{position:relative;margin-bottom:28px;border-radius:20px;overflow:hidden;background:var(--surface);border:1px solid var(--border);}
+        .header-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 10% 50%,rgba(6,182,212,0.08) 0%,transparent 60%),radial-gradient(ellipse 50% 70% at 90% 30%,rgba(139,92,246,0.10) 0%,transparent 55%),radial-gradient(ellipse 40% 60% at 60% 90%,rgba(245,158,11,0.05) 0%,transparent 50%);}
+        .header-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%);}
+        .header-content{position:relative;z-index:2;padding:44px 40px;}
+        .header-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.25);color:var(--accent);font-family:'Syne',sans-serif;font-size:0.72em;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;padding:5px 12px;border-radius:100px;margin-bottom:16px;}
+        .header-badge::before{content:'';width:6px;height:6px;background:var(--accent);border-radius:50%;box-shadow:0 0 8px var(--accent);}
+        .header-title{font-family:'Syne',sans-serif;font-size:2.6em;font-weight:800;line-height:1.1;letter-spacing:-0.02em;margin-bottom:12px;}
+        .header-title span{background:linear-gradient(135deg,#e8edf8 0%,#06b6d4 50%,#8b5cf6 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .header-sub{color:var(--text-muted);font-size:1em;font-weight:300;max-width:520px;}
+        .header-line{position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(6,182,212,0.4),rgba(139,92,246,0.4),transparent);}
+
+        /* CARD */
+        .card{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:20px;}
+        .card-inner{padding:28px 24px;}
+        .section{margin-bottom:36px;padding-bottom:28px;border-bottom:1px solid var(--border);}
+        .section:last-child{border-bottom:none;margin-bottom:0;}
+        .section-title{font-family:'Syne',sans-serif;font-size:0.78em;font-weight:700;color:var(--text-muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+        .section-title::before{content:'';width:3px;height:18px;background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:2px;}
+
+        /* FORM */
+        .form-group{margin-bottom:20px;}
+        .form-group label{display:block;font-weight:500;margin-bottom:10px;color:var(--text);font-size:0.95em;}
+
+        /* Color picker + HEX inline */
+        .color-picker-row{display:flex;align-items:center;gap:12px;}
+        .color-picker-row input[type="color"]{width:64px;height:56px;flex-shrink:0;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;background:var(--surface2);padding:4px;transition:all 0.2s;}
+        .color-picker-row input[type="color"]:hover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(6,182,212,0.1);}
+        .hex-input-wrap{flex:1;position:relative;}
+        .hex-input-wrap input[type="text"]{width:100%;padding:15px 16px 15px 44px;border:1px solid var(--border);border-radius:var(--radius);font-family:'Syne',monospace;font-size:1em;font-weight:600;background:var(--surface2);color:var(--text);outline:none;transition:all 0.2s;letter-spacing:0.04em;}
+        .hex-input-wrap input[type="text"]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(6,182,212,0.1);}
+        .hex-preview{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:5px;border:1px solid rgba(255,255,255,0.15);pointer-events:none;transition:background 0.15s;}
+
+        select{width:100%;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);font-size:0.95em;font-family:'DM Sans',sans-serif;background:var(--surface2);color:var(--text);cursor:pointer;transition:all 0.2s;}
+        select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(6,182,212,0.1);}
+
+        /* RADIO */
+        .radio-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;}
+        .radio-option{padding:13px 10px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all 0.2s;background:var(--surface2);text-align:center;font-size:0.88em;font-weight:500;color:var(--text-muted);}
+        .radio-option:hover{border-color:var(--border-bright);color:var(--text);}
+        .radio-option.selected{border-color:var(--accent);background:rgba(6,182,212,0.07);color:var(--accent);box-shadow:0 0 0 1px rgba(6,182,212,0.2);}
+        .radio-option input{display:none;}
+
+        /* TABS */
+        .tabs{display:flex;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:24px;}
+        .tab{flex:1;padding:10px 16px;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.88em;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--text-muted);transition:all 0.2s;text-align:center;}
+        .tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,0.3);}
+
+        /* CORRECTEUR */
+        .corrector-desc{background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:14px 16px;font-size:0.88em;color:var(--text-muted);margin-bottom:20px;line-height:1.6;}
+        .corrector-desc strong{color:var(--accent3);}
+        .sector-select-row{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+        .sector-select-row label{font-family:'Syne',sans-serif;font-size:0.75em;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);white-space:nowrap;}
+        .sector-select-row select{border-color:rgba(245,158,11,0.3);}
+        .sector-select-row select:focus{border-color:var(--accent3);box-shadow:0 0 0 3px rgba(245,158,11,0.1);}
+
+        .harmony-detect{display:none;align-items:center;gap:10px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:0.85em;}
+        .harmony-detect.show{display:flex;}
+        .harmony-detect-label{color:var(--text-muted);}
+        .harmony-detect-value{font-family:'Syne',sans-serif;font-weight:700;color:var(--accent2);}
+        .harmony-warn{color:var(--warn);font-size:0.8em;margin-left:auto;}
+
+        .color-inputs-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+        .color-input-row{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;transition:all 0.2s;}
+        .color-input-row:hover{border-color:var(--border-bright);}
+        .color-input-row:focus-within{border-color:var(--accent3);box-shadow:0 0 0 2px rgba(245,158,11,0.1);}
+        .color-input-row.outlier{border-color:rgba(239,68,68,0.4);background:rgba(239,68,68,0.04);}
+
+        .swatch-wrapper{position:relative;width:40px;height:40px;flex-shrink:0;cursor:pointer;}
+        .swatch-wrapper input[type="color"]{position:absolute;inset:0;width:100%;height:100%;border:none;padding:0;opacity:0;cursor:pointer;z-index:2;}
+        .swatch-display{width:40px;height:40px;border-radius:10px;border:2px solid rgba(255,255,255,0.15);transition:all 0.2s;pointer-events:none;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;}
+        .swatch-hint{font-size:0.42em;font-weight:700;letter-spacing:0.04em;background:rgba(0,0,0,0.6);color:#fff;width:100%;text-align:center;padding:2px 0;text-transform:uppercase;opacity:0;transition:opacity 0.2s;}
+        .swatch-wrapper:hover .swatch-hint{opacity:1;}
+        .swatch-wrapper:hover .swatch-display{border-color:var(--accent3);box-shadow:0 0 0 2px rgba(245,158,11,0.25);}
+
+        .color-hex-input{flex:1;background:transparent;border:none;font-family:'Syne',monospace;font-size:0.9em;font-weight:600;color:var(--text);outline:none;min-width:0;}
+        .color-hex-input::placeholder{color:var(--text-muted);font-weight:400;}
+
+        .outlier-badge{font-size:0.65em;font-weight:700;background:rgba(239,68,68,0.15);color:var(--warn);border:1px solid rgba(239,68,68,0.3);padding:2px 7px;border-radius:100px;white-space:nowrap;}
+        .btn-lock{background:none;border:none;cursor:pointer;font-size:1em;padding:4px 6px;border-radius:6px;transition:all 0.2s;flex-shrink:0;opacity:0.45;}
+        .btn-lock:hover{opacity:1;background:rgba(255,255,255,0.07);}
+        .btn-lock.locked{opacity:1;filter:drop-shadow(0 0 4px rgba(245,158,11,0.5));}
+        .locked-badge{font-size:0.65em;font-weight:700;background:rgba(245,158,11,0.15);color:var(--accent3);border:1px solid rgba(245,158,11,0.25);padding:2px 8px;border-radius:100px;white-space:nowrap;}
+        .btn-remove{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85em;padding:4px 6px;border-radius:6px;transition:all 0.2s;flex-shrink:0;}
+        .btn-remove:hover{color:#ef4444;background:rgba(239,68,68,0.1);}
+
+        /* Bouton ajouter avec suggestion */
+        .btn-add-color{display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;background:transparent;border:1px dashed var(--border-bright);border-radius:12px;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:0.88em;cursor:pointer;transition:all 0.2s;margin-bottom:16px;text-align:left;}
+        .btn-add-color:hover{border-color:var(--accent3);color:var(--text);background:rgba(245,158,11,0.05);}
+        .btn-add-suggested-swatch{width:22px;height:22px;border-radius:6px;flex-shrink:0;border:1px solid rgba(255,255,255,0.2);transition:all 0.2s;}
+        .btn-add-label{flex:1;}
+        .btn-add-hint{font-size:0.8em;color:var(--text-muted);font-style:italic;}
+
+        /* BUTTONS */
+        .btn-generate{width:100%;padding:16px;background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);color:white;border:none;border-radius:var(--radius);font-family:'Syne',sans-serif;font-size:1em;font-weight:700;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;}
+        .btn-generate::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,0.1));opacity:0;transition:opacity 0.3s;}
+        .btn-generate:hover::after{opacity:1;}
+        .btn-generate:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(6,182,212,0.25);}
+        .btn-generate:active{transform:translateY(0);}
+        .btn-correct{width:100%;padding:16px;background:linear-gradient(135deg,var(--accent3) 0%,#ea580c 100%);color:white;border:none;border-radius:var(--radius);font-family:'Syne',sans-serif;font-size:1em;font-weight:700;cursor:pointer;transition:all 0.3s;}
+        .btn-correct:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(245,158,11,0.25);}
+
+        /* RESULTS */
+        .palette-result{display:none;margin-top:28px;}
+        .palette-result.show{display:block;}
+        .result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+        .result-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:var(--success);font-size:0.78em;font-weight:600;padding:4px 12px;border-radius:100px;font-family:'Syne',sans-serif;letter-spacing:0.08em;}
+        .colors-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:28px;}
+        .color-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all 0.25s;cursor:pointer;}
+        .color-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,0.3);border-color:var(--border-bright);}
+        .color-swatch{height:110px;position:relative;}
+        .copy-hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);opacity:0;transition:opacity 0.2s;font-size:0.8em;font-weight:600;color:white;letter-spacing:0.05em;}
+        .color-card:hover .copy-hint{opacity:1;}
+        .color-info{padding:12px;}
+        .color-role{font-family:'Syne',sans-serif;font-size:0.7em;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
+        .color-codes{display:flex;flex-direction:column;gap:4px;}
+        .color-code{font-family:'Syne',monospace;font-size:0.82em;color:var(--text);padding:4px 8px;background:var(--surface);border-radius:6px;}
+
+        .correction-diff{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:24px;}
+        .correction-diff h4{font-family:'Syne',sans-serif;font-size:0.78em;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;}
+        .diff-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:0.85em;}
+        .diff-swatch-before,.diff-swatch-after{width:36px;height:36px;border-radius:8px;flex-shrink:0;border:1px solid var(--border);}
+        .diff-arrow{color:var(--text-muted);}
+        .diff-label{color:var(--text-muted);flex:1;font-size:0.82em;}
+        .diff-badge{font-family:'Syne',sans-serif;font-size:0.7em;font-weight:700;padding:2px 8px;border-radius:100px;letter-spacing:0.06em;}
+        .diff-badge.adjusted{background:rgba(245,158,11,0.15);color:var(--accent3);}
+        .diff-badge.kept{background:rgba(16,185,129,0.12);color:var(--success);}
+        .diff-badge.locked-kept{background:rgba(245,158,11,0.1);color:var(--accent3);border:1px solid rgba(245,158,11,0.3);}
+        .diff-badge.replaced{background:rgba(139,92,246,0.15);color:var(--accent2);}
+
+        .harmony-summary{background:rgba(6,182,212,0.06);border:1px solid rgba(6,182,212,0.18);border-radius:12px;padding:14px 18px;margin-bottom:20px;}
+        .harmony-summary-title{font-family:'Syne',sans-serif;font-size:0.75em;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
+        .harmony-summary-body{font-size:0.85em;color:var(--text-muted);line-height:1.6;}
+        .harmony-summary-body strong{color:var(--text);}
+
+        .context-info{background:rgba(6,182,212,0.05);border:1px solid rgba(6,182,212,0.15);padding:16px 20px;border-radius:var(--radius);margin-top:16px;line-height:1.7;}
+        .context-info h3{font-family:'Syne',sans-serif;font-size:0.85em;font-weight:700;color:var(--accent);margin-bottom:10px;}
+        .context-info p{color:var(--text-muted);margin-bottom:6px;font-size:0.88em;}
+        .context-info strong{color:var(--text);}
+        .suggested-palette-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:12px;}
+        .suggested-palette-item:hover{border-color:var(--accent);transform:translateX(4px);}
+
+        .preview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-top:24px;}
+        .preview-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;min-height:280px;position:relative;}
+        .preview-label{font-family:'Syne',sans-serif;font-weight:700;font-size:0.72em;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);}
+
+        .copy-feedback{position:fixed;top:20px;right:20px;background:var(--success);color:white;padding:12px 20px;border-radius:10px;box-shadow:0 8px 24px rgba(16,185,129,0.3);display:none;font-family:'Syne',sans-serif;font-size:0.85em;font-weight:600;z-index:1000;animation:slideIn 0.3s ease;}
+        .copy-feedback.show{display:block;}
+        @keyframes slideIn{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+        @media(max-width:768px){
+            body{padding:12px;}
+            .header-content{padding:28px 20px;}
+            .header-title{font-size:1.8em;}
+            .card-inner{padding:20px 16px;}
+            .radio-group{grid-template-columns:1fr 1fr;}
+            .sector-select-row{flex-direction:column;align-items:flex-start;}
+            .color-picker-row{flex-direction:column;align-items:stretch;}
+            .color-picker-row input[type="color"]{width:100%;height:48px;}
         }
-        
-        .header {
-            background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
-        }
-        .header h1 { font-size: 2em; font-weight: 700; margin-bottom: 10px; }
-        .header p { font-size: 1.1em; opacity: 0.95; }
-        
-        .content { padding: 30px 20px; }
-        
-        .section {
-            margin-bottom: 40px;
-            padding-bottom: 30px;
-            border-bottom: 1px solid #334155;
-        }
-        .section:last-child { border-bottom: none; }
-        
-        .section-title {
-            font-size: 1.2em;
-            font-weight: 700;
-            color: #06b6d4;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .section-title::before {
-            content: '';
-            width: 4px;
-            height: 24px;
-            background: linear-gradient(180deg, #06b6d4, #8b5cf6);
-            border-radius: 2px;
-        }
-        
-        .form-group { margin-bottom: 25px; }
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #f1f5f9;
-            font-size: 1em;
-        }
-        
-        input[type="color"] {
-            width: 100%;
-            height: 60px;
-            border: 2px solid #334155;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        input[type="color"]:hover {
-            border-color: #06b6d4;
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
-        }
-        
-        select {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #334155;
-            border-radius: 12px;
-            font-size: 1em;
-            background: #0f172a;
-            color: #f1f5f9;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        select:focus {
-            outline: none;
-            border-color: #06b6d4;
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
-        }
-        
-        .radio-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-        }
-        .radio-option {
-            padding: 14px;
-            border: 2px solid #334155;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: #0f172a;
-            text-align: center;
-            font-weight: 500;
-        }
-        .radio-option:hover {
-            border-color: #06b6d4;
-            background: #1e293b;
-        }
-        .radio-option.selected {
-            border-color: #06b6d4;
-            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.1));
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
-        }
-        .radio-option input { display: none; }
-        
-        .btn-generate {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1em;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.3);
-        }
-        .btn-generate:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 40px rgba(6, 182, 212, 0.4);
-        }
-        .btn-generate:active {
-            transform: translateY(0);
-        }
-        
-        .palette-result {
-            display: none;
-            margin-top: 30px;
-        }
-        .palette-result.show { display: block; }
-        
-        .colors-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        .color-card {
-            background: #0f172a;
-            border: 2px solid #334155;
-            border-radius: 12px;
-            overflow: hidden;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-        .color-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.2);
-            border-color: #06b6d4;
-        }
-        .color-swatch {
-            height: 120px;
-            position: relative;
-        }
-        .color-info {
-            padding: 15px;
-            text-align: center;
-        }
-        .color-name {
-            font-weight: 600;
-            color: #f1f5f9;
-            margin-bottom: 8px;
-            font-size: 0.95em;
-        }
-        .color-codes {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .color-code {
-            font-family: 'Monaco', 'Courier New', monospace;
-            font-size: 0.85em;
-            color: #94a3b8;
-            padding: 5px;
-            background: #1e293b;
-            border-radius: 6px;
-        }
-        
-        .copy-feedback {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #10b981;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
-            display: none;
-            animation: slideIn 0.3s ease;
-        }
-        .copy-feedback.show { display: block; }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        .context-info {
-            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.1));
-            border-left: 4px solid #06b6d4;
-            padding: 20px;
-            border-radius: 12px;
-            margin-top: 20px;
-            line-height: 1.8;
-        }
-        .context-info h3 {
-            color: #06b6d4;
-            margin-bottom: 12px;
-            font-size: 1.1em;
-        }
-        .context-info p {
-            color: #94a3b8;
-            margin-bottom: 10px;
-        }
-        .context-info strong {
-            color: #f1f5f9;
-        }
-        
-        .preview-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        .preview-card {
-            background: #0f172a;
-            border: 2px solid #334155;
-            border-radius: 12px;
-            padding: 20px;
-            min-height: 300px;
-            position: relative;
-        }
-        .preview-title {
-            font-weight: 600;
-            color: #06b6d4;
-            margin-bottom: 15px;
-            font-size: 1em;
-        }
-        
-        /* RESPONSIVE MOBILE */
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            .header { padding: 30px 15px; }
-            .header h1 { font-size: 1.5em; }
-            .header p { font-size: 1em; }
-            .content { padding: 20px 15px; }
-            .section-title { font-size: 1.1em; }
-            .radio-group { grid-template-columns: 1fr; }
-            .colors-grid { grid-template-columns: 1fr; }
-            .preview-grid { grid-template-columns: 1fr; }
-            .btn-generate { font-size: 1em; padding: 16px; }
-        }
-        
-        @media (max-width: 480px) {
-            .header h1 { font-size: 1.3em; }
-            .color-swatch { height: 100px; }
+        @media(max-width:480px){
+            .header-title{font-size:1.5em;}
+            .radio-group{grid-template-columns:1fr;}
+            .colors-grid{grid-template-columns:1fr 1fr;}
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <div class="header">
-                <h1>Générateur de Palettes</h1>
-                <p>Créez des palettes harmonieuses adaptées à votre projet</p>
+<div class="container">
+
+    <header class="header">
+        <div class="header-bg"></div>
+        <div class="header-grid"></div>
+        <div class="header-content">
+            <div class="header-badge">FlashTools</div>
+            <h1 class="header-title"><span>Générateur<br>de Palettes</span></h1>
+            <p class="header-sub">Créez des palettes harmonieuses ou corrigez vos couleurs pour un rendu professionnel.</p>
+        </div>
+        <div class="header-line"></div>
+    </header>
+
+    <div class="card">
+        <div class="card-inner">
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('generate',this)">✦ Générer une palette</button>
+                <button class="tab" onclick="switchTab('correct',this)">🔧 Corriger mes couleurs</button>
             </div>
 
-            <div class="content">
-                <!-- COULEUR BASE -->
+            <!-- TAB GÉNÉRER -->
+            <div id="tab-generate">
                 <div class="section">
                     <div class="section-title">Couleur de base</div>
                     <div class="form-group">
-                        <label>Choisissez votre couleur principale</label>
-                        <input type="color" id="baseColor" value="#06b6d4">
+                        <label>Votre couleur principale</label>
+                        <div class="color-picker-row">
+                            <input type="color" id="baseColor" value="#06b6d4" oninput="syncFromPicker(this.value)">
+                            <div class="hex-input-wrap">
+                                <div class="hex-preview" id="hexPreview" style="background:#06b6d4;"></div>
+                                <input type="text" id="baseHex" value="#06b6d4" placeholder="#rrggbb"
+                                    oninput="syncFromHex(this.value)" maxlength="7"
+                                    spellcheck="false" autocomplete="off">
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <!-- HARMONIE -->
                 <div class="section">
                     <div class="section-title">Type d'harmonie</div>
                     <div class="radio-group">
-                        <div class="radio-option selected" onclick="selectHarmony('mono')">
-                            <input type="radio" name="harmony" value="mono" checked>
-                            <div>Monochromatique</div>
-                        </div>
-                        <div class="radio-option" onclick="selectHarmony('analogous')">
-                            <input type="radio" name="harmony" value="analogous">
-                            <div>Analogues</div>
-                        </div>
-                        <div class="radio-option" onclick="selectHarmony('complementary')">
-                            <input type="radio" name="harmony" value="complementary">
-                            <div>Complémentaires</div>
-                        </div>
-                        <div class="radio-option" onclick="selectHarmony('triadic')">
-                            <input type="radio" name="harmony" value="triadic">
-                            <div>Triadique</div>
-                        </div>
-                        <div class="radio-option" onclick="selectHarmony('tetradic')">
-                            <input type="radio" name="harmony" value="tetradic">
-                            <div>Tétradique</div>
-                        </div>
+                        <div class="radio-option selected" onclick="selectHarmony('mono',this)"><input type="radio" name="harmony" value="mono" checked>Monochromatique</div>
+                        <div class="radio-option" onclick="selectHarmony('analogous',this)"><input type="radio" name="harmony" value="analogous">Analogues</div>
+                        <div class="radio-option" onclick="selectHarmony('complementary',this)"><input type="radio" name="harmony" value="complementary">Complémentaires</div>
+                        <div class="radio-option" onclick="selectHarmony('triadic',this)"><input type="radio" name="harmony" value="triadic">Triadique</div>
+                        <div class="radio-option" onclick="selectHarmony('tetradic',this)"><input type="radio" name="harmony" value="tetradic">Tétradique</div>
                     </div>
                 </div>
-
-                <!-- CONTEXTE -->
                 <div class="section">
                     <div class="section-title">Contexte d'utilisation</div>
                     <div class="form-group">
@@ -345,575 +251,474 @@
                         </select>
                     </div>
                     <div class="context-info" id="contextInfo"></div>
-                    
-                    <!-- PALETTES SUGGÉRÉES -->
-                    <div id="suggestedPalettes" style="margin-top: 20px;"></div>
+                    <div id="suggestedPalettes" style="margin-top:16px;"></div>
                 </div>
-
-                <!-- BOUTON GÉNÉRATION -->
-                <button class="btn-generate" onclick="generatePalette()">
-                    ✨ Générer la palette
-                </button>
-
-                <!-- RÉSULTATS -->
+                <button class="btn-generate" onclick="generatePalette()">✦ Générer la palette</button>
                 <div class="palette-result" id="paletteResult">
-                    <div class="section">
-                        <div class="section-title">Votre palette</div>
-                        <div class="colors-grid" id="colorsGrid"></div>
+                    <div class="result-header">
+                        <div class="section-title" style="margin-bottom:0">Votre palette</div>
+                        <span class="result-tag">✓ Générée</span>
                     </div>
-
-                    <div class="section">
-                        <div class="section-title">Aperçus</div>
-                        <div class="preview-grid" id="previewGrid"></div>
-                    </div>
+                    <div class="colors-grid" id="colorsGrid"></div>
+                    <div class="section-title">Aperçus</div>
+                    <div class="preview-grid" id="previewGrid"></div>
                 </div>
             </div>
+
+            <!-- TAB CORRIGER -->
+            <div id="tab-correct" style="display:none">
+                <div class="corrector-desc">
+                    <strong>Comment ça marche :</strong> Entrez vos couleurs. L'algo détecte l'harmonie, repositionne les teintes sur les angles théoriques et adapte au secteur. <strong>Cliquez sur le carré coloré</strong> pour choisir, ou tapez un code HEX. 🔒 Verrouillez une couleur comme pivot.
+                </div>
+                <div class="sector-select-row">
+                    <label>Secteur cible</label>
+                    <select id="correctContext" onchange="analyzeInputs()">
+                        <option value="digital">Digital / Web</option>
+                        <option value="print">Print / Imprimé</option>
+                        <option value="food">Food / Restauration</option>
+                        <option value="fashion">Mode / Fashion</option>
+                        <option value="health">Santé / Wellness</option>
+                        <option value="tech">Tech / Innovation</option>
+                        <option value="finance">Finance / Business</option>
+                        <option value="creative">Créatif / Artistique</option>
+                        <option value="education">Éducation / Formation</option>
+                        <option value="eco">Éco / Durable</option>
+                    </select>
+                </div>
+                <div class="harmony-detect" id="harmonyDetect">
+                    <span class="harmony-detect-label">Harmonie détectée :</span>
+                    <span class="harmony-detect-value" id="harmonyDetectValue">—</span>
+                    <span class="harmony-warn" id="harmonyWarn"></span>
+                </div>
+                <div class="section-title">Vos couleurs de départ</div>
+                <div class="color-inputs-grid" id="colorInputsGrid"></div>
+                <button class="btn-add-color" id="btnAddColor" onclick="addSmartColor()">
+                    <div class="btn-add-suggested-swatch" id="addSwatch" style="background:#888;"></div>
+                    <div class="btn-add-label">
+                        <div>+ Ajouter une couleur</div>
+                        <div class="btn-add-hint" id="addHint">Calcul de la meilleure suggestion…</div>
+                    </div>
+                </button>
+                <div style="margin-top:4px;">
+                    <button class="btn-correct" onclick="correctPalette()">🔧 Optimiser la palette</button>
+                </div>
+                <div class="palette-result" id="correctResult">
+                    <div class="result-header">
+                        <div class="section-title" style="margin-bottom:0">Palette optimisée</div>
+                        <span class="result-tag" style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:var(--accent3);">✦ Corrigée</span>
+                    </div>
+                    <div class="harmony-summary" id="harmonySummary"></div>
+                    <div class="correction-diff" id="correctionDiff"></div>
+                    <div class="colors-grid" id="correctedColorsGrid"></div>
+                    <div class="section-title">Aperçus</div>
+                    <div class="preview-grid" id="correctedPreviewGrid"></div>
+                </div>
+            </div>
+
         </div>
     </div>
+</div>
+<div class="copy-feedback" id="copyFeedback">✓ Copié !</div>
 
-    <div class="copy-feedback" id="copyFeedback">✓ Couleur copiée !</div>
+<script>
+let currentHarmony='mono', currentContext='digital';
 
-    <script>
-        let currentHarmony = 'mono';
-        let currentContext = 'digital';
+const contextData={
+    digital:{title:'Digital / Web',desc:'Sites web, applications, interfaces',tip:'Privilégiez des contrastes WCAG AA.',trend:'Glassmorphisme, dark mode structuré',targetSat:70,targetLightDark:'dark',palettes:[{name:'Tech Moderne',colors:['#0f172a','#1e293b','#06b6d4','#8b5cf6','#e0e7ff']},{name:'SaaS Clean',colors:['#1e40af','#3b82f6','#60a5fa','#93c5fd','#dbeafe']},{name:'Startup Bold',colors:['#7c3aed','#a78bfa','#c4b5fd','#e9d5ff','#f5f3ff']}]},
+    print:{title:'Print / Imprimé',desc:'Cartes de visite, flyers, brochures',tip:'Attention au rendu CMJN.',trend:'Couleurs vibrantes, contrastes marqués',targetSat:80,targetLightDark:'neutral',palettes:[{name:'Corporate Pro',colors:['#1e3a8a','#3b82f6','#60a5fa','#dbeafe','#f8fafc']},{name:'Creative Pop',colors:['#dc2626','#f97316','#facc15','#4ade80','#2dd4bf']},{name:'Elegant Noir',colors:['#000000','#404040','#737373','#d4d4d4','#f5f5f5']}]},
+    food:{title:'Food / Restauration',desc:'Restaurants, food trucks, packaging',tip:"Rouge et orange stimulent l'appétit.",trend:'Terracotta, vert sauge, noir mat',targetSat:75,targetLightDark:'neutral',palettes:[{name:'Appétit Rouge',colors:['#7f1d1d','#dc2626','#f87171','#fecaca','#fef2f2']},{name:'Bio Naturel',colors:['#14532d','#16a34a','#4ade80','#bbf7d0','#f0fdf4']},{name:'Gourmet Chic',colors:['#78350f','#d97706','#fbbf24','#fef3c7','#fffbeb']}]},
+    fashion:{title:'Mode / Fashion',desc:'Boutiques, marques de vêtements',tip:'Noir/blanc pour le luxe.',trend:'Lilas digital, vert menthe, beige chaud',targetSat:45,targetLightDark:'neutral',palettes:[{name:'Luxe Minimaliste',colors:['#000000','#171717','#525252','#d4d4d4','#ffffff']},{name:'Pastel Doux',colors:['#fae8ff','#f5d0fe','#e879f9','#a21caf','#701a75']},{name:'Street Bold',colors:['#facc15','#84cc16','#06b6d4','#f97316','#dc2626']}]},
+    health:{title:'Santé / Wellness',desc:'Médical, fitness, bien-être',tip:'Bleu = confiance. Vert = santé.',trend:"Bleu ciel, vert d'eau, blanc pur",targetSat:60,targetLightDark:'light',palettes:[{name:'Médical Pro',colors:['#0c4a6e','#0284c7','#38bdf8','#bae6fd','#f0f9ff']},{name:'Wellness Zen',colors:['#14532d','#22c55e','#86efac','#dcfce7','#f0fdf4']},{name:'Fitness Energy',colors:['#ea580c','#fb923c','#fdba74','#fed7aa','#fff7ed']}]},
+    tech:{title:'Tech / Innovation',desc:'Startups, SaaS, high-tech',tip:'Bleu électrique, violet, cyan = innovation.',trend:'Gradients néon, holographique',targetSat:80,targetLightDark:'dark',palettes:[{name:'Cyber Neon',colors:['#0f172a','#06b6d4','#8b5cf6','#ec4899','#fbbf24']},{name:'AI Future',colors:['#1e1b4b','#4c1d95','#7c3aed','#a78bfa','#ddd6fe']},{name:'Tech Clean',colors:['#0369a1','#0891b2','#06b6d4','#67e8f9','#cffafe']}]},
+    finance:{title:'Finance / Business',desc:'Banques, consulting, corporate',tip:'Bleu marine = confiance. Or = prestige.',trend:'Bleu nuit, or rose, gris anthracite',targetSat:55,targetLightDark:'dark',palettes:[{name:'Banking Trust',colors:['#0c4a6e','#075985','#0369a1','#0284c7','#e0f2fe']},{name:'Corporate Gold',colors:['#713f12','#a16207','#ca8a04','#fbbf24','#fef3c7']},{name:'Premium Dark',colors:['#1e293b','#334155','#64748b','#cbd5e1','#f1f5f9']}]},
+    creative:{title:'Créatif / Artistique',desc:'Agences, studios, portfolios',tip:'Osez les combinaisons audacieuses !',trend:'Arc-en-ciel, dégradés vifs',targetSat:85,targetLightDark:'neutral',palettes:[{name:'Rainbow Pop',colors:['#dc2626','#f59e0b','#eab308','#22c55e','#3b82f6']},{name:'Gradient Magic',colors:['#f97316','#ec4899','#8b5cf6','#3b82f6','#06b6d4']},{name:'Art Vibrant',colors:['#be123c','#c026d3','#7c3aed','#0284c7','#059669']}]},
+    education:{title:'Éducation / Formation',desc:'Écoles, e-learning, formations',tip:'Jaune = attention. Bleu = concentration.',trend:'Pastels doux, couleurs primaires modernes',targetSat:65,targetLightDark:'light',palettes:[{name:'Campus Fresh',colors:['#1e40af','#3b82f6','#60a5fa','#dbeafe','#eff6ff']},{name:'Learn Happy',colors:['#fbbf24','#34d399','#60a5fa','#f472b6','#a78bfa']},{name:'Academic Pro',colors:['#0f766e','#14b8a6','#5eead4','#ccfbf1','#f0fdfa']}]},
+    eco:{title:'Éco / Durable',desc:'Bio, écologie, développement durable',tip:'Vert obligatoire. Marron/beige = naturel.',trend:'Vert forêt, terracotta, beige lin',targetSat:60,targetLightDark:'neutral',palettes:[{name:'Nature Pure',colors:['#14532d','#16a34a','#22c55e','#86efac','#dcfce7']},{name:'Terre Bio',colors:['#78350f','#92400e','#a16207','#d97706','#fed7aa']},{name:'Eco Soft',colors:['#064e3b','#059669','#34d399','#a7f3d0','#d1fae5']}]}
+};
 
-        const contextData = {
-            digital: {
-                title: 'Digital / Web',
-                desc: 'Pour sites web, applications, interfaces',
-                tip: 'Privilégiez des couleurs avec bon contraste WCAG. Le cyan et violet sont très tendance.',
-                trend: 'Néomorphisme, gradients subtils, mode sombre',
-                palettes: [
-                    { name: 'Tech Moderne', colors: ['#0f172a', '#1e293b', '#06b6d4', '#8b5cf6', '#e0e7ff'] },
-                    { name: 'SaaS Clean', colors: ['#1e40af', '#3b82f6', '#60a5fa', '#93c5fd', '#dbeafe'] },
-                    { name: 'Startup Bold', colors: ['#7c3aed', '#a78bfa', '#c4b5fd', '#e9d5ff', '#f5f3ff'] }
-                ]
-            },
-            print: {
-                title: 'Print / Imprimé',
-                desc: 'Cartes de visite, flyers, brochures',
-                tip: 'Attention au rendu CMJN. Testez vos couleurs avant impression.',
-                trend: 'Couleurs vibrantes, contrastes marqués, minimalisme',
-                palettes: [
-                    { name: 'Corporate Pro', colors: ['#1e3a8a', '#3b82f6', '#60a5fa', '#dbeafe', '#f8fafc'] },
-                    { name: 'Creative Pop', colors: ['#dc2626', '#f97316', '#facc15', '#4ade80', '#2dd4bf'] },
-                    { name: 'Elegant Noir', colors: ['#000000', '#404040', '#737373', '#d4d4d4', '#f5f5f5'] }
-                ]
-            },
-            food: {
-                title: 'Food / Restauration',
-                desc: 'Restaurants, food trucks, packaging alimentaire',
-                tip: 'Rouge et orange stimulent l\'appétit. Vert = bio/frais.',
-                trend: 'Terracotta, vert sauge, noir mat',
-                palettes: [
-                    { name: 'Appétit Rouge', colors: ['#7f1d1d', '#dc2626', '#f87171', '#fecaca', '#fef2f2'] },
-                    { name: 'Bio Naturel', colors: ['#14532d', '#16a34a', '#4ade80', '#bbf7d0', '#f0fdf4'] },
-                    { name: 'Gourmet Chic', colors: ['#78350f', '#d97706', '#fbbf24', '#fef3c7', '#fffbeb'] }
-                ]
-            },
-            fashion: {
-                title: 'Mode / Fashion',
-                desc: 'Boutiques, marques de vêtements, accessoires',
-                tip: 'Noir/blanc pour le luxe. Pastels pour le casual. Couleurs vives pour le streetwear.',
-                trend: 'Lilas, vert menthe, beige chaud',
-                palettes: [
-                    { name: 'Luxe Minimaliste', colors: ['#000000', '#171717', '#525252', '#d4d4d4', '#ffffff'] },
-                    { name: 'Pastel Doux', colors: ['#fae8ff', '#f5d0fe', '#e879f9', '#a21caf', '#701a75'] },
-                    { name: 'Street Bold', colors: ['#facc15', '#84cc16', '#06b6d4', '#f97316', '#dc2626'] }
-                ]
-            },
-            health: {
-                title: 'Santé / Wellness',
-                desc: 'Médical, fitness, bien-être',
-                tip: 'Bleu = confiance. Vert = santé. Évitez le rouge (stress).',
-                trend: 'Bleu ciel, vert d\'eau, blanc pur',
-                palettes: [
-                    { name: 'Médical Pro', colors: ['#0c4a6e', '#0284c7', '#38bdf8', '#bae6fd', '#f0f9ff'] },
-                    { name: 'Wellness Zen', colors: ['#14532d', '#22c55e', '#86efac', '#dcfce7', '#f0fdf4'] },
-                    { name: 'Fitness Energy', colors: ['#ea580c', '#fb923c', '#fdba74', '#fed7aa', '#fff7ed'] }
-                ]
-            },
-            tech: {
-                title: 'Tech / Innovation',
-                desc: 'Startups, SaaS, high-tech',
-                tip: 'Bleu électrique, violet, cyan = innovation. Noir = premium.',
-                trend: 'Gradients néon, bleu électrique, violet profond',
-                palettes: [
-                    { name: 'Cyber Neon', colors: ['#0f172a', '#06b6d4', '#8b5cf6', '#ec4899', '#fbbf24'] },
-                    { name: 'AI Future', colors: ['#1e1b4b', '#4c1d95', '#7c3aed', '#a78bfa', '#ddd6fe'] },
-                    { name: 'Tech Clean', colors: ['#0369a1', '#0891b2', '#06b6d4', '#67e8f9', '#cffafe'] }
-                ]
-            },
-            finance: {
-                title: 'Finance / Business',
-                desc: 'Banques, consulting, corporate',
-                tip: 'Bleu marine = confiance. Gris = sérieux. Or = prestige.',
-                trend: 'Bleu nuit, or rose, gris anthracite',
-                palettes: [
-                    { name: 'Banking Trust', colors: ['#0c4a6e', '#075985', '#0369a1', '#0284c7', '#e0f2fe'] },
-                    { name: 'Corporate Gold', colors: ['#713f12', '#a16207', '#ca8a04', '#fbbf24', '#fef3c7'] },
-                    { name: 'Premium Dark', colors: ['#1e293b', '#334155', '#64748b', '#cbd5e1', '#f1f5f9'] }
-                ]
-            },
-            creative: {
-                title: 'Créatif / Artistique',
-                desc: 'Agences, studios, portfolios',
-                tip: 'Osez les combinaisons audacieuses. Pas de limites !',
-                trend: 'Arc-en-ciel, dégradés vifs, contrastes forts',
-                palettes: [
-                    { name: 'Rainbow Pop', colors: ['#dc2626', '#f59e0b', '#eab308', '#22c55e', '#3b82f6'] },
-                    { name: 'Gradient Magic', colors: ['#f97316', '#ec4899', '#8b5cf6', '#3b82f6', '#06b6d4'] },
-                    { name: 'Art Vibrant', colors: ['#be123c', '#c026d3', '#7c3aed', '#0284c7', '#059669'] }
-                ]
-            },
-            education: {
-                title: 'Éducation / Formation',
-                desc: 'Écoles, e-learning, formations',
-                tip: 'Jaune = attention. Bleu = concentration. Vert = croissance.',
-                trend: 'Pastels doux, couleurs primaires modernes',
-                palettes: [
-                    { name: 'Campus Fresh', colors: ['#1e40af', '#3b82f6', '#60a5fa', '#dbeafe', '#eff6ff'] },
-                    { name: 'Learn Happy', colors: ['#fbbf24', '#34d399', '#60a5fa', '#f472b6', '#a78bfa'] },
-                    { name: 'Academic Pro', colors: ['#0f766e', '#14b8a6', '#5eead4', '#ccfbf1', '#f0fdfa'] }
-                ]
-            },
-            eco: {
-                title: 'Éco / Durable',
-                desc: 'Bio, écologie, développement durable',
-                tip: 'Vert obligatoire. Marron/beige = naturel. Blanc cassé.',
-                trend: 'Vert forêt, terracotta, beige lin',
-                palettes: [
-                    { name: 'Nature Pure', colors: ['#14532d', '#16a34a', '#22c55e', '#86efac', '#dcfce7'] },
-                    { name: 'Terre Bio', colors: ['#78350f', '#92400e', '#a16207', '#d97706', '#fed7aa'] },
-                    { name: 'Eco Soft', colors: ['#064e3b', '#059669', '#34d399', '#a7f3d0', '#d1fae5'] }
-                ]
-            }
-        };
+const colorRoles=['Principale','Secondaire','Accent','Claire','Très claire'];
+const harmonyNames={mono:'Monochromatique',analogous:'Analogues',complementary:'Complémentaires',triadic:'Triadique',tetradic:'Tétradique'};
+const harmonyAngles={mono:[0,0,0,0,0],analogous:[0,30,60,-30,-60],complementary:[0,180,0,180,0],triadic:[0,120,240,120,240],tetradic:[0,90,180,270,90]};
 
-        function selectHarmony(harmony) {
-            currentHarmony = harmony;
-            document.querySelectorAll('.radio-option').forEach(opt => opt.classList.remove('selected'));
-            event.currentTarget.classList.add('selected');
-        }
+// ── SYNC COULEUR DE BASE ──────────────────────────────────────────
+function syncFromPicker(value){
+    document.getElementById('baseHex').value=value;
+    document.getElementById('hexPreview').style.background=value;
+}
+function syncFromHex(value){
+    const v=value.startsWith('#')?value:'#'+value;
+    if(/^#[0-9a-fA-F]{6}$/.test(v)){
+        document.getElementById('baseColor').value=v;
+        document.getElementById('hexPreview').style.background=v;
+    }
+}
 
-        function updateContextInfo() {
-            currentContext = document.getElementById('context').value;
-            const data = contextData[currentContext];
-            
-            // Info contexte
-            document.getElementById('contextInfo').innerHTML = `
-                <h3>${data.title}</h3>
-                <p><strong>Usage :</strong> ${data.desc}</p>
-                <p><strong>Conseil :</strong> ${data.tip}</p>
-                <p><strong>Tendance 2025 :</strong> ${data.trend}</p>
-            `;
-            
-            // Palettes suggérées
-            const palettesHTML = `
-                <div style="background: rgba(6, 182, 212, 0.05); border: 1px solid #334155; border-radius: 12px; padding: 20px;">
-                    <div style="font-weight: 600; color: #06b6d4; margin-bottom: 15px; font-size: 0.95em;">
-                        💡 Palettes recommandées pour ce secteur
-                    </div>
-                    <div style="display: grid; gap: 12px;">
-                        ${data.palettes.map((palette, index) => `
-                            <div onclick="useSuggestedPalette(${index})" style="
-                                background: #0f172a;
-                                border: 2px solid #334155;
-                                border-radius: 10px;
-                                padding: 12px;
-                                cursor: pointer;
-                                transition: all 0.3s;
-                            " onmouseover="this.style.borderColor='#06b6d4'; this.style.transform='translateX(5px)'" 
-                               onmouseout="this.style.borderColor='#334155'; this.style.transform='translateX(0)'">
-                                <div style="display: flex; align-items: center; gap: 12px;">
-                                    <div style="display: flex; gap: 3px; flex-shrink: 0;">
-                                        ${palette.colors.map(color => `
-                                            <div style="width: 24px; height: 24px; background: ${color}; border-radius: 4px;"></div>
-                                        `).join('')}
-                                    </div>
-                                    <div style="flex: 1;">
-                                        <div style="font-weight: 600; color: #f1f5f9; font-size: 0.85em;">${palette.name}</div>
-                                    </div>
-                                    <div style="color: #06b6d4; font-size: 0.85em;">→</div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
+// ── TABS ──────────────────────────────────────────────────────────
+function switchTab(tab,btn){
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-generate').style.display=tab==='generate'?'block':'none';
+    document.getElementById('tab-correct').style.display=tab==='correct'?'block':'none';
+}
+function selectHarmony(h,el){
+    currentHarmony=h;
+    document.querySelectorAll('.radio-option').forEach(o=>o.classList.remove('selected'));
+    el.classList.add('selected');
+}
+
+// ── CONTEXT ───────────────────────────────────────────────────────
+function updateContextInfo(){
+    currentContext=document.getElementById('context').value;
+    const d=contextData[currentContext];
+    document.getElementById('contextInfo').innerHTML=`<h3>${d.title}</h3><p><strong>Usage :</strong> ${d.desc}</p><p><strong>Conseil :</strong> ${d.tip}</p><p><strong>Tendance :</strong> ${d.trend}</p>`;
+    document.getElementById('suggestedPalettes').innerHTML=`
+        <div style="background:rgba(6,182,212,0.04);border:1px solid var(--border);border-radius:12px;padding:16px;">
+            <div style="font-family:'Syne',sans-serif;font-size:0.75em;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;">Palettes recommandées</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+                ${d.palettes.map((p,i)=>`
+                <div class="suggested-palette-item" onclick="useSuggestedPalette(${i})">
+                    <div style="display:flex;gap:4px;">${p.colors.map(c=>`<div style="width:22px;height:22px;background:${c};border-radius:5px;"></div>`).join('')}</div>
+                    <div style="flex:1;font-size:0.85em;font-weight:500;">${p.name}</div>
+                    <span style="color:var(--text-muted);font-size:0.8em;">→</span>
+                </div>`).join('')}
+            </div>
+        </div>`;
+}
+function useSuggestedPalette(i){
+    const p=contextData[currentContext].palettes[i];
+    displayColors(p.colors,'colorsGrid');
+    displayPreviews(p.colors,'previewGrid');
+    document.getElementById('paletteResult').classList.add('show');
+    document.getElementById('paletteResult').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ── COLOR MATH ────────────────────────────────────────────────────
+function hexToHSL(hex){
+    let r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;
+    let max=Math.max(r,g,b),min=Math.min(r,g,b),h,s,l=(max+min)/2;
+    if(max===min){h=s=0;}else{
+        let d=max-min;s=l>0.5?d/(2-max-min):d/(max+min);
+        switch(max){case r:h=((g-b)/d+(g<b?6:0))/6;break;case g:h=((b-r)/d+2)/6;break;case b:h=((r-g)/d+4)/6;break;}
+    }
+    return[Math.round(h*360),Math.round(s*100),Math.round(l*100)];
+}
+function hslToHex(h,s,l){
+    h=((h%360)+360)%360;s=Math.max(0,Math.min(100,s));l=Math.max(0,Math.min(100,l));
+    s/=100;l/=100;
+    let c=(1-Math.abs(2*l-1))*s,x=c*(1-Math.abs((h/60)%2-1)),m=l-c/2,r=0,g=0,b=0;
+    if(h<60){r=c;g=x;}else if(h<120){r=x;g=c;}else if(h<180){g=c;b=x;}else if(h<240){g=x;b=c;}else if(h<300){r=x;b=c;}else{r=c;b=x;}
+    return'#'+[r,g,b].map(v=>Math.round((v+m)*255).toString(16).padStart(2,'0')).join('');
+}
+function hueDiff(a,b){return Math.min(Math.abs(a-b),360-Math.abs(a-b));}
+function relativeLuminance(hex){return[parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)].map(v=>{v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4);}).reduce((a,v,i)=>a+v*[0.2126,0.7152,0.0722][i],0);}
+function contrastRatio(c1,c2){const l1=relativeLuminance(c1),l2=relativeLuminance(c2);return(Math.max(l1,l2)+0.05)/(Math.min(l1,l2)+0.05);}
+
+function detectHarmony(hues){
+    if(hues.length<2)return{type:'mono',pivotHue:hues[0]||0};
+    const scores={};
+    const monoScore=Math.max(0,100-Math.max(...hues.flatMap((h,i)=>hues.slice(i+1).map(h2=>hueDiff(h,h2)))));
+    scores.mono=monoScore;
+    let compScore=0;
+    for(let i=0;i<hues.length;i++)for(let j=i+1;j<hues.length;j++){const d=hueDiff(hues[i],hues[j]);compScore=Math.max(compScore,100-Math.abs(d-180)*1.5);}
+    scores.complementary=compScore;
+    let analogScore=0;
+    for(let pivot of hues){const inRange=hues.filter(h=>hueDiff(h,pivot)<=60).length;analogScore=Math.max(analogScore,(inRange/hues.length)*100);}
+    scores.analogous=analogScore;
+    let triadScore=0;
+    for(let i=0;i<hues.length;i++){const t1=hues[i],t2=(t1+120)%360,t3=(t1+240)%360;const s=hues.reduce((acc,h)=>acc+(100-Math.min(hueDiff(h,t1),hueDiff(h,t2),hueDiff(h,t3))*2),0)/hues.length;triadScore=Math.max(triadScore,s);}
+    scores.triadic=triadScore;
+    let tetScore=0;
+    for(let i=0;i<hues.length;i++){const t1=hues[i],t2=(t1+90)%360,t3=(t1+180)%360,t4=(t1+270)%360;const s=hues.reduce((acc,h)=>acc+(100-Math.min(hueDiff(h,t1),hueDiff(h,t2),hueDiff(h,t3),hueDiff(h,t4))*2),0)/hues.length;tetScore=Math.max(tetScore,s);}
+    scores.tetradic=tetScore;
+    const best=Object.entries(scores).sort((a,b)=>b[1]-a[1])[0];
+    const sortedH=[...hues].sort((a,b)=>a-b);
+    const pivotHue=sortedH[Math.floor(sortedH.length/2)];
+    return{type:best[0],score:Math.round(best[1]),pivotHue,scores};
+}
+
+// ── SUGGESTION INTELLIGENTE DE COULEUR ───────────────────────────
+function computeSuggestedColor(){
+    const valid=colorInputs.filter(ci=>/^#[0-9a-fA-F]{6}$/.test(ci.color));
+    if(valid.length===0)return{color:'#3b82f6',hint:'Couleur de départ'};
+
+    const hslList=valid.map(ci=>hexToHSL(ci.color));
+    const hues=hslList.map(([h])=>h);
+    const detection=detectHarmony(hues);
+    const pivot=detection.pivotHue;
+    const harmony=detection.type;
+    const avgSat=Math.round(hslList.reduce((s,[,sat])=>s+sat,0)/hslList.length);
+    const avgLum=Math.round(hslList.reduce((s,[,,l])=>s+l,0)/hslList.length);
+
+    // Angles théoriques pour l'harmonie détectée
+    const allAngles=harmonyAngles[harmony].map(a=>((pivot+a)+360)%360);
+
+    // Trouver l'angle non encore couvert
+    let bestAngle=null;
+    let bestScore=-1;
+    allAngles.forEach(targetAngle=>{
+        // Score = distance minimale de toutes les couleurs existantes à cet angle
+        const minDist=Math.min(...hues.map(h=>hueDiff(h,targetAngle)));
+        if(minDist>bestScore){bestScore=minDist;bestAngle=targetAngle;}
+    });
+
+    // Si toutes les positions sont couvertes, chercher la plus utile selon la luminosité manquante
+    const lums=hslList.map(([,,l])=>l).sort((a,b)=>a-b);
+    let targetL=50;
+    if(lums.length>0){
+        // Chercher le plus grand écart entre luminosités existantes
+        let maxGap=0,gapCenter=50;
+        for(let i=0;i<lums.length-1;i++){const gap=lums[i+1]-lums[i];if(gap>maxGap){maxGap=gap;gapCenter=Math.round((lums[i]+lums[i+1])/2);}}
+        if(lums[0]>30){gapCenter=Math.round(lums[0]/2);}
+        else if(lums[lums.length-1]<70){gapCenter=Math.round((lums[lums.length-1]+95)/2);}
+        targetL=gapCenter;
+    }
+
+    const suggestedColor=hslToHex(bestAngle||pivot,Math.min(85,Math.max(40,avgSat)),Math.max(15,Math.min(90,targetL)));
+    const harmonyLabel=harmonyNames[harmony]||harmony;
+    return{color:suggestedColor,hint:`Complète l'harmonie ${harmonyLabel}`};
+}
+
+function updateAddButton(){
+    const suggestion=computeSuggestedColor();
+    document.getElementById('addSwatch').style.background=suggestion.color;
+    document.getElementById('addHint').textContent=suggestion.hint+' — '+suggestion.color;
+    return suggestion.color;
+}
+
+function addSmartColor(){
+    const suggestedColor=updateAddButton();
+    const id='ci_'+(colorCounter++);
+    colorInputs.push({id,color:suggestedColor,locked:false});
+    renderColorInputs();
+    analyzeInputs();
+}
+
+// ── GENERATE ──────────────────────────────────────────────────────
+function generatePalette(){
+    const base=document.getElementById('baseColor').value;
+    const[h,s,l]=hexToHSL(base);let colors=[];
+    switch(currentHarmony){
+        case'mono':colors=[hslToHex(h,s,Math.max(10,l-30)),hslToHex(h,s,Math.max(20,l-15)),base,hslToHex(h,s,Math.min(90,l+15)),hslToHex(h,s,Math.min(95,l+30))];break;
+        case'analogous':colors=[hslToHex((h-30+360)%360,s,l),hslToHex((h-15+360)%360,s,l),base,hslToHex((h+15)%360,s,l),hslToHex((h+30)%360,s,l)];break;
+        case'complementary':colors=[hslToHex(h,s,Math.max(20,l-20)),base,hslToHex(h,s,Math.min(90,l+20)),hslToHex((h+180)%360,s,l),hslToHex((h+180)%360,s,Math.min(90,l+20))];break;
+        case'triadic':colors=[base,hslToHex((h+120)%360,s,l),hslToHex((h+240)%360,s,l),hslToHex(h,s,Math.min(90,l+20)),hslToHex((h+120)%360,s,Math.min(90,l+20))];break;
+        case'tetradic':colors=[base,hslToHex((h+90)%360,s,l),hslToHex((h+180)%360,s,l),hslToHex((h+270)%360,s,l),hslToHex(h,Math.max(20,s-20),l)];break;
+    }
+    displayColors(colors,'colorsGrid');
+    displayPreviews(colors,'previewGrid');
+    document.getElementById('paletteResult').classList.add('show');
+    document.getElementById('paletteResult').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ── CORRECTEUR ────────────────────────────────────────────────────
+let colorInputs=[],colorCounter=0;
+
+function initColorInputs(){
+    ['#e63946','#457b9d','#f4a261'].forEach(c=>{
+        const id='ci_'+(colorCounter++);
+        colorInputs.push({id,color:c,locked:false});
+    });
+    renderColorInputs();
+    analyzeInputs();
+}
+
+function removeColorInput(id){
+    if(colorInputs.length<=2)return;
+    colorInputs=colorInputs.filter(c=>c.id!==id);
+    renderColorInputs();analyzeInputs();
+}
+function toggleLock(id){
+    const ci=colorInputs.find(c=>c.id===id);
+    if(ci){ci.locked=!ci.locked;renderColorInputs();}
+}
+
+function analyzeInputs(){
+    const valid=colorInputs.filter(ci=>/^#[0-9a-fA-F]{6}$/.test(ci.color));
+    if(valid.length<2){document.getElementById('harmonyDetect').classList.remove('show');updateAddButton();return;}
+    const hues=valid.map(ci=>hexToHSL(ci.color)[0]);
+    const result=detectHarmony(hues);
+    const angles=harmonyAngles[result.type]||[0];
+    const pivotH=result.pivotHue;
+    valid.forEach(ci=>{
+        const[h]=hexToHSL(ci.color);
+        const targetAngles=angles.map(a=>(pivotH+a+360)%360);
+        const minDist=Math.min(...targetAngles.map(ta=>hueDiff(h,ta)));
+        ci.outlier=(!ci.locked&&minDist>55);
+    });
+    renderColorInputs();
+    const outlierCount=valid.filter(ci=>ci.outlier).length;
+    document.getElementById('harmonyDetectValue').textContent=harmonyNames[result.type]||result.type;
+    document.getElementById('harmonyWarn').textContent=outlierCount>0?`⚠ ${outlierCount} couleur${outlierCount>1?'s':''} hors harmonie`:'';
+    document.getElementById('harmonyDetect').classList.add('show');
+    updateAddButton();
+}
+
+function renderColorInputs(){
+    document.getElementById('colorInputsGrid').innerHTML=colorInputs.map(ci=>`
+        <div class="color-input-row${ci.outlier?' outlier':''}" id="row_${ci.id}" style="${ci.locked?'border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.04);':''}">
+            <div class="swatch-wrapper" title="Cliquer pour choisir la couleur">
+                <input type="color" value="${ci.color}" oninput="updateInputColor('${ci.id}',this.value)">
+                <div class="swatch-display" style="background:${ci.color};">
+                    <div class="swatch-hint">Changer</div>
                 </div>
-            `;
-            
-            document.getElementById('suggestedPalettes').innerHTML = palettesHTML;
-        }
-        
-        function useSuggestedPalette(index) {
-            const data = contextData[currentContext];
-            const palette = data.palettes[index];
-            
-            displayColors(palette.colors);
-            displayPreviews(palette.colors);
-            document.getElementById('paletteResult').classList.add('show');
-            
-            // Scroll vers résultat
-            document.getElementById('paletteResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
+            </div>
+            <input class="color-hex-input" type="text" value="${ci.color}"
+                placeholder="#rrggbb"
+                oninput="updateInputHex('${ci.id}',this.value)"
+                maxlength="7"
+                spellcheck="false">
+            ${ci.outlier?'<span class="outlier-badge">⚠ hors harmonie</span>':''}
+            ${ci.locked?'<span class="locked-badge">🔒 Pivot</span>':''}
+            <button class="btn-lock ${ci.locked?'locked':''}" onclick="toggleLock('${ci.id}')" title="${ci.locked?'Déverrouiller':'Verrouiller comme pivot'}">${ci.locked?'🔒':'🔓'}</button>
+            <button class="btn-remove" onclick="removeColorInput('${ci.id}')" title="Supprimer">✕</button>
+        </div>`).join('');
+}
 
-        function hexToHSL(hex) {
-            let r = parseInt(hex.slice(1, 3), 16) / 255;
-            let g = parseInt(hex.slice(3, 5), 16) / 255;
-            let b = parseInt(hex.slice(5, 7), 16) / 255;
+function updateInputColor(id,value){
+    const ci=colorInputs.find(c=>c.id===id);
+    if(ci){ci.color=value;const row=document.getElementById('row_'+id);if(row){row.querySelector('.color-hex-input').value=value;row.querySelector('.swatch-display').style.background=value;}analyzeInputs();}
+}
+function updateInputHex(id,value){
+    const v=value.startsWith('#')?value:'#'+value;
+    if(/^#[0-9a-fA-F]{6}$/.test(v)){
+        const ci=colorInputs.find(c=>c.id===id);
+        if(ci){ci.color=v;const row=document.getElementById('row_'+id);if(row){row.querySelector('input[type="color"]').value=v;row.querySelector('.swatch-display').style.background=v;}analyzeInputs();}
+    }
+}
 
-            let max = Math.max(r, g, b), min = Math.min(r, g, b);
-            let h, s, l = (max + min) / 2;
+// ── ALGO CORRECTION ───────────────────────────────────────────────
+function correctPalette(){
+    const inputs=colorInputs.filter(ci=>/^#[0-9a-fA-F]{6}$/.test(ci.color));
+    if(inputs.length<2){alert('Entrez au moins 2 couleurs valides.');return;}
+    const sector=document.getElementById('correctContext').value;
+    const sectorData=contextData[sector];
+    const targetSat=sectorData.targetSat;
+    const lightMode=sectorData.targetLightDark;
+    const hslAll=inputs.map(ci=>hexToHSL(ci.color));
+    const hues=hslAll.map(([h])=>h);
+    const locked=inputs.find(ci=>ci.locked);
+    const pivotHue=locked?hexToHSL(locked.color)[0]:detectHarmony(hues).pivotHue;
+    const detectedHarmony=detectHarmony(hues).type;
+    const angles=harmonyAngles[detectedHarmony];
+    const n=inputs.length;
+    let lumTargets;
+    if(lightMode==='dark')lumTargets=n===2?[18,72]:n===3?[14,40,75]:n===4?[10,28,55,80]:[8,20,38,60,82];
+    else if(lightMode==='light')lumTargets=n===2?[35,88]:n===3?[28,60,90]:n===4?[22,48,72,92]:[18,38,58,78,92];
+    else lumTargets=n===2?[22,78]:n===3?[18,50,82]:n===4?[14,38,62,86]:[10,27,47,68,88];
+    const sorted=inputs.map((ci,i)=>({...ci,hsl:hslAll[i]})).sort((a,b)=>a.hsl[2]-b.hsl[2]);
+    const optimized=[];
+    sorted.forEach((item,i)=>{
+        if(item.locked){optimized.push({original:item.color,corrected:item.color,locked:true,outlier:false});return;}
+        const[origH,origS]=item.hsl;
+        const targetAngles=angles.slice(0,n).map(a=>(pivotHue+a+360)%360);
+        let bestAngle=targetAngles[0],bestDist=999;
+        targetAngles.forEach(ta=>{const d=hueDiff(origH,ta);if(d<bestDist){bestDist=d;bestAngle=ta;}});
+        const newH=item.outlier?bestAngle:Math.round(origH*0.3+bestAngle*0.7);
+        const newS=Math.round(origS*0.3+targetSat*0.7);
+        const targetL=lumTargets[i]!==undefined?lumTargets[i]:item.hsl[2];
+        let corrected=hslToHex(newH,newS,targetL);
+        if(i>0&&optimized[i-1]){const prev=optimized[i-1].corrected;if(contrastRatio(prev,corrected)<1.35)corrected=hslToHex(newH,newS,Math.min(95,targetL+12));}
+        optimized.push({original:item.color,corrected,locked:false,outlier:item.outlier,hueShift:Math.round(hueDiff(origH,newH))});
+    });
+    const correctedColors=optimized.map(o=>o.corrected);
+    displayHarmonySummary(detectedHarmony,sector,optimized,pivotHue);
+    displayDiff(optimized);
+    displayColors(correctedColors,'correctedColorsGrid');
+    displayPreviews(correctedColors,'correctedPreviewGrid');
+    document.getElementById('correctResult').classList.add('show');
+    document.getElementById('correctResult').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
 
-            if (max === min) {
-                h = s = 0;
-            } else {
-                let d = max - min;
-                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-                switch (max) {
-                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
-                    case g: h = ((b - r) / d + 2) / 6; break;
-                    case b: h = ((r - g) / d + 4) / 6; break;
-                }
-            }
+function displayHarmonySummary(harmony,sector,items,pivotHue){
+    const outliers=items.filter(o=>o.outlier&&!o.locked).length;
+    document.getElementById('harmonySummary').innerHTML=`
+        <div class="harmony-summary-title">✦ Analyse & corrections</div>
+        <div class="harmony-summary-body">
+            Harmonie : <strong>${harmonyNames[harmony]}</strong> · Pivot : <strong>${pivotHue}°</strong> · Secteur : <strong>${contextData[sector].title}</strong><br>
+            ${outliers>0?`<span style="color:var(--warn)">⚠ ${outliers} couleur${outliers>1?'s':''} repositionnée${outliers>1?'s':''} sur les angles théoriques.</span>`:'<span style="color:var(--success)">✓ Toutes les teintes étaient cohérentes.</span>'}
+        </div>`;
+}
 
-            return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
-        }
+function displayDiff(items){
+    const adj=items.filter(o=>!o.locked&&o.original!==o.corrected).length;
+    const locked=items.filter(o=>o.locked).length;
+    const unch=items.length-adj-locked;
+    document.getElementById('correctionDiff').innerHTML=`
+        <h4>${adj} ajustement${adj>1?'s':''} · ${locked} fixée${locked>1?'s':''} · ${unch} inchangée${unch>1?'s':''}</h4>
+        ${items.map((o,i)=>`
+        <div class="diff-row">
+            <div class="diff-swatch-before" style="background:${o.original}"></div>
+            <span class="diff-arrow">→</span>
+            <div class="diff-swatch-after" style="background:${o.corrected}"></div>
+            <span class="diff-label">Couleur ${i+1}${o.hueShift>0?' (+'+o.hueShift+'°)':''}</span>
+            <span class="diff-badge ${o.locked?'locked-kept':o.outlier?'replaced':o.original!==o.corrected?'adjusted':'kept'}">
+                ${o.locked?'🔒 Pivot':o.outlier?'↻ Repositionnée':o.original!==o.corrected?'Ajustée':'Conservée'}
+            </span>
+        </div>`).join('')}`;
+}
 
-        function hslToHex(h, s, l) {
-            s /= 100;
-            l /= 100;
-            let c = (1 - Math.abs(2 * l - 1)) * s;
-            let x = c * (1 - Math.abs((h / 60) % 2 - 1));
-            let m = l - c/2;
-            let r = 0, g = 0, b = 0;
-
-            if (0 <= h && h < 60) { r = c; g = x; b = 0; }
-            else if (60 <= h && h < 120) { r = x; g = c; b = 0; }
-            else if (120 <= h && h < 180) { r = 0; g = c; b = x; }
-            else if (180 <= h && h < 240) { r = 0; g = x; b = c; }
-            else if (240 <= h && h < 300) { r = x; g = 0; b = c; }
-            else if (300 <= h && h < 360) { r = c; g = 0; b = x; }
-
-            r = Math.round((r + m) * 255);
-            g = Math.round((g + m) * 255);
-            b = Math.round((b + m) * 255);
-
-            return "#" + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
-        }
-
-        function generatePalette() {
-            const baseColor = document.getElementById('baseColor').value;
-            const [h, s, l] = hexToHSL(baseColor);
-            let colors = [];
-
-            switch(currentHarmony) {
-                case 'mono':
-                    colors = [
-                        hslToHex(h, s, Math.max(10, l - 30)),
-                        hslToHex(h, s, Math.max(20, l - 15)),
-                        baseColor,
-                        hslToHex(h, s, Math.min(90, l + 15)),
-                        hslToHex(h, s, Math.min(95, l + 30))
-                    ];
-                    break;
-                case 'analogous':
-                    colors = [
-                        hslToHex((h - 30 + 360) % 360, s, l),
-                        hslToHex((h - 15 + 360) % 360, s, l),
-                        baseColor,
-                        hslToHex((h + 15) % 360, s, l),
-                        hslToHex((h + 30) % 360, s, l)
-                    ];
-                    break;
-                case 'complementary':
-                    colors = [
-                        hslToHex(h, s, Math.max(20, l - 20)),
-                        baseColor,
-                        hslToHex(h, s, Math.min(90, l + 20)),
-                        hslToHex((h + 180) % 360, s, l),
-                        hslToHex((h + 180) % 360, s, Math.min(90, l + 20))
-                    ];
-                    break;
-                case 'triadic':
-                    colors = [
-                        baseColor,
-                        hslToHex((h + 120) % 360, s, l),
-                        hslToHex((h + 240) % 360, s, l),
-                        hslToHex(h, s, Math.min(90, l + 20)),
-                        hslToHex((h + 120) % 360, s, Math.min(90, l + 20))
-                    ];
-                    break;
-                case 'tetradic':
-                    colors = [
-                        baseColor,
-                        hslToHex((h + 90) % 360, s, l),
-                        hslToHex((h + 180) % 360, s, l),
-                        hslToHex((h + 270) % 360, s, l),
-                        hslToHex(h, Math.max(20, s - 20), l)
-                    ];
-                    break;
-            }
-
-            displayColors(colors);
-            displayPreviews(colors);
-            document.getElementById('paletteResult').classList.add('show');
-        }
-
-        function displayColors(colors) {
-            const grid = document.getElementById('colorsGrid');
-            grid.innerHTML = colors.map((color, i) => {
-                const [h, s, l] = hexToHSL(color);
-                return `
-                    <div class="color-card" onclick="copyColor('${color}')">
-                        <div class="color-swatch" style="background: ${color}"></div>
-                        <div class="color-info">
-                            <div class="color-name">Couleur ${i + 1}</div>
-                            <div class="color-codes">
-                                <div class="color-code">${color.toUpperCase()}</div>
-                                <div class="color-code">HSL(${h}, ${s}%, ${l}%)</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function displayPreviews(colors) {
-            const grid = document.getElementById('previewGrid');
-            grid.innerHTML = `
-                <!-- SITE WEB - MOCKUP CHROME -->
-                <div class="preview-card" style="background: #f1f5f9; padding: 0; overflow: hidden;">
-                    <div class="preview-title" style="padding: 15px 20px; background: #0f172a;">Site Web</div>
-                    <!-- Barre Chrome -->
-                    <div style="background: #e5e7eb; padding: 8px 12px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #d1d5db;">
-                        <div style="display: flex; gap: 6px;">
-                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></div>
-                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #f59e0b;"></div>
-                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #10b981;"></div>
-                        </div>
-                        <div style="flex: 1; background: white; padding: 4px 12px; border-radius: 6px; font-size: 0.75em; color: #6b7280;">
-                            https://monsite.fr
-                        </div>
-                    </div>
-                    <!-- Contenu site -->
-                    <div style="background: ${colors[4]};">
-                        <!-- Header -->
-                        <div style="background: ${colors[0]}; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
-                            <div style="font-weight: bold; color: white; font-size: 0.9em;">MonSite</div>
-                            <div style="display: flex; gap: 10px; font-size: 0.75em; color: ${colors[3]};">
-                                <span>Accueil</span>
-                                <span>Services</span>
-                                <span>Contact</span>
-                            </div>
-                        </div>
-                        <!-- Hero -->
-                        <div style="padding: 30px 15px; text-align: center; background: linear-gradient(135deg, ${colors[0]}, ${colors[1]});">
-                            <div style="font-size: 1.2em; font-weight: bold; color: white; margin-bottom: 10px;">
-                                Votre Message Principal
-                            </div>
-                            <div style="font-size: 0.8em; color: ${colors[4]}; margin-bottom: 15px;">
-                                Sous-titre explicatif pour convaincre vos visiteurs
-                            </div>
-                            <div style="display: inline-block; background: ${colors[2]}; color: white; padding: 10px 20px; border-radius: 8px; font-size: 0.8em; font-weight: 600;">
-                                Bouton CTA
-                            </div>
-                        </div>
-                        <!-- Cards -->
-                        <div style="padding: 20px 15px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                            <div style="background: white; padding: 12px; border-radius: 8px; border: 2px solid ${colors[2]};">
-                                <div style="width: 100%; height: 40px; background: ${colors[2]}; border-radius: 6px; margin-bottom: 8px;"></div>
-                                <div style="font-size: 0.75em; font-weight: 600; color: ${colors[0]}; margin-bottom: 4px;">Service 1</div>
-                                <div style="font-size: 0.65em; color: #6b7280;">Description courte</div>
-                            </div>
-                            <div style="background: white; padding: 12px; border-radius: 8px; border: 2px solid ${colors[2]};">
-                                <div style="width: 100%; height: 40px; background: ${colors[1]}; border-radius: 6px; margin-bottom: 8px;"></div>
-                                <div style="font-size: 0.75em; font-weight: 600; color: ${colors[0]}; margin-bottom: 4px;">Service 2</div>
-                                <div style="font-size: 0.65em; color: #6b7280;">Description courte</div>
-                            </div>
-                        </div>
-                    </div>
+// ── DISPLAY ───────────────────────────────────────────────────────
+function displayColors(colors,gridId){
+    const roles=colors.length<=5?colorRoles:colors.map((_,i)=>`Couleur ${i+1}`);
+    document.getElementById(gridId).innerHTML=colors.map((color,i)=>{
+        const[h,s,l]=hexToHSL(color);
+        return`<div class="color-card" onclick="copyColor('${color}')">
+            <div class="color-swatch" style="background:${color}"><div class="copy-hint">Copier</div></div>
+            <div class="color-info">
+                <div class="color-role">${roles[i]||'Couleur '+(i+1)}</div>
+                <div class="color-codes">
+                    <div class="color-code">${color}</div>
+                    <div class="color-code" style="font-size:0.75em;color:var(--text-muted)">hsl(${h}, ${s}%, ${l}%)</div>
                 </div>
+            </div>
+        </div>`;
+    }).join('');
+}
 
-                <!-- APP MOBILE - MOCKUP IPHONE -->
-                <div class="preview-card" style="background: linear-gradient(135deg, #1e293b, #0f172a); padding: 20px; display: flex; justify-content: center;">
-                    <div class="preview-title" style="position: absolute; top: 15px; left: 20px;">App Mobile</div>
-                    <!-- iPhone Frame -->
-                    <div style="width: 180px; background: #000; border-radius: 24px; padding: 8px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); margin-top: 30px;">
-                        <!-- Notch -->
-                        <div style="height: 20px; background: #000; border-radius: 16px 16px 0 0; position: relative;">
-                            <div style="width: 60px; height: 6px; background: #1a1a1a; border-radius: 3px; margin: 0 auto; position: relative; top: 4px;"></div>
-                        </div>
-                        <!-- Screen -->
-                        <div style="background: ${colors[4]}; height: 300px; border-radius: 0 0 16px 16px; overflow: hidden;">
-                            <!-- Status Bar -->
-                            <div style="background: ${colors[0]}; padding: 6px 12px; display: flex; justify-content: space-between; font-size: 0.6em; color: white;">
-                                <span>9:41</span>
-                                <span>●●●●</span>
-                            </div>
-                            <!-- App Header -->
-                            <div style="background: ${colors[0]}; padding: 12px; text-align: center; color: white;">
-                                <div style="font-weight: bold; font-size: 0.85em;">Mon App</div>
-                            </div>
-                            <!-- Content -->
-                            <div style="padding: 12px;">
-                                <div style="background: white; padding: 12px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid ${colors[2]};">
-                                    <div style="font-size: 0.7em; font-weight: 600; color: ${colors[0]}; margin-bottom: 4px;">Notification</div>
-                                    <div style="font-size: 0.6em; color: #6b7280;">Vous avez un nouveau message</div>
-                                </div>
-                                <div style="background: ${colors[2]}; padding: 12px; border-radius: 12px; text-align: center; color: white; margin-bottom: 10px;">
-                                    <div style="font-size: 0.7em; font-weight: 600;">Action Principale</div>
-                                </div>
-                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
-                                    ${[0,1,2].map(i => `
-                                        <div style="background: white; padding: 10px; border-radius: 10px; text-align: center; border: 2px solid ${colors[1]};">
-                                            <div style="width: 30px; height: 30px; background: ${colors[i]}; border-radius: 8px; margin: 0 auto 6px;"></div>
-                                            <div style="font-size: 0.55em; color: #6b7280;">Menu ${i+1}</div>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                            <!-- Bottom Nav -->
-                            <div style="position: absolute; bottom: 8px; left: 8px; right: 8px; background: white; padding: 8px; border-radius: 12px; display: flex; justify-content: space-around; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);">
-                                ${[0,1,2,3].map(i => `
-                                    <div style="width: 24px; height: 24px; background: ${i === 0 ? colors[2] : '#e5e7eb'}; border-radius: 6px;"></div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+function displayPreviews(colors,gridId){
+    const c=colors;
+    const s=i=>c[i]||c[c.length-1]||'#888888';
+    document.getElementById(gridId).innerHTML=`
+        <div class="preview-card">
+            <div class="preview-label">Site Web</div>
+            <div style="background:#e5e7eb;">
+                <div style="background:#e5e7eb;padding:6px 10px;display:flex;align-items:center;gap:6px;"><div style="display:flex;gap:4px;"><div style="width:10px;height:10px;border-radius:50%;background:#ef4444;"></div><div style="width:10px;height:10px;border-radius:50%;background:#f59e0b;"></div><div style="width:10px;height:10px;border-radius:50%;background:#10b981;"></div></div><div style="flex:1;background:white;padding:3px 10px;border-radius:5px;font-size:0.65em;color:#6b7280;">https://monsite.fr</div></div>
+                <div style="background:${s(4)};"><div style="background:${s(0)};padding:12px;display:flex;justify-content:space-between;align-items:center;"><div style="font-weight:bold;color:white;font-size:0.8em;">MonSite</div><div style="display:flex;gap:8px;font-size:0.65em;color:${s(3)};"><span>Accueil</span><span>Services</span><span>Contact</span></div></div><div style="padding:24px 12px;text-align:center;background:linear-gradient(135deg,${s(0)},${s(1)});"><div style="font-size:1em;font-weight:bold;color:white;margin-bottom:8px;">Votre Message Principal</div><div style="font-size:0.7em;color:${s(4)};margin-bottom:12px;opacity:0.9;">Sous-titre explicatif</div><div style="display:inline-block;background:${s(2)};color:white;padding:8px 16px;border-radius:7px;font-size:0.7em;font-weight:600;">Commencer →</div></div><div style="padding:14px 12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div style="background:white;padding:10px;border-radius:7px;border:2px solid ${s(2)};"><div style="height:30px;background:${s(2)};border-radius:5px;margin-bottom:6px;"></div><div style="font-size:0.65em;font-weight:600;color:${s(0)};">Service 1</div></div><div style="background:white;padding:10px;border-radius:7px;border:2px solid ${s(1)};"><div style="height:30px;background:${s(1)};border-radius:5px;margin-bottom:6px;"></div><div style="font-size:0.65em;font-weight:600;color:${s(0)};">Service 2</div></div></div></div>
+            </div>
+        </div>
+        <div class="preview-card" style="background:linear-gradient(135deg,#1e293b,#0f172a);display:flex;justify-content:center;align-items:flex-start;padding-top:40px;padding-bottom:16px;">
+            <div class="preview-label" style="position:absolute;top:12px;left:16px;">App Mobile</div>
+            <div style="width:160px;background:#000;border-radius:22px;padding:6px;box-shadow:0 16px 48px rgba(0,0,0,0.6);margin-top:4px;"><div style="height:16px;background:#000;border-radius:14px 14px 0 0;"><div style="width:50px;height:5px;background:#1a1a1a;border-radius:3px;margin:0 auto;position:relative;top:3px;"></div></div><div style="background:${s(4)};min-height:260px;border-radius:0 0 14px 14px;overflow:hidden;position:relative;"><div style="background:${s(0)};padding:5px 10px;display:flex;justify-content:space-between;font-size:0.55em;color:white;"><span>9:41</span><span>●●●●</span></div><div style="background:${s(0)};padding:10px;text-align:center;color:white;font-weight:bold;font-size:0.75em;">Mon App</div><div style="padding:10px;"><div style="background:white;padding:10px;border-radius:10px;margin-bottom:8px;border-left:3px solid ${s(2)};"><div style="font-size:0.6em;font-weight:600;color:${s(0)};margin-bottom:2px;">Notification</div><div style="font-size:0.55em;color:#6b7280;">Nouveau message reçu</div></div><div style="background:${s(2)};padding:10px;border-radius:10px;text-align:center;color:white;margin-bottom:8px;"><div style="font-size:0.65em;font-weight:600;">Action Principale</div></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">${[0,1,2].map(i=>`<div style="background:white;padding:8px;border-radius:8px;text-align:center;border:1px solid ${s(1)};"><div style="width:24px;height:24px;background:${s(i)};border-radius:6px;margin:0 auto 4px;"></div><div style="font-size:0.5em;color:#6b7280;">Menu ${i+1}</div></div>`).join('')}</div></div><div style="position:absolute;bottom:6px;left:6px;right:6px;background:white;padding:6px;border-radius:10px;display:flex;justify-content:space-around;">${[0,1,2,3].map(i=>`<div style="width:20px;height:20px;background:${i===0?s(2):'#e5e7eb'};border-radius:5px;"></div>`).join('')}</div></div></div>
+        </div>
+        <div class="preview-card" style="background:#0f172a;padding:20px;display:flex;flex-direction:column;gap:12px;">
+            <div class="preview-label" style="margin:-20px -20px 0;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);">Carte de Visite</div>
+            <div style="margin-top:8px;background:white;padding:16px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.2);"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><div><div style="width:42px;height:42px;background:linear-gradient(135deg,${s(0)},${s(2)});border-radius:9px;margin-bottom:10px;"></div><div style="font-size:0.85em;font-weight:bold;color:${s(0)};margin-bottom:3px;">Prénom NOM</div><div style="font-size:0.65em;color:${s(1)};margin-bottom:6px;">Fonction / Métier</div><div style="font-size:0.6em;color:#6b7280;line-height:1.5;"><div>📞 06 12 34 56 78</div><div>✉️ contact@email.fr</div></div></div><div style="width:2px;background:${s(2)};align-self:stretch;margin:0 10px;"></div><div style="writing-mode:vertical-rl;font-size:0.65em;font-weight:600;color:${s(2)};">ENTREPRISE</div></div></div>
+            <div style="background:linear-gradient(135deg,${s(0)},${s(1)});padding:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;text-align:center;color:white;min-height:70px;"><div><div style="font-size:0.95em;font-weight:bold;margin-bottom:6px;">LOGO</div><div style="width:32px;height:1px;background:rgba(255,255,255,0.5);margin:0 auto 6px;"></div><div style="font-size:0.65em;opacity:0.9;">Votre slogan ici</div></div></div>
+        </div>
+        <div class="preview-card" style="background:#e5e7eb;padding:0;overflow:hidden;">
+            <div class="preview-label">Flyer A5</div>
+            <div style="background:white;margin:12px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);overflow:hidden;"><div style="background:linear-gradient(135deg,${s(0)},${s(2)});padding:22px 16px;text-align:center;color:white;"><div style="font-size:1.2em;font-weight:bold;margin-bottom:6px;">OFFRE SPÉCIALE</div><div style="font-size:0.75em;opacity:0.95;">Profitez de −30% sur tous nos services</div></div><div style="padding:14px;">${[1,2,3].map(i=>`<div style="display:flex;gap:10px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid ${s(4)};"><div style="width:36px;height:36px;background:${s(i)};border-radius:7px;flex-shrink:0;"></div><div><div style="font-size:0.75em;font-weight:600;color:${s(0)};margin-bottom:2px;">Avantage ${i}</div><div style="font-size:0.65em;color:#6b7280;">Description courte du bénéfice</div></div></div>`).join('')}</div><div style="padding:0 14px 14px;"><div style="background:${s(2)};color:white;padding:10px;border-radius:7px;text-align:center;font-weight:600;font-size:0.8em;">👉 Contactez-nous</div></div></div>
+        </div>
+        <div class="preview-card" style="background:white;padding:20px;">
+            <div class="preview-label" style="color:#0f172a;background:#f1f5f9;margin:-20px -20px 16px;border-bottom:1px solid #e2e8f0;">Logo & Identité</div>
+            <div style="display:flex;flex-direction:column;gap:14px;margin-top:4px;"><div style="text-align:center;padding:18px;background:${s(4)};border-radius:10px;"><div style="width:70px;height:70px;background:linear-gradient(135deg,${s(0)},${s(2)});border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:1.4em;">M</div><div style="font-size:0.95em;font-weight:bold;color:${s(0)};">MA MARQUE</div><div style="font-size:0.65em;color:${s(1)};">Mon slogan accrocheur</div></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">${[s(0),s(1),s(2)].map(color=>`<div style="background:${color};padding:14px;border-radius:7px;text-align:center;color:white;"><div style="font-size:1.1em;font-weight:bold;">M</div></div>`).join('')}</div></div>
+        </div>
+        <div class="preview-card" style="background:#000;padding:0;overflow:hidden;">
+            <div class="preview-label">Post Instagram</div>
+            <div style="padding:12px;background:#000;"><div style="background:white;border-radius:10px;overflow:hidden;"><div style="padding:10px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #e5e7eb;"><div style="width:28px;height:28px;background:linear-gradient(135deg,${s(0)},${s(2)});border-radius:50%;"></div><div><div style="font-size:0.7em;font-weight:600;color:#000;">mon_entreprise</div><div style="font-size:0.6em;color:#6b7280;">Il y a 2h</div></div><div style="margin-left:auto;font-size:0.9em;color:#000;">⋯</div></div><div style="background:linear-gradient(135deg,${s(0)},${s(2)});aspect-ratio:1;display:flex;align-items:center;justify-content:center;color:white;padding:20px;text-align:center;max-height:170px;"><div><div style="font-size:1em;font-weight:bold;margin-bottom:8px;">ANNONCE</div><div style="font-size:0.75em;opacity:0.95;">Nouveau produit disponible !</div></div></div><div style="padding:10px;display:flex;gap:12px;font-size:1em;color:#000;"><span>♡</span><span>💬</span><span>⋗</span></div><div style="padding:0 10px 10px;font-size:0.65em;color:#000;"><span style="font-weight:600;">mon_entreprise</span> Découvrez notre nouvelle collection ! 🚀</div></div></div>
+        </div>`;
+}
 
-                <!-- CARTE DE VISITE -->
-                <div class="preview-card" style="background: #0f172a; padding: 25px; display: flex; flex-direction: column; gap: 15px;">
-                    <div class="preview-title">Carte de Visite</div>
-                    <!-- Recto -->
-                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); aspect-ratio: 85/55;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; height: 100%;">
-                            <div style="flex: 1;">
-                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, ${colors[0]}, ${colors[2]}); border-radius: 10px; margin-bottom: 12px;"></div>
-                                <div style="font-size: 0.9em; font-weight: bold; color: ${colors[0]}; margin-bottom: 4px;">Prénom NOM</div>
-                                <div style="font-size: 0.7em; color: ${colors[1]}; margin-bottom: 8px;">Fonction / Métier</div>
-                                <div style="font-size: 0.65em; color: #6b7280; line-height: 1.4;">
-                                    <div>📞 06 12 34 56 78</div>
-                                    <div>✉️ contact@email.fr</div>
-                                </div>
-                            </div>
-                            <div style="width: 2px; background: ${colors[2]}; height: 100%; margin: 0 12px;"></div>
-                            <div style="writing-mode: vertical-rl; font-size: 0.7em; font-weight: 600; color: ${colors[2]};">
-                                ENTREPRISE
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Verso -->
-                    <div style="background: linear-gradient(135deg, ${colors[0]}, ${colors[1]}); padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); aspect-ratio: 85/55; display: flex; align-items: center; justify-content: center; text-align: center; color: white;">
-                        <div>
-                            <div style="font-size: 1.1em; font-weight: bold; margin-bottom: 8px;">LOGO</div>
-                            <div style="width: 40px; height: 2px; background: ${colors[3]}; margin: 0 auto 8px;"></div>
-                            <div style="font-size: 0.7em; opacity: 0.9;">Votre slogan ici</div>
-                        </div>
-                    </div>
-                </div>
+function copyColor(color){
+    navigator.clipboard.writeText(color);
+    const fb=document.getElementById('copyFeedback');
+    fb.textContent='✓ '+color+' copié !';
+    fb.classList.add('show');
+    setTimeout(()=>fb.classList.remove('show'),2000);
+}
 
-                <!-- FLYER A5 -->
-                <div class="preview-card" style="background: #e5e7eb; padding: 0; overflow: hidden;">
-                    <div class="preview-title" style="padding: 15px 20px; background: #0f172a;">Flyer A5</div>
-                    <div style="background: white; margin: 15px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden;">
-                        <!-- Header Flyer -->
-                        <div style="background: linear-gradient(135deg, ${colors[0]}, ${colors[2]}); padding: 25px 20px; text-align: center; color: white;">
-                            <div style="font-size: 1.3em; font-weight: bold; margin-bottom: 8px;">OFFRE SPÉCIALE</div>
-                            <div style="font-size: 0.85em; opacity: 0.95;">Profitez de -30% sur tous nos services</div>
-                        </div>
-                        <!-- Contenu -->
-                        <div style="padding: 20px;">
-                            ${[1,2,3].map(i => `
-                                <div style="display: flex; gap: 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid ${colors[4]};">
-                                    <div style="width: 40px; height: 40px; background: ${colors[i]}; border-radius: 8px; flex-shrink: 0;"></div>
-                                    <div style="flex: 1;">
-                                        <div style="font-size: 0.8em; font-weight: 600; color: ${colors[0]}; margin-bottom: 3px;">Avantage ${i}</div>
-                                        <div style="font-size: 0.7em; color: #6b7280;">Description courte du bénéfice</div>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <!-- CTA -->
-                        <div style="padding: 0 20px 20px;">
-                            <div style="background: ${colors[2]}; color: white; padding: 12px; border-radius: 8px; text-align: center; font-weight: 600; font-size: 0.85em;">
-                                👉 Contactez-nous maintenant
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- LOGO MOCKUP -->
-                <div class="preview-card" style="background: white; padding: 25px;">
-                    <div class="preview-title" style="color: #0f172a;">Logo & Identité</div>
-                    <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
-                        <!-- Logo principal -->
-                        <div style="text-align: center; padding: 20px; background: ${colors[4]}; border-radius: 12px;">
-                            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, ${colors[0]}, ${colors[2]}); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.5em;">
-                                M
-                            </div>
-                            <div style="font-size: 1em; font-weight: bold; color: ${colors[0]};">MA MARQUE</div>
-                            <div style="font-size: 0.7em; color: ${colors[1]};">Mon slogan accrocheur</div>
-                        </div>
-                        <!-- Variantes -->
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-                            ${[colors[0], colors[1], colors[2]].map(color => `
-                                <div style="background: ${color}; padding: 15px; border-radius: 8px; text-align: center; color: white;">
-                                    <div style="font-size: 1.2em; font-weight: bold;">M</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- POST RÉSEAUX SOCIAUX -->
-                <div class="preview-card" style="background: #000; padding: 0; overflow: hidden;">
-                    <div class="preview-title" style="padding: 15px 20px; background: #0f172a; color: white;">Post Instagram</div>
-                    <div style="background: #000; padding: 15px;">
-                        <!-- Post Instagram -->
-                        <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
-                            <!-- Header post -->
-                            <div style="padding: 12px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e5e7eb;">
-                                <div style="width: 32px; height: 32px; background: linear-gradient(135deg, ${colors[0]}, ${colors[2]}); border-radius: 50%;"></div>
-                                <div style="flex: 1;">
-                                    <div style="font-size: 0.75em; font-weight: 600; color: #000;">mon_entreprise</div>
-                                    <div style="font-size: 0.65em; color: #6b7280;">Il y a 2h</div>
-                                </div>
-                                <div style="font-size: 1em; color: #000;">⋯</div>
-                            </div>
-                            <!-- Image post -->
-                            <div style="background: linear-gradient(135deg, ${colors[0]}, ${colors[2]}); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; color: white; padding: 30px; text-align: center;">
-                                <div>
-                                    <div style="font-size: 1.2em; font-weight: bold; margin-bottom: 10px;">ANNONCE</div>
-                                    <div style="font-size: 0.8em; opacity: 0.95;">Nouveau produit disponible !</div>
-                                </div>
-                            </div>
-                            <!-- Actions -->
-                            <div style="padding: 12px; display: flex; gap: 15px; font-size: 1.2em; color: #000;">
-                                <span>♡</span>
-                                <span>💬</span>
-                                <span>⋗</span>
-                            </div>
-                            <!-- Caption -->
-                            <div style="padding: 0 12px 12px; font-size: 0.7em; color: #000;">
-                                <span style="font-weight: 600;">mon_entreprise</span> Découvrez notre nouvelle collection ! 🚀 #nouveauté
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function copyColor(color) {
-            navigator.clipboard.writeText(color);
-            const feedback = document.getElementById('copyFeedback');
-            feedback.classList.add('show');
-            setTimeout(() => feedback.classList.remove('show'), 2000);
-        }
-
-        // Init
-        updateContextInfo();
-    </script>
+updateContextInfo();
+initColorInputs();
+</script>
 </body>
 </html>
