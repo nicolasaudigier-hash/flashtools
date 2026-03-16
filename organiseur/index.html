@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Organiseur Pro - FlashTools</title>
+  <meta name="description" content="Organisez tous vos fichiers en quelques clics. Gratuit et sans inscription.">
+  
+  <!-- React & Babel -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { overflow-x: hidden; }
+    body { font-family: 'Nunito', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #1a2942 100%); min-height: 100vh; -webkit-tap-highlight-color: transparent; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; } }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+    .tooltip { position: relative; }
+    .tooltip:hover::after {
+      content: attr(data-tip);
+      position: absolute; bottom: -32px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.9); color: white; padding: 6px 10px;
+      border-radius: 6px; font-size: 11px; white-space: nowrap; z-index: 100;
+    }
+    .checkbox-container { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+    .checkbox-container input { width: 18px; height: 18px; cursor: pointer; accent-color: #34d399; }
+    #loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(145deg, #0a1628 0%, #1a2942 100%); color: #60a5fa; font-size: 18px; font-family: 'Nunito', sans-serif; }
+    
+    /* Mobile touch optimizations */
+    @media (max-width: 768px) {
+      button, .clickable { min-height: 44px; min-width: 44px; }
+      input { font-size: 16px !important; } /* Prevent zoom on iOS */
+    }
+  </style>
+</head>
+<body>
+  <div id="loading">Chargement...</div>
+  <div id="root"></div>
+  
+  <script type="text/babel" data-presets="react">
+    const { useState, useRef, useEffect } = React;
+
+    // CONFIGURATION - Limites augmentées
+    const CONFIG = {
+      MAX_FILES: 200,
+      MAX_FOLDERS: 12,
+      MAX_PDF_PAGES: 50,
+      PDF_RENDER_SCALE: 2,
+      MAX_FILE_SIZE: 100 * 1024 * 1024, // 100 Mo par fichier
+      MAX_TOTAL_SIZE: 500 * 1024 * 1024, // 500 Mo total
+    };
+
+    // Types de fichiers supportés avec leurs icônes
+    const FILE_TYPES = {
+      // Images
+      'image/jpeg': { icon: '🖼️', category: 'image' },
+      'image/png': { icon: '🖼️', category: 'image' },
+      'image/webp': { icon: '🖼️', category: 'image' },
+      'image/gif': { icon: '🖼️', category: 'image' },
+      'image/svg+xml': { icon: '🖼️', category: 'image' },
+      'image/bmp': { icon: '🖼️', category: 'image' },
+      // Audio
+      'audio/mpeg': { icon: '🎵', category: 'audio' },
+      'audio/mp3': { icon: '🎵', category: 'audio' },
+      'audio/ogg': { icon: '🎵', category: 'audio' },
+      'audio/wav': { icon: '🎵', category: 'audio' },
+      'audio/flac': { icon: '🎵', category: 'audio' },
+      'audio/aac': { icon: '🎵', category: 'audio' },
+      // Video
+      'video/mp4': { icon: '🎬', category: 'video' },
+      'video/webm': { icon: '🎬', category: 'video' },
+      'video/quicktime': { icon: '🎬', category: 'video' },
+      'video/x-msvideo': { icon: '🎬', category: 'video' },
+      // Documents
+      'application/pdf': { icon: '📄', category: 'pdf' },
+      'application/msword': { icon: '📝', category: 'document' },
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': { icon: '📝', category: 'document' },
+      'application/vnd.ms-excel': { icon: '📊', category: 'document' },
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': { icon: '📊', category: 'document' },
+      'application/vnd.ms-powerpoint': { icon: '📽️', category: 'document' },
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation': { icon: '📽️', category: 'document' },
+      'text/plain': { icon: '📃', category: 'document' },
+      'text/csv': { icon: '📊', category: 'document' },
+      // Archives
+      'application/zip': { icon: '📦', category: 'archive' },
+      'application/x-rar-compressed': { icon: '📦', category: 'archive' },
+      'application/x-7z-compressed': { icon: '📦', category: 'archive' },
+      // Autres
+      'application/json': { icon: '⚙️', category: 'code' },
+      'text/html': { icon: '🌐', category: 'code' },
+      'text/css': { icon: '🎨', category: 'code' },
+      'text/javascript': { icon: '⚙️', category: 'code' },
+      'application/javascript': { icon: '⚙️', category: 'code' },
+    };
+
+    function App() {
+      const [screen, setScreen] = useState('onboarding');
+      const [folders, setFolders] = useState([{ id: 'inbox', name: 'Réception', locked: true, files: [] }]);
+      const [trash, setTrash] = useState([]);
+      const [dragItem, setDragItem] = useState(null);
+      const [dragSource, setDragSource] = useState(null);
+      const [dragOverFolder, setDragOverFolder] = useState(null);
+      const [dragOverIndex, setDragOverIndex] = useState(null);
+      const [processing, setProcessing] = useState(false);
+      const [processingMsg, setProcessingMsg] = useState('');
+      const [alerts, setAlerts] = useState([]);
+      const [newFolderName, setNewFolderName] = useState('');
+      const [showFolderInput, setShowFolderInput] = useState(false);
+      const [editingFolder, setEditingFolder] = useState(null);
+      const [editingFile, setEditingFile] = useState(null);
+      const [previewFile, setPreviewFile] = useState(null);
+      const [isMobile, setIsMobile] = useState(false);
+      const [numberFiles, setNumberFiles] = useState(true);
+      const fileInputRef = useRef(null);
+
+      useEffect(() => {
+        document.getElementById('loading').style.display = 'none';
+        const check = () => setIsMobile(window.innerWidth <= 768);
+        check(); window.addEventListener('resize', check);
+        return () => window.removeEventListener('resize', check);
+      }, []);
+
+      const allFiles = folders.flatMap(f => f.files);
+      const totalFiles = allFiles.length;
+      const totalSize = allFiles.reduce((a, f) => a + (f.size || 0), 0);
+      const usagePercent = Math.min(100, (totalFiles / CONFIG.MAX_FILES) * 100);
+
+      const showAlert = (msg, type = 'info') => {
+        const id = Date.now();
+        setAlerts(p => [...p, { id, msg, type }]);
+        setTimeout(() => setAlerts(p => p.filter(a => a.id !== id)), 6000);
+      };
+
+      const formatSize = (b) => b < 1024 ? b + ' o' : b < 1048576 ? (b/1024).toFixed(1) + ' Ko' : (b/1048576).toFixed(1) + ' Mo';
+      
+      const getFileInfo = (type) => FILE_TYPES[type] || { icon: '📎', category: 'other' };
+      
+      const getFolderIcon = (files) => {
+        if (!files.length) return '📁';
+        const cats = [...new Set(files.map(f => f.category))];
+        if (cats.length === 1) {
+          const icons = { image: '🖼️', audio: '🎵', video: '🎬', pdf: '📄', document: '📝', archive: '📦', code: '⚙️' };
+          return icons[cats[0]] || '📁';
+        }
+        return '📁';
+      };
+      
+      const getUsageColor = () => usagePercent < 60 ? '#34d399' : usagePercent < 85 ? '#fbbf24' : '#f97316';
+      const genId = () => `f-${Date.now()}-${Math.random().toString(36).substr(2,9)}`;
+      const getExtension = (name) => { const p = name.split('.'); return p.length > 1 ? '.' + p.pop().toLowerCase() : ''; };
+      const getNameWithoutExt = (name) => { const e = getExtension(name); return e ? name.slice(0, -e.length) : name; };
+
+      const loadScript = (src) => new Promise((res, rej) => {
+        if (document.querySelector(`script[src="${src}"]`)) { res(); return; }
+        const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s);
+      });
+
+      const processFiles = async (fileList) => {
+        const files = Array.from(fileList);
+        setProcessing(true);
+        const newFiles = [];
+        
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          setProcessingMsg(`${i+1}/${files.length}: ${file.name}`);
+          
+          // Vérifications
+          if (file.size > CONFIG.MAX_FILE_SIZE) { 
+            showAlert(`Fichier trop gros (max 100Mo): ${file.name}`, 'error'); 
+            continue; 
+          }
+          if (totalSize + file.size > CONFIG.MAX_TOTAL_SIZE) {
+            showAlert('Limite totale atteinte (500Mo)', 'error');
+            break;
+          }
+          if (totalFiles + newFiles.length >= CONFIG.MAX_FILES) { 
+            showAlert('Limite de fichiers atteinte (200)', 'error'); 
+            break; 
+          }
+          
+          const fileInfo = getFileInfo(file.type);
+          const category = fileInfo.category;
+          const icon = fileInfo.icon;
+          
+          // Images - génère preview
+          if (category === 'image') {
+            try {
+              const preview = await new Promise(r => { 
+                const fr = new FileReader(); 
+                fr.onload = e => r(e.target.result); 
+                fr.onerror = () => r(null);
+                fr.readAsDataURL(file); 
+              });
+              newFiles.push({ id: genId(), name: file.name, type: file.type, category, icon, size: file.size, preview, file });
+            } catch {
+              newFiles.push({ id: genId(), name: file.name, type: file.type, category, icon, size: file.size, file });
+            }
+          }
+          // Audio - récupère durée
+          else if (category === 'audio') {
+            const duration = await new Promise(r => {
+              try {
+                const url = URL.createObjectURL(file);
+                const a = new Audio(); a.preload = 'metadata';
+                a.onloadedmetadata = () => { URL.revokeObjectURL(url); r(a.duration && isFinite(a.duration) ? `${Math.floor(a.duration/60)}:${String(Math.floor(a.duration%60)).padStart(2,'0')}` : null); };
+                a.onerror = () => { URL.revokeObjectURL(url); r(null); }; 
+                a.src = url;
+              } catch { r(null); }
+            });
+            newFiles.push({ id: genId(), name: file.name, type: file.type, category, icon, size: file.size, duration, file });
+          }
+          // PDF - extrait pages
+          else if (category === 'pdf') {
+            if (!window.pdfjsLib) {
+              await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+              window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            }
+            try {
+              const pdf = await window.pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+              const n = Math.min(pdf.numPages, CONFIG.MAX_PDF_PAGES);
+              for (let p = 1; p <= n; p++) {
+                setProcessingMsg(`PDF ${p}/${n}`);
+                const page = await pdf.getPage(p);
+                const vp = page.getViewport({ scale: 0.5 });
+                const canvas = document.createElement('canvas'); canvas.width = vp.width; canvas.height = vp.height;
+                await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+                newFiles.push({ id: genId(), name: `${file.name.replace('.pdf','')} - Page ${p}`, type: 'application/pdf', category: 'pdf', icon: '📄', size: Math.floor(file.size/n), pageNum: p, totalPages: pdf.numPages, preview: canvas.toDataURL('image/jpeg', 0.7), originalPdf: file.name, file });
+              }
+            } catch { 
+              newFiles.push({ id: genId(), name: file.name, type: 'application/pdf', category: 'pdf', icon: '📄', size: file.size, file }); 
+            }
+          }
+          // Autres fichiers
+          else {
+            newFiles.push({ id: genId(), name: file.name, type: file.type, category, icon, size: file.size, file });
+          }
+        }
+        
+        if (newFiles.length) {
+          setFolders(p => p.map(f => f.id === 'inbox' ? { ...f, files: [...newFiles, ...f.files] } : f));
+          showAlert(`${newFiles.length} fichier(s) ajouté(s)`, 'success');
+        }
+        setProcessing(false); setProcessingMsg('');
+      };
+
+      // Drag & Drop handlers
+      const onDragStart = (e, item, folderId, index) => { e.dataTransfer.effectAllowed = 'move'; setDragItem(item); setDragSource({ folderId, index }); };
+      const onDragEnd = () => { setDragItem(null); setDragSource(null); setDragOverFolder(null); setDragOverIndex(null); };
+      const onDragOverCard = (e, folderId, index) => {
+        e.preventDefault(); e.stopPropagation();
+        const rect = e.currentTarget.getBoundingClientRect();
+        const insertIndex = e.clientX < rect.left + rect.width / 2 ? index : index + 1;
+        if (dragOverFolder !== folderId || dragOverIndex !== insertIndex) { setDragOverFolder(folderId); setDragOverIndex(insertIndex); }
+      };
+      const onDropFolder = (e, targetId) => {
+        e.preventDefault(); e.stopPropagation();
+        if (!dragItem || !dragSource) return;
+        setFolders(prev => {
+          const next = prev.map(f => ({ ...f, files: [...f.files] }));
+          const src = next.find(f => f.id === dragSource.folderId), tgt = next.find(f => f.id === targetId);
+          if (!src || !tgt) return prev;
+          src.files.splice(dragSource.index, 1);
+          let idx = dragOverIndex ?? tgt.files.length;
+          if (dragSource.folderId === targetId && dragSource.index < idx) idx = Math.max(0, idx - 1);
+          tgt.files.splice(idx, 0, dragItem);
+          return next;
+        });
+        onDragEnd();
+      };
+      const onDropTrash = (e) => {
+        e.preventDefault(); if (!dragItem || !dragSource) return;
+        setFolders(p => p.map(f => f.id === dragSource.folderId ? { ...f, files: f.files.filter((_, i) => i !== dragSource.index) } : f));
+        setTrash(p => [...p, dragItem]); onDragEnd();
+      };
+
+      // Actions
+      const createFolder = () => {
+        if (!newFolderName.trim()) return;
+        if (folders.length >= CONFIG.MAX_FOLDERS) { showAlert(`Max ${CONFIG.MAX_FOLDERS} dossiers`, 'error'); return; }
+        setFolders(p => [...p, { id: genId(), name: newFolderName.trim(), locked: false, files: [] }]);
+        setNewFolderName(''); setShowFolderInput(false); showAlert('Dossier créé', 'success');
+      };
+      const deleteFolder = (id) => {
+        const folder = folders.find(f => f.id === id);
+        if (!folder || folder.locked) return;
+        setFolders(prev => prev.filter(f => f.id !== id).map(f => f.id === 'inbox' ? { ...f, files: [...folder.files, ...f.files] } : f));
+        showAlert('Fichiers déplacés', 'info');
+      };
+      const renameFolder = (id, name) => { if (!name.trim()) return; setFolders(p => p.map(f => f.id === id ? { ...f, name: name.trim() } : f)); setEditingFolder(null); };
+      const clearInbox = () => {
+        const inbox = folders.find(f => f.id === 'inbox');
+        if (!inbox?.files.length) return;
+        setTrash(p => [...p, ...inbox.files]);
+        setFolders(p => p.map(f => f.id === 'inbox' ? { ...f, files: [] } : f));
+        showAlert('Réception vidée', 'info');
+      };
+      const resetProject = () => { setFolders([{ id: 'inbox', name: 'Réception', locked: true, files: [] }]); setTrash([]); setScreen('app'); showAlert('Nouveau projet', 'success'); };
+      const renameFile = (folderId, fileId, name) => { if (!name.trim()) return; setFolders(p => p.map(f => f.id === folderId ? { ...f, files: f.files.map(file => file.id === fileId ? { ...file, name: name.trim() } : file) } : f)); setEditingFile(null); };
+      const restoreFile = (item) => { setTrash(p => p.filter(f => f.id !== item.id)); setFolders(p => p.map(f => f.id === 'inbox' ? { ...f, files: [item, ...f.files] } : f)); };
+
+      // Export ZIP
+      const exportZip = async (singleFolderId = null) => {
+        const toExport = singleFolderId ? folders.filter(f => f.id === singleFolderId && f.files.length) : folders.filter(f => f.files.length);
+        if (!toExport.length) { showAlert('Aucun fichier', 'info'); return; }
+        setProcessing(true); setProcessingMsg('Préparation...');
+        try {
+          await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+          await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+          if (!window.pdfjsLib) {
+            await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+          }
+          const zip = new window.JSZip();
+          for (const folder of toExport) {
+            setProcessingMsg(`Dossier: ${folder.name}`);
+            const zf = singleFolderId ? zip : zip.folder(folder.name.replace(/[\\/:*?"<>|]/g, '_'));
+            const pdfGroups = {}, others = [];
+            folder.files.forEach(f => f.originalPdf && f.pageNum ? (pdfGroups[f.originalPdf] = pdfGroups[f.originalPdf] || []).push(f) : others.push(f));
+            let idx = 1;
+            for (const [name, pages] of Object.entries(pdfGroups)) {
+              setProcessingMsg(`PDF: ${name}`);
+              try {
+                const pdfDoc = await window.pdfjsLib.getDocument({ data: await pages[0].file.arrayBuffer() }).promise;
+                const { jsPDF } = window.jspdf; let doc = null;
+                for (let i = 0; i < pages.length; i++) {
+                  const pg = await pdfDoc.getPage(pages[i].pageNum);
+                  const vp = pg.getViewport({ scale: 2 });
+                  const canvas = document.createElement('canvas'); canvas.width = vp.width; canvas.height = vp.height;
+                  const ctx = canvas.getContext('2d'); ctx.fillStyle = 'white'; ctx.fillRect(0,0,vp.width,vp.height);
+                  await pg.render({ canvasContext: ctx, viewport: vp }).promise;
+                  const img = canvas.toDataURL('image/png');
+                  const w = vp.width/2*72/96, h = vp.height/2*72/96;
+                  if (!doc) doc = new jsPDF({ orientation: w > h ? 'l' : 'p', unit: 'pt', format: [w,h] });
+                  else doc.addPage([w,h], w > h ? 'l' : 'p');
+                  doc.addImage(img, 'PNG', 0, 0, w, h);
+                }
+                let fn = name.replace(/[\\/:*?"<>|]/g, '_'); if (!fn.endsWith('.pdf')) fn += '.pdf';
+                if (numberFiles) fn = `${String(idx++).padStart(2,'0')} - ${fn}`;
+                zf.file(fn, doc.output('blob'));
+              } catch(e) { console.error(e); }
+            }
+            for (const f of others) {
+              if (!f.file) continue;
+              const ext = getExtension(f.file.name);
+              let fn = getNameWithoutExt(f.name).replace(/[\\/:*?"<>|]/g, '_') + ext;
+              if (numberFiles) fn = `${String(idx++).padStart(2,'0')} - ${fn}`;
+              zf.file(fn, await f.file.arrayBuffer());
+            }
+          }
+          setProcessingMsg('Compression...');
+          const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = singleFolderId ? `${toExport[0].name}.zip` : `fichiers-${new Date().toISOString().slice(0,10)}.zip`;
+          a.click(); URL.revokeObjectURL(a.href);
+          showAlert('ZIP téléchargé ! Extrayez pour voir les miniatures.', 'success');
+        } catch(e) { console.error(e); showAlert('Erreur export', 'error'); }
+        setProcessing(false); setProcessingMsg('');
+      };
+
+      const bg = 'linear-gradient(145deg, #0a1628 0%, #1a2942 100%)';
+      const btnStyle = { padding: isMobile ? '12px 14px' : '10px 16px', borderRadius: 10, border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit' };
+
+      // ==================
+      // ONBOARDING - Aéré
+      // ==================
+      if (screen === 'onboarding') {
+        return (
+          <div style={{ minHeight: '100vh', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: isMobile ? 16 : 24, fontFamily: "'Nunito', sans-serif", color: '#e2e8f0' }}>
+            <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 24, padding: isMobile ? 28 : 40, maxWidth: 480, width: '100%', border: '1px solid rgba(255,255,255,0.06)' }}>
+              
+              {/* Logo */}
+              <h1 style={{ fontSize: isMobile ? 28 : 36, fontWeight: 800, textAlign: 'center', marginBottom: 20, background: 'linear-gradient(135deg, #60a5fa, #34d399)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                Organiseur Pro
+              </h1>
+              
+              {/* Accroche */}
+              <p style={{ fontSize: isMobile ? 15 : 17, textAlign: 'center', color: '#94a3b8', marginBottom: 32, lineHeight: 1.6 }}>
+                Classez et réorganisez <b style={{ color: '#f1f5f9' }}>tous vos fichiers</b><br/>
+                puis téléchargez en un clic.
+              </p>
+
+              {/* Types de fichiers */}
+              <div style={{ display: 'flex', justifyContent: 'center', gap: isMobile ? 16 : 24, marginBottom: 32, flexWrap: 'wrap' }}>
+                {[
+                  { icon: '🖼️', label: 'Images' },
+                  { icon: '📄', label: 'PDF' },
+                  { icon: '🎵', label: 'Audio' },
+                  { icon: '🎬', label: 'Vidéo' },
+                  { icon: '📝', label: 'Docs' },
+                  { icon: '📦', label: 'ZIP' },
+                ].map((t, i) => (
+                  <div key={i} style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: 28, marginBottom: 4 }}>{t.icon}</div>
+                    <div style={{ fontSize: 11, color: '#64748b' }}>{t.label}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Gestes */}
+              <div style={{ background: 'rgba(52,211,153,0.08)', borderRadius: 16, padding: isMobile ? 16 : 20, marginBottom: 24 }}>
+                {[
+                  ['👆', 'Glisser', 'pour déplacer'],
+                  ['🗑️', 'Corbeille', 'pour supprimer'],
+                  ['👆👆', 'Double-clic', 'pour agrandir'],
+                ].map(([icon, action, desc], i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: i < 2 ? 10 : 0 }}>
+                    <span style={{ fontSize: 20, width: 32, textAlign: 'center' }}>{icon}</span>
+                    <span style={{ color: '#34d399', fontWeight: 700, fontSize: 14 }}>{action}</span>
+                    <span style={{ color: '#94a3b8', fontSize: 13 }}>{desc}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Limites */}
+              <div style={{ textAlign: 'center', marginBottom: 28, fontSize: 12, color: '#64748b' }}>
+                <span style={{ color: '#94a3b8' }}>200 fichiers</span> • <span style={{ color: '#94a3b8' }}>100 Mo/fichier</span> • <span style={{ color: '#94a3b8' }}>500 Mo total</span>
+              </div>
+
+              {/* CTA */}
+              <button 
+                onClick={() => setScreen('app')} 
+                style={{ 
+                  width: '100%', 
+                  padding: isMobile ? 16 : 18, 
+                  fontSize: 16, 
+                  fontWeight: 700, 
+                  background: 'linear-gradient(135deg, #3b82f6, #10b981)', 
+                  border: 'none', 
+                  borderRadius: 14, 
+                  color: 'white', 
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 20px rgba(59, 130, 246, 0.3)'
+                }}
+              >
+                Commencer →
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      // HELP
+      if (screen === 'help') {
+        return (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 }}>
+            <div style={{ background: '#1a2942', borderRadius: 16, padding: 24, maxWidth: 400, width: '100%', position: 'relative', color: '#e2e8f0' }}>
+              <button onClick={() => setScreen('app')} style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 8, width: 36, height: 36, color: '#94a3b8', cursor: 'pointer', fontSize: 16 }}>✕</button>
+              <h2 style={{ fontSize: 18, marginBottom: 20 }}>💡 Aide</h2>
+              <div style={{ fontSize: 13, lineHeight: 2, color: '#cbd5e1' }}>
+                <p><b style={{ color: '#60a5fa' }}>Tous types de fichiers</b> acceptés</p>
+                <p><b style={{ color: '#34d399' }}>Glisser</b> = déplacer</p>
+                <p><b style={{ color: '#34d399' }}>Double-clic</b> = agrandir (images)</p>
+                <p><b style={{ color: '#fb923c' }}>Numérotation</b> = préserve l'ordre</p>
+              </div>
+              <div style={{ marginTop: 16, padding: 12, background: 'rgba(96,165,250,0.1)', borderRadius: 10, fontSize: 12, color: '#94a3b8' }}>
+                <b style={{ color: '#60a5fa' }}>Limites :</b> 200 fichiers • 100 Mo/fichier • 500 Mo total
+              </div>
+              <button onClick={() => setScreen('app')} style={{ width: '100%', marginTop: 20, padding: 14, background: '#3b82f6', border: 'none', borderRadius: 10, color: 'white', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>OK</button>
+            </div>
+          </div>
+        );
+      }
+
+      // RESET
+      if (screen === 'reset') {
+        return (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 }}>
+            <div style={{ background: '#1a2942', borderRadius: 16, padding: 28, maxWidth: 320, width: '100%', textAlign: 'center', color: '#e2e8f0' }}>
+              <div style={{ fontSize: 40, marginBottom: 16 }}>🔄</div>
+              <h3 style={{ marginBottom: 10, fontSize: 18 }}>Nouveau projet ?</h3>
+              <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 24 }}>Les fichiers non exportés seront perdus.</p>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <button onClick={() => setScreen('app')} style={{ flex: 1, padding: 14, background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 10, color: '#94a3b8', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>Annuler</button>
+                <button onClick={resetProject} style={{ flex: 1, padding: 14, background: '#3b82f6', border: 'none', borderRadius: 10, color: 'white', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>OK</button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // PREVIEW
+      if (previewFile) {
+        return (
+          <div onClick={() => setPreviewFile(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 998, padding: 20, cursor: 'pointer' }}>
+            {previewFile.preview && <img src={previewFile.preview} alt="" style={{ maxWidth: '100%', maxHeight: '90vh', borderRadius: 8 }} />}
+            <div style={{ position: 'absolute', bottom: 20, color: '#94a3b8', fontSize: 13 }}>{previewFile.name}</div>
+          </div>
+        );
+      }
+
+      // ==================
+      // MAIN APP
+      // ==================
+      return (
+        <div style={{ minHeight: '100vh', background: bg, fontFamily: "'Nunito', sans-serif", color: '#e2e8f0', padding: isMobile ? 12 : 20, paddingBottom: 80 }}
+             onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (e.dataTransfer.files?.length) processFiles(e.dataTransfer.files); }}>
+          
+          {/* Alerts */}
+          <div style={{ position: 'fixed', top: 12, left: '50%', transform: 'translateX(-50%)', zIndex: 1000, display: 'flex', flexDirection: 'column', gap: 8, maxWidth: '90%', width: 360 }}>
+            {alerts.map(a => (
+              <div key={a.id} style={{ padding: '12px 18px', borderRadius: 12, background: a.type === 'success' ? '#34d399' : a.type === 'error' ? '#f87171' : '#60a5fa', color: a.type === 'success' ? '#064e3b' : a.type === 'error' ? '#7f1d1d' : '#1e3a5f', fontWeight: 600, fontSize: 13, textAlign: 'center', animation: 'fadeIn 0.3s' }}>{a.msg}</div>
+            ))}
+          </div>
+
+          {/* Processing */}
+          {processing && (
+            <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999 }}>
+              <div style={{ background: '#1a2942', padding: 36, borderRadius: 20, textAlign: 'center', width: 300 }}>
+                <div style={{ fontSize: 36, marginBottom: 16, animation: 'pulse 1s infinite' }}>⏳</div>
+                <div style={{ fontSize: 14, color: '#f1f5f9' }}>{processingMsg}</div>
+              </div>
+            </div>
+          )}
+
+          {/* Header */}
+          <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? 16 : 24, flexWrap: 'wrap', gap: 12 }}>
+            <h1 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 800, background: 'linear-gradient(135deg, #60a5fa, #34d399)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Organiseur Pro</h1>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+              <button onClick={() => setScreen('help')} style={{ ...btnStyle, background: 'rgba(255,255,255,0.08)', color: '#94a3b8' }}>💡</button>
+              <button onClick={() => setScreen('reset')} style={{ ...btnStyle, background: 'rgba(255,255,255,0.08)', color: '#94a3b8' }}>🔄</button>
+              <button onClick={() => exportZip()} disabled={!totalFiles} style={{ ...btnStyle, background: totalFiles ? 'linear-gradient(135deg, #3b82f6, #10b981)' : 'rgba(255,255,255,0.05)', color: 'white', opacity: totalFiles ? 1 : 0.5 }}>📦 {!isMobile && 'Télécharger'}</button>
+            </div>
+          </header>
+
+          {/* Import Zone */}
+          <div onClick={() => fileInputRef.current?.click()} style={{ padding: isMobile ? 24 : 32, background: 'rgba(59,130,246,0.06)', border: '2px dashed rgba(59,130,246,0.3)', borderRadius: 16, textAlign: 'center', cursor: 'pointer', marginBottom: isMobile ? 16 : 24, transition: 'all 0.2s' }}>
+            <input ref={fileInputRef} type="file" multiple onChange={e => { if (e.target.files?.length) processFiles(e.target.files); e.target.value = ''; }} style={{ display: 'none' }} />
+            <div style={{ fontSize: 32, marginBottom: 8 }}>📥</div>
+            <div style={{ fontSize: isMobile ? 14 : 16, fontWeight: 700, color: '#f1f5f9' }}>{isMobile ? 'Appuyez pour importer' : 'Glissez ou cliquez pour importer'}</div>
+            <div style={{ fontSize: 12, color: '#64748b', marginTop: 6 }}>Tous types de fichiers acceptés</div>
+          </div>
+
+          {/* Actions */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+            {showFolderInput ? (
+              <div style={{ display: 'flex', gap: 8, flex: 1, minWidth: 200 }}>
+                <input type="text" value={newFolderName} onChange={e => setNewFolderName(e.target.value)} onKeyPress={e => e.key === 'Enter' && createFolder()} placeholder="Nom du dossier" autoFocus style={{ flex: 1, padding: '12px 14px', borderRadius: 10, border: '2px solid #34d399', background: 'rgba(255,255,255,0.05)', color: '#f1f5f9', outline: 'none', fontSize: 14, fontFamily: 'inherit' }} />
+                <button onClick={createFolder} style={{ ...btnStyle, background: '#10b981', color: 'white' }}>✓</button>
+                <button onClick={() => { setShowFolderInput(false); setNewFolderName(''); }} style={{ ...btnStyle, background: 'rgba(255,255,255,0.1)', color: '#94a3b8' }}>✕</button>
+              </div>
+            ) : (
+              <button onClick={() => setShowFolderInput(true)} disabled={folders.length >= CONFIG.MAX_FOLDERS} style={{ ...btnStyle, background: folders.length >= CONFIG.MAX_FOLDERS ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg, #10b981, #34d399)', color: folders.length >= CONFIG.MAX_FOLDERS ? '#475569' : 'white', opacity: folders.length >= CONFIG.MAX_FOLDERS ? 0.5 : 1 }}>➕ Dossier</button>
+            )}
+            {folders.find(f => f.id === 'inbox')?.files.length > 0 && <button onClick={clearInbox} style={{ ...btnStyle, background: 'rgba(255,255,255,0.06)', color: '#94a3b8' }}>🧹</button>}
+            <label className="checkbox-container" style={{ marginLeft: isMobile ? 0 : 'auto', marginRight: 8, fontSize: 13, color: '#94a3b8' }}>
+              <input type="checkbox" checked={numberFiles} onChange={e => setNumberFiles(e.target.checked)} />
+              <span>Numéroter</span>
+            </label>
+            <div onDragOver={e => { e.preventDefault(); setDragOverFolder('trash'); }} onDragLeave={() => setDragOverFolder(null)} onDrop={onDropTrash} style={{ padding: '12px 16px', background: dragOverFolder === 'trash' ? 'rgba(239,68,68,0.3)' : 'rgba(239,68,68,0.1)', border: `2px dashed ${dragOverFolder === 'trash' ? '#ef4444' : 'rgba(239,68,68,0.3)'}`, borderRadius: 12, color: '#f87171', fontSize: 13, fontWeight: 600, transition: 'all 0.2s' }}>🗑️ {trash.length > 0 && `(${trash.length})`}</div>
+          </div>
+
+          {/* Welcome */}
+          {folders.length === 1 && !folders[0].files.length && (
+            <div style={{ padding: 28, background: 'rgba(52,211,153,0.08)', border: '2px dashed rgba(52,211,153,0.3)', borderRadius: 16, textAlign: 'center', marginBottom: 20 }}>
+              <div style={{ fontSize: 28, marginBottom: 10 }}>👋</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#34d399' }}>Créez un dossier pour commencer</div>
+            </div>
+          )}
+
+          {/* Folders */}
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))', gap: isMobile ? 12 : 20, marginBottom: 20 }}>
+            {folders.map(folder => {
+              const isOver = dragOverFolder === folder.id && dragItem;
+              return (
+                <div key={folder.id} onDragOver={e => { e.preventDefault(); setDragOverFolder(folder.id); setDragOverIndex(folder.files.length); }} onDrop={e => onDropFolder(e, folder.id)} style={{ background: isOver ? 'rgba(52,211,153,0.1)' : 'rgba(255,255,255,0.02)', borderRadius: 16, border: `2px solid ${isOver ? '#34d399' : 'rgba(255,255,255,0.06)'}`, padding: isMobile ? 14 : 18, minHeight: isMobile ? 160 : 200, transition: 'all 0.2s' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, paddingBottom: 10, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span style={{ fontSize: 18 }}>{folder.locked ? '📥' : getFolderIcon(folder.files)}</span>
+                      {editingFolder === folder.id ? (
+                        <input type="text" defaultValue={folder.name} autoFocus onBlur={e => renameFolder(folder.id, e.target.value)} onKeyPress={e => e.key === 'Enter' && renameFolder(folder.id, e.target.value)} style={{ padding: '6px 10px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, color: '#f1f5f9', fontSize: 14, fontWeight: 600, outline: 'none', width: 120, fontFamily: 'inherit' }} />
+                      ) : (
+                        <span style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9', cursor: folder.locked ? 'default' : 'pointer' }} onDoubleClick={() => !folder.locked && setEditingFolder(folder.id)}>{folder.name}</span>
+                      )}
+                      <span style={{ background: 'rgba(96,165,250,0.15)', padding: '3px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700, color: '#60a5fa' }}>{folder.files.length}</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      {folder.files.length > 0 && <button onClick={e => { e.stopPropagation(); exportZip(folder.id); }} style={{ padding: '8px 12px', background: 'linear-gradient(135deg, #3b82f6, #10b981)', border: 'none', borderRadius: 8, color: 'white', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>📥</button>}
+                      {!folder.locked && <button onClick={() => deleteFolder(folder.id)} style={{ padding: '8px 10px', background: 'rgba(239,68,68,0.15)', border: 'none', borderRadius: 8, color: '#f87171', cursor: 'pointer', fontSize: 14 }}>✕</button>}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, minHeight: 80, alignContent: 'flex-start', overflowY: 'auto', maxHeight: isMobile ? 220 : 300 }}>
+                    {isOver && dragOverIndex === 0 && <div style={{ width: 4, height: isMobile ? 110 : 140, background: 'linear-gradient(180deg, #34d399, #10b981)', borderRadius: 3, boxShadow: '0 0 14px rgba(52,211,153,0.6)', flexShrink: 0 }} />}
+                    {!folder.files.length && !isOver ? (
+                      <div style={{ width: '100%', textAlign: 'center', padding: 20, color: '#475569', fontSize: 13 }}>{folder.id === 'inbox' ? '📥 Importez des fichiers' : '📁 Glissez des fichiers ici'}</div>
+                    ) : folder.files.map((file, idx) => {
+                      const showAfter = isOver && dragOverIndex === idx + 1 && dragItem?.id !== file.id;
+                      const hasPreview = file.preview && file.category === 'image';
+                      const cardW = isMobile ? 90 : 120;
+                      const previewH = isMobile ? 70 : 90;
+                      return (
+                        <React.Fragment key={file.id}>
+                          <div draggable onDragStart={e => onDragStart(e, file, folder.id, idx)} onDragEnd={onDragEnd} onDragOver={e => onDragOverCard(e, folder.id, idx)} onDoubleClick={() => hasPreview && setPreviewFile(file)} style={{ width: cardW, borderRadius: 12, overflow: 'hidden', cursor: 'grab', background: dragItem?.id === file.id ? 'rgba(52,211,153,0.2)' : 'rgba(255,255,255,0.03)', border: `2px solid ${dragItem?.id === file.id ? '#34d399' : 'rgba(255,255,255,0.1)'}`, opacity: dragItem?.id === file.id ? 0.5 : 1, flexShrink: 0, transition: 'opacity 0.15s' }}>
+                            <div style={{ height: previewH, display: 'flex', alignItems: 'center', justifyContent: 'center', background: hasPreview ? `url(${file.preview}) center/cover` : 'linear-gradient(135deg, #1e293b, #334155)', position: 'relative' }}>
+                              {!hasPreview && <span style={{ fontSize: 28 }}>{file.icon || '📎'}</span>}
+                              {file.duration && <div style={{ position: 'absolute', bottom: 4, right: 4, background: 'rgba(0,0,0,0.7)', color: 'white', padding: '3px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600 }}>{file.duration}</div>}
+                              {file.pageNum && <div style={{ position: 'absolute', bottom: 4, right: 4, background: 'rgba(0,0,0,0.7)', color: 'white', padding: '3px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600 }}>{file.pageNum}/{file.totalPages}</div>}
+                              {numberFiles && <div style={{ position: 'absolute', top: 4, left: 4, background: 'rgba(0,0,0,0.7)', color: 'white', padding: '3px 7px', borderRadius: 6, fontSize: 10, fontWeight: 700 }}>{String(idx + 1).padStart(2, '0')}</div>}
+                            </div>
+                            <div style={{ padding: '8px 10px' }}>
+                              {editingFile === file.id ? (
+                                <input type="text" defaultValue={file.name} autoFocus onClick={e => e.stopPropagation()} onBlur={e => renameFile(folder.id, file.id, e.target.value)} onKeyPress={e => e.key === 'Enter' && renameFile(folder.id, file.id, e.target.value)} style={{ width: '100%', padding: '4px 6px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 6, color: '#f1f5f9', fontSize: 10, outline: 'none', fontFamily: 'inherit' }} />
+                              ) : (
+                                <div onDoubleClick={e => { e.stopPropagation(); setEditingFile(file.id); }} style={{ fontSize: 11, fontWeight: 600, lineHeight: 1.3, height: 28, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', color: '#e2e8f0', cursor: 'text' }} title={file.name}>{file.name}</div>
+                              )}
+                              <div style={{ fontSize: 10, color: '#64748b', marginTop: 3 }}>{formatSize(file.size)}</div>
+                            </div>
+                          </div>
+                          {showAfter && <div style={{ width: 4, height: isMobile ? 110 : 140, background: 'linear-gradient(180deg, #34d399, #10b981)', borderRadius: 3, boxShadow: '0 0 14px rgba(52,211,153,0.6)', flexShrink: 0 }} />}
+                        </React.Fragment>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Trash */}
+          {trash.length > 0 && (
+            <div style={{ padding: 14, background: 'rgba(239,68,68,0.08)', borderRadius: 14, marginBottom: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <span style={{ fontWeight: 700, color: '#f87171', fontSize: 14 }}>🗑️ Corbeille ({trash.length})</span>
+                <button onClick={() => setTrash([])} style={{ padding: '8px 14px', background: 'rgba(239,68,68,0.8)', border: 'none', borderRadius: 8, color: 'white', fontWeight: 600, cursor: 'pointer', fontSize: 12 }}>Vider</button>
+              </div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {trash.slice(0, 6).map(f => (
+                  <div key={f.id} onClick={() => restoreFile(f)} style={{ padding: '8px 12px', background: 'rgba(30,41,59,0.9)', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span>{f.icon || '📎'}</span>
+                    <span style={{ maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#cbd5e1' }}>{f.name}</span>
+                    <span style={{ color: '#34d399' }}>↩</span>
+                  </div>
+                ))}
+                {trash.length > 6 && <span style={{ padding: 8, color: '#64748b', fontSize: 12 }}>+{trash.length - 6}</span>}
+              </div>
+            </div>
+          )}
+
+          {/* Footer */}
+          <footer style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: '12px 20px', background: 'rgba(10,22,40,0.95)', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, color: '#64748b' }}>
+            {!isMobile && <span>Double-clic : renommer ou agrandir</span>}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: isMobile ? 0 : 'auto' }}>
+              <span style={{ color: '#94a3b8' }}>{totalFiles} fichier{totalFiles !== 1 ? 's' : ''} • {formatSize(totalSize)}</span>
+              <div style={{ width: isMobile ? 60 : 80, height: 5, background: 'rgba(255,255,255,0.1)', borderRadius: 3, overflow: 'hidden' }}>
+                <div style={{ width: `${usagePercent}%`, height: '100%', background: getUsageColor(), transition: 'width 0.3s' }} />
+              </div>
+              <span style={{ color: getUsageColor(), fontWeight: 600 }}>{Math.round(usagePercent)}%</span>
+            </div>
+          </footer>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
