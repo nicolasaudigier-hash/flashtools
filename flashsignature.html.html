@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>FlashSignature</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07080f;--card:#11131c;--border:#1c2030;--border2:#252d42;
+  --cyan:#00e5ff;--violet:#9d7dff;--green:#00e5a0;
+  --text:#edf0f8;--text2:#a0aab8;--text3:#5a6580;
+  --cg:rgba(0,229,255,0.08);--vg:rgba(157,125,255,0.08);
+  --safe:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overscroll-behavior:none;}
+body{
+  font-family:'DM Sans',system-ui,sans-serif;
+  background:var(--bg);color:var(--text);font-size:14px;
+  background-image:
+    radial-gradient(ellipse 60% 40% at 10% 0%,rgba(0,229,255,0.05) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 35% at 90% 100%,rgba(157,125,255,0.06) 0%,transparent 60%);
+  display:flex;flex-direction:column;min-height:100dvh;
+}
+
+/* ── TOP BAR ── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;height:52px;flex-shrink:0;
+  background:rgba(7,8,15,0.9);border-bottom:1px solid var(--border);
+  backdrop-filter:blur(16px);position:sticky;top:0;z-index:100;
+}
+.brand{font-size:15px;font-weight:700;letter-spacing:-.3px;}
+.brand em{font-style:normal;background:linear-gradient(90deg,var(--cyan),var(--violet));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.brand-sub{font-size:10px;color:var(--text3);margin-top:1px;}
+
+/* ── TABS ── */
+.tabs{
+  display:flex;border-bottom:1px solid var(--border);flex-shrink:0;
+  background:rgba(7,8,15,0.7);backdrop-filter:blur(12px);
+  position:sticky;top:52px;z-index:99;overflow-x:auto;
+  scrollbar-width:none;
+}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{
+  flex:1;min-width:80px;padding:13px 8px;
+  border:none;border-bottom:2px solid transparent;background:none;
+  color:var(--text3);font:600 12px/1 'DM Sans',sans-serif;
+  cursor:pointer;white-space:nowrap;transition:all .2s;
+}
+.tab:hover{color:var(--text2);}
+.tab.on{color:var(--cyan);border-bottom-color:var(--cyan);}
+
+/* ── SCROLL AREA ── */
+.main{flex:1;overflow-y:auto;overscroll-behavior:contain;}
+
+/* ── SECTIONS ── */
+.panel{display:none;padding:16px;padding-bottom:calc(16px + var(--safe));}
+.panel.on{display:block;}
+
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:18px;margin-bottom:14px;
+}
+.card-title{
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+  color:var(--cyan);padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:16px;
+}
+.card-title.v{color:var(--violet);}
+.card-title.g{color:var(--green);}
+
+/* ── FORM ── */
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.row.full{grid-template-columns:1fr;}
+.fld{display:flex;flex-direction:column;gap:4px;}
+.fld label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;}
+.fld input,.fld select{
+  background:var(--bg);border:1px solid var(--border);border-radius:8px;
+  color:var(--text);padding:9px 11px;font:14px 'DM Sans',sans-serif;
+  outline:none;width:100%;transition:border-color .2s;
+}
+.fld input:focus,.fld select:focus{border-color:var(--cyan);}
+.fld input::placeholder{color:var(--text3);}
+input[type=range]{accent-color:var(--violet);height:4px;padding:0;border:none;background:none;}
+input[type=color]{height:40px;padding:3px;cursor:pointer;border-radius:8px;}
+
+/* ── DRAW CANVAS AREA ── */
+.canvas-wrap{
+  position:relative;background:#fff;border-radius:12px;
+  overflow:hidden;touch-action:none;margin-bottom:12px;
+  border:2px solid #e2e5ef;
+}
+.canvas-wrap canvas{display:block;width:100%;height:auto;cursor:crosshair;}
+.canvas-hint{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;transition:opacity .3s;
+}
+.canvas-hint span{
+  font-size:13px;color:#b0b8cc;font-weight:500;
+  background:rgba(255,255,255,.8);padding:8px 16px;border-radius:20px;
+}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;}
+.tool-group{display:flex;gap:6px;align-items:center;background:var(--bg);
+  border:1px solid var(--border);border-radius:10px;padding:6px 10px;}
+.tool-group label{font-size:10px;color:var(--text3);font-weight:600;white-space:nowrap;}
+
+/* ── BUTTONS ── */
+.btns{display:flex;gap:8px;flex-wrap:wrap;}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:10px 16px;border:none;border-radius:9px;
+  font:600 13px/1 'DM Sans',sans-serif;cursor:pointer;
+  transition:all .15s;white-space:nowrap;
+}
+.btn-c{background:var(--cg);color:var(--cyan);border:1px solid rgba(0,229,255,.25);}
+.btn-c:hover,.btn-c:active{background:rgba(0,229,255,.15);}
+.btn-v{background:var(--vg);color:var(--violet);border:1px solid rgba(157,125,255,.25);}
+.btn-v:hover,.btn-v:active{background:rgba(157,125,255,.15);}
+.btn-g{background:rgba(0,229,160,.08);color:var(--green);border:1px solid rgba(0,229,160,.2);}
+.btn-g:hover,.btn-g:active{background:rgba(0,229,160,.15);}
+.btn-n{background:rgba(255,255,255,.05);color:var(--text2);border:1px solid var(--border);}
+.btn-n:hover,.btn-n:active{border-color:var(--border2);color:var(--text);}
+.btn-full{width:100%;}
+.btn-sm{padding:7px 12px;font-size:12px;}
+
+/* ── PREVIEW BOX ── */
+.preview-box{
+  background:#fff;border:1px solid #e2e5ef;border-radius:12px;
+  min-height:120px;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;margin-bottom:12px;position:relative;
+}
+.preview-box canvas{display:block;width:100%;height:auto;max-height:200px;object-fit:contain;}
+
+/* ── WATERMARK ── */
+.wm-drop{
+  border:2px dashed var(--border2);border-radius:12px;
+  min-height:160px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:10px;padding:24px;cursor:pointer;
+  transition:border-color .2s;margin-bottom:12px;background:var(--bg);
+  position:relative;
+}
+.wm-drop:hover{border-color:var(--cyan);}
+.wm-drop p{font-size:13px;color:var(--text3);text-align:center;}
+.wm-result{position:relative;border-radius:12px;overflow:hidden;margin-bottom:12px;}
+.wm-result canvas{display:block;width:100%;height:auto;}
+.wm-controls{display:none;}
+
+/* ── EMAIL PREVIEW ── */
+.email-wrap{background:#fff;border-radius:10px;padding:20px;}
+
+/* ── STYLE SLIDER ── */
+.slider-wrap{margin-bottom:12px;}
+.slider-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:3px;}
+
+/* ── SBTN GRID ── */
+.sgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px;}
+.sbtn{
+  padding:7px 4px;background:var(--bg);border:1px solid var(--border);
+  border-radius:7px;color:var(--text3);font:600 11px/1 'DM Sans',sans-serif;
+  text-align:center;cursor:pointer;transition:all .15s;
+}
+.sbtn.on{background:var(--cg);border-color:rgba(0,229,255,.4);color:var(--cyan);}
+
+/* ── NOTE ── */
+.note{
+  background:var(--bg);border:1px solid var(--border);
+  border-left:2px solid var(--cyan);border-radius:8px;
+  padding:9px 12px;font-size:12px;color:var(--text2);line-height:1.5;
+  margin-top:10px;
+}
+.note.v{border-left-color:var(--violet);}
+.note.g{border-left-color:var(--green);}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:calc(16px + var(--safe));left:50%;
+  transform:translateX(-50%) translateY(10px);
+  background:var(--green);color:#06070f;
+  padding:9px 18px;border-radius:20px;font-size:12px;font-weight:700;
+  z-index:999;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── RESPONSIVE ── */
+@media(min-width:600px){
+  .panel{padding:20px 24px;}
+  .topbar{padding:0 24px;}
+}
+@media(min-width:900px){
+  .row{grid-template-columns:1fr 1fr 1fr;}
+  .sgrid{grid-template-columns:repeat(5,1fr);}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="brand"><em>FlashSignature</em></div>
+    <div class="brand-sub">Créez votre signature manuscrite</div>
+  </div>
+</div>
+
+<div style="background:rgba(0,229,255,0.04);border-bottom:1px solid #1c2030;padding:10px 16px;">
+  <p style="font-size:12px;color:#5a6580;line-height:1.5;max-width:700px;">
+    <strong style="color:#a0aab8;">FlashSignature</strong> — Dessinez votre signature manuscrite au doigt ou à la souris, 
+    exportez-la en PNG transparent ou SVG, apposez-la sur vos photos, et intégrez-la dans votre signature email.
+  </p>
+</div>
+<div class="tabs">
+  <button class="tab on" id="tab-draw"  onclick="switchTab('draw')">✏️ Signature</button>
+  <button class="tab"    id="tab-wm"    onclick="switchTab('wm')">🖼️ Watermark</button>
+  <button class="tab"    id="tab-email" onclick="switchTab('email')">📧 Email</button>
+</div>
+
+<div class="main">
+
+<!-- ══ SIGNATURE ══ -->
+<div class="panel on" id="panel-draw">
+
+  <div class="card">
+    <div class="card-title v">Dessinez votre signature</div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="tool-group">
+        <label>Taille</label>
+        <input type="range" id="brushSize" min="1" max="16" value="4" step=".5"
+          style="width:80px;" oninput="D.baseW=+this.value">
+      </div>
+      <div class="tool-group">
+        <label>Encre</label>
+        <input type="color" id="brushColor" value="#1a1a2e"
+          style="width:44px;height:32px;" oninput="D.color=this.value">
+      </div>
+      <button class="btn btn-n btn-sm" onclick="undoStroke()">↩ Annuler</button>
+      <button class="btn btn-n btn-sm" onclick="clearDraw()">🗑️ Effacer</button>
+    </div>
+
+    <!-- Canvas -->
+    <div class="canvas-wrap" id="drawWrap">
+      <canvas id="drawPad" width="700" height="220"></canvas>
+      <div class="canvas-hint" id="drawHint">
+        <span>Signez ici au doigt ou à la souris</span>
+      </div>
+    </div>
+
+    <!-- Ajustements post-dessin -->
+    <div style="margin-bottom:12px;">
+      <div class="row">
+        <div class="fld">
+          <label>Inclinaison (pente)</label>
+          <input type="range" id="skewSlider" min="-30" max="15" value="-8" step="1" oninput="applySkew()">
+        </div>
+        <div class="fld">
+          <label>Compression verticale</label>
+          <input type="range" id="scaleYSlider" min="60" max="130" value="100" step="1" oninput="applySkew()">
+        </div>
+      </div>
+      <div class="row">
+        <div class="fld">
+          <label>Ondulation base</label>
+          <input type="range" id="skewYSlider" min="-15" max="15" value="0" step="1" oninput="applySkew()">
+        </div>
+        <div class="fld">
+          <label>Couleur résultat</label>
+          <input type="color" id="resultColor" value="#1a1a2e" oninput="applySkew()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Aperçu rendu final -->
+
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:6px;">Résultat final</div>
+    <div class="preview-box" id="previewBox" style="min-height:160px;overflow:auto;border:2px dashed rgba(157,125,255,0.5);background:#f8f8fc;">
+      <canvas id="previewPad" width="700" height="220" style="width:100%;height:auto;"></canvas>
+    </div>
+
+    <!-- Export buttons -->
+    <div class="btns">
+      <button class="btn btn-v btn-full" onclick="dlPNG()">⬇ PNG transparent</button>
+    </div>
+    <div class="btns" style="margin-top:8px;">
+      <button class="btn btn-g" onclick="dlWhitePNG()">⬇ PNG fond blanc</button>
+      <button class="btn btn-c" onclick="dlSVG()">⬇ SVG</button>
+      <button class="btn btn-n" onclick="copyImgHTML()">📋 HTML email</button>
+    </div>
+
+    <div class="note v" style="margin-top:12px;">
+      Geste lent = trait épais · Geste rapide = trait fin · Utilisez le curseur Inclinaison pour redresser ou pencher l'ensemble.
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ WATERMARK ══ -->
+<div class="panel" id="panel-wm">
+  <div class="card">
+    <div class="card-title g">Watermark — Signature sur photo</div>
+
+    <!-- Visually-hidden input — méthode MDN recommandée, fonctionne partout -->
+    <input type="file" id="wmFile" accept="image/*"
+      style="clip:rect(0 0 0 0);clip-path:inset(50%);height:1px;overflow:hidden;
+             position:absolute;white-space:nowrap;width:1px;"
+      onchange="loadWMPhoto(event)">
+
+    <div id="wmDropZone" style="
+      border:2px dashed #252d42;border-radius:12px;min-height:150px;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:12px;padding:24px;background:#07080f;margin-bottom:12px;">
+      <svg width="38" height="38" fill="none" viewBox="0 0 24 24">
+        <path d="M4 16l4-4 4 4 4-6 4 6" stroke="#5a6580" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="3" y="3" width="18" height="18" rx="3" stroke="#5a6580" stroke-width="1.5"/>
+      </svg>
+      <p style="font-size:13px;color:#a0aab8;text-align:center;margin:0;">
+        Choisissez une photo à filigraner avec votre signature
+      </p>
+      <label for="wmFile" style="
+        display:inline-block;padding:10px 22px;cursor:pointer;
+        background:rgba(0,229,160,.1);color:#00e5a0;
+        border:1px solid rgba(0,229,160,.3);border-radius:9px;
+        font:600 13px 'DM Sans',sans-serif;">
+        Parcourir…
+      </label>
+      <p style="font-size:11px;color:#5a6580;margin:0;">JPG · PNG · WEBP</p>
+    </div>
+
+    <div id="wmResult" style="display:none;margin-bottom:12px;max-height:65vh;overflow-y:auto;overflow-x:hidden;border-radius:10px;">
+      <canvas id="wmCanvas" style="display:block;width:100%;height:auto;"></canvas>
+    </div>
+
+    <div id="wmControls" style="display:none;">
+      <div class="row" style="margin-bottom:10px;">
+        <div class="fld"><label>Opacité</label>
+          <input type="range" id="wmOpacity" min="5" max="100" value="60" oninput="renderWM()"></div>
+        <div class="fld"><label>Taille</label>
+          <input type="range" id="wmScale" min="5" max="100" value="35" oninput="renderWM()"></div>
+      </div>
+      <div class="row" style="margin-bottom:14px;">
+        <div class="fld"><label>Position X</label>
+          <input type="range" id="wmX" min="0" max="100" value="75" oninput="renderWM()"></div>
+        <div class="fld"><label>Position Y</label>
+          <input type="range" id="wmY" min="0" max="100" value="85" oninput="renderWM()"></div>
+      </div>
+      <div class="btns" style="margin-bottom:8px;">
+        <button class="btn btn-g btn-full" onclick="dlWM()">⬇ Télécharger avec signature</button>
+      </div>
+      <div class="btns">
+        <label for="wmFile" class="btn btn-n" style="cursor:pointer;">🔄 Changer de photo</label>
+      </div>
+    </div>
+
+    <div class="note g" style="margin-top:12px;">
+      Dessinez d'abord votre signature dans l'onglet Signature, puis revenez ici pour l'apposer sur vos photos.
+    </div>
+  </div>
+</div>
+
+<!-- ══ EMAIL ══ -->
+<div class="panel" id="panel-email">
+  <div class="card">
+    <div class="card-title">Informations</div>
+    <div class="row">
+      <div class="fld"><label>Prénom</label><input id="firstName" value="Sophie" oninput="renderEmail()"></div>
+      <div class="fld"><label>Nom</label><input id="lastName" value="Martin" oninput="renderEmail()"></div>
+    </div>
+    <div class="row">
+      <div class="fld"><label>Poste</label><input id="jobTitle" value="Directrice Marketing" oninput="renderEmail()"></div>
+      <div class="fld"><label>Entreprise</label><input id="company" value="FlashTools" oninput="renderEmail()"></div>
+    </div>
+    <div class="row">
+      <div class="fld"><label>Email</label><input id="emailAddr" value="contact@flashtools.fr" oninput="renderEmail()"></div>
+      <div class="fld"><label>Téléphone</label><input id="phone" value="+33 6 xx xx xx xx" oninput="renderEmail()"></div>
+    </div>
+    <div class="row full">
+      <div class="fld"><label>Site web</label><input id="website" value="https://flashtools.fr" oninput="renderEmail()"></div>
+    </div>
+
+    <!-- Signature manuscrite dans l'email -->
+    <div style="border-top:1px solid var(--border);margin:14px 0 12px;padding-top:12px;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--violet);margin-bottom:8px;">
+        Inclure votre signature manuscrite
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;min-height:60px;display:flex;align-items:center;justify-content:center;" id="emailSigPreview">
+        <span style="font-size:12px;color:var(--text3);">Dessinez votre signature dans l'onglet Signature puis cliquez sur le bouton ci-dessous</span>
+      </div>
+      <div class="btns">
+        <button class="btn btn-v" onclick="insertSigInEmail()">✏️ Insérer ma signature dessinée</button>
+        <button class="btn btn-n btn-sm" onclick="removeSigFromEmail()">✕ Retirer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Style</div>
+    <div class="sgrid">
+      <button class="sbtn on" data-s="minimal">Minimal</button>
+      <button class="sbtn" data-s="modern">Modern</button>
+      <button class="sbtn" data-s="bold">Bold</button>
+      <button class="sbtn" data-s="accent">Accent</button>
+      <button class="sbtn" data-s="line">Line</button>
+      <button class="sbtn" data-s="box">Box</button>
+      <button class="sbtn" data-s="compact">Compact</button>
+      <button class="sbtn" data-s="business">Business</button>
+      <button class="sbtn" data-s="simple">Simple</button>
+      <button class="sbtn" data-s="photo">Photo</button>
+    </div>
+    <div class="row">
+      <div class="fld"><label>Couleur</label>
+        <input type="color" id="emailColor" value="#06b6d4" oninput="renderEmail()">
+      </div>
+      <div class="fld"><label>Police</label>
+        <select id="emailFont" onchange="renderEmail()">
+          <option>Arial</option><option>Georgia</option><option>Verdana</option><option>Tahoma</option>
+        </select>
+      </div>
+      <div class="fld"><label>Séparateur</label>
+        <select id="emailSep" onchange="renderEmail()">
+          <option value="line">Ligne</option><option value="thick">Épaisse</option>
+          <option value="dots">Points</option><option value="none">Aucun</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Aperçu</div>
+    <div class="email-wrap" id="emailPreview"></div>
+    <div class="btns" style="margin-top:12px;">
+      <button class="btn btn-c btn-full" onclick="copyEmailHTML()">📋 Copier HTML pour Gmail/Outlook</button>
+    </div>
+    <div class="btns" style="margin-top:8px;">
+      <button class="btn btn-n" onclick="showGuide()">Guide d'installation</button>
+    </div>
+    <div class="note" style="margin-top:10px;">Compatible Gmail, Outlook, Apple Mail.</div>
+
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════
+// DRAW ENGINE — vitesse → épaisseur + lissage
+// Points parasites éliminés : distance minimale
+// ════════════════════════════════════════════
+const D={
+  color:'#1a1a2e', baseW:4,
+  drawing:false, pts:[], strokes:[],
+  lastX:0, lastY:0, lastT:0,
+};
+const MIN_DIST=3; // distance minimale entre 2 points (px)
+
+function initDraw(){
+  const pad=document.getElementById('drawPad');
+  if(!pad) return;
+  const fresh=pad.cloneNode(true);
+  pad.parentNode.replaceChild(fresh,pad);
+  const p=document.getElementById('drawPad');
+  const hint=document.getElementById('drawHint');
+
+  function getXY(e){
+    const r=p.getBoundingClientRect();
+    const sx=p.width/r.width, sy=p.height/r.height;
+    const src=e.touches?e.touches[0]:e;
+    return{x:(src.clientX-r.left)*sx, y:(src.clientY-r.top)*sy, t:Date.now()};
+  }
+
+  function down(e){
+    e.preventDefault();
+    D.drawing=true; D.pts=[];
+    const {x,y,t}=getXY(e);
+    D.lastX=x; D.lastY=y; D.lastT=t;
+    D.pts.push({x,y,w:D.baseW});
+    if(hint) hint.style.opacity='0';
+  }
+
+  function move(e){
+    if(!D.drawing) return;
+    e.preventDefault();
+    const {x,y,t}=getXY(e);
+    const dx=x-D.lastX, dy=y-D.lastY;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    // Ignorer les micro-mouvements → élimine les points parasites
+    if(dist<MIN_DIST) return;
+    const dt=Math.max(t-D.lastT,1);
+    const speed=dist/dt;
+    // Épaisseur inversement proportionnelle à la vitesse
+    // Rapide → fin, lent → épais. Transition douce.
+    const prevW=D.pts.length?D.pts[D.pts.length-1].w:D.baseW;
+    const targetW=Math.max(0.6, D.baseW*(1-Math.min(speed*6,0.80)));
+    // Lissage de l'épaisseur : interpolation avec le point précédent
+    const w=prevW*0.88+targetW*0.12;
+    D.pts.push({x,y,w});
+    D.lastX=x; D.lastY=y; D.lastT=t;
+    liveDrawRaw(p);
+  }
+
+  function up(e){
+    e.preventDefault();
+    if(!D.drawing) return;
+    D.drawing=false;
+    finStroke(p);
+  }
+
+  p.addEventListener('touchstart',down,{passive:false});
+  p.addEventListener('touchmove',move,{passive:false});
+  p.addEventListener('touchend',up,{passive:false});
+  p.addEventListener('touchcancel',up,{passive:false});
+  p.addEventListener('mousedown',down);
+  p.addEventListener('mousemove',move);
+  p.addEventListener('mouseup',up);
+  p.addEventListener('mouseleave',up);
+
+  redrawRaw(p);
+}
+
+// Dessin brut sur le canvas de dessin (sans skew)
+function liveDrawRaw(p){
+  const ctx=p.getContext('2d');
+  redrawRaw(p,ctx);
+  drawStrokePts(ctx,D.pts,D.color);
+}
+
+function redrawRaw(p,ctx){
+  if(!ctx) ctx=p.getContext('2d');
+  ctx.clearRect(0,0,p.width,p.height);
+  D.strokes.forEach(s=>drawStrokePts(ctx,s.pts,s.color));
+}
+
+// Rendu d'un stroke avec courbes Catmull-Rom lissées
+function drawStrokePts(ctx,pts,color){
+  if(pts.length<2) return;
+
+  // Précalculer les points de contrôle Catmull-Rom pour toute la courbe
+  const cps=[];
+  for(let i=0;i<pts.length-1;i++){
+    const p0=pts[Math.max(0,i-1)];
+    const p1=pts[i];
+    const p2=pts[i+1];
+    const p3=pts[Math.min(pts.length-1,i+2)];
+    cps.push({
+      cp1x:p1.x+(p2.x-p0.x)/6, cp1y:p1.y+(p2.y-p0.y)/6,
+      cp2x:p2.x-(p3.x-p1.x)/6, cp2y:p2.y-(p3.y-p1.y)/6,
+    });
+  }
+
+  // Pour chaque segment, subdiviser en N micro-segments
+  // et interpoler l'épaisseur de façon continue → pas de rupture
+  const STEPS=14; // sous-divisions par segment
+  ctx.lineCap='round';
+  ctx.strokeStyle=color;
+
+  for(let i=0;i<pts.length-1;i++){
+    const p1=pts[i], p2=pts[i+1];
+    const {cp1x,cp1y,cp2x,cp2y}=cps[i];
+    const wStart=p1.w, wEnd=p2.w;
+
+    for(let s=0;s<STEPS;s++){
+      const t0=s/STEPS, t1=(s+1)/STEPS;
+      // Point sur la courbe de Bézier à t0 et t1
+      const bx0=bezierPoint(p1.x,cp1x,cp2x,p2.x,t0);
+      const by0=bezierPoint(p1.y,cp1y,cp2y,p2.y,t0);
+      const bx1=bezierPoint(p1.x,cp1x,cp2x,p2.x,t1);
+      const by1=bezierPoint(p1.y,cp1y,cp2y,p2.y,t1);
+      // Épaisseur interpolée linéairement sur ce sous-segment
+      const w=wStart+(wEnd-wStart)*((t0+t1)/2);
+
+      ctx.beginPath();
+      ctx.lineWidth=w;
+      ctx.moveTo(bx0,by0);
+      ctx.lineTo(bx1,by1);
+      ctx.stroke();
+    }
+
+    // Cercle de jonction au point p2 pour boucher les gaps entre segments
+    // (épaisseur = moyenne des deux segments adjacents)
+    if(i<pts.length-2){
+      const wNext=pts[i+2]?.w??wEnd;
+      const wJoin=(wEnd+wNext)/2;
+      ctx.beginPath();
+      ctx.fillStyle=color;
+      ctx.arc(p2.x,p2.y,wJoin/2,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
+}
+
+// Point sur courbe cubique de Bézier à paramètre t
+function bezierPoint(p0,p1,p2,p3,t){
+  const mt=1-t;
+  return mt*mt*mt*p0 + 3*mt*mt*t*p1 + 3*mt*t*t*p2 + t*t*t*p3;
+}
+
+function finStroke(p){
+  if(D.pts.length<2){D.pts=[];return;}
+  // Simplification légère : supprimer les points redondants (Douglas-Peucker simplifié)
+  const simplified=simplify(D.pts,2.2);
+  D.strokes.push({pts:simplified,color:D.color});
+  D.pts=[];
+  redrawRaw(p);
+  applySkew(); // Met à jour le preview avec skew
+}
+
+// Simplification Douglas-Peucker pour lisser sans perdre la forme
+function simplify(pts,eps){
+  if(pts.length<=3) return pts;
+  let maxD=0, idx=1;
+  for(let i=1;i<pts.length-1;i++){
+    const d=pointToSegmentDist(pts[i],pts[0],pts[pts.length-1]);
+    if(d>maxD){maxD=d;idx=i;}
+  }
+  if(maxD>eps){
+    const l=simplify(pts.slice(0,idx+1),eps);
+    const r=simplify(pts.slice(idx),eps);
+    return [...l.slice(0,-1),...r];
+  }
+  return[pts[0],pts[pts.length-1]];
+}
+function pointToSegmentDist(p,a,b){
+  const dx=b.x-a.x,dy=b.y-a.y;
+  if(dx===0&&dy===0) return Math.hypot(p.x-a.x,p.y-a.y);
+  const t=Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/(dx*dx+dy*dy)));
+  return Math.hypot(p.x-a.x-t*dx,p.y-a.y-t*dy);
+}
+
+// Skew global appliqué sur le canvas PREVIEW
+function applySkew(){
+  const skewX=+( document.getElementById('skewSlider')?.value||-8 );
+  const skewY=+( document.getElementById('skewYSlider')?.value||0 );
+  const scaleY=( +(document.getElementById('scaleYSlider')?.value||100) )/100;
+  const color=document.getElementById('resultColor')?.value||'#1a1a2e';
+  const src=document.getElementById('drawPad');
+  const dst=document.getElementById('previewPad');
+  if(!src||!dst) return;
+  dst.width=src.width; dst.height=src.height;
+  const ctx=dst.getContext('2d');
+  ctx.fillStyle='#ffffff';
+  ctx.fillRect(0,0,dst.width,dst.height);
+  const cx=dst.width/2, cy=dst.height/2;
+  const rX=skewX*Math.PI/180;
+  const rY=skewY*Math.PI/180;
+  ctx.save();
+  ctx.translate(cx,cy);
+  // skewX + skewY + scaleY combinés
+  ctx.transform(1, Math.tan(rY), Math.tan(rX), scaleY, 0, 0);
+  ctx.translate(-cx,-cy);
+  D.strokes.forEach(s=>drawStrokePts(ctx,s.pts,color));
+  ctx.restore();
+  dst.style.width='100%';
+  dst.style.height='auto';
+}
+
+function syncPreview(){applySkew();}
+
+// Ajuste le canvas preview pour remplir au maximum le cadre disponible
+// en conservant le ratio — comme un "object-fit:contain" dynamique
+
+
+function undoStroke(){
+  D.strokes.pop();
+  const p=document.getElementById('drawPad');
+  redrawRaw(p); applySkew();
+}
+
+function clearDraw(){
+  D.strokes=[]; D.pts=[];
+  const p=document.getElementById('drawPad');
+  p.getContext('2d').clearRect(0,0,p.width,p.height);
+  document.getElementById('drawHint').style.opacity='1';
+  const dst=document.getElementById('previewPad');
+  if(dst) dst.getContext('2d').clearRect(0,0,dst.width,dst.height);
+  // Reset email sig preview
+  document.getElementById('emailSigPreview').innerHTML=
+    '<span style="font-size:12px;color:var(--text3);">Dessinez votre signature dans l\'onglet Signature puis cliquez sur le bouton ci-dessous</span>';
+}
+
+// Exporter le canvas PREVIEW (avec skew appliqué) cropé
+function getCroppedCanvas(withBg){
+  const src=document.getElementById('previewPad');
+  if(!src||D.strokes.length===0) return null;
+  // Trouver la bbox des pixels non-blancs via ImageData
+  const ctx=src.getContext('2d');
+  const idata=ctx.getImageData(0,0,src.width,src.height);
+  const d=idata.data;
+  let minX=src.width,minY=src.height,maxX=0,maxY=0;
+  for(let y=0;y<src.height;y++){
+    for(let x=0;x<src.width;x++){
+      const a=d[(y*src.width+x)*4+3];
+      if(a>10){
+        if(x<minX)minX=x; if(x>maxX)maxX=x;
+        if(y<minY)minY=y; if(y>maxY)maxY=y;
+      }
+    }
+  }
+  if(maxX<=minX||maxY<=minY) return src;
+  const pad=8;
+  minX=Math.max(0,minX-pad); minY=Math.max(0,minY-pad);
+  maxX=Math.min(src.width,maxX+pad); maxY=Math.min(src.height,maxY+pad);
+  const w=maxX-minX, h=maxY-minY;
+  const off=document.createElement('canvas');
+  off.width=w; off.height=h;
+  const octx=off.getContext('2d');
+  if(withBg){octx.fillStyle='#fff';octx.fillRect(0,0,w,h);}
+  octx.drawImage(src,minX,minY,w,h,0,0,w,h);
+  return off;
+}
+
+function dlPNG(){
+  if(D.strokes.length===0){toast('Dessinez d\'abord votre signature');return;}
+  const cv=getCroppedCanvas(false);
+  const a=document.createElement('a');
+  a.download='signature-transparent.png';
+  a.href=cv.toDataURL('image/png'); a.click();
+  toast('PNG transparent téléchargé ✓');
+}
+
+function dlWhitePNG(){
+  if(D.strokes.length===0){toast('Dessinez d\'abord votre signature');return;}
+  const cv=getCroppedCanvas(true);
+  const a=document.createElement('a');
+  a.download='signature-blanc.png';
+  a.href=cv.toDataURL('image/png'); a.click();
+  toast('PNG fond blanc téléchargé ✓');
+}
+
+function dlSVG(){
+  if(D.strokes.length===0){toast('Dessinez d\'abord votre signature');return;}
+  const pad=document.getElementById('drawPad');
+  let paths='';
+  D.strokes.forEach(s=>{
+    if(s.pts.length<2) return;
+    const pts=s.pts;
+    let d=`M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+    for(let i=1;i<pts.length;i++){
+      const mx=((pts[i-1].x+pts[i].x)/2).toFixed(1);
+      const my=((pts[i-1].y+pts[i].y)/2).toFixed(1);
+      d+=` Q ${pts[i-1].x.toFixed(1)} ${pts[i-1].y.toFixed(1)} ${mx} ${my}`;
+    }
+    const w=((s.pts[0].w+s.pts[s.pts.length-1].w)/2).toFixed(1);
+    paths+=`<path d="${d}" stroke="${s.color}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>\n`;
+  });
+  const svg=`<svg viewBox="0 0 ${pad.width} ${pad.height}" xmlns="http://www.w3.org/2000/svg">\n${paths}</svg>`;
+  const blob=new Blob([svg],{type:'image/svg+xml'});
+  const a=document.createElement('a');
+  a.download='signature.svg'; a.href=URL.createObjectURL(blob); a.click();
+  toast('SVG vectoriel téléchargé ✓');
+}
+
+function copyImgHTML(){
+  if(D.strokes.length===0){toast('Dessinez d\'abord votre signature');return;}
+  const cv=getCroppedCanvas(false);
+  const html=`<img src="${cv.toDataURL('image/png')}" alt="Signature" style="max-width:220px;display:block;">`;
+  navigator.clipboard.writeText(html).then(()=>toast('HTML copié ✓'));
+}
+
+// ════════════════════════════════════════════
+// WATERMARK ENGINE
+// ════════════════════════════════════════════
+let WM={photo:null};
+
+function loadWMPhoto(event){
+  const file=event.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onloadend=function(e){
+    const img=new Image();
+    img.onload=function(){
+      WM.photo=img;
+      document.getElementById('wmDropZone').style.display='none';
+      document.getElementById('wmResult').style.display='block';
+      document.getElementById('wmControls').style.display='block';
+      renderWM();
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderWM(){
+  if(!WM.photo) return;
+  if(D.strokes.length===0){toast('Dessinez d\'abord votre signature dans l\'onglet Signature');return;}
+
+  const opacity=(+document.getElementById('wmOpacity').value)/100;
+  const scale=(+document.getElementById('wmScale').value)/100;
+  const px=(+document.getElementById('wmX').value)/100;
+  const py=(+document.getElementById('wmY').value)/100;
+
+  const ph=WM.photo;
+  const cv=document.getElementById('wmCanvas');
+
+  // Photo : max 1400px largeur, ratio conservé
+  const maxW=1400;
+  const ratio=Math.min(maxW/ph.width,1);
+  cv.width=Math.round(ph.width*ratio);
+  cv.height=Math.round(ph.height*ratio);
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.drawImage(ph,0,0,cv.width,cv.height);
+
+  // Générer la signature en transparent DIRECTEMENT depuis les strokes
+  // (sans passer par previewPad qui a un fond blanc)
+  const skewX=+(document.getElementById('skewSlider')?.value||-8);
+  const skewY=+(document.getElementById('skewYSlider')?.value||0);
+  const scaleY=(+(document.getElementById('scaleYSlider')?.value||100))/100;
+  const color=document.getElementById('resultColor')?.value||'#1a1a2e';
+
+  const sigRaw=document.getElementById('drawPad');
+  const sigOff=document.createElement('canvas');
+  sigOff.width=sigRaw.width; sigOff.height=sigRaw.height;
+  const sCtx=sigOff.getContext('2d');
+  // Fond TRANSPARENT — pas de fillRect blanc
+  const cx=sigOff.width/2, cy=sigOff.height/2;
+  const rX=skewX*Math.PI/180, rY=skewY*Math.PI/180;
+  sCtx.save();
+  sCtx.translate(cx,cy);
+  sCtx.transform(1,Math.tan(rY),Math.tan(rX),scaleY,0,0);
+  sCtx.translate(-cx,-cy);
+  D.strokes.forEach(s=>drawStrokePts(sCtx,s.pts,color));
+  sCtx.restore();
+
+  // Cropper aux pixels non-transparents
+  const sigCv=cropTransparent(sigOff);
+  if(!sigCv) return;
+
+  // Placer sur la photo
+  const sw=Math.round(cv.width*scale);
+  const sh=Math.round(sw*(sigCv.height/sigCv.width));
+  const sx=Math.round((cv.width-sw)*px);
+  const sy=Math.round((cv.height-sh)*py);
+  ctx.globalAlpha=opacity;
+  ctx.drawImage(sigCv,sx,sy,sw,sh);
+  ctx.globalAlpha=1;
+}
+
+// Rogne un canvas à ses pixels non-transparents (alpha > 10)
+function cropTransparent(src){
+  const ctx=src.getContext('2d');
+  const d=ctx.getImageData(0,0,src.width,src.height).data;
+  let minX=src.width,minY=src.height,maxX=0,maxY=0;
+  for(let y=0;y<src.height;y++){
+    for(let x=0;x<src.width;x++){
+      if(d[(y*src.width+x)*4+3]>10){
+        if(x<minX)minX=x; if(x>maxX)maxX=x;
+        if(y<minY)minY=y; if(y>maxY)maxY=y;
+      }
+    }
+  }
+  if(maxX<=minX||maxY<=minY) return null;
+  const pad=6;
+  minX=Math.max(0,minX-pad); minY=Math.max(0,minY-pad);
+  maxX=Math.min(src.width,maxX+pad); maxY=Math.min(src.height,maxY+pad);
+  const w=maxX-minX, h=maxY-minY;
+  const off=document.createElement('canvas');
+  off.width=w; off.height=h;
+  off.getContext('2d').drawImage(src,minX,minY,w,h,0,0,w,h);
+  return off;
+}
+
+function dlWM(){
+  const cv=document.getElementById('wmCanvas');
+  if(!cv||!WM.photo){toast('Chargez d\'abord une photo');return;}
+  const a=document.createElement('a');
+  a.download='photo-signature.jpg';
+  a.href=cv.toDataURL('image/jpeg',0.92); a.click();
+  toast('Photo téléchargée ✓');
+}
+
+// Signature manuscrite dans email
+let emailSigData=''; // base64 PNG de la signature
+
+function insertSigInEmail(){
+  if(D.strokes.length===0){
+    toast('Dessinez d\'abord votre signature dans l\'onglet Signature');
+    return;
+  }
+  const cv=getCroppedCanvas(false);
+  if(!cv){toast('Erreur — signature vide');return;}
+  emailSigData=cv.toDataURL('image/png');
+  // Afficher dans le preview email
+  const prev=document.getElementById('emailSigPreview');
+  prev.innerHTML=`<img src="${emailSigData}" alt="Signature" style="max-height:70px;display:block;">`;
+  renderEmail();
+  toast('Signature insérée ✓');
+}
+
+function removeSigFromEmail(){
+  emailSigData='';
+  document.getElementById('emailSigPreview').innerHTML=
+    '<span style="font-size:12px;color:var(--text3);">Aucune signature insérée</span>';
+  renderEmail();
+}
+
+// Drag & drop desktop watermark
+document.addEventListener('DOMContentLoaded',()=>{
+  const drop=document.getElementById('wmDrop');
+  if(drop){
+    drop.addEventListener('dragover',e=>e.preventDefault());
+    drop.addEventListener('drop',e=>{
+      e.preventDefault();
+      const f=e.dataTransfer.files[0];
+      if(f&&f.type.startsWith('image/')){
+        const inp=document.getElementById('wmFileInput');
+        // Simuler via DataTransfer
+        const dt=new DataTransfer();
+        dt.items.add(f);
+        inp.files=dt.files;
+        loadWMPhoto(inp);
+      }
+    });
+  }
+});
+
+// ════════════════════════════════════════════
+// EMAIL ENGINE
+// ════════════════════════════════════════════
+let eStyle='minimal';
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.sbtn[data-s]').forEach(btn=>{
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('.sbtn[data-s]').forEach(b=>b.classList.remove('on'));
+      this.classList.add('on');
+      eStyle=this.dataset.s;
+      renderEmail();
+    });
+  });
+  renderEmail();
+  initDraw();
+});
+
+function g(id){return document.getElementById(id)?.value?.trim()||'';}
+
+function sepHTML(){
+  const c=g('emailColor')||'#06b6d4';
+  const s=document.getElementById('emailSep')?.value||'line';
+  if(s==='line')  return`<div style="border-top:1px solid #d1d5db;margin:8px 0;"></div>`;
+  if(s==='thick') return`<div style="border-top:3px solid ${c};margin:8px 0;"></div>`;
+  if(s==='dots')  return`<div style="color:#9ca3af;margin:6px 0;letter-spacing:4px;">· · ·</div>`;
+  return`<div style="margin:8px 0;"></div>`;
+}
+
+function renderEmail(){
+  const fn=g('firstName'), ln=g('lastName');
+  const nm=[fn,ln].filter(Boolean).join(' ')||'Sophie Martin';
+  const job=g('jobTitle'), co=g('company');
+  const sub=[job,co].filter(Boolean).join(' · ');
+  const em=g('emailAddr'), ph=g('phone'), wb=g('website');
+  const c=g('emailColor')||'#06b6d4';
+  const f=document.getElementById('emailFont')?.value||'Arial';
+  const ct=`${em?`<a href="mailto:${em}" style="color:#374151;text-decoration:none;">${em}</a><br>`:''}${ph?`${ph}<br>`:''}${wb?`<a href="${wb}" style="color:${c};text-decoration:none;">${wb}</a>`:''}`;
+
+  const sigImg=emailSigData
+    ?`<div style="margin:8px 0 4px;"><img src="${emailSigData}" alt="Signature" style="max-height:60px;display:block;"></div>`
+    :'';
+
+  const tpl={
+    minimal:`<table cellpadding="0" cellspacing="0" border="0" style="font-family:${f},Arial,sans-serif;font-size:14px;color:#374151;">
+<tr><td style="padding-bottom:6px;"><strong style="font-size:17px;color:${c};">${nm}</strong><br><span style="color:#6b7280;font-size:13px;">${sub}</span></td></tr>
+<tr><td>${sepHTML()}${ct}${sigImg}</td></tr></table>`,
+    modern:`<table cellpadding="0" cellspacing="0" border="0" style="font-family:${f},sans-serif;font-size:14px;">
+<tr><td style="border-left:4px solid ${c};padding-left:14px;"><strong style="font-size:17px;color:${c};">${nm}</strong><br><span style="color:#6b7280;font-size:13px;">${sub}</span><br><br>${ct}${sigImg}</td></tr></table>`,
+    bold:`<table cellpadding="0" cellspacing="0" border="0" style="font-family:${f},sans-serif;">
+<tr><td><strong style="font-size:22px;color:${c};font-weight:800;">${nm.toUpperCase()}</strong><br><span style="color:#6b7280;font-size:13px;">${sub}</span><br><br><span style="font-size:13px;">${ct}</span>${sigImg}</td></tr></table>`,
+    accent:`<table cellpadding="0" cellspacing="0" border="0" style="font-family:${f},sans-serif;font-size:14px;">
+<tr><td style="background:${c}18;padding:12px 16px;border-radius:6px;border-left:3px solid ${c};"><strong style="font-size:17px;color:${c};display:block;margin-bottom:3px;">${nm}</strong><span style="color:#6b7280;font-size:13px;display:block;margin-bottom:8px;">${sub}</span>${ct}${sigImg}</td></tr></table>`,
+    line:`<table cellpadding="0" cellspacing="0" border="0" style="font-family:${f},sans-serif;font-size:14px;">
+<tr><td><strong style="font-size:17px;color:${c};">${nm}</strong> <span style="color:#9ca3af;font-size:13px;">${job}</span></td></tr>
+<tr><td style="border-top:2px solid ${c};padding-top:8px;font-size:13px;color:#6b7280;">${ct}${sigImg}</td></tr></table>`,
+    box:`<table cellpadding="0" cellspacing="0" border="0" style="font-family:${f},sans-serif;font-size:14px;">
+<tr><td style="border:2px solid ${c};padding:12px 16px;border-radius:6px;"><strong style="color:${c};font-size:16px;">${nm}</strong><br><span style="color:#6b7280;font-size:13px;">${sub}</span><br><br>${ct}${sigImg}</td></tr></table>`,
+    compact:`<table cellpadding="0" cellspacing="0" border="0" style="font-family:${f},sans-serif;font-size:13px;">
+<tr><td><strong style="color:${c};">${nm}</strong> — <span style="color:#6b7280;">${job}</span><br><span style="color:#9ca3af;">${[em,ph,wb].filter(Boolean).join(' · ')}</span>${sigImg}</td></tr></table>`,
+    business:`<table cellpadding="0" cellspacing="0" border="0" style="font-family:${f},sans-serif;font-size:14px;">
+<tr><td style="border:1px solid #e5e7eb;padding:14px;background:#f9fafb;border-radius:6px;"><strong style="font-size:17px;color:${c};">${nm}</strong><br><span style="color:#6b7280;font-size:13px;">${sub}</span><br>${sepHTML()}${ct}${sigImg}</td></tr></table>`,
+    simple:`<table cellpadding="0" cellspacing="0" border="0" style="font-family:${f},sans-serif;font-size:13px;color:#374151;">
+<tr><td><strong>${nm}</strong><br>${job}${co?`<br>${co}`:''}<br><br>${ct}${sigImg}</td></tr></table>`,
+    photo:`<table cellpadding="0" cellspacing="0" border="0" style="font-family:${f},sans-serif;font-size:14px;">
+<tr><td><strong style="font-size:18px;color:${c};display:block;margin-bottom:3px;">${nm}</strong><span style="color:#6b7280;display:block;">${job}</span>${co?`<span style="color:#9ca3af;font-size:12px;display:block;margin-bottom:8px;">${co}</span>`:'<br>'}<div style="font-size:13px;line-height:1.8;">${ct}</div>${sigImg}</td></tr></table>`,
+  };
+
+  const html=tpl[eStyle]||tpl.minimal;
+  document.getElementById('emailPreview').innerHTML=html;
+  const live=document.getElementById('emailPreviewLive');
+  if(live) live.innerHTML=html;
+}
+
+function copyEmailHTML(){
+  const html=document.getElementById('emailPreview').innerHTML;
+  navigator.clipboard.writeText(html).then(()=>toast('HTML copié ✓'));
+}
+
+function showGuide(){
+  const m=document.getElementById('guideModal');
+  if(m) m.style.display='flex';
+}
+function closeGuide(){
+  const m=document.getElementById('guideModal');
+  if(m) m.style.display='none';
+}
+
+// ════════════════════════════════════════════
+// TABS & UTILS
+// ════════════════════════════════════════════
+function switchTab(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('panel-'+name).classList.add('on');
+  document.getElementById('tab-'+name).classList.add('on');
+  if(name==='draw') setTimeout(initDraw,50);
+  if(name==='wm'&&WM.photo&&D.strokes.length>0) renderWM();
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('on');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('on'),2600);
+}
+</script>
+
+<!-- Guide modal -->
+<div id="guideModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;
+  align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#11131c;border:1px solid #1c2030;border-radius:16px;padding:24px;max-width:440px;width:100%;">
+    <div style="font-size:15px;font-weight:700;color:#edf0f8;margin-bottom:16px;">
+      Guide d'installation — Signature Email
+    </div>
+    <div style="font-size:13px;color:#a0aab8;line-height:1.8;margin-bottom:12px;">
+      <strong style="color:#00e5ff;">Gmail</strong><br>
+      Parametres (roue dentee) → Voir tous les parametres → Signature → Creer → Coller le HTML<br><br>
+      <strong style="color:#00e5ff;">Outlook</strong><br>
+      Fichier → Options → Courrier → Signatures → Nouvelle → Coller<br><br>
+      <strong style="color:#00e5ff;">Apple Mail</strong><br>
+      Mail → Preferences → Signatures → + → Coller dans le champ<br><br>
+      <strong style="color:#00e5ff;">Astuce</strong><br>
+      Copiez le HTML avec le bouton, ouvrez votre client email, collez directement dans l'editeur de signature.
+    </div>
+    <button onclick="closeGuide()" style="width:100%;padding:11px;background:rgba(0,229,255,.1);
+      color:#00e5ff;border:1px solid rgba(0,229,255,.3);border-radius:9px;
+      font:600 13px 'DM Sans',sans-serif;cursor:pointer;">
+      Fermer
+    </button>
+  </div>
+</div>
+
+</body>
+</html>
