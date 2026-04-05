@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlashDetox — Décrypteur d'affirmations</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0A0E27;
+      --bg2: #111827;
+      --surface: #1E293B;
+      --surface2: #243044;
+      --cyan: #06B6D4;
+      --violet: #8B5CF6;
+      --text: #F1F5F9;
+      --text2: #94A3B8;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --border: #334155;
+      --border-active: #06B6D4;
+      --gradient: linear-gradient(135deg, #06B6D4, #8B5CF6);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Background ambiance */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px;
+      left: -200px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(6,182,212,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -200px;
+      right: -200px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 16px 60px;
+    }
+
+    /* Header */
+    .header {
+      padding: 28px 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.4rem;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+
+    .logo span {
+      -webkit-text-fill-color: var(--text2);
+      font-weight: 400;
+      font-size: 0.75rem;
+      font-family: 'DM Sans', sans-serif;
+      display: block;
+      margin-top: -2px;
+      background: none;
+      -webkit-background-clip: unset;
+      background-clip: unset;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 28px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px 8px;
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .tab.active {
+      background: var(--bg2);
+      color: var(--cyan);
+      box-shadow: 0 0 12px rgba(6,182,212,0.15);
+    }
+
+    /* Panel */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* Hero text */
+    .hero {
+      margin-bottom: 24px;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.5rem, 5vw, 2rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      color: var(--text2);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    /* Input zone */
+    .input-zone {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      animation: fadeUp 0.5s 0.1s ease both;
+    }
+
+    .input-zone:focus-within {
+      border-color: var(--border-active);
+      box-shadow: 0 0 0 3px rgba(6,182,212,0.1);
+    }
+
+    .input-label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+
+    textarea {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      resize: none;
+      min-height: 100px;
+    }
+
+    textarea::placeholder { color: var(--text2); opacity: 0.6; }
+
+    .input-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .char-count {
+      font-size: 0.72rem;
+      color: var(--text2);
+    }
+
+    .clear-btn {
+      font-size: 0.72rem;
+      color: var(--text2);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: color 0.2s;
+    }
+    .clear-btn:hover { color: var(--danger); }
+
+    /* Exemples */
+    .exemples {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      animation: fadeUp 0.5s 0.15s ease both;
+    }
+
+    .exemple-tag {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      font-size: 0.72rem;
+      padding: 5px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .exemple-tag:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      background: rgba(6,182,212,0.05);
+    }
+
+    /* Bouton Décrypter */
+    .btn-decrypt {
+      width: 100%;
+      padding: 16px;
+      background: var(--gradient);
+      border: none;
+      border-radius: 14px;
+      color: white;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp 0.5s 0.2s ease both;
+    }
+
+    .btn-decrypt::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .btn-decrypt:hover::before { opacity: 1; }
+    .btn-decrypt:hover { transform: translateY(-1px); box-shadow: 0 8px 25px rgba(6,182,212,0.3); }
+    .btn-decrypt:active { transform: translateY(0); }
+    .btn-decrypt:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* Loading */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+      animation: fadeUp 0.3s ease both;
+    }
+
+    .loading.show { display: block; }
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--cyan);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    .loading-text {
+      color: var(--text2);
+      font-size: 0.85rem;
+    }
+
+    .loading-step {
+      color: var(--cyan);
+      font-size: 0.78rem;
+      margin-top: 6px;
+      min-height: 20px;
+    }
+
+    /* Résultat */
+    .result {
+      display: none;
+      animation: fadeUp 0.4s ease both;
+      margin-top: 24px;
+    }
+
+    .result.show { display: block; }
+
+    /* Jauge probabilité */
+    .proba-card {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .proba-label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+
+    .proba-score {
+      font-family: 'Syne', sans-serif;
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .proba-verdict {
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+
+    .proba-bar-bg {
+      height: 8px;
+      background: var(--bg);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .proba-bar-fill {
+      height: 100%;
+      border-radius: 10px;
+      transition: width 1s cubic-bezier(0.4,0,0.2,1);
+      width: 0%;
+    }
+
+    /* Sections résultat */
+    .result-section {
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .result-section-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--cyan);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .result-section-title .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cyan);
+      flex-shrink: 0;
+    }
+
+    .result-section p {
+      font-size: 0.88rem;
+      line-height: 1.65;
+      color: var(--text);
+    }
+
+    .result-section .text2 { color: var(--text2); font-size: 0.85rem; }
+
+    /* Sources */
+    .sources-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .source-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text2);
+    }
+
+    .source-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--violet);
+      flex-shrink: 0;
+    }
+
+    /* Historique temporel */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .timeline-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.82rem;
+    }
+
+    .timeline-date {
+      color: var(--cyan);
+      font-weight: 600;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.78rem;
+      min-width: 80px;
+      flex-shrink: 0;
+    }
+
+    .timeline-desc { color: var(--text2); line-height: 1.5; }
+
+    /* Bouton nouvelle analyse */
+    .btn-reset {
+      width: 100%;
+      padding: 13px;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      color: var(--text2);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 16px;
+    }
+
+    .btn-reset:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      background: rgba(6,182,212,0.05);
+    }
+
+    /* ===== ONGLET FAKE NEWS ===== */
+    .fakenews-header {
+      margin-bottom: 20px;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .fakenews-header h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .fakenews-meta {
+      font-size: 0.78rem;
+      color: var(--text2);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .fakenews-meta .badge {
+      background: rgba(6,182,212,0.1);
+      border: 1px solid rgba(6,182,212,0.3);
+      color: var(--cyan);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+    }
+
+    .fn-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 12px;
+      animation: fadeUp 0.4s ease both;
+      transition: border-color 0.2s;
+    }
+
+    .fn-card:hover { border-color: var(--border-active); }
+
+    .fn-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .fn-affirmation {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    .fn-score {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .fn-bar-bg {
+      height: 4px;
+      background: var(--bg);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .fn-bar-fill {
+      height: 100%;
+      border-radius: 10px;
+    }
+
+    .fn-body {
+      font-size: 0.83rem;
+      line-height: 1.6;
+      color: var(--text2);
+      margin-bottom: 10px;
+    }
+
+    .fn-timeline {
+      font-size: 0.75rem;
+      color: var(--text2);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .fn-timeline-icon {
+      width: 14px;
+      height: 14px;
+      opacity: 0.5;
+    }
+
+    /* Loading fake news */
+    .fn-loading {
+      text-align: center;
+      padding: 50px 20px;
+    }
+
+    .fn-loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--violet);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 14px;
+    }
+
+    /* Score colors */
+    .score-high { color: var(--success); }
+    .score-mid { color: var(--warning); }
+    .score-low { color: var(--danger); }
+
+    .bar-high { background: var(--success); }
+    .bar-mid { background: var(--warning); }
+    .bar-low { background: var(--danger); }
+
+    /* Animations */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Disclaimer */
+    .disclaimer {
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--text2);
+      opacity: 0.5;
+      margin-top: 24px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">
+      FlashDetox
+      <span>par FlashTools.fr</span>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('analyse')">Décrypter</button>
+    <button class="tab" onclick="switchTab('fakenews')">Fake news de la semaine</button>
+  </div>
+
+  <!-- Panel Analyse -->
+  <div class="panel active" id="panel-analyse">
+
+    <div class="hero">
+      <h1>Vous avez lu quelque chose<br><em>de suspect ?</em></h1>
+      <p>Soumettez une affirmation. Notre analyse vous donne un taux de probabilité basé sur les sources web disponibles.</p>
+    </div>
+
+    <div class="input-zone">
+      <div class="input-label">Votre affirmation</div>
+      <textarea id="affirmation" placeholder="Ex : Les téléphones portables causent des tumeurs au cerveau..." maxlength="500" oninput="updateCharCount()"></textarea>
+      <div class="input-footer">
+        <span class="char-count" id="charCount">0 / 500</span>
+        <button class="clear-btn" onclick="clearInput()">Effacer</button>
+      </div>
+    </div>
+
+    <div class="exemples">
+      <span class="exemple-tag" onclick="setExemple(this)">Les vaccins causent l'autisme</span>
+      <span class="exemple-tag" onclick="setExemple(this)">La Terre est plate</span>
+      <span class="exemple-tag" onclick="setExemple(this)">Einstein était mauvais élève</span>
+      <span class="exemple-tag" onclick="setExemple(this)">On n'utilise que 10% de notre cerveau</span>
+    </div>
+
+    <button class="btn-decrypt" id="btnDecrypt" onclick="decrypter()">
+      Décrypter
+    </button>
+
+    <!-- Loading -->
+    <div class="loading" id="loading">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Analyse en cours...</div>
+      <div class="loading-step" id="loadingStep">Recherche sur le web</div>
+    </div>
+
+    <!-- Résultat -->
+    <div class="result" id="result">
+
+      <div class="proba-card">
+        <div class="proba-label">Probabilité d'être vraie</div>
+        <div class="proba-score" id="probaScore">—</div>
+        <div class="proba-verdict" id="probaVerdict"></div>
+        <div class="proba-bar-bg">
+          <div class="proba-bar-fill" id="probaBar"></div>
+        </div>
+      </div>
+
+      <div class="result-section" id="sectionCircule">
+        <div class="result-section-title"><span class="dot"></span>Ce qui circule</div>
+        <p id="circuleText"></p>
+      </div>
+
+      <div class="result-section" id="sectionWeb">
+        <div class="result-section-title"><span class="dot" style="background:var(--violet)"></span>Ce que le web dit</div>
+        <p id="webText"></p>
+      </div>
+
+      <div class="result-section" id="sectionAnalyse">
+        <div class="result-section-title"><span class="dot" style="background:var(--warning)"></span>Analyse</div>
+        <p id="analyseText"></p>
+      </div>
+
+      <div class="result-section" id="sectionHistorique" style="display:none">
+        <div class="result-section-title"><span class="dot" style="background:var(--text2)"></span>Historique</div>
+        <div class="timeline" id="timelineContent"></div>
+      </div>
+
+      <div class="result-section" id="sectionConclusion">
+        <div class="result-section-title"><span class="dot" style="background:var(--success)"></span>Conclusion</div>
+        <p id="conclusionText"></p>
+      </div>
+
+      <div class="result-section" id="sectionSources" style="display:none">
+        <div class="result-section-title"><span class="dot" style="background:var(--text2)"></span>Sources</div>
+        <div class="sources-list" id="sourcesList"></div>
+      </div>
+
+      <button class="btn-reset" onclick="nouvelleAnalyse()">Nouvelle analyse</button>
+    </div>
+
+    <p class="disclaimer">Les résultats sont basés sur les sources web disponibles au moment de l'analyse.<br>Un score de probabilité ne constitue pas une vérité absolue.</p>
+  </div>
+
+  <!-- Panel Fake News -->
+  <div class="panel" id="panel-fakenews">
+    <div class="fakenews-header">
+      <h2>Fake news de la semaine</h2>
+      <div class="fakenews-meta">
+        <span id="fnDate">Chargement...</span>
+        <span class="badge">Mis à jour chaque semaine</span>
+      </div>
+    </div>
+
+    <div id="fnContent">
+      <div class="fn-loading">
+        <div class="fn-loading-spinner"></div>
+        <div style="color:var(--text2);font-size:0.85rem;">Chargement des fake news de la semaine...</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // =====================
+  // TABS
+  // =====================
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('panel-' + tab).classList.add('active');
+    if (tab === 'fakenews' && !fnLoaded) loadFakeNews();
+  }
+
+  // =====================
+  // INPUT
+  // =====================
+  function updateCharCount() {
+    const val = document.getElementById('affirmation').value.length;
+    document.getElementById('charCount').textContent = val + ' / 500';
+  }
+
+  function clearInput() {
+    document.getElementById('affirmation').value = '';
+    updateCharCount();
+  }
+
+  function setExemple(el) {
+    document.getElementById('affirmation').value = el.textContent;
+    updateCharCount();
+  }
+
+  // =====================
+  // SCORE COLOR
+  // =====================
+  function getScoreClass(score) {
+    if (score >= 60) return 'score-high';
+    if (score >= 35) return 'score-mid';
+    return 'score-low';
+  }
+
+  function getBarClass(score) {
+    if (score >= 60) return 'bar-high';
+    if (score >= 35) return 'bar-mid';
+    return 'bar-low';
+  }
+
+  function getVerdict(score) {
+    if (score >= 80) return 'Très probablement vraie';
+    if (score >= 60) return 'Probablement vraie';
+    if (score >= 45) return 'Incertaine — à vérifier';
+    if (score >= 25) return 'Probablement fausse';
+    return 'Très probablement fausse';
+  }
+
+  // =====================
+  // LOADING STEPS
+  // =====================
+  const steps = [
+    'Recherche sur le web...',
+    'Analyse des sources...',
+    'Vérification historique...',
+    'Calcul du score de probabilité...',
+    'Rédaction de la conclusion...'
+  ];
+  let stepInterval;
+
+  function startLoadingSteps() {
+    let i = 0;
+    document.getElementById('loadingStep').textContent = steps[0];
+    stepInterval = setInterval(() => {
+      i = (i + 1) % steps.length;
+      document.getElementById('loadingStep').textContent = steps[i];
+    }, 1800);
+  }
+
+  function stopLoadingSteps() {
+    clearInterval(stepInterval);
+  }
+
+  // =====================
+  // DÉCRYPTER
+  // =====================
+  async function decrypter() {
+    const affirmation = document.getElementById('affirmation').value.trim();
+    if (!affirmation) {
+      document.getElementById('affirmation').focus();
+      return;
+    }
+
+    // UI states
+    document.getElementById('btnDecrypt').disabled = true;
+    document.getElementById('loading').classList.add('show');
+    document.getElementById('result').classList.remove('show');
+    startLoadingSteps();
+
+    try {
+      const response = await fetch('/api/decrypter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ affirmation })
+      });
+
+      if (!response.ok) throw new Error('Erreur serveur');
+      const data = await response.json();
+      afficherResultat(data);
+
+    } catch (err) {
+      // Mode démo si pas de serveur
+      await new Promise(r => setTimeout(r, 3000));
+      afficherResultat(getDemoResult(affirmation));
+    } finally {
+      stopLoadingSteps();
+      document.getElementById('loading').classList.remove('show');
+      document.getElementById('btnDecrypt').disabled = false;
+    }
+  }
+
+  function afficherResultat(data) {
+    const score = data.score;
+    const scoreClass = getScoreClass(score);
+    const barClass = getBarClass(score);
+
+    document.getElementById('probaScore').textContent = score + '%';
+    document.getElementById('probaScore').className = 'proba-score ' + scoreClass;
+    document.getElementById('probaVerdict').textContent = getVerdict(score);
+    document.getElementById('probaVerdict').className = 'proba-verdict ' + scoreClass;
+
+    const bar = document.getElementById('probaBar');
+    bar.className = 'proba-bar-fill ' + barClass;
+    setTimeout(() => { bar.style.width = score + '%'; }, 100);
+
+    document.getElementById('circuleText').textContent = data.circule || '';
+    document.getElementById('webText').textContent = data.web || '';
+    document.getElementById('analyseText').textContent = data.analyse || '';
+    document.getElementById('conclusionText').textContent = data.conclusion || '';
+
+    // Historique
+    if (data.historique && data.historique.length > 0) {
+      const timeline = document.getElementById('timelineContent');
+      timeline.innerHTML = data.historique.map(h => `
+        <div class="timeline-item">
+          <span class="timeline-date">${h.date}</span>
+          <span class="timeline-desc">${h.description}</span>
+        </div>
+      `).join('');
+      document.getElementById('sectionHistorique').style.display = 'block';
+    }
+
+    // Sources
+    if (data.sources && data.sources.length > 0) {
+      const list = document.getElementById('sourcesList');
+      list.innerHTML = data.sources.map(s => `
+        <div class="source-item">
+          <span class="source-dot"></span>
+          <span>${s}</span>
+        </div>
+      `).join('');
+      document.getElementById('sectionSources').style.display = 'block';
+    }
+
+    document.getElementById('result').classList.add('show');
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function nouvelleAnalyse() {
+    document.getElementById('result').classList.remove('show');
+    document.getElementById('affirmation').value = '';
+    updateCharCount();
+    document.getElementById('sectionHistorique').style.display = 'none';
+    document.getElementById('sectionSources').style.display = 'none';
+    document.getElementById('probaBar').style.width = '0%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Demo result (avant branchement API)
+  function getDemoResult(affirmation) {
+    return {
+      score: 8,
+      circule: `L'affirmation "${affirmation}" circule régulièrement sur les réseaux sociaux et dans certains articles non vérifiés.`,
+      web: "Les sources scientifiques sérieuses disponibles sur le web contredisent largement cette affirmation. Plusieurs études publiées dans des revues à comité de lecture apportent des éléments contraires.",
+      analyse: "L'analyse des sources disponibles montre un consensus clair parmi les experts du domaine. Les arguments en faveur de cette affirmation reposent généralement sur des sources non vérifiées ou des interprétations erronées de données scientifiques.",
+      conclusion: "Cette affirmation présente une très faible probabilité d'être vraie selon les sources disponibles. Elle appartient à la catégorie des idées reçues largement réfutées par la communauté scientifique.",
+      historique: [
+        { date: "2003", description: "Premières mentions significatives dans les médias grand public." },
+        { date: "2012", description: "Regain de popularité via les réseaux sociaux naissants." },
+        { date: "2019–2024", description: "Résurgences régulières, souvent liées à des événements d'actualité." }
+      ],
+      sources: [
+        "Wikipedia — Article de référence",
+        "Snopes.com — Fact-check détaillé",
+        "Science & Vie — Analyse experte"
+      ]
+    };
+  }
+
+  // =====================
+  // FAKE NEWS SEMAINE
+  // =====================
+  let fnLoaded = false;
+
+  async function loadFakeNews() {
+    fnLoaded = true;
+    const now = new Date();
+    const options = { day: 'numeric', month: 'long', year: 'numeric' };
+    document.getElementById('fnDate').textContent = 'Semaine du ' + now.toLocaleDateString('fr-FR', options);
+
+    try {
+      const response = await fetch('/api/fakenews-semaine');
+      if (!response.ok) throw new Error();
+      const data = await response.json();
+      renderFakeNews(data.items);
+    } catch {
+      // Demo
+      await new Promise(r => setTimeout(r, 1500));
+      renderFakeNews(getDemoFakeNews());
+    }
+  }
+
+  function renderFakeNews(items) {
+    const container = document.getElementById('fnContent');
+    container.innerHTML = items.map((item, i) => {
+      const scoreClass = getScoreClass(item.score);
+      const barClass = getBarClass(item.score);
+      return `
+        <div class="fn-card" style="animation-delay:${i * 0.08}s">
+          <div class="fn-card-header">
+            <div class="fn-affirmation">${item.affirmation}</div>
+            <div class="fn-score ${scoreClass}">${item.score}%</div>
+          </div>
+          <div class="fn-bar-bg">
+            <div class="fn-bar-fill ${barClass}" style="width:${item.score}%"></div>
+          </div>
+          <div class="fn-body">${item.analyse}</div>
+          <div class="fn-timeline">
+            <svg class="fn-timeline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+            </svg>
+            ${item.historique}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function getDemoFakeNews() {
+    return [
+      {
+        affirmation: "Le réchauffement climatique est une invention des scientifiques",
+        score: 3,
+        analyse: "97% des climatologues s'accordent sur la réalité du réchauffement d'origine humaine. Les données satellitaires, les relevés de température et la fonte des glaces sont cohérents et vérifiables indépendamment.",
+        historique: "Apparue dans les années 90 — résurgences régulières, souvent associées à des lobbies industriels"
+      },
+      {
+        affirmation: "Les éoliennes rendent les gens malades",
+        score: 12,
+        analyse: "Les études scientifiques indépendantes ne montrent pas de lien de causalité entre la proximité des éoliennes et des problèmes de santé avérés. Certains symptômes rapportés s'expliquent par l'effet nocebo.",
+        historique: "Popularisée vers 2009 — revient régulièrement lors de projets d'implantation locaux"
+      },
+      {
+        affirmation: "5G et coronavirus sont liés",
+        score: 1,
+        analyse: "Aucune base scientifique. Les ondes radio n'interagissent pas avec les virus. Cette théorie a conduit à des actes de vandalisme sur des antennes en 2020.",
+        historique: "Apparue en mars 2020 — phénomène mondial, particulièrement virulente au Royaume-Uni et en France"
+      },
+      {
+        affirmation: "Les chargeurs laissés branchés consomment autant que les appareils allumés",
+        score: 28,
+        analyse: "Les chargeurs modernes consomment très peu en veille (0,1 à 0,5W). Bien que la consommation soit réelle, l'impact est marginal comparé à l'utilisation active des appareils.",
+        historique: "Conseil exagéré popularisé dans les années 2000 — partiellement vrai avec les anciens chargeurs"
+      },
+      {
+        affirmation: "Boire 8 verres d'eau par jour est indispensable",
+        score: 35,
+        analyse: "Cette règle est simplifiée à l'extrême. Les besoins en eau varient selon le poids, l'activité et l'alimentation. Une grande partie des besoins est couverte par la nourriture.",
+        historique: "Issue d'une recommandation américaine de 1945 sortie de son contexte — perpétuée par l'industrie des boissons"
+      }
+    ];
+  }
+</script>
+</body>
+</html>
