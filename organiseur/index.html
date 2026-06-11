@@ -3,660 +3,956 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Organiseur Pro - FlashTools</title>
-  <meta name="description" content="Organisez tous vos fichiers en quelques clics. Gratuit et sans inscription.">
-  
-  <!-- React & Babel -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-  
+  <title>FlashOrganiseur | FlashTools</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { overflow-x: hidden; }
-    body { font-family: 'Nunito', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #1a2942 100%); min-height: 100vh; -webkit-tap-highlight-color: transparent; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; } }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-    .tooltip { position: relative; }
-    .tooltip:hover::after {
-      content: attr(data-tip);
-      position: absolute; bottom: -32px; left: 50%; transform: translateX(-50%);
-      background: rgba(0,0,0,0.9); color: white; padding: 6px 10px;
-      border-radius: 6px; font-size: 11px; white-space: nowrap; z-index: 100;
+    :root {
+      --bg:#0A0E27; --bg2:#111827; --surface:#1E293B; --surface2:#243044;
+      --cyan:#06B6D4; --violet:#8B5CF6;
+      --text:#F1F5F9; --text2:#94A3B8; --text3:#64748B;
+      --border:#1E293B; --border2:#334155;
+      --success:#10B981; --error:#EF4444; --warn:#F59E0B;
+      --grad:linear-gradient(135deg,#06B6D4,#8B5CF6);
     }
-    .checkbox-container { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
-    .checkbox-container input { width: 18px; height: 18px; cursor: pointer; accent-color: #34d399; }
-    #loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(145deg, #0a1628 0%, #1a2942 100%); color: #60a5fa; font-size: 18px; font-family: 'Nunito', sans-serif; }
-    
-    /* Mobile touch optimizations */
-    @media (max-width: 768px) {
-      button, .clickable { min-height: 44px; min-width: 44px; }
-      input { font-size: 16px !important; } /* Prevent zoom on iOS */
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html,body{overflow-x:hidden;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-tap-highlight-color:transparent;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+    /* BOUTONS */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 16px;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;min-height:44px;transition:all .2s;}
+    .btn-grad{background:var(--grad);color:#fff;}
+    .btn-grad:hover{opacity:.88;}
+    .btn-ghost{background:rgba(255,255,255,.06);color:var(--text2);border:1px solid var(--border2);}
+    .btn-ghost:hover{border-color:var(--cyan);color:var(--text);}
+    .btn:disabled{opacity:.4;cursor:default;}
+
+    /* CARD */
+    .card{background:var(--surface);border-radius:14px;border:2px solid var(--border2);padding:18px;transition:border-color .2s;}
+    .card.drag-over{border-color:var(--cyan);background:rgba(6,182,212,.07);}
+
+    /* ÉCRANS */
+    .screen{display:none;} .screen.active{display:block;}
+
+    /* ONBOARDING */
+    #screen-onboarding{min-height:100vh;display:none;align-items:center;justify-content:center;padding:20px;}
+    #screen-onboarding.active{display:flex;}
+
+    /* APP */
+    #screen-app{padding:16px;padding-bottom:90px;}
+
+    /* HEADER */
+    .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:10px;flex-wrap:wrap;}
+    .header h1{line-height:1;display:flex;align-items:center;}
+
+    /* IMPORT ZONE */
+    .import-zone{padding:26px;background:rgba(6,182,212,.04);border:2px dashed rgba(6,182,212,.25);border-radius:14px;text-align:center;cursor:pointer;margin-bottom:16px;transition:all .2s;}
+    .import-zone:hover{border-color:var(--cyan);background:rgba(6,182,212,.08);}
+
+    /* TOOLBAR */
+    .toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+
+    /* TRASH DROP */
+    .trash-drop{padding:11px 14px;background:rgba(239,68,68,.08);border:2px dashed rgba(239,68,68,.3);border-radius:11px;color:#f87171;font-size:13px;font-weight:600;min-height:44px;display:flex;align-items:center;cursor:default;transition:all .2s;}
+    .trash-drop.drag-over{background:rgba(239,68,68,.2);border-color:var(--error);}
+
+    /* GRILLE DOSSIERS */
+    .folders-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px;margin-bottom:16px;}
+
+    /* FOLDER CARD */
+    .folder-card{background:var(--surface);border-radius:14px;border:2px solid var(--border2);padding:16px;min-height:170px;transition:all .2s;}
+    .folder-card.drag-over{border-color:var(--cyan);background:rgba(6,182,212,.07);}
+    .folder-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+    .folder-title{display:flex;align-items:center;gap:8px;}
+    .folder-name{font-size:13px;font-weight:700;color:var(--text);}
+    .folder-count{background:rgba(6,182,212,.15);padding:2px 9px;border-radius:7px;font-size:11px;font-weight:700;color:var(--cyan);}
+    .folder-actions{display:flex;gap:6px;}
+
+    /* FILES DANS DOSSIER */
+    .files-wrap{display:flex;flex-wrap:wrap;gap:9px;min-height:60px;align-content:flex-start;overflow-y:auto;max-height:260px;}
+    .empty-hint{width:100%;text-align:center;padding:16px;color:var(--text3);font-size:12px;}
+
+    /* FILE CARD */
+    .file-card{width:116px;border-radius:11px;overflow:hidden;cursor:grab;background:rgba(255,255,255,.025);border:1.5px solid var(--border2);transition:opacity .15s;flex-shrink:0;}
+    .file-card:active{cursor:grabbing;}
+    .file-card.dragging{opacity:.4;}
+    .file-thumb{height:86px;display:flex;align-items:center;justify-content:center;position:relative;background:linear-gradient(135deg,var(--surface),var(--surface2));}
+    .file-thumb img{width:100%;height:100%;object-fit:cover;}
+    .file-badge{position:absolute;padding:2px 6px;border-radius:5px;font-size:10px;font-weight:700;background:rgba(0,0,0,.75);color:#fff;}
+    .file-badge.top-left{top:4px;left:4px;}
+    .file-badge.bottom-right{bottom:4px;right:4px;}
+    .file-info{padding:7px 9px;}
+    .file-name{font-size:10px;font-weight:600;line-height:1.3;height:26px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;color:var(--text);}
+    .file-size{font-size:10px;color:var(--text3);margin-top:2px;}
+    .drop-indicator{width:4px;min-height:86px;flex-shrink:0;border-radius:3px;background:var(--grad);box-shadow:0 0 8px rgba(6,182,212,.5);align-self:stretch;}
+
+    /* ALERTS */
+    .alerts{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:1000;display:flex;flex-direction:column;gap:7px;width:340px;max-width:92vw;pointer-events:none;}
+    .alert{padding:11px 18px;border-radius:11px;font-weight:600;font-size:13px;text-align:center;animation:fadeIn .25s;}
+    .alert-success{background:rgba(16,185,129,.15);border:1px solid var(--success);color:var(--success);}
+    .alert-error{background:rgba(239,68,68,.15);border:1px solid var(--error);color:var(--error);}
+    .alert-info{background:rgba(6,182,212,.15);border:1px solid var(--cyan);color:var(--cyan);}
+
+    /* PROCESSING */
+    .processing-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;z-index:999;}
+    .processing-box{background:var(--surface);border-radius:14px;padding:32px;text-align:center;width:280px;}
+    .processing-icon{font-size:34px;margin-bottom:14px;animation:pulse 1s infinite;}
+    .processing-msg{font-size:13px;color:var(--text2);}
+
+    /* MODAL */
+    .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;z-index:998;padding:16px;}
+    .modal{background:var(--surface);border-radius:14px;padding:28px;max-width:380px;width:100%;border:1px solid var(--border2);}
+
+    /* PREVIEW */
+    .preview-bg{position:fixed;inset:0;background:rgba(0,0,0,.96);display:flex;align-items:center;justify-content:center;z-index:997;padding:20px;cursor:pointer;}
+    .preview-bg img{max-width:100%;max-height:90vh;border-radius:8px;}
+    .preview-name{position:absolute;bottom:20px;color:var(--text2);font-size:13px;}
+
+    /* CORBEILLE */
+    .trash-section{background:var(--surface);border-radius:14px;padding:14px;border:1px solid rgba(239,68,68,.25);margin-bottom:14px;}
+    .trash-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+    .trash-items{display:flex;gap:7px;flex-wrap:wrap;}
+    .trash-item{padding:7px 11px;background:var(--surface2);border-radius:8px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:7px;border:1px solid var(--border2);}
+    .trash-item:hover{border-color:var(--cyan);}
+
+    /* FOOTER */
+    footer{position:fixed;bottom:0;left:0;right:0;padding:10px 20px;background:rgba(10,14,39,.97);border-top:1px solid var(--border2);display:flex;justify-content:flex-end;align-items:center;gap:12px;font-size:12px;color:var(--text3);}
+    .progress-bar{width:75px;height:4px;background:var(--surface2);border-radius:3px;overflow:hidden;}
+    .progress-fill{height:100%;border-radius:3px;transition:width .3s;}
+
+    /* INPUT RENAME */
+    .rename-input{width:100%;padding:5px 8px;background:var(--surface2);border:1px solid var(--cyan);border-radius:6px;color:var(--text);font-size:10px;outline:none;font-family:inherit;}
+    .folder-rename-input{padding:5px 8px;background:var(--surface2);border:1px solid var(--cyan);border-radius:7px;color:var(--text);font-size:13px;font-weight:600;outline:none;font-family:inherit;width:120px;}
+
+    /* CHECKBOX */
+    .cb{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13px;color:var(--text2);user-select:none;}
+    .cb input{accent-color:var(--cyan);width:15px;height:15px;}
+
+    /* FOLDER INPUT */
+    .folder-input-row{display:flex;gap:7px;flex:1;min-width:200px;}
+    .folder-input{flex:1;padding:10px 12px;border-radius:10px;border:2px solid var(--cyan);background:var(--surface);color:var(--text);outline:none;font-size:14px;font-family:inherit;}
+
+    /* TOUCH GHOST */
+    .touch-ghost{position:fixed;pointer-events:none;z-index:9999;opacity:.85;transform:scale(1.06);border-radius:10px;overflow:hidden;box-shadow:0 8px 28px rgba(6,182,212,.4);}
+
+    /* RESPONSIVE */
+    @media(max-width:640px){
+      #screen-app{padding:12px;padding-bottom:90px;}
+      .folders-grid{grid-template-columns:1fr;}
+      .header h1{font-size:19px;}
+      .file-card{width:110px;}
+      .file-thumb{height:80px;}
     }
   </style>
 </head>
 <body>
-  <div id="loading">Chargement...</div>
-  <div id="root"></div>
-  
-  <script type="text/babel" data-presets="react">
-    const { useState, useRef, useEffect } = React;
 
-    // CONFIGURATION - Limites augmentées
-    const CONFIG = {
-      MAX_FILES: 200,
-      MAX_FOLDERS: 12,
-      MAX_PDF_PAGES: 50,
-      PDF_RENDER_SCALE: 2,
-      MAX_FILE_SIZE: 100 * 1024 * 1024, // 100 Mo par fichier
-      MAX_TOTAL_SIZE: 500 * 1024 * 1024, // 500 Mo total
-    };
+<!-- ALERTS -->
+<div class="alerts" id="alerts"></div>
 
-    // Types de fichiers supportés avec leurs icônes
-    const FILE_TYPES = {
-      // Images
-      'image/jpeg': { icon: '🖼️', category: 'image' },
-      'image/png': { icon: '🖼️', category: 'image' },
-      'image/webp': { icon: '🖼️', category: 'image' },
-      'image/gif': { icon: '🖼️', category: 'image' },
-      'image/svg+xml': { icon: '🖼️', category: 'image' },
-      'image/bmp': { icon: '🖼️', category: 'image' },
-      // Audio
-      'audio/mpeg': { icon: '🎵', category: 'audio' },
-      'audio/mp3': { icon: '🎵', category: 'audio' },
-      'audio/ogg': { icon: '🎵', category: 'audio' },
-      'audio/wav': { icon: '🎵', category: 'audio' },
-      'audio/flac': { icon: '🎵', category: 'audio' },
-      'audio/aac': { icon: '🎵', category: 'audio' },
-      // Video
-      'video/mp4': { icon: '🎬', category: 'video' },
-      'video/webm': { icon: '🎬', category: 'video' },
-      'video/quicktime': { icon: '🎬', category: 'video' },
-      'video/x-msvideo': { icon: '🎬', category: 'video' },
-      // Documents
-      'application/pdf': { icon: '📄', category: 'pdf' },
-      'application/msword': { icon: '📝', category: 'document' },
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': { icon: '📝', category: 'document' },
-      'application/vnd.ms-excel': { icon: '📊', category: 'document' },
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': { icon: '📊', category: 'document' },
-      'application/vnd.ms-powerpoint': { icon: '📽️', category: 'document' },
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation': { icon: '📽️', category: 'document' },
-      'text/plain': { icon: '📃', category: 'document' },
-      'text/csv': { icon: '📊', category: 'document' },
-      // Archives
-      'application/zip': { icon: '📦', category: 'archive' },
-      'application/x-rar-compressed': { icon: '📦', category: 'archive' },
-      'application/x-7z-compressed': { icon: '📦', category: 'archive' },
-      // Autres
-      'application/json': { icon: '⚙️', category: 'code' },
-      'text/html': { icon: '🌐', category: 'code' },
-      'text/css': { icon: '🎨', category: 'code' },
-      'text/javascript': { icon: '⚙️', category: 'code' },
-      'application/javascript': { icon: '⚙️', category: 'code' },
-    };
+<!-- PROCESSING -->
+<div class="processing-overlay" id="processing" style="display:none">
+  <div class="processing-box">
+    <div class="processing-icon">⏳</div>
+    <div class="processing-msg" id="processingMsg">Traitement…</div>
+  </div>
+</div>
 
-    function App() {
-      const [screen, setScreen] = useState('onboarding');
-      const [folders, setFolders] = useState([{ id: 'inbox', name: 'Réception', locked: true, files: [] }]);
-      const [trash, setTrash] = useState([]);
-      const [dragItem, setDragItem] = useState(null);
-      const [dragSource, setDragSource] = useState(null);
-      const [dragOverFolder, setDragOverFolder] = useState(null);
-      const [dragOverIndex, setDragOverIndex] = useState(null);
-      const [processing, setProcessing] = useState(false);
-      const [processingMsg, setProcessingMsg] = useState('');
-      const [alerts, setAlerts] = useState([]);
-      const [newFolderName, setNewFolderName] = useState('');
-      const [showFolderInput, setShowFolderInput] = useState(false);
-      const [editingFolder, setEditingFolder] = useState(null);
-      const [editingFile, setEditingFile] = useState(null);
-      const [previewFile, setPreviewFile] = useState(null);
-      const [isMobile, setIsMobile] = useState(false);
-      const [numberFiles, setNumberFiles] = useState(true);
-      const fileInputRef = useRef(null);
+<!-- PREVIEW -->
+<div class="preview-bg" id="previewBg" style="display:none" onclick="closePreview()">
+  <img id="previewImg" src="" alt="">
+  <div class="preview-name" id="previewName"></div>
+</div>
 
-      useEffect(() => {
-        document.getElementById('loading').style.display = 'none';
-        const check = () => setIsMobile(window.innerWidth <= 768);
-        check(); window.addEventListener('resize', check);
-        return () => window.removeEventListener('resize', check);
-      }, []);
+<!-- MODAL RESET -->
+<div class="modal-bg" id="modalReset" style="display:none">
+  <div class="modal" style="text-align:center">
+    <div style="font-size:36px;margin-bottom:14px">🔄</div>
+    <h3 style="font-family:'Syne',sans-serif;margin-bottom:10px;font-size:17px">Nouveau projet ?</h3>
+    <p style="color:var(--text2);font-size:13px;margin-bottom:22px">Les fichiers non exportés seront perdus.</p>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-ghost" style="flex:1" onclick="document.getElementById('modalReset').style.display='none'">Annuler</button>
+      <button class="btn btn-grad" style="flex:1" onclick="confirmReset()">Confirmer</button>
+    </div>
+  </div>
+</div>
 
-      const allFiles = folders.flatMap(f => f.files);
-      const totalFiles = allFiles.length;
-      const totalSize = allFiles.reduce((a, f) => a + (f.size || 0), 0);
-      const usagePercent = Math.min(100, (totalFiles / CONFIG.MAX_FILES) * 100);
+<!-- MODAL AIDE -->
+<div class="modal-bg" id="modalHelp" style="display:none">
+  <div class="modal">
+    <h2 style="font-family:'Syne',sans-serif;font-size:18px;color:var(--cyan);margin-bottom:16px">Aide</h2>
+    <div style="font-size:13px;line-height:2;color:var(--text2)">
+      <p><strong style="color:var(--cyan)">Glisser</strong> = déplacer un fichier entre dossiers</p>
+      <p><strong style="color:var(--cyan)">Double-clic</strong> = agrandir (images) ou renommer</p>
+      <p><strong style="color:var(--warn)">Numérotation</strong> = préserve l'ordre dans le ZIP</p>
+      <p style="margin-top:10px;font-size:11px;color:var(--text3)">200 fichiers · 100 Mo/fichier · 500 Mo total</p>
+    </div>
+    <button class="btn btn-grad" style="width:100%;margin-top:18px" onclick="document.getElementById('modalHelp').style.display='none'">OK</button>
+  </div>
+</div>
 
-      const showAlert = (msg, type = 'info') => {
-        const id = Date.now();
-        setAlerts(p => [...p, { id, msg, type }]);
-        setTimeout(() => setAlerts(p => p.filter(a => a.id !== id)), 6000);
-      };
+<!-- ONBOARDING -->
+<div id="screen-onboarding" class="active">
+  <div class="card" style="max-width:450px;width:100%;padding:36px;border-color:var(--border2)">
+    <div style="text-align:center;margin-bottom:16px">
+      <svg viewBox="0 0 420 44" width="100%" style="max-width:380px;display:block;margin:0 auto" aria-label="FlashOrganiseur">
+        <defs>
+          <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#06B6D4"/>
+            <stop offset="100%" stop-color="#8B5CF6"/>
+          </linearGradient>
+        </defs>
+        <text x="210" y="32" text-anchor="middle" font-family="Syne,sans-serif" font-size="26" font-weight="800" fill="url(#g1)">FlashOrganiseur</text>
+      </svg>
+    </div>
+    <p style="font-size:15px;text-align:center;color:var(--text2);margin-bottom:26px;line-height:1.7">
+      Classez et réorganisez <strong style="color:var(--text)">tous vos fichiers</strong>,<br>puis téléchargez en un clic.
+    </p>
+    <div style="display:flex;justify-content:center;gap:20px;margin-bottom:26px;flex-wrap:wrap">
+      <div style="text-align:center"><div style="font-size:24px;margin-bottom:3px">🖼️</div><div style="font-size:11px;color:var(--text3)">Images</div></div>
+      <div style="text-align:center"><div style="font-size:24px;margin-bottom:3px">📄</div><div style="font-size:11px;color:var(--text3)">PDF</div></div>
+      <div style="text-align:center"><div style="font-size:24px;margin-bottom:3px">🎵</div><div style="font-size:11px;color:var(--text3)">Audio</div></div>
+      <div style="text-align:center"><div style="font-size:24px;margin-bottom:3px">🎬</div><div style="font-size:11px;color:var(--text3)">Vidéo</div></div>
+      <div style="text-align:center"><div style="font-size:24px;margin-bottom:3px">📝</div><div style="font-size:11px;color:var(--text3)">Docs</div></div>
+      <div style="text-align:center"><div style="font-size:24px;margin-bottom:3px">📦</div><div style="font-size:11px;color:var(--text3)">ZIP</div></div>
+    </div>
+    <div style="background:rgba(6,182,212,.07);border:1px solid rgba(6,182,212,.2);border-radius:12px;padding:16px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><span style="font-size:18px;width:26px;text-align:center">👆</span><span style="color:var(--cyan);font-weight:700;font-size:13px">Glisser</span><span style="color:var(--text2);font-size:12px">pour déplacer entre dossiers</span></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><span style="font-size:18px;width:26px;text-align:center">🗑️</span><span style="color:var(--cyan);font-weight:700;font-size:13px">Corbeille</span><span style="color:var(--text2);font-size:12px">pour supprimer</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px;width:26px;text-align:center">👆👆</span><span style="color:var(--cyan);font-weight:700;font-size:13px">Double-tap</span><span style="color:var(--text2);font-size:12px">agrandir / renommer</span></div>
+    </div>
+    <div style="text-align:center;margin-bottom:20px;font-size:11px;color:var(--text3)">200 fichiers · 100 Mo/fichier · 500 Mo total</div>
+    <button class="btn btn-grad" style="width:100%;font-size:15px;padding:16px" onclick="showApp()">Commencer →</button>
+  </div>
+</div>
 
-      const formatSize = (b) => b < 1024 ? b + ' o' : b < 1048576 ? (b/1024).toFixed(1) + ' Ko' : (b/1048576).toFixed(1) + ' Mo';
-      
-      const getFileInfo = (type) => FILE_TYPES[type] || { icon: '📎', category: 'other' };
-      
-      const getFolderIcon = (files) => {
-        if (!files.length) return '📁';
-        const cats = [...new Set(files.map(f => f.category))];
-        if (cats.length === 1) {
-          const icons = { image: '🖼️', audio: '🎵', video: '🎬', pdf: '📄', document: '📝', archive: '📦', code: '⚙️' };
-          return icons[cats[0]] || '📁';
-        }
-        return '📁';
-      };
-      
-      const getUsageColor = () => usagePercent < 60 ? '#34d399' : usagePercent < 85 ? '#fbbf24' : '#f97316';
-      const genId = () => `f-${Date.now()}-${Math.random().toString(36).substr(2,9)}`;
-      const getExtension = (name) => { const p = name.split('.'); return p.length > 1 ? '.' + p.pop().toLowerCase() : ''; };
-      const getNameWithoutExt = (name) => { const e = getExtension(name); return e ? name.slice(0, -e.length) : name; };
+<!-- APP -->
+<div id="screen-app" style="display:none">
+  <div class="header">
+    <h1>
+      <svg viewBox="0 0 300 32" width="100%" style="max-width:260px;display:block" aria-label="FlashOrganiseur">
+        <defs>
+          <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#06B6D4"/>
+            <stop offset="100%" stop-color="#8B5CF6"/>
+          </linearGradient>
+        </defs>
+        <text x="150" y="24" text-anchor="middle" font-family="Syne,sans-serif" font-size="22" font-weight="800" fill="url(#g2)">FlashOrganiseur</text>
+      </svg>
+    </h1>
+    <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">
+      <button class="btn btn-ghost" style="padding:10px 12px" onclick="document.getElementById('modalHelp').style.display='flex'">💡</button>
+      <button class="btn btn-ghost" style="padding:10px 12px" onclick="document.getElementById('modalReset').style.display='flex'">🔄</button>
+      <button class="btn btn-grad" id="btnExportAll" onclick="exportZip(null)" disabled>📦 <span id="exportLabel">Tout exporter</span></button>
+    </div>
+  </div>
 
-      const loadScript = (src) => new Promise((res, rej) => {
-        if (document.querySelector(`script[src="${src}"]`)) { res(); return; }
-        const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s);
+  <div class="import-zone" id="importZone" onclick="document.getElementById('fileInput').click()">
+    <input type="file" id="fileInput" multiple style="display:none" accept="*/*">
+    <div style="font-size:28px;margin-bottom:7px">📥</div>
+    <div style="font-size:15px;font-weight:600;color:var(--text)" id="importLabel">Glissez ou cliquez pour importer</div>
+    <div style="font-size:11px;color:var(--text3);margin-top:5px">Tous types de fichiers acceptés</div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn btn-grad" id="btnNewFolder" onclick="toggleFolderInput()">➕ <span id="newFolderLabel">Dossier</span></button>
+    <div id="folderInputRow" style="display:none" class="folder-input-row">
+      <input type="text" class="folder-input" id="folderNameInput" placeholder="Nom du dossier" onkeydown="if(event.key==='Enter')createFolder()">
+      <button class="btn btn-grad" style="padding:10px 14px" onclick="createFolder()">✓</button>
+      <button class="btn btn-ghost" style="padding:10px 14px" onclick="toggleFolderInput()">✕</button>
+    </div>
+    <button class="btn btn-ghost" id="btnClearInbox" style="display:none" onclick="clearInbox()">🧹 Vider réception</button>
+    <label class="cb" style="margin-left:auto">
+      <input type="checkbox" id="cbNumber" checked onchange="renderAll()">
+      <span>Numéroter</span>
+    </label>
+    <div class="trash-drop" id="trashDrop">🗑️ <span id="trashCount"></span></div>
+  </div>
+
+  <div id="welcomeHint" style="display:none;padding:24px;background:rgba(6,182,212,.05);border:2px dashed rgba(6,182,212,.2);border-radius:14px;text-align:center;margin-bottom:16px">
+    <div style="font-size:24px;margin-bottom:8px">👋</div>
+    <div style="font-size:15px;font-weight:700;color:var(--cyan)">Importez des fichiers pour commencer</div>
+  </div>
+
+  <div class="folders-grid" id="foldersGrid"></div>
+  <div id="trashSection" style="display:none" class="trash-section">
+    <div class="trash-header">
+      <span style="font-weight:700;color:#f87171;font-size:13px">🗑️ Corbeille (<span id="trashCountBig">0</span>)</span>
+      <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px;min-height:auto;color:var(--error)" onclick="emptyTrash()">Vider</button>
+    </div>
+    <div class="trash-items" id="trashItems"></div>
+  </div>
+</div>
+
+<footer>
+  <span id="footerStats" style="color:var(--text2)">0 fichier</span>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%;background:var(--success)"></div></div>
+  <span id="progressPct" style="font-weight:600;color:var(--success)">0%</span>
+</footer>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────
+const CFG = { MAX_FILES:200, MAX_FOLDERS:12, MAX_FILE_SIZE:100*1024*1024, MAX_TOTAL_SIZE:500*1024*1024, MAX_PDF_PAGES:50 };
+const FILE_TYPES = {
+  'image/jpeg':{icon:'🖼️',cat:'image'},'image/png':{icon:'🖼️',cat:'image'},
+  'image/webp':{icon:'🖼️',cat:'image'},'image/gif':{icon:'🖼️',cat:'image'},
+  'image/svg+xml':{icon:'🖼️',cat:'image'},'image/bmp':{icon:'🖼️',cat:'image'},
+  'audio/mpeg':{icon:'🎵',cat:'audio'},'audio/mp3':{icon:'🎵',cat:'audio'},
+  'audio/ogg':{icon:'🎵',cat:'audio'},'audio/wav':{icon:'🎵',cat:'audio'},
+  'audio/flac':{icon:'🎵',cat:'audio'},'audio/aac':{icon:'🎵',cat:'audio'},
+  'video/mp4':{icon:'🎬',cat:'video'},'video/webm':{icon:'🎬',cat:'video'},
+  'video/quicktime':{icon:'🎬',cat:'video'},'video/x-msvideo':{icon:'🎬',cat:'video'},
+  'application/pdf':{icon:'📄',cat:'pdf'},
+  'application/msword':{icon:'📝',cat:'document'},
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document':{icon:'📝',cat:'document'},
+  'application/vnd.ms-excel':{icon:'📊',cat:'document'},
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':{icon:'📊',cat:'document'},
+  'text/plain':{icon:'📃',cat:'document'},'text/csv':{icon:'📊',cat:'document'},
+  'application/zip':{icon:'📦',cat:'archive'},
+  'application/json':{icon:'⚙️',cat:'code'},'text/html':{icon:'🌐',cat:'code'},
+};
+
+// ── STATE ───────────────────────────────────────────────
+let folders = [{ id:'inbox', name:'Réception', locked:true, files:[] }];
+let trash = [];
+let dragItem = null, dragSource = null, dragOverFolderId = null;
+// État d'insertion précis — folderId + index où sera inséré le fichier
+let dragOverState = null; // { folderId, insertIndex }
+let touchGhost = null, touchDragging = null;
+
+// ── UTILS ───────────────────────────────────────────────
+const genId = () => 'f-'+Date.now()+'-'+Math.random().toString(36).substr(2,8);
+const fmtSize = b => b<1024?b+' o':b<1048576?(b/1024).toFixed(1)+' Ko':(b/1048576).toFixed(1)+' Mo';
+const getExt = n => { const p=n.split('.'); return p.length>1?'.'+p.pop().toLowerCase():''; };
+const getBase = n => { const e=getExt(n); return e?n.slice(0,-e.length):n; };
+const getInfo = t => FILE_TYPES[t]||{icon:'📎',cat:'other'};
+const isMobile = () => window.innerWidth <= 640;
+
+// ── ALERTS ──────────────────────────────────────────────
+function showAlert(msg, type='info') {
+  const el = document.createElement('div');
+  el.className = `alert alert-${type}`;
+  el.textContent = msg;
+  document.getElementById('alerts').appendChild(el);
+  setTimeout(() => el.remove(), 4500);
+}
+
+// ── PROCESSING ──────────────────────────────────────────
+function setProcessing(on, msg='') {
+  document.getElementById('processing').style.display = on ? 'flex' : 'none';
+  document.getElementById('processingMsg').textContent = msg;
+}
+
+// ── SCREENS ─────────────────────────────────────────────
+function showApp() {
+  document.getElementById('screen-onboarding').style.display = 'none';
+  document.getElementById('screen-app').style.display = 'block';
+  // Mobile : adapter labels
+  if(isMobile()) {
+    document.getElementById('importLabel').textContent = 'Appuyer pour importer';
+    document.getElementById('exportLabel').textContent = '';
+    document.getElementById('newFolderLabel').textContent = '';
+  }
+  setupDropZones();
+  renderAll();
+}
+
+// ── LOAD SCRIPT ─────────────────────────────────────────
+function loadScript(src) {
+  return new Promise((res,rej) => {
+    if(document.querySelector(`script[src="${src}"]`)){res();return;}
+    const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;
+    document.head.appendChild(s);
+  });
+}
+
+// ── PROCESS FILES ───────────────────────────────────────
+async function processFiles(fileList) {
+  const files = Array.from(fileList);
+  const allFiles = folders.flatMap(f=>f.files);
+  let totalSize = allFiles.reduce((a,f)=>a+(f.size||0),0);
+  setProcessing(true, '');
+  const newFiles = [];
+
+  for(let i=0;i<files.length;i++) {
+    const file = files[i];
+    setProcessing(true, `${i+1}/${files.length} : ${file.name}`);
+    if(file.size>CFG.MAX_FILE_SIZE){showAlert('Trop gros (max 100Mo) : '+file.name,'error');continue;}
+    if(totalSize+file.size>CFG.MAX_TOTAL_SIZE){showAlert('Limite 500Mo atteinte','error');break;}
+    if(allFiles.length+newFiles.length>=CFG.MAX_FILES){showAlert('Limite 200 fichiers atteinte','error');break;}
+    const {icon,cat} = getInfo(file.type);
+
+    if(cat==='image') {
+      const preview = await new Promise(r=>{
+        const fr=new FileReader();
+        fr.onload=e=>r(e.target.result);
+        fr.onerror=()=>r(null);
+        fr.readAsDataURL(file);
       });
-
-      const processFiles = async (fileList) => {
-        const files = Array.from(fileList);
-        setProcessing(true);
-        const newFiles = [];
-        
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
-          setProcessingMsg(`${i+1}/${files.length}: ${file.name}`);
-          
-          // Vérifications
-          if (file.size > CONFIG.MAX_FILE_SIZE) { 
-            showAlert(`Fichier trop gros (max 100Mo): ${file.name}`, 'error'); 
-            continue; 
-          }
-          if (totalSize + file.size > CONFIG.MAX_TOTAL_SIZE) {
-            showAlert('Limite totale atteinte (500Mo)', 'error');
-            break;
-          }
-          if (totalFiles + newFiles.length >= CONFIG.MAX_FILES) { 
-            showAlert('Limite de fichiers atteinte (200)', 'error'); 
-            break; 
-          }
-          
-          const fileInfo = getFileInfo(file.type);
-          const category = fileInfo.category;
-          const icon = fileInfo.icon;
-          
-          // Images - génère preview
-          if (category === 'image') {
-            try {
-              const preview = await new Promise(r => { 
-                const fr = new FileReader(); 
-                fr.onload = e => r(e.target.result); 
-                fr.onerror = () => r(null);
-                fr.readAsDataURL(file); 
-              });
-              newFiles.push({ id: genId(), name: file.name, type: file.type, category, icon, size: file.size, preview, file });
-            } catch {
-              newFiles.push({ id: genId(), name: file.name, type: file.type, category, icon, size: file.size, file });
-            }
-          }
-          // Audio - récupère durée
-          else if (category === 'audio') {
-            const duration = await new Promise(r => {
-              try {
-                const url = URL.createObjectURL(file);
-                const a = new Audio(); a.preload = 'metadata';
-                a.onloadedmetadata = () => { URL.revokeObjectURL(url); r(a.duration && isFinite(a.duration) ? `${Math.floor(a.duration/60)}:${String(Math.floor(a.duration%60)).padStart(2,'0')}` : null); };
-                a.onerror = () => { URL.revokeObjectURL(url); r(null); }; 
-                a.src = url;
-              } catch { r(null); }
-            });
-            newFiles.push({ id: genId(), name: file.name, type: file.type, category, icon, size: file.size, duration, file });
-          }
-          // PDF - extrait pages
-          else if (category === 'pdf') {
-            if (!window.pdfjsLib) {
-              await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
-              window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-            }
-            try {
-              const pdf = await window.pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
-              const n = Math.min(pdf.numPages, CONFIG.MAX_PDF_PAGES);
-              for (let p = 1; p <= n; p++) {
-                setProcessingMsg(`PDF ${p}/${n}`);
-                const page = await pdf.getPage(p);
-                const vp = page.getViewport({ scale: 0.5 });
-                const canvas = document.createElement('canvas'); canvas.width = vp.width; canvas.height = vp.height;
-                await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
-                newFiles.push({ id: genId(), name: `${file.name.replace('.pdf','')} - Page ${p}`, type: 'application/pdf', category: 'pdf', icon: '📄', size: Math.floor(file.size/n), pageNum: p, totalPages: pdf.numPages, preview: canvas.toDataURL('image/jpeg', 0.7), originalPdf: file.name, file });
-              }
-            } catch { 
-              newFiles.push({ id: genId(), name: file.name, type: 'application/pdf', category: 'pdf', icon: '📄', size: file.size, file }); 
-            }
-          }
-          // Autres fichiers
-          else {
-            newFiles.push({ id: genId(), name: file.name, type: file.type, category, icon, size: file.size, file });
-          }
+      newFiles.push({id:genId(),name:file.name,type:file.type,cat,icon,size:file.size,preview,file});
+    } else if(cat==='audio') {
+      const duration = await new Promise(r=>{
+        try{
+          const url=URL.createObjectURL(file);
+          const a=new Audio();a.preload='metadata';
+          a.onloadedmetadata=()=>{URL.revokeObjectURL(url);r(isFinite(a.duration)?`${Math.floor(a.duration/60)}:${String(Math.floor(a.duration%60)).padStart(2,'0')}`:null);};
+          a.onerror=()=>{URL.revokeObjectURL(url);r(null);};
+          a.src=url;
+        }catch{r(null);}
+      });
+      newFiles.push({id:genId(),name:file.name,type:file.type,cat,icon,size:file.size,duration,file});
+    } else if(cat==='pdf') {
+      if(!window.pdfjsLib){
+        await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      }
+      try{
+        const pdf=await window.pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;
+        const n=Math.min(pdf.numPages,CFG.MAX_PDF_PAGES);
+        for(let p=1;p<=n;p++){
+          setProcessing(true,`PDF page ${p}/${n}`);
+          const page=await pdf.getPage(p);
+          const vp=page.getViewport({scale:.5});
+          const cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;
+          await page.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;
+          newFiles.push({id:genId(),name:`${file.name.replace('.pdf','')} - Page ${p}`,type:'application/pdf',cat:'pdf',icon:'📄',size:Math.floor(file.size/n),pageNum:p,totalPages:pdf.numPages,preview:cv.toDataURL('image/jpeg',.7),originalPdf:file.name,file});
         }
-        
-        if (newFiles.length) {
-          setFolders(p => p.map(f => f.id === 'inbox' ? { ...f, files: [...newFiles, ...f.files] } : f));
-          showAlert(`${newFiles.length} fichier(s) ajouté(s)`, 'success');
+      }catch{newFiles.push({id:genId(),name:file.name,type:'application/pdf',cat:'pdf',icon:'📄',size:file.size,file});}
+    } else {
+      newFiles.push({id:genId(),name:file.name,type:file.type,cat,icon,size:file.size,file});
+    }
+    totalSize += file.size;
+  }
+
+  if(newFiles.length){
+    folders = folders.map(f=>f.id==='inbox'?{...f,files:[...newFiles,...f.files]}:f);
+    showAlert(`${newFiles.length} fichier(s) ajouté(s)`,'success');
+  }
+  setProcessing(false);
+  renderAll();
+}
+
+// ── FOLDER ACTIONS ──────────────────────────────────────
+function toggleFolderInput() {
+  const row = document.getElementById('folderInputRow');
+  const btn = document.getElementById('btnNewFolder');
+  const visible = row.style.display !== 'none';
+  row.style.display = visible ? 'none' : 'flex';
+  btn.style.display = visible ? 'inline-flex' : 'none';
+  if(!visible) setTimeout(()=>document.getElementById('folderNameInput').focus(),50);
+}
+
+function createFolder() {
+  const name = document.getElementById('folderNameInput').value.trim();
+  if(!name) return;
+  if(folders.length>=CFG.MAX_FOLDERS){showAlert('Max '+CFG.MAX_FOLDERS+' dossiers','error');return;}
+  folders.push({id:genId(),name,locked:false,files:[]});
+  document.getElementById('folderNameInput').value='';
+  toggleFolderInput();
+  showAlert('Dossier créé','success');
+  renderAll();
+}
+
+function deleteFolder(id) {
+  const f = folders.find(x=>x.id===id);
+  if(!f||f.locked) return;
+  folders = folders.filter(x=>x.id!==id).map(x=>x.id==='inbox'?{...x,files:[...f.files,...x.files]}:x);
+  showAlert('Fichiers déplacés vers Réception','info');
+  renderAll();
+}
+
+function clearInbox() {
+  const inbox = folders.find(f=>f.id==='inbox');
+  if(!inbox?.files.length) return;
+  trash = [...trash, ...inbox.files];
+  folders = folders.map(f=>f.id==='inbox'?{...f,files:[]}:f);
+  showAlert('Réception vidée','info');
+  renderAll();
+}
+
+function confirmReset() {
+  folders = [{id:'inbox',name:'Réception',locked:true,files:[]}];
+  trash = [];
+  document.getElementById('modalReset').style.display='none';
+  showAlert('Nouveau projet','success');
+  renderAll();
+}
+
+function emptyTrash() { trash=[]; renderAll(); }
+
+function restoreFile(id) {
+  const item = trash.find(f=>f.id===id);
+  if(!item) return;
+  trash = trash.filter(f=>f.id!==id);
+  folders = folders.map(f=>f.id==='inbox'?{...f,files:[item,...f.files]}:f);
+  renderAll();
+}
+
+// ── RENAME ──────────────────────────────────────────────
+function startRenameFile(folderId, fileId, el) {
+  const file = folders.find(f=>f.id===folderId)?.files.find(x=>x.id===fileId);
+  if(!file) return;
+  el.innerHTML = `<input class="rename-input" value="${file.name.replace(/"/g,'&quot;')}">`;
+  const input = el.querySelector('input');
+  input.focus(); input.select();
+  const done = () => {
+    const v = input.value.trim();
+    if(v) folders=folders.map(f=>f.id===folderId?{...f,files:f.files.map(x=>x.id===fileId?{...x,name:v}:x)}:f);
+    renderAll();
+  };
+  input.onblur = done;
+  input.onkeydown = e => { if(e.key==='Enter') done(); e.stopPropagation(); };
+  input.onclick = e => e.stopPropagation();
+}
+
+function startRenameFolder(id, el) {
+  const f = folders.find(x=>x.id===id);
+  if(!f||f.locked) return;
+  el.innerHTML = `<input class="folder-rename-input" value="${f.name.replace(/"/g,'&quot;')}">`;
+  const input = el.querySelector('input');
+  input.focus(); input.select();
+  const done = () => {
+    const v = input.value.trim();
+    if(v) folders=folders.map(x=>x.id===id?{...x,name:v}:x);
+    renderAll();
+  };
+  input.onblur = done;
+  input.onkeydown = e => { if(e.key==='Enter') done(); e.stopPropagation(); };
+}
+
+// ── PREVIEW ─────────────────────────────────────────────
+function openPreview(src, name) {
+  document.getElementById('previewImg').src = src;
+  document.getElementById('previewName').textContent = name;
+  document.getElementById('previewBg').style.display = 'flex';
+}
+function closePreview() { document.getElementById('previewBg').style.display='none'; }
+
+// ── DRAG & DROP MOUSE ───────────────────────────────────
+function setupDropZones() {
+  // Import zone
+  const iz = document.getElementById('importZone');
+  iz.ondragover = e => { e.preventDefault(); iz.style.borderColor='var(--cyan)'; };
+  iz.ondragleave = () => { iz.style.borderColor='rgba(6,182,212,.25)'; };
+  iz.ondrop = e => { e.preventDefault(); iz.style.borderColor='rgba(6,182,212,.25)'; if(e.dataTransfer.files.length) processFiles(e.dataTransfer.files); };
+
+  // Trash
+  const td = document.getElementById('trashDrop');
+  td.ondragover = e => { e.preventDefault(); td.classList.add('drag-over'); };
+  td.ondragleave = () => td.classList.remove('drag-over');
+  td.ondrop = e => {
+    e.preventDefault(); td.classList.remove('drag-over');
+    if(!dragItem||!dragSource) return;
+    folders=folders.map(f=>f.id===dragSource.folderId?{...f,files:f.files.filter((_,i)=>i!==dragSource.index)}:f);
+    trash=[...trash,dragItem];
+    dragItem=null;dragSource=null;
+    renderAll();
+  };
+
+  // File input
+  document.getElementById('fileInput').onchange = e => {
+    if(e.target.files.length) processFiles(e.target.files);
+    e.target.value='';
+  };
+}
+
+// ── TOUCH DRAG ──────────────────────────────────────────
+function onTouchStartFile(e, file, folderId, index, cardEl) {
+  const touch = e.touches[0];
+  const rect = cardEl.getBoundingClientRect();
+  touchDragging = {file, folderId, index};
+  touchGhost = cardEl.cloneNode(true);
+  touchGhost.className = 'touch-ghost';
+  touchGhost.style.width = rect.width+'px';
+  touchGhost.style.height = rect.height+'px';
+  touchGhost.style.left = rect.left+'px';
+  touchGhost.style.top = rect.top+'px';
+  document.body.appendChild(touchGhost);
+  cardEl.style.opacity = '.35';
+}
+
+document.addEventListener('touchmove', e => {
+  if(!touchGhost) return;
+  const t = e.touches[0];
+  touchGhost.style.left = (t.clientX - parseInt(touchGhost.style.width)/2)+'px';
+  touchGhost.style.top = (t.clientY - parseInt(touchGhost.style.height)/2)+'px';
+}, {passive:true});
+
+document.addEventListener('touchend', e => {
+  if(!touchGhost||!touchDragging) return;
+  const t = e.changedTouches[0];
+  touchGhost.remove(); touchGhost=null;
+  // Restaurer opacité
+  renderAll();
+  const el = document.elementFromPoint(t.clientX, t.clientY);
+  if(!el) {touchDragging=null;return;}
+  const trashEl = el.closest('[data-trash]');
+  const folderEl = el.closest('[data-folderid]');
+  if(trashEl) {
+    folders=folders.map(f=>f.id===touchDragging.folderId?{...f,files:f.files.filter((_,i)=>i!==touchDragging.index)}:f);
+    trash=[...trash,touchDragging.file];
+    showAlert('Fichier supprimé','info');
+  } else if(folderEl) {
+    const targetId = folderEl.getAttribute('data-folderid');
+    if(targetId && targetId!==touchDragging.folderId) {
+      folders=folders.map(f=>{
+        if(f.id===touchDragging.folderId) return {...f,files:f.files.filter((_,i)=>i!==touchDragging.index)};
+        if(f.id===targetId) return {...f,files:[...f.files,touchDragging.file]};
+        return f;
+      });
+      showAlert('Fichier déplacé','success');
+    }
+  }
+  touchDragging=null;
+  renderAll();
+}, {passive:true});
+
+// ── RENDER ──────────────────────────────────────────────
+function renderAll() {
+  const numbered = document.getElementById('cbNumber')?.checked;
+  const allFiles = folders.flatMap(f=>f.files);
+  const totalFiles = allFiles.length;
+  const totalSize = allFiles.reduce((a,f)=>a+(f.size||0),0);
+  const pct = Math.min(100,Math.round((totalFiles/CFG.MAX_FILES)*100));
+  const col = pct<60?'var(--success)':pct<85?'var(--warn)':'var(--error)';
+
+  // Footer
+  document.getElementById('footerStats').textContent = `${totalFiles} fichier${totalFiles!==1?'s':''} · ${fmtSize(totalSize)}`;
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('progressFill').style.background = col;
+  document.getElementById('progressPct').style.color = col;
+  document.getElementById('progressPct').textContent = pct+'%';
+
+  // Export all btn
+  const btnAll = document.getElementById('btnExportAll');
+  btnAll.disabled = !totalFiles;
+
+  // Clear inbox btn
+  const inbox = folders.find(f=>f.id==='inbox');
+  document.getElementById('btnClearInbox').style.display = inbox?.files.length?'inline-flex':'none';
+
+  // Welcome hint
+  document.getElementById('welcomeHint').style.display = (folders.length===1&&!folders[0].files.length)?'block':'none';
+
+  // Trash
+  const trashCount = trash.length;
+  document.getElementById('trashCount').textContent = trashCount>0?`(${trashCount})`:'';
+  document.getElementById('trashCountBig').textContent = trashCount;
+  document.getElementById('trashSection').style.display = trashCount>0?'block':'none';
+  renderTrash();
+
+  // Folders
+  renderFolders(numbered);
+}
+
+function renderTrash() {
+  const el = document.getElementById('trashItems');
+  el.innerHTML = '';
+  trash.slice(0,8).forEach(f => {
+    const item = document.createElement('div');
+    item.className = 'trash-item';
+    item.innerHTML = `<span>${f.icon||'📎'}</span><span style="max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)">${f.name}</span><span style="color:var(--cyan)">↩</span>`;
+    item.onclick = () => restoreFile(f.id);
+    el.appendChild(item);
+  });
+  if(trash.length>8) {
+    const more = document.createElement('span');
+    more.style.cssText='padding:7px;color:var(--text3);font-size:12px;align-self:center';
+    more.textContent = `+${trash.length-8}`;
+    el.appendChild(more);
+  }
+}
+
+function renderFolders(numbered) {
+  const grid = document.getElementById('foldersGrid');
+  grid.innerHTML = '';
+  folders.forEach(folder => {
+    const card = document.createElement('div');
+    card.className = 'folder-card';
+    card.setAttribute('data-folderid', folder.id);
+
+    // Drag over folder — highlight cadre + calcul position d'insertion
+    card.ondragover = e => {
+      e.preventDefault(); e.stopPropagation();
+      card.classList.add('drag-over');
+      // Calcul de l'index d'insertion selon position souris dans les file cards
+      const wrap = card.querySelector('.files-wrap');
+      const cards = Array.from(wrap.querySelectorAll('.file-card'));
+      let insertIndex = folder.files.length; // par défaut : à la fin
+      for(let i=0;i<cards.length;i++) {
+        const r = cards[i].getBoundingClientRect();
+        if(e.clientX < r.left + r.width/2) { insertIndex = i; break; }
+      }
+      const changed = !dragOverState || dragOverState.folderId !== folder.id || dragOverState.insertIndex !== insertIndex;
+      if(changed) {
+        dragOverState = { folderId: folder.id, insertIndex };
+        renderInsertIndicators();
+      }
+    };
+    card.ondragleave = e => {
+      // Vérifier qu'on quitte vraiment la card (pas juste un enfant)
+      if(!card.contains(e.relatedTarget)) {
+        card.classList.remove('drag-over');
+        if(dragOverState && dragOverState.folderId === folder.id) {
+          dragOverState = null;
+          renderInsertIndicators();
         }
-        setProcessing(false); setProcessingMsg('');
-      };
-
-      // Drag & Drop handlers
-      const onDragStart = (e, item, folderId, index) => { e.dataTransfer.effectAllowed = 'move'; setDragItem(item); setDragSource({ folderId, index }); };
-      const onDragEnd = () => { setDragItem(null); setDragSource(null); setDragOverFolder(null); setDragOverIndex(null); };
-      const onDragOverCard = (e, folderId, index) => {
-        e.preventDefault(); e.stopPropagation();
-        const rect = e.currentTarget.getBoundingClientRect();
-        const insertIndex = e.clientX < rect.left + rect.width / 2 ? index : index + 1;
-        if (dragOverFolder !== folderId || dragOverIndex !== insertIndex) { setDragOverFolder(folderId); setDragOverIndex(insertIndex); }
-      };
-      const onDropFolder = (e, targetId) => {
-        e.preventDefault(); e.stopPropagation();
-        if (!dragItem || !dragSource) return;
-        setFolders(prev => {
-          const next = prev.map(f => ({ ...f, files: [...f.files] }));
-          const src = next.find(f => f.id === dragSource.folderId), tgt = next.find(f => f.id === targetId);
-          if (!src || !tgt) return prev;
-          src.files.splice(dragSource.index, 1);
-          let idx = dragOverIndex ?? tgt.files.length;
-          if (dragSource.folderId === targetId && dragSource.index < idx) idx = Math.max(0, idx - 1);
-          tgt.files.splice(idx, 0, dragItem);
-          return next;
-        });
-        onDragEnd();
-      };
-      const onDropTrash = (e) => {
-        e.preventDefault(); if (!dragItem || !dragSource) return;
-        setFolders(p => p.map(f => f.id === dragSource.folderId ? { ...f, files: f.files.filter((_, i) => i !== dragSource.index) } : f));
-        setTrash(p => [...p, dragItem]); onDragEnd();
-      };
-
-      // Actions
-      const createFolder = () => {
-        if (!newFolderName.trim()) return;
-        if (folders.length >= CONFIG.MAX_FOLDERS) { showAlert(`Max ${CONFIG.MAX_FOLDERS} dossiers`, 'error'); return; }
-        setFolders(p => [...p, { id: genId(), name: newFolderName.trim(), locked: false, files: [] }]);
-        setNewFolderName(''); setShowFolderInput(false); showAlert('Dossier créé', 'success');
-      };
-      const deleteFolder = (id) => {
-        const folder = folders.find(f => f.id === id);
-        if (!folder || folder.locked) return;
-        setFolders(prev => prev.filter(f => f.id !== id).map(f => f.id === 'inbox' ? { ...f, files: [...folder.files, ...f.files] } : f));
-        showAlert('Fichiers déplacés', 'info');
-      };
-      const renameFolder = (id, name) => { if (!name.trim()) return; setFolders(p => p.map(f => f.id === id ? { ...f, name: name.trim() } : f)); setEditingFolder(null); };
-      const clearInbox = () => {
-        const inbox = folders.find(f => f.id === 'inbox');
-        if (!inbox?.files.length) return;
-        setTrash(p => [...p, ...inbox.files]);
-        setFolders(p => p.map(f => f.id === 'inbox' ? { ...f, files: [] } : f));
-        showAlert('Réception vidée', 'info');
-      };
-      const resetProject = () => { setFolders([{ id: 'inbox', name: 'Réception', locked: true, files: [] }]); setTrash([]); setScreen('app'); showAlert('Nouveau projet', 'success'); };
-      const renameFile = (folderId, fileId, name) => { if (!name.trim()) return; setFolders(p => p.map(f => f.id === folderId ? { ...f, files: f.files.map(file => file.id === fileId ? { ...file, name: name.trim() } : file) } : f)); setEditingFile(null); };
-      const restoreFile = (item) => { setTrash(p => p.filter(f => f.id !== item.id)); setFolders(p => p.map(f => f.id === 'inbox' ? { ...f, files: [item, ...f.files] } : f)); };
-
-      // Export ZIP
-      const exportZip = async (singleFolderId = null) => {
-        const toExport = singleFolderId ? folders.filter(f => f.id === singleFolderId && f.files.length) : folders.filter(f => f.files.length);
-        if (!toExport.length) { showAlert('Aucun fichier', 'info'); return; }
-        setProcessing(true); setProcessingMsg('Préparation...');
-        try {
-          await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
-          await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
-          if (!window.pdfjsLib) {
-            await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
-            window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-          }
-          const zip = new window.JSZip();
-          for (const folder of toExport) {
-            setProcessingMsg(`Dossier: ${folder.name}`);
-            const zf = singleFolderId ? zip : zip.folder(folder.name.replace(/[\\/:*?"<>|]/g, '_'));
-            const pdfGroups = {}, others = [];
-            folder.files.forEach(f => f.originalPdf && f.pageNum ? (pdfGroups[f.originalPdf] = pdfGroups[f.originalPdf] || []).push(f) : others.push(f));
-            let idx = 1;
-            for (const [name, pages] of Object.entries(pdfGroups)) {
-              setProcessingMsg(`PDF: ${name}`);
-              try {
-                const pdfDoc = await window.pdfjsLib.getDocument({ data: await pages[0].file.arrayBuffer() }).promise;
-                const { jsPDF } = window.jspdf; let doc = null;
-                for (let i = 0; i < pages.length; i++) {
-                  const pg = await pdfDoc.getPage(pages[i].pageNum);
-                  const vp = pg.getViewport({ scale: 2 });
-                  const canvas = document.createElement('canvas'); canvas.width = vp.width; canvas.height = vp.height;
-                  const ctx = canvas.getContext('2d'); ctx.fillStyle = 'white'; ctx.fillRect(0,0,vp.width,vp.height);
-                  await pg.render({ canvasContext: ctx, viewport: vp }).promise;
-                  const img = canvas.toDataURL('image/png');
-                  const w = vp.width/2*72/96, h = vp.height/2*72/96;
-                  if (!doc) doc = new jsPDF({ orientation: w > h ? 'l' : 'p', unit: 'pt', format: [w,h] });
-                  else doc.addPage([w,h], w > h ? 'l' : 'p');
-                  doc.addImage(img, 'PNG', 0, 0, w, h);
-                }
-                let fn = name.replace(/[\\/:*?"<>|]/g, '_'); if (!fn.endsWith('.pdf')) fn += '.pdf';
-                if (numberFiles) fn = `${String(idx++).padStart(2,'0')} - ${fn}`;
-                zf.file(fn, doc.output('blob'));
-              } catch(e) { console.error(e); }
-            }
-            for (const f of others) {
-              if (!f.file) continue;
-              const ext = getExtension(f.file.name);
-              let fn = getNameWithoutExt(f.name).replace(/[\\/:*?"<>|]/g, '_') + ext;
-              if (numberFiles) fn = `${String(idx++).padStart(2,'0')} - ${fn}`;
-              zf.file(fn, await f.file.arrayBuffer());
-            }
-          }
-          setProcessingMsg('Compression...');
-          const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
-          const a = document.createElement('a');
-          a.href = URL.createObjectURL(blob);
-          a.download = singleFolderId ? `${toExport[0].name}.zip` : `fichiers-${new Date().toISOString().slice(0,10)}.zip`;
-          a.click(); URL.revokeObjectURL(a.href);
-          showAlert('ZIP téléchargé ! Extrayez pour voir les miniatures.', 'success');
-        } catch(e) { console.error(e); showAlert('Erreur export', 'error'); }
-        setProcessing(false); setProcessingMsg('');
-      };
-
-      const bg = 'linear-gradient(145deg, #0a1628 0%, #1a2942 100%)';
-      const btnStyle = { padding: isMobile ? '12px 14px' : '10px 16px', borderRadius: 10, border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit' };
-
-      // ==================
-      // ONBOARDING - Aéré
-      // ==================
-      if (screen === 'onboarding') {
-        return (
-          <div style={{ minHeight: '100vh', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: isMobile ? 16 : 24, fontFamily: "'Nunito', sans-serif", color: '#e2e8f0' }}>
-            <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 24, padding: isMobile ? 28 : 40, maxWidth: 480, width: '100%', border: '1px solid rgba(255,255,255,0.06)' }}>
-              
-              {/* Logo */}
-              <h1 style={{ fontSize: isMobile ? 28 : 36, fontWeight: 800, textAlign: 'center', marginBottom: 20, background: 'linear-gradient(135deg, #60a5fa, #34d399)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                Organiseur Pro
-              </h1>
-              
-              {/* Accroche */}
-              <p style={{ fontSize: isMobile ? 15 : 17, textAlign: 'center', color: '#94a3b8', marginBottom: 32, lineHeight: 1.6 }}>
-                Classez et réorganisez <b style={{ color: '#f1f5f9' }}>tous vos fichiers</b><br/>
-                puis téléchargez en un clic.
-              </p>
-
-              {/* Types de fichiers */}
-              <div style={{ display: 'flex', justifyContent: 'center', gap: isMobile ? 16 : 24, marginBottom: 32, flexWrap: 'wrap' }}>
-                {[
-                  { icon: '🖼️', label: 'Images' },
-                  { icon: '📄', label: 'PDF' },
-                  { icon: '🎵', label: 'Audio' },
-                  { icon: '🎬', label: 'Vidéo' },
-                  { icon: '📝', label: 'Docs' },
-                  { icon: '📦', label: 'ZIP' },
-                ].map((t, i) => (
-                  <div key={i} style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: 28, marginBottom: 4 }}>{t.icon}</div>
-                    <div style={{ fontSize: 11, color: '#64748b' }}>{t.label}</div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Gestes */}
-              <div style={{ background: 'rgba(52,211,153,0.08)', borderRadius: 16, padding: isMobile ? 16 : 20, marginBottom: 24 }}>
-                {[
-                  ['👆', 'Glisser', 'pour déplacer'],
-                  ['🗑️', 'Corbeille', 'pour supprimer'],
-                  ['👆👆', 'Double-clic', 'pour agrandir'],
-                ].map(([icon, action, desc], i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: i < 2 ? 10 : 0 }}>
-                    <span style={{ fontSize: 20, width: 32, textAlign: 'center' }}>{icon}</span>
-                    <span style={{ color: '#34d399', fontWeight: 700, fontSize: 14 }}>{action}</span>
-                    <span style={{ color: '#94a3b8', fontSize: 13 }}>{desc}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Limites */}
-              <div style={{ textAlign: 'center', marginBottom: 28, fontSize: 12, color: '#64748b' }}>
-                <span style={{ color: '#94a3b8' }}>200 fichiers</span> • <span style={{ color: '#94a3b8' }}>100 Mo/fichier</span> • <span style={{ color: '#94a3b8' }}>500 Mo total</span>
-              </div>
-
-              {/* CTA */}
-              <button 
-                onClick={() => setScreen('app')} 
-                style={{ 
-                  width: '100%', 
-                  padding: isMobile ? 16 : 18, 
-                  fontSize: 16, 
-                  fontWeight: 700, 
-                  background: 'linear-gradient(135deg, #3b82f6, #10b981)', 
-                  border: 'none', 
-                  borderRadius: 14, 
-                  color: 'white', 
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 20px rgba(59, 130, 246, 0.3)'
-                }}
-              >
-                Commencer →
-              </button>
-            </div>
-          </div>
-        );
       }
+    };
+    card.ondrop = e => {
+      e.preventDefault(); e.stopPropagation();
+      card.classList.remove('drag-over');
+      if(!dragItem||!dragSource) return;
+      const insertAt = dragOverState ? dragOverState.insertIndex : folder.files.length;
+      folders = folders.map(f => {
+        if(f.id === dragSource.folderId) return {...f, files: f.files.filter((_,i) => i !== dragSource.index)};
+        return f;
+      });
+      // Recalcul index si même dossier
+      let realInsert = insertAt;
+      if(dragSource.folderId === folder.id && dragSource.index < insertAt) realInsert = Math.max(0, insertAt - 1);
+      folders = folders.map(f => {
+        if(f.id === folder.id) {
+          const newFiles = [...f.files];
+          newFiles.splice(realInsert, 0, dragItem);
+          return {...f, files: newFiles};
+        }
+        return f;
+      });
+      dragItem=null; dragSource=null; dragOverState=null;
+      renderAll();
+    };
 
-      // HELP
-      if (screen === 'help') {
-        return (
-          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 }}>
-            <div style={{ background: '#1a2942', borderRadius: 16, padding: 24, maxWidth: 400, width: '100%', position: 'relative', color: '#e2e8f0' }}>
-              <button onClick={() => setScreen('app')} style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 8, width: 36, height: 36, color: '#94a3b8', cursor: 'pointer', fontSize: 16 }}>✕</button>
-              <h2 style={{ fontSize: 18, marginBottom: 20 }}>💡 Aide</h2>
-              <div style={{ fontSize: 13, lineHeight: 2, color: '#cbd5e1' }}>
-                <p><b style={{ color: '#60a5fa' }}>Tous types de fichiers</b> acceptés</p>
-                <p><b style={{ color: '#34d399' }}>Glisser</b> = déplacer</p>
-                <p><b style={{ color: '#34d399' }}>Double-clic</b> = agrandir (images)</p>
-                <p><b style={{ color: '#fb923c' }}>Numérotation</b> = préserve l'ordre</p>
-              </div>
-              <div style={{ marginTop: 16, padding: 12, background: 'rgba(96,165,250,0.1)', borderRadius: 10, fontSize: 12, color: '#94a3b8' }}>
-                <b style={{ color: '#60a5fa' }}>Limites :</b> 200 fichiers • 100 Mo/fichier • 500 Mo total
-              </div>
-              <button onClick={() => setScreen('app')} style={{ width: '100%', marginTop: 20, padding: 14, background: '#3b82f6', border: 'none', borderRadius: 10, color: 'white', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>OK</button>
-            </div>
-          </div>
-        );
-      }
+    // Header
+    const header = document.createElement('div');
+    header.className = 'folder-header';
 
-      // RESET
-      if (screen === 'reset') {
-        return (
-          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 }}>
-            <div style={{ background: '#1a2942', borderRadius: 16, padding: 28, maxWidth: 320, width: '100%', textAlign: 'center', color: '#e2e8f0' }}>
-              <div style={{ fontSize: 40, marginBottom: 16 }}>🔄</div>
-              <h3 style={{ marginBottom: 10, fontSize: 18 }}>Nouveau projet ?</h3>
-              <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 24 }}>Les fichiers non exportés seront perdus.</p>
-              <div style={{ display: 'flex', gap: 12 }}>
-                <button onClick={() => setScreen('app')} style={{ flex: 1, padding: 14, background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 10, color: '#94a3b8', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>Annuler</button>
-                <button onClick={resetProject} style={{ flex: 1, padding: 14, background: '#3b82f6', border: 'none', borderRadius: 10, color: 'white', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>OK</button>
-              </div>
-            </div>
-          </div>
-        );
-      }
+    const titleWrap = document.createElement('div');
+    titleWrap.className = 'folder-title';
+    titleWrap.innerHTML = `<span style="font-size:15px">${folder.locked?'📥':folderIconFor(folder.files)}</span>`;
 
-      // PREVIEW
-      if (previewFile) {
-        return (
-          <div onClick={() => setPreviewFile(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 998, padding: 20, cursor: 'pointer' }}>
-            {previewFile.preview && <img src={previewFile.preview} alt="" style={{ maxWidth: '100%', maxHeight: '90vh', borderRadius: 8 }} />}
-            <div style={{ position: 'absolute', bottom: 20, color: '#94a3b8', fontSize: 13 }}>{previewFile.name}</div>
-          </div>
-        );
-      }
+    const nameEl = document.createElement('span');
+    nameEl.className = 'folder-name';
+    nameEl.textContent = folder.name;
+    if(!folder.locked) {
+      nameEl.style.cursor='pointer';
+      nameEl.ondblclick = () => startRenameFolder(folder.id, nameEl);
+    }
+    titleWrap.appendChild(nameEl);
 
-      // ==================
-      // MAIN APP
-      // ==================
-      return (
-        <div style={{ minHeight: '100vh', background: bg, fontFamily: "'Nunito', sans-serif", color: '#e2e8f0', padding: isMobile ? 12 : 20, paddingBottom: 80 }}
-             onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (e.dataTransfer.files?.length) processFiles(e.dataTransfer.files); }}>
-          
-          {/* Alerts */}
-          <div style={{ position: 'fixed', top: 12, left: '50%', transform: 'translateX(-50%)', zIndex: 1000, display: 'flex', flexDirection: 'column', gap: 8, maxWidth: '90%', width: 360 }}>
-            {alerts.map(a => (
-              <div key={a.id} style={{ padding: '12px 18px', borderRadius: 12, background: a.type === 'success' ? '#34d399' : a.type === 'error' ? '#f87171' : '#60a5fa', color: a.type === 'success' ? '#064e3b' : a.type === 'error' ? '#7f1d1d' : '#1e3a5f', fontWeight: 600, fontSize: 13, textAlign: 'center', animation: 'fadeIn 0.3s' }}>{a.msg}</div>
-            ))}
-          </div>
+    const countEl = document.createElement('span');
+    countEl.className = 'folder-count';
+    countEl.textContent = folder.files.length;
+    titleWrap.appendChild(countEl);
 
-          {/* Processing */}
-          {processing && (
-            <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999 }}>
-              <div style={{ background: '#1a2942', padding: 36, borderRadius: 20, textAlign: 'center', width: 300 }}>
-                <div style={{ fontSize: 36, marginBottom: 16, animation: 'pulse 1s infinite' }}>⏳</div>
-                <div style={{ fontSize: 14, color: '#f1f5f9' }}>{processingMsg}</div>
-              </div>
-            </div>
-          )}
-
-          {/* Header */}
-          <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? 16 : 24, flexWrap: 'wrap', gap: 12 }}>
-            <h1 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 800, background: 'linear-gradient(135deg, #60a5fa, #34d399)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Organiseur Pro</h1>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-              <button onClick={() => setScreen('help')} style={{ ...btnStyle, background: 'rgba(255,255,255,0.08)', color: '#94a3b8' }}>💡</button>
-              <button onClick={() => setScreen('reset')} style={{ ...btnStyle, background: 'rgba(255,255,255,0.08)', color: '#94a3b8' }}>🔄</button>
-              <button onClick={() => exportZip()} disabled={!totalFiles} style={{ ...btnStyle, background: totalFiles ? 'linear-gradient(135deg, #3b82f6, #10b981)' : 'rgba(255,255,255,0.05)', color: 'white', opacity: totalFiles ? 1 : 0.5 }}>📦 {!isMobile && 'Télécharger'}</button>
-            </div>
-          </header>
-
-          {/* Import Zone */}
-          <div onClick={() => fileInputRef.current?.click()} style={{ padding: isMobile ? 24 : 32, background: 'rgba(59,130,246,0.06)', border: '2px dashed rgba(59,130,246,0.3)', borderRadius: 16, textAlign: 'center', cursor: 'pointer', marginBottom: isMobile ? 16 : 24, transition: 'all 0.2s' }}>
-            <input ref={fileInputRef} type="file" multiple onChange={e => { if (e.target.files?.length) processFiles(e.target.files); e.target.value = ''; }} style={{ display: 'none' }} />
-            <div style={{ fontSize: 32, marginBottom: 8 }}>📥</div>
-            <div style={{ fontSize: isMobile ? 14 : 16, fontWeight: 700, color: '#f1f5f9' }}>{isMobile ? 'Appuyez pour importer' : 'Glissez ou cliquez pour importer'}</div>
-            <div style={{ fontSize: 12, color: '#64748b', marginTop: 6 }}>Tous types de fichiers acceptés</div>
-          </div>
-
-          {/* Actions */}
-          <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
-            {showFolderInput ? (
-              <div style={{ display: 'flex', gap: 8, flex: 1, minWidth: 200 }}>
-                <input type="text" value={newFolderName} onChange={e => setNewFolderName(e.target.value)} onKeyPress={e => e.key === 'Enter' && createFolder()} placeholder="Nom du dossier" autoFocus style={{ flex: 1, padding: '12px 14px', borderRadius: 10, border: '2px solid #34d399', background: 'rgba(255,255,255,0.05)', color: '#f1f5f9', outline: 'none', fontSize: 14, fontFamily: 'inherit' }} />
-                <button onClick={createFolder} style={{ ...btnStyle, background: '#10b981', color: 'white' }}>✓</button>
-                <button onClick={() => { setShowFolderInput(false); setNewFolderName(''); }} style={{ ...btnStyle, background: 'rgba(255,255,255,0.1)', color: '#94a3b8' }}>✕</button>
-              </div>
-            ) : (
-              <button onClick={() => setShowFolderInput(true)} disabled={folders.length >= CONFIG.MAX_FOLDERS} style={{ ...btnStyle, background: folders.length >= CONFIG.MAX_FOLDERS ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg, #10b981, #34d399)', color: folders.length >= CONFIG.MAX_FOLDERS ? '#475569' : 'white', opacity: folders.length >= CONFIG.MAX_FOLDERS ? 0.5 : 1 }}>➕ Dossier</button>
-            )}
-            {folders.find(f => f.id === 'inbox')?.files.length > 0 && <button onClick={clearInbox} style={{ ...btnStyle, background: 'rgba(255,255,255,0.06)', color: '#94a3b8' }}>🧹</button>}
-            <label className="checkbox-container" style={{ marginLeft: isMobile ? 0 : 'auto', marginRight: 8, fontSize: 13, color: '#94a3b8' }}>
-              <input type="checkbox" checked={numberFiles} onChange={e => setNumberFiles(e.target.checked)} />
-              <span>Numéroter</span>
-            </label>
-            <div onDragOver={e => { e.preventDefault(); setDragOverFolder('trash'); }} onDragLeave={() => setDragOverFolder(null)} onDrop={onDropTrash} style={{ padding: '12px 16px', background: dragOverFolder === 'trash' ? 'rgba(239,68,68,0.3)' : 'rgba(239,68,68,0.1)', border: `2px dashed ${dragOverFolder === 'trash' ? '#ef4444' : 'rgba(239,68,68,0.3)'}`, borderRadius: 12, color: '#f87171', fontSize: 13, fontWeight: 600, transition: 'all 0.2s' }}>🗑️ {trash.length > 0 && `(${trash.length})`}</div>
-          </div>
-
-          {/* Welcome */}
-          {folders.length === 1 && !folders[0].files.length && (
-            <div style={{ padding: 28, background: 'rgba(52,211,153,0.08)', border: '2px dashed rgba(52,211,153,0.3)', borderRadius: 16, textAlign: 'center', marginBottom: 20 }}>
-              <div style={{ fontSize: 28, marginBottom: 10 }}>👋</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#34d399' }}>Créez un dossier pour commencer</div>
-            </div>
-          )}
-
-          {/* Folders */}
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))', gap: isMobile ? 12 : 20, marginBottom: 20 }}>
-            {folders.map(folder => {
-              const isOver = dragOverFolder === folder.id && dragItem;
-              return (
-                <div key={folder.id} onDragOver={e => { e.preventDefault(); setDragOverFolder(folder.id); setDragOverIndex(folder.files.length); }} onDrop={e => onDropFolder(e, folder.id)} style={{ background: isOver ? 'rgba(52,211,153,0.1)' : 'rgba(255,255,255,0.02)', borderRadius: 16, border: `2px solid ${isOver ? '#34d399' : 'rgba(255,255,255,0.06)'}`, padding: isMobile ? 14 : 18, minHeight: isMobile ? 160 : 200, transition: 'all 0.2s' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, paddingBottom: 10, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <span style={{ fontSize: 18 }}>{folder.locked ? '📥' : getFolderIcon(folder.files)}</span>
-                      {editingFolder === folder.id ? (
-                        <input type="text" defaultValue={folder.name} autoFocus onBlur={e => renameFolder(folder.id, e.target.value)} onKeyPress={e => e.key === 'Enter' && renameFolder(folder.id, e.target.value)} style={{ padding: '6px 10px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, color: '#f1f5f9', fontSize: 14, fontWeight: 600, outline: 'none', width: 120, fontFamily: 'inherit' }} />
-                      ) : (
-                        <span style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9', cursor: folder.locked ? 'default' : 'pointer' }} onDoubleClick={() => !folder.locked && setEditingFolder(folder.id)}>{folder.name}</span>
-                      )}
-                      <span style={{ background: 'rgba(96,165,250,0.15)', padding: '3px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700, color: '#60a5fa' }}>{folder.files.length}</span>
-                    </div>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      {folder.files.length > 0 && <button onClick={e => { e.stopPropagation(); exportZip(folder.id); }} style={{ padding: '8px 12px', background: 'linear-gradient(135deg, #3b82f6, #10b981)', border: 'none', borderRadius: 8, color: 'white', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>📥</button>}
-                      {!folder.locked && <button onClick={() => deleteFolder(folder.id)} style={{ padding: '8px 10px', background: 'rgba(239,68,68,0.15)', border: 'none', borderRadius: 8, color: '#f87171', cursor: 'pointer', fontSize: 14 }}>✕</button>}
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, minHeight: 80, alignContent: 'flex-start', overflowY: 'auto', maxHeight: isMobile ? 220 : 300 }}>
-                    {isOver && dragOverIndex === 0 && <div style={{ width: 4, height: isMobile ? 110 : 140, background: 'linear-gradient(180deg, #34d399, #10b981)', borderRadius: 3, boxShadow: '0 0 14px rgba(52,211,153,0.6)', flexShrink: 0 }} />}
-                    {!folder.files.length && !isOver ? (
-                      <div style={{ width: '100%', textAlign: 'center', padding: 20, color: '#475569', fontSize: 13 }}>{folder.id === 'inbox' ? '📥 Importez des fichiers' : '📁 Glissez des fichiers ici'}</div>
-                    ) : folder.files.map((file, idx) => {
-                      const showAfter = isOver && dragOverIndex === idx + 1 && dragItem?.id !== file.id;
-                      const hasPreview = file.preview && file.category === 'image';
-                      const cardW = isMobile ? 90 : 120;
-                      const previewH = isMobile ? 70 : 90;
-                      return (
-                        <React.Fragment key={file.id}>
-                          <div draggable onDragStart={e => onDragStart(e, file, folder.id, idx)} onDragEnd={onDragEnd} onDragOver={e => onDragOverCard(e, folder.id, idx)} onDoubleClick={() => hasPreview && setPreviewFile(file)} style={{ width: cardW, borderRadius: 12, overflow: 'hidden', cursor: 'grab', background: dragItem?.id === file.id ? 'rgba(52,211,153,0.2)' : 'rgba(255,255,255,0.03)', border: `2px solid ${dragItem?.id === file.id ? '#34d399' : 'rgba(255,255,255,0.1)'}`, opacity: dragItem?.id === file.id ? 0.5 : 1, flexShrink: 0, transition: 'opacity 0.15s' }}>
-                            <div style={{ height: previewH, display: 'flex', alignItems: 'center', justifyContent: 'center', background: hasPreview ? `url(${file.preview}) center/cover` : 'linear-gradient(135deg, #1e293b, #334155)', position: 'relative' }}>
-                              {!hasPreview && <span style={{ fontSize: 28 }}>{file.icon || '📎'}</span>}
-                              {file.duration && <div style={{ position: 'absolute', bottom: 4, right: 4, background: 'rgba(0,0,0,0.7)', color: 'white', padding: '3px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600 }}>{file.duration}</div>}
-                              {file.pageNum && <div style={{ position: 'absolute', bottom: 4, right: 4, background: 'rgba(0,0,0,0.7)', color: 'white', padding: '3px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600 }}>{file.pageNum}/{file.totalPages}</div>}
-                              {numberFiles && <div style={{ position: 'absolute', top: 4, left: 4, background: 'rgba(0,0,0,0.7)', color: 'white', padding: '3px 7px', borderRadius: 6, fontSize: 10, fontWeight: 700 }}>{String(idx + 1).padStart(2, '0')}</div>}
-                            </div>
-                            <div style={{ padding: '8px 10px' }}>
-                              {editingFile === file.id ? (
-                                <input type="text" defaultValue={file.name} autoFocus onClick={e => e.stopPropagation()} onBlur={e => renameFile(folder.id, file.id, e.target.value)} onKeyPress={e => e.key === 'Enter' && renameFile(folder.id, file.id, e.target.value)} style={{ width: '100%', padding: '4px 6px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 6, color: '#f1f5f9', fontSize: 10, outline: 'none', fontFamily: 'inherit' }} />
-                              ) : (
-                                <div onDoubleClick={e => { e.stopPropagation(); setEditingFile(file.id); }} style={{ fontSize: 11, fontWeight: 600, lineHeight: 1.3, height: 28, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', color: '#e2e8f0', cursor: 'text' }} title={file.name}>{file.name}</div>
-                              )}
-                              <div style={{ fontSize: 10, color: '#64748b', marginTop: 3 }}>{formatSize(file.size)}</div>
-                            </div>
-                          </div>
-                          {showAfter && <div style={{ width: 4, height: isMobile ? 110 : 140, background: 'linear-gradient(180deg, #34d399, #10b981)', borderRadius: 3, boxShadow: '0 0 14px rgba(52,211,153,0.6)', flexShrink: 0 }} />}
-                        </React.Fragment>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Trash */}
-          {trash.length > 0 && (
-            <div style={{ padding: 14, background: 'rgba(239,68,68,0.08)', borderRadius: 14, marginBottom: 16 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <span style={{ fontWeight: 700, color: '#f87171', fontSize: 14 }}>🗑️ Corbeille ({trash.length})</span>
-                <button onClick={() => setTrash([])} style={{ padding: '8px 14px', background: 'rgba(239,68,68,0.8)', border: 'none', borderRadius: 8, color: 'white', fontWeight: 600, cursor: 'pointer', fontSize: 12 }}>Vider</button>
-              </div>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                {trash.slice(0, 6).map(f => (
-                  <div key={f.id} onClick={() => restoreFile(f)} style={{ padding: '8px 12px', background: 'rgba(30,41,59,0.9)', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span>{f.icon || '📎'}</span>
-                    <span style={{ maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#cbd5e1' }}>{f.name}</span>
-                    <span style={{ color: '#34d399' }}>↩</span>
-                  </div>
-                ))}
-                {trash.length > 6 && <span style={{ padding: 8, color: '#64748b', fontSize: 12 }}>+{trash.length - 6}</span>}
-              </div>
-            </div>
-          )}
-
-          {/* Footer */}
-          <footer style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: '12px 20px', background: 'rgba(10,22,40,0.95)', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, color: '#64748b' }}>
-            {!isMobile && <span>Double-clic : renommer ou agrandir</span>}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: isMobile ? 0 : 'auto' }}>
-              <span style={{ color: '#94a3b8' }}>{totalFiles} fichier{totalFiles !== 1 ? 's' : ''} • {formatSize(totalSize)}</span>
-              <div style={{ width: isMobile ? 60 : 80, height: 5, background: 'rgba(255,255,255,0.1)', borderRadius: 3, overflow: 'hidden' }}>
-                <div style={{ width: `${usagePercent}%`, height: '100%', background: getUsageColor(), transition: 'width 0.3s' }} />
-              </div>
-              <span style={{ color: getUsageColor(), fontWeight: 600 }}>{Math.round(usagePercent)}%</span>
-            </div>
-          </footer>
-        </div>
-      );
+    const actions = document.createElement('div');
+    actions.className = 'folder-actions';
+    if(folder.files.length>0) {
+      const expBtn = document.createElement('button');
+      expBtn.className='btn btn-grad';
+      expBtn.style.cssText='padding:6px 10px;font-size:12px;min-height:auto';
+      expBtn.textContent='📥';
+      expBtn.onclick=e=>{e.stopPropagation();exportZip(folder.id);};
+      actions.appendChild(expBtn);
+    }
+    if(!folder.locked) {
+      const delBtn = document.createElement('button');
+      delBtn.className='btn btn-ghost';
+      delBtn.style.cssText='padding:6px 8px;font-size:13px;min-height:auto;color:var(--error);border-color:rgba(239,68,68,.3)';
+      delBtn.textContent='✕';
+      delBtn.onclick=e=>{e.stopPropagation();deleteFolder(folder.id);};
+      actions.appendChild(delBtn);
     }
 
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-  </script>
+    header.appendChild(titleWrap);
+    header.appendChild(actions);
+    card.appendChild(header);
+
+    // Files wrap — id unique pour mise à jour indicateurs sans re-render complet
+    const wrap = document.createElement('div');
+    wrap.className = 'files-wrap';
+    wrap.id = 'wrap-'+folder.id;
+    if(!folder.files.length) {
+      const hint = document.createElement('div');
+      hint.className='empty-hint';
+      hint.textContent = folder.id==='inbox'?'📥 Importez des fichiers':'📁 Glissez des fichiers ici';
+      wrap.appendChild(hint);
+    } else {
+      folder.files.forEach((file,idx) => {
+        const fc = buildFileCard(file, idx, folder.id, numbered);
+        wrap.appendChild(fc);
+      });
+    }
+    card.appendChild(wrap);
+    grid.appendChild(card);
+  });
+}
+
+// Dessine les indicateurs d'insertion sans re-render toute la grille
+function renderInsertIndicators() {
+  // Supprimer tous les indicateurs existants
+  document.querySelectorAll('.drop-indicator').forEach(el => el.remove());
+  if(!dragOverState) return;
+  const { folderId, insertIndex } = dragOverState;
+  const wrap = document.getElementById('wrap-'+folderId);
+  if(!wrap) return;
+  const cards = Array.from(wrap.querySelectorAll('.file-card'));
+  const indicator = document.createElement('div');
+  indicator.className = 'drop-indicator';
+  indicator.style.height = '86px'; // hauteur thumb
+  indicator.style.alignSelf = 'flex-start';
+  if(insertIndex >= cards.length) {
+    wrap.appendChild(indicator);
+  } else {
+    wrap.insertBefore(indicator, cards[insertIndex]);
+  }
+}
+
+function buildFileCard(file, idx, folderId, numbered) {
+  const card = document.createElement('div');
+  card.className = 'file-card';
+  card.draggable = true;
+  card.ondragstart = e => {
+    e.dataTransfer.effectAllowed='move';
+    dragItem=file; dragSource={folderId,index:idx};
+    setTimeout(()=>card.classList.add('dragging'),0);
+  };
+  card.ondragend = () => {
+    card.classList.remove('dragging');
+    dragItem=null; dragSource=null; dragOverState=null;
+    document.querySelectorAll('.drop-indicator').forEach(el=>el.remove());
+    document.querySelectorAll('.folder-card.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  };
+
+  // Touch
+  card.ontouchstart = e => onTouchStartFile(e,file,folderId,idx,card);
+
+  // Thumb
+  const thumb = document.createElement('div');
+  thumb.className='file-thumb';
+  if(file.preview && (file.cat==='image'||file.cat==='pdf')) {
+    const img=document.createElement('img');
+    img.src=file.preview; img.alt='';
+    thumb.appendChild(img);
+    if(file.cat==='image') {
+      card.ondblclick = e => { e.stopPropagation(); openPreview(file.preview,file.name); };
+    }
+  } else {
+    thumb.innerHTML=`<span style="font-size:26px">${file.icon||'📎'}</span>`;
+  }
+  if(numbered) {
+    const nb=document.createElement('div');
+    nb.className='file-badge top-left';
+    nb.textContent=String(idx+1).padStart(2,'0');
+    thumb.appendChild(nb);
+  }
+  if(file.duration) {
+    const d=document.createElement('div');
+    d.className='file-badge bottom-right';
+    d.textContent=file.duration;
+    thumb.appendChild(d);
+  }
+  if(file.pageNum) {
+    const p=document.createElement('div');
+    p.className='file-badge bottom-right';
+    p.textContent=`${file.pageNum}/${file.totalPages}`;
+    thumb.appendChild(p);
+  }
+  card.appendChild(thumb);
+
+  // Info
+  const info=document.createElement('div');
+  info.className='file-info';
+  const nameEl=document.createElement('div');
+  nameEl.className='file-name';
+  nameEl.textContent=file.name;
+  nameEl.title=file.name;
+  nameEl.ondblclick=e=>{e.stopPropagation();startRenameFile(folderId,file.id,nameEl);};
+  info.appendChild(nameEl);
+  const sizeEl=document.createElement('div');
+  sizeEl.className='file-size';
+  sizeEl.textContent=fmtSize(file.size);
+  info.appendChild(sizeEl);
+  card.appendChild(info);
+  return card;
+}
+
+function folderIconFor(files) {
+  if(!files.length) return '📁';
+  const cats=[...new Set(files.map(f=>f.cat))];
+  if(cats.length===1){const m={image:'🖼️',audio:'🎵',video:'🎬',pdf:'📄',document:'📝',archive:'📦',code:'⚙️'};return m[cats[0]]||'📁';}
+  return '📁';
+}
+
+// ── EXPORT ZIP ──────────────────────────────────────────
+async function exportZip(singleId=null) {
+  const toExport = singleId ? folders.filter(f=>f.id===singleId&&f.files.length) : folders.filter(f=>f.files.length);
+  if(!toExport.length){showAlert('Aucun fichier à exporter','info');return;}
+  setProcessing(true,'Préparation…');
+  try{
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    if(!window.pdfjsLib){
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+    const zip=new window.JSZip();
+    for(const folder of toExport){
+      setProcessing(true,'Dossier : '+folder.name);
+      const zf=singleId?zip:zip.folder(folder.name.replace(/[\\/:*?"<>|]/g,'_'));
+      const pdfGroups={},others=[];
+      folder.files.forEach(f=>f.originalPdf&&f.pageNum?(pdfGroups[f.originalPdf]=pdfGroups[f.originalPdf]||[]).push(f):others.push(f));
+      const numbered=document.getElementById('cbNumber').checked;
+      let idx=1;
+      for(const[name,pages]of Object.entries(pdfGroups)){
+        setProcessing(true,'PDF : '+name);
+        try{
+          const pdfDoc=await window.pdfjsLib.getDocument({data:await pages[0].file.arrayBuffer()}).promise;
+          const{jsPDF}=window.jspdf;let doc=null;
+          for(let i=0;i<pages.length;i++){
+            const pg=await pdfDoc.getPage(pages[i].pageNum);
+            const vp=pg.getViewport({scale:2});
+            const cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;
+            const cx=cv.getContext('2d');cx.fillStyle='white';cx.fillRect(0,0,vp.width,vp.height);
+            await pg.render({canvasContext:cx,viewport:vp}).promise;
+            const img=cv.toDataURL('image/png');
+            const w=vp.width/2*72/96,h=vp.height/2*72/96;
+            if(!doc)doc=new jsPDF({orientation:w>h?'l':'p',unit:'pt',format:[w,h]});
+            else doc.addPage([w,h],w>h?'l':'p');
+            doc.addImage(img,'PNG',0,0,w,h);
+          }
+          let fn=name.replace(/[\\/:*?"<>|]/g,'_');
+          if(!fn.endsWith('.pdf'))fn+='.pdf';
+          if(numbered)fn=String(idx++).padStart(2,'0')+' - '+fn;
+          zf.file(fn,doc.output('blob'));
+        }catch(e){console.error(e);}
+      }
+      for(const f of others){
+        if(!f.file)continue;
+        const ext=getExt(f.file.name);
+        let fn=getBase(f.name).replace(/[\\/:*?"<>|]/g,'_')+ext;
+        if(numbered)fn=String(idx++).padStart(2,'0')+' - '+fn;
+        zf.file(fn,await f.file.arrayBuffer());
+      }
+    }
+    setProcessing(true,'Compression…');
+    const blob=await zip.generateAsync({type:'blob',compression:'DEFLATE'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=singleId?toExport[0].name+'.zip':'flashorganiseur-'+new Date().toISOString().slice(0,10)+'.zip';
+    a.click();URL.revokeObjectURL(a.href);
+    showAlert('ZIP téléchargé !','success');
+  }catch(e){console.error(e);showAlert('Erreur export','error');}
+  setProcessing(false);
+}
+
+// ── INIT ────────────────────────────────────────────────
+window.onload = () => {
+  if(isMobile()) {
+    document.getElementById('importLabel').textContent='Appuyer pour importer';
+  }
+};
+</script>
 </body>
 </html>
