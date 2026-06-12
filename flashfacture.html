@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlashFacture | FlashTools</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:#0A0E27;--bg2:#111827;--surface:#1E293B;--surface2:#243044;
+            --cyan:#06B6D4;--violet:#8B5CF6;--text:#F1F5F9;--text2:#94A3B8;
+            --border:#334155;--grad:linear-gradient(135deg,#06B6D4,#8B5CF6);
+            --success:#10B981;--error:#EF4444;--warn:#F59E0B;
+            /* thème document */
+            --theme-primary:#000000;--theme-secondary:#1f1f1f;--theme-light:#f5f5f5;
+            --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;
+            --gray-300:#d1d5db;--gray-600:#4b5563;--gray-700:#374151;
+            --gray-800:#1f2937;--gray-900:#111827;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;line-height:1.6;color:var(--text);background:var(--bg);padding:20px;}
+        .container{max-width:1100px;margin:0 auto;}
+
+        /* HEADER FLASHTOOLS */
+        .ft-header{text-align:center;padding:28px 20px 20px;border-bottom:1px solid var(--border);margin-bottom:20px;}
+        .ft-header h1{font-family:'Syne',sans-serif;font-size:clamp(1.6em,4vw,2.4em);font-weight:800;line-height:1.3;}
+        .ft-header h1 span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-block;padding-bottom:3px;}
+        .ft-header p{color:var(--text2);margin-top:5px;font-size:.9em;}
+
+        /* TOAST NOTIFICATIONS */
+        .toast-container{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;width:340px;max-width:92vw;pointer-events:none;}
+        .toast{padding:12px 18px;border-radius:10px;font-weight:600;font-size:13px;text-align:center;animation:toastIn .25s ease;pointer-events:none;}
+        .toast-success{background:rgba(16,185,129,.15);border:1px solid var(--success);color:var(--success);}
+        .toast-error{background:rgba(239,68,68,.15);border:1px solid var(--error);color:var(--error);}
+        .toast-info{background:rgba(6,182,212,.15);border:1px solid var(--cyan);color:var(--cyan);}
+        @keyframes toastIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+
+        /* CARD */
+        .card{background:var(--surface);border-radius:12px;border:1px solid var(--border);margin-bottom:20px;overflow:hidden;}
+        .card-header{background:var(--surface2);padding:20px 28px;border-bottom:1px solid var(--border);}
+        .card-header h2{font-family:'Syne',sans-serif;font-size:1em;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+        .card-header h2::before{content:'';display:inline-block;width:3px;height:16px;background:var(--grad);border-radius:2px;}
+        .content{padding:28px;}
+
+        /* SECTIONS */
+        .section{margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--border);}
+        .section:last-child{border-bottom:none;margin-bottom:0;}
+        .section-title{font-size:.68em;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan);margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid rgba(6,182,212,.3);}
+
+        /* FORMS */
+        .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+        .form-group{margin-bottom:16px;}
+        .form-group label{display:block;font-weight:600;margin-bottom:6px;color:var(--text);font-size:.88em;}
+        .form-group small{display:block;color:var(--text2);font-size:.8em;margin-top:4px;}
+        input,textarea,select{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:.88em;font-family:inherit;transition:all .2s;background:var(--bg2);color:var(--text);}
+        input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(6,182,212,.12);}
+        textarea{min-height:76px;resize:vertical;}
+        select option{background:var(--surface);}
+
+        .radio-group{display:flex;gap:10px;flex-wrap:wrap;}
+        .radio-item{display:flex;align-items:center;gap:7px;padding:9px 15px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .2s;background:var(--bg2);}
+        .radio-item:hover{border-color:var(--cyan);}
+        .radio-item input[type="radio"]{accent-color:var(--cyan);width:15px;height:15px;}
+        .radio-item label{cursor:pointer;font-weight:500;font-size:.88em;margin:0;color:var(--text);}
+        .radio-item.checked{border-color:var(--cyan);background:rgba(6,182,212,.08);}
+
+        .checkbox-item{display:flex;align-items:center;gap:9px;padding:10px 14px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:var(--bg2);}
+        .checkbox-item:hover{border-color:var(--cyan);}
+        .checkbox-item input[type="checkbox"]{accent-color:var(--cyan);width:15px;height:15px;}
+        .checkbox-item label{cursor:pointer;font-size:.88em;color:var(--text);}
+
+        /* LIGNES */
+        .lines-container{margin:16px 0;}
+        .line-item{display:grid;grid-template-columns:2fr .6fr .8fr .8fr .6fr 44px;gap:8px;margin-bottom:10px;align-items:end;background:var(--bg2);padding:14px;border-radius:10px;border:1px solid var(--border);}
+        .line-item label{font-size:.77em;margin-bottom:4px;display:block;color:var(--text2);}
+        .discount-input{position:relative;}
+        .discount-input input{padding-right:22px;}
+        .discount-input::after{content:'%';position:absolute;right:10px;bottom:10px;color:var(--text2);font-size:.85em;}
+        .remove-line{background:rgba(239,68,68,.15);color:var(--error);border:1px solid rgba(239,68,68,.3);border-radius:7px;cursor:pointer;padding:10px;height:38px;width:38px;display:flex;align-items:center;justify-content:center;font-size:1.1em;transition:all .2s;}
+        .remove-line:hover{background:rgba(239,68,68,.3);}
+
+        /* BOUTONS */
+        .btn{padding:10px 20px;border:none;border-radius:8px;font-size:.88em;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;}
+        .btn-primary{background:var(--grad);color:#fff;}
+        .btn-primary:hover{opacity:.88;transform:translateY(-1px);}
+        .btn-secondary{background:var(--surface2);color:var(--text2);border:1px solid var(--border);}
+        .btn-secondary:hover{border-color:var(--cyan);color:var(--text);}
+        .btn-block{width:100%;padding:15px;font-size:1em;font-family:'Syne',sans-serif;}
+
+        /* TOTAUX */
+        .totals{background:var(--bg2);padding:18px;border-radius:10px;margin-top:16px;border:1px solid var(--border);}
+        .total-line{display:flex;justify-content:space-between;padding:7px 0;font-size:.9em;color:var(--text2);}
+        .total-line strong{color:var(--text);}
+        .total-line.grand-total{font-size:1.1em;font-weight:700;color:var(--cyan);border-top:1px solid var(--border);margin-top:10px;padding-top:12px;}
+
+        /* INFO BOX */
+        .info-box{background:rgba(6,182,212,.07);border-left:3px solid var(--cyan);padding:14px 16px;border-radius:0 8px 8px 0;margin:16px 0;font-size:.88em;color:var(--text2);}
+        .info-box strong{color:var(--text);}
+
+        /* LOGO */
+        .logo-upload{border:2px dashed var(--border);padding:18px;border-radius:10px;text-align:center;cursor:pointer;transition:all .2s;color:var(--text2);font-size:.88em;background:var(--bg2);}
+        .logo-upload:hover{border-color:var(--cyan);color:var(--text);}
+        .logo-controls-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:12px 0;}
+        .logo-preview-zone{grid-column:1/-1;text-align:center;padding:16px;background:var(--bg2);border-radius:8px;min-height:80px;display:none;border:1px solid var(--border);}
+        .logo-preview-zone img{max-width:180px;max-height:70px;object-fit:contain;}
+
+        /* PREVIEW DOCUMENT */
+        .preview-wrap{background:var(--bg2);padding:24px;border-radius:10px;margin:20px 0;border:1px solid var(--border);}
+        .preview-page{background:white;padding:44px;border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.25);max-width:860px;margin:0 auto;position:relative;color:var(--gray-900);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+        .preview-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:26px;padding-bottom:18px;border-bottom:1px solid var(--gray-200);position:relative;}
+        .preview-left{display:flex;align-items:center;gap:14px;}
+        .preview-logo-img{max-width:75px;max-height:38px;object-fit:contain;}
+        .preview-company-name{font-size:1.05em;font-weight:700;color:var(--gray-900);margin-bottom:5px;}
+        .preview-company-info{font-size:.72em;color:var(--gray-700);line-height:1.5;}
+        .preview-company-info p{margin:2px 0;}
+        .preview-doc-info{text-align:right;min-width:170px;}
+        .preview-doc-type{font-size:1.5em;font-weight:700;color:var(--theme-primary);margin-bottom:6px;letter-spacing:1px;}
+        .preview-doc-number{font-size:.95em;color:var(--gray-600);font-weight:500;}
+        .preview-doc-dates{margin-top:10px;font-size:.82em;color:var(--gray-700);}
+        .preview-doc-dates div{margin:3px 0;}
+        .preview-parties{display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--gray-200);}
+        .preview-party h4{font-size:.72em;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-600);margin-bottom:8px;font-weight:700;}
+        .preview-party p{margin:2px 0;font-size:.88em;color:var(--gray-800);}
+        .preview-party strong{font-weight:600;color:var(--gray-900);}
+        .preview-note{font-size:.73em;color:var(--gray-600);font-style:italic;margin-bottom:18px;padding:7px 0;border-top:1px dashed var(--gray-300);}
+        .preview-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.88em;}
+        .preview-table thead{background:var(--theme-light);}
+        .preview-table th{padding:10px 9px;text-align:left;font-weight:600;border-bottom:2px solid var(--theme-primary);color:var(--theme-secondary);font-size:.82em;text-transform:uppercase;letter-spacing:.3px;}
+        .preview-table td{padding:9px;border-bottom:1px solid var(--gray-200);color:var(--gray-800);vertical-align:top;}
+        .preview-table td:nth-child(n+2),.preview-table th:nth-child(n+2){text-align:right;}
+        .preview-totals{margin-left:auto;width:300px;margin-top:18px;}
+        .preview-total-line{display:flex;justify-content:space-between;padding:7px 0;font-size:.92em;}
+        .preview-total-line.grand{font-size:1.25em;font-weight:700;color:var(--theme-primary);border-top:2px solid var(--gray-300);margin-top:10px;padding-top:13px;}
+        .preview-footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--gray-200);font-size:.73em;color:var(--gray-600);line-height:1.6;}
+        .preview-footer div{margin:5px 0;}
+        .stamp-paid{position:absolute;bottom:130px;right:70px;border:3px solid #dc2626;color:#dc2626;padding:8px 18px;font-size:1.4em;font-weight:700;transform:rotate(-8deg);opacity:.5;border-radius:4px;letter-spacing:2px;}
+
+        /* RESPONSIVE */
+        @media(max-width:768px){
+            body{padding:10px;}
+            .content{padding:18px;}
+            .form-grid{grid-template-columns:1fr;}
+            .line-item{grid-template-columns:1fr;}
+            .preview-header{flex-direction:column;gap:16px;}
+            .preview-left{flex-direction:column;align-items:flex-start;}
+            .preview-doc-info{text-align:left;}
+            .preview-parties{grid-template-columns:1fr;gap:20px;}
+            .preview-page{padding:24px 16px;}
+            .logo-controls-grid{grid-template-columns:1fr;}
+            .preview-wrap{padding:12px;}
+            .preview-page{font-size:.85em;}
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOASTS -->
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="ft-header">
+        <h1><span>FlashFacture</span></h1>
+        <p>Génération de factures professionnelles — 100% local, aucune donnée envoyée</p>
+    </div>
+
+    <div class="card">
+        <div class="content">
+
+            <!-- TYPE -->
+            <div class="section">
+                <div class="section-title">Type de document</div>
+                <div class="radio-group">
+                    <div class="radio-item checked" id="ri-invoice">
+                        <input type="radio" id="typeInvoice" name="docType" value="invoice" checked onchange="updateDocType();updateRadioStyle()">
+                        <label for="typeInvoice">Facture</label>
+                    </div>
+                    <div class="radio-item" id="ri-quote">
+                        <input type="radio" id="typeQuote" name="docType" value="quote" onchange="updateDocType();updateRadioStyle()">
+                        <label for="typeQuote">Devis</label>
+                        <span style="margin-left:6px;cursor:help;color:var(--cyan);font-size:13px" title="Pour avoir une valeur juridique, un devis doit être signé par le client avec la mention 'Bon pour accord'">ⓘ</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LOGO -->
+            <div class="section">
+                <div class="section-title">Logo (optionnel)</div>
+                <div class="logo-upload" onclick="document.getElementById('logoInput').click()">
+                    Cliquez pour ajouter un logo
+                    <input type="file" id="logoInput" accept="image/*" style="display:none" onchange="handleLogo(event)">
+                </div>
+                <div id="logoControls" style="display:none">
+                    <div class="logo-controls-grid">
+                        <div class="form-group">
+                            <label>Position</label>
+                            <select id="logoPosition" onchange="updatePreview()">
+                                <option value="position1">Position 1 : Marge</option>
+                                <option value="position2">Position 2 : Dessus</option>
+                                <option value="position3">Position 3 : Centre</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Taille (%)</label>
+                            <input type="range" id="logoSize" min="30" max="150" value="100" oninput="updateLogoPreview()">
+                            <small id="logoSizeValue">100%</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Opacité (%)</label>
+                            <input type="range" id="logoOpacity" min="10" max="100" value="100" oninput="updateLogoPreview()">
+                            <small id="logoOpacityValue">100%</small>
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-secondary" onclick="removeLogo()">Retirer logo</button>
+                        </div>
+                    </div>
+                    <div class="logo-preview-zone" id="logoPreviewZone">
+                        <img id="logoPreviewImg" src="" alt="Aperçu logo">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ENTREPRISE -->
+            <div class="section">
+                <div class="section-title">Vos informations</div>
+                <div class="form-group">
+                    <label>Nom de votre entreprise *</label>
+                    <input type="text" id="companyName" placeholder="SARL Mon Entreprise" oninput="updatePreview()">
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>SIRET</label>
+                        <input type="text" id="companySiret" oninput="updatePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label>N° TVA intracommunautaire</label>
+                        <input type="text" id="companyVAT" oninput="updatePreview()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Adresse</label>
+                    <textarea id="companyAddress" oninput="updatePreview()"></textarea>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="companyEmail" oninput="updatePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label>Téléphone</label>
+                        <input type="text" id="companyPhone" oninput="updatePreview()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- CLIENT -->
+            <div class="section">
+                <div class="section-title">Client</div>
+                <div class="form-group">
+                    <label>Nom du client *</label>
+                    <input type="text" id="clientName" oninput="updatePreview()">
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="clientEmail" oninput="updatePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label>Téléphone</label>
+                        <input type="text" id="clientPhone" oninput="updatePreview()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Adresse de facturation</label>
+                    <textarea id="clientAddress" oninput="updatePreview()"></textarea>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="differentDelivery" onchange="toggleDelivery()">
+                    <label for="differentDelivery">Adresse de livraison différente</label>
+                </div>
+                <div id="deliveryBlock" style="display:none;margin-top:12px">
+                    <div class="form-group">
+                        <label>Adresse de livraison</label>
+                        <textarea id="deliveryAddress" oninput="updatePreview()"></textarea>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top:12px">
+                    <label>Note optionnelle</label>
+                    <input type="text" id="optionalNote" placeholder="Ex: Commande n°, Projet..." oninput="updatePreview()">
+                </div>
+            </div>
+
+            <!-- NUMÉRO -->
+            <div class="section">
+                <div class="section-title">Numéro et dates</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label><span id="docNumberLabel">Numéro de facture</span> *</label>
+                        <input type="text" id="docNumber" placeholder="FA-2025-001" oninput="updatePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label>Date d'émission</label>
+                        <input type="date" id="docDate" oninput="updatePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label><span id="dueDateLabel">Date d'échéance</span></label>
+                        <input type="date" id="dueDate" oninput="updatePreview()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- LIGNES -->
+            <div class="section">
+                <div class="section-title">Prestations / Produits</div>
+                <div id="linesContainer" class="lines-container"></div>
+                <button class="btn btn-secondary" onclick="addLine()">+ Ajouter une ligne</button>
+                <div class="totals">
+                    <div class="total-line"><span>Total HT :</span><strong id="totalHT">0.00 €</strong></div>
+                    <div class="total-line"><span>Total TVA :</span><strong id="totalVAT">0.00 €</strong></div>
+                    <div class="total-line grand-total"><span>Total TTC :</span><strong id="totalTTC">0.00 €</strong></div>
+                </div>
+            </div>
+
+            <!-- OPTIONS -->
+            <div class="section">
+                <div class="section-title">Options</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Thème de couleur</label>
+                        <select id="colorTheme" onchange="applyTheme();updatePreview()">
+                            <option value="black" selected>Noir</option>
+                            <option value="indigo">Indigo</option>
+                            <option value="blue">Bleu</option>
+                            <option value="terracotta">Terracotta</option>
+                            <option value="emerald">Émeraude</option>
+                            <option value="violet">Violet</option>
+                            <option value="rouge">Rouge</option>
+                            <option value="cyan">Cyan</option>
+                            <option value="or">Or</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Mode de paiement</label>
+                        <select id="paymentMode" onchange="updatePreview();toggleIBAN()">
+                            <option value="Virement bancaire">Virement bancaire</option>
+                            <option value="Chèque">Chèque</option>
+                            <option value="Espèces">Espèces</option>
+                            <option value="Carte bancaire">Carte bancaire</option>
+                            <option value="Prélèvement">Prélèvement</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- IBAN si virement -->
+                <div id="ibanBlock" class="form-grid" style="margin-top:0">
+                    <div class="form-group">
+                        <label>IBAN</label>
+                        <input type="text" id="companyIBAN" placeholder="FR76 3000 6000 0112 3456 7890 189" oninput="updatePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label>BIC / SWIFT</label>
+                        <input type="text" id="companyBIC" placeholder="BNPAFRPPXXX" oninput="updatePreview()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Échéance de paiement</label>
+                    <select id="paymentTerms" onchange="updatePreview()">
+                        <option value="">Aucune mention</option>
+                        <option value="À la livraison">À la livraison</option>
+                        <option value="Payable à 30 jours fin de mois">Payable à 30 jours fin de mois</option>
+                        <option value="Payable à 30 jours">Payable à 30 jours</option>
+                        <option value="Payable à 60 jours">Payable à 60 jours</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Mention TVA</label>
+                    <select id="vatMention" onchange="updatePreview()">
+                        <option value="">Aucune mention spéciale</option>
+                        <option value="article293b">TVA non applicable, article 293B CGI</option>
+                        <option value="autoliquidation">Autoliquidation — article 242 nonies A CGI</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Acompte versé (optionnel)</label>
+                    <input type="number" id="deposit" step="0.01" placeholder="0.00" oninput="calculateTotals();updatePreview()">
+                </div>
+                <div class="checkbox-item" id="paidCheckbox" style="display:none">
+                    <input type="checkbox" id="markAsPaid" onchange="updatePreview()">
+                    <label for="markAsPaid">Marquer comme payée (tampon PAYÉ)</label>
+                </div>
+                <div class="form-group" style="margin-top:12px">
+                    <label>Notes personnalisées (PDF uniquement)</label>
+                    <textarea id="notes" placeholder="Conditions particulières, notes..."></textarea>
+                </div>
+            </div>
+
+            <!-- APERÇU -->
+            <div class="section">
+                <div class="section-title">Aperçu du document</div>
+                <div class="preview-wrap">
+                    <div class="preview-page" id="previewPage">
+                        <div id="stampPaid" class="stamp-paid" style="display:none">PAYÉ</div>
+                        <div id="previewLogoCenterTop" style="text-align:center;margin-bottom:18px;display:none">
+                            <img id="previewLogoCenterImg" class="preview-logo-img" style="display:none" src="" alt="Logo">
+                        </div>
+                        <div class="preview-header">
+                            <div class="preview-left">
+                                <img id="previewLogoMain" class="preview-logo-img" style="display:none" src="" alt="Logo">
+                                <div>
+                                    <div class="preview-company-name" id="previewCompanyName">---</div>
+                                    <div class="preview-company-info" id="previewCompanyInfo"></div>
+                                </div>
+                            </div>
+                            <div id="previewLogoCenterMiddle" style="position:absolute;left:50%;transform:translateX(-50%);top:18px;display:none">
+                                <img id="previewLogoCenterMiddleImg" class="preview-logo-img" style="display:none" src="" alt="Logo">
+                            </div>
+                            <div class="preview-doc-info">
+                                <div class="preview-doc-type" id="previewDocType">FACTURE</div>
+                                <div class="preview-doc-number" id="previewNumber">N° ---</div>
+                                <div class="preview-doc-dates">
+                                    <div><strong>Date :</strong> <span id="previewDate">---</span></div>
+                                    <div><strong><span id="previewDueLabel">Échéance</span> :</strong> <span id="previewDue">---</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="preview-parties">
+                            <div class="preview-party">
+                                <h4>Client</h4>
+                                <div id="previewClient">---</div>
+                            </div>
+                            <div id="previewDelivery" style="display:none">
+                                <div class="preview-party">
+                                    <h4>Livraison</h4>
+                                    <div id="previewDeliveryAddress">---</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="previewNote" class="preview-note" style="display:none"></div>
+                        <table class="preview-table">
+                            <thead>
+                                <tr>
+                                    <th>Description</th><th>Qté</th><th>P.U. HT</th>
+                                    <th>Rem.</th><th>TVA</th><th>Total HT</th>
+                                </tr>
+                            </thead>
+                            <tbody id="previewLines">
+                                <tr><td colspan="6" style="text-align:center;color:#999">Aucune ligne</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="preview-totals">
+                            <div class="preview-total-line"><span>Total HT :</span><strong id="previewTotalHT">0.00 €</strong></div>
+                            <div class="preview-total-line"><span>Total TVA :</span><strong id="previewTotalVAT">0.00 €</strong></div>
+                            <div class="preview-total-line grand"><span>Total TTC :</span><strong id="previewTotalTTC">0.00 €</strong></div>
+                            <div id="previewDepositLine" style="display:none;margin-top:8px">
+                                <div class="preview-total-line"><span>Acompte :</span><strong id="previewDeposit">0.00 €</strong></div>
+                                <div class="preview-total-line" style="font-weight:700"><span>Reste à payer :</span><strong id="previewRemaining">0.00 €</strong></div>
+                            </div>
+                        </div>
+                        <div class="preview-footer">
+                            <div id="previewPaymentTerms" style="font-weight:600"></div>
+                            <div id="previewPayment"></div>
+                            <div id="previewIBAN"></div>
+                            <div id="previewVatMention" style="margin-top:10px"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GÉNÉRATION -->
+            <button class="btn btn-primary btn-block" onclick="generatePDF()">
+                Générer la <span id="btnDocType">facture</span> PDF
+            </button>
+
+        </div>
+    </div>
+</div>
+
+<script>
+var lines=[];var logoData=null;
+var themes={
+    black:{primary:'#000000',secondary:'#1f1f1f',light:'#f5f5f5'},
+    indigo:{primary:'#4f46e5',secondary:'#4338ca',light:'#e0e7ff'},
+    blue:{primary:'#2563eb',secondary:'#1e40af',light:'#dbeafe'},
+    terracotta:{primary:'#d97706',secondary:'#b45309',light:'#fed7aa'},
+    emerald:{primary:'#059669',secondary:'#047857',light:'#d1fae5'},
+    violet:{primary:'#7c3aed',secondary:'#6d28d9',light:'#ddd6fe'},
+    rouge:{primary:'#dc2626',secondary:'#b91c1c',light:'#fee2e2'},
+    cyan:{primary:'#06b6d4',secondary:'#0891b2',light:'#cffafe'},
+    or:{primary:'#eab308',secondary:'#ca8a04',light:'#fef3c7'}
+};
+
+// ── TOAST ────────────────────────────────────────────────
+function showToast(msg,type='info'){
+    const el=document.createElement('div');
+    el.className=`toast toast-${type}`;
+    el.textContent=msg;
+    document.getElementById('toastContainer').appendChild(el);
+    setTimeout(()=>el.remove(),4500);
+}
+
+// ── INIT ─────────────────────────────────────────────────
+function init(){
+    var today=new Date().toISOString().split('T')[0];
+    document.getElementById('docDate').value=today;
+    var due=new Date();due.setDate(due.getDate()+30);
+    document.getElementById('dueDate').value=due.toISOString().split('T')[0];
+    applyTheme();addLine();updatePreview();toggleIBAN();
+}
+
+function applyTheme(){
+    var tk=document.getElementById('colorTheme').value;
+    var t=themes[tk];
+    var r=document.documentElement;
+    r.style.setProperty('--theme-primary',t.primary);
+    r.style.setProperty('--theme-secondary',t.secondary);
+    r.style.setProperty('--theme-light',t.light);
+}
+
+function updateDocType(){
+    var isInv=document.querySelector('input[name="docType"]:checked').value==='invoice';
+    document.getElementById('docNumberLabel').textContent=isInv?'Numéro de facture':'Numéro de devis';
+    document.getElementById('dueDateLabel').textContent=isInv?"Date d'échéance":'Validité du devis';
+    document.getElementById('btnDocType').textContent=isInv?'facture':'devis';
+    document.getElementById('paidCheckbox').style.display=isInv?'flex':'none';
+    updatePreview();
+}
+
+function updateRadioStyle(){
+    var val=document.querySelector('input[name="docType"]:checked').value;
+    document.getElementById('ri-invoice').classList.toggle('checked',val==='invoice');
+    document.getElementById('ri-quote').classList.toggle('checked',val==='quote');
+}
+
+function toggleIBAN(){
+    var show=document.getElementById('paymentMode').value==='Virement bancaire';
+    document.getElementById('ibanBlock').style.display=show?'grid':'none';
+}
+
+// ── LOGO ─────────────────────────────────────────────────
+function handleLogo(e){
+    var file=e.target.files[0];if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+        logoData=ev.target.result;
+        document.getElementById('logoPreviewImg').src=logoData;
+        document.getElementById('logoControls').style.display='block';
+        document.getElementById('logoPreviewZone').style.display='block';
+        updateLogoPreview();updatePreview();
+    };
+    reader.readAsDataURL(file);
+}
+function updateLogoPreview(){
+    var size=document.getElementById('logoSize').value;
+    var op=document.getElementById('logoOpacity').value;
+    document.getElementById('logoSizeValue').textContent=size+'%';
+    document.getElementById('logoOpacityValue').textContent=op+'%';
+    var img=document.getElementById('logoPreviewImg');
+    img.style.transform='scale('+(size/100)+')';img.style.opacity=op/100;
+    updatePreview();
+}
+function removeLogo(){
+    logoData=null;
+    document.getElementById('logoControls').style.display='none';
+    document.getElementById('logoPreviewZone').style.display='none';
+    document.getElementById('logoInput').value='';
+    updatePreview();
+}
+
+// ── LIGNES ───────────────────────────────────────────────
+function toggleDelivery(){
+    document.getElementById('deliveryBlock').style.display=
+        document.getElementById('differentDelivery').checked?'block':'none';
+    updatePreview();
+}
+
+function addLine(){
+    lines.push({id:Date.now()+Math.random(),description:'',quantity:1,priceHT:0,discount:0,vat:20});
+    renderLines();
+}
+function renderLines(){
+    var html='';
+    lines.forEach(function(line,index){
+        html+=`<div class="line-item">
+            <div><label>Description</label><input type="text" placeholder="Désignation" value="${line.description}" oninput="updateLine(${index},'description',this.value)"></div>
+            <div><label>Qté</label><input type="number" value="${line.quantity}" min="0.01" step="0.01" oninput="updateLine(${index},'quantity',this.value)"></div>
+            <div><label>P.U. HT</label><input type="number" value="${line.priceHT}" step="0.01" oninput="updateLine(${index},'priceHT',this.value)"></div>
+            <div class="discount-input"><label>Remise</label><input type="number" value="${line.discount}" min="0" max="100" step="0.1" oninput="updateLine(${index},'discount',this.value)"></div>
+            <div><label>TVA</label><select onchange="updateLine(${index},'vat',this.value)">
+                <option value="20" ${line.vat==20?'selected':''}>20%</option>
+                <option value="10" ${line.vat==10?'selected':''}>10%</option>
+                <option value="5.5" ${line.vat==5.5?'selected':''}>5.5%</option>
+                <option value="0" ${line.vat==0?'selected':''}>0%</option>
+            </select></div>
+            <button class="remove-line" onclick="removeLine(${index})">×</button>
+        </div>`;
+    });
+    document.getElementById('linesContainer').innerHTML=html;
+    calculateTotals();
+}
+function updateLine(index,field,value){
+    if(['quantity','priceHT','vat','discount'].includes(field))lines[index][field]=parseFloat(value)||0;
+    else lines[index][field]=value;
+    calculateTotals();updatePreview();
+}
+function removeLine(index){
+    lines.splice(index,1);
+    if(lines.length===0)addLine();else renderLines();
+}
+
+// ── TOTAUX (fonction centrale) ────────────────────────────
+function getTotals(){
+    var ht=0,vat=0;
+    lines.forEach(function(l){
+        var lht=l.quantity*l.priceHT;
+        var disc=lht*(l.discount/100);
+        var net=lht-disc;
+        ht+=net;vat+=net*(l.vat/100);
+    });
+    return{ht:ht,vat:vat,ttc:ht+vat};
+}
+function calculateTotals(){
+    var t=getTotals();
+    document.getElementById('totalHT').textContent=t.ht.toFixed(2)+' €';
+    document.getElementById('totalVAT').textContent=t.vat.toFixed(2)+' €';
+    document.getElementById('totalTTC').textContent=t.ttc.toFixed(2)+' €';
+}
+
+// ── PREVIEW ──────────────────────────────────────────────
+function updatePreview(){
+    var isInv=document.querySelector('input[name="docType"]:checked').value==='invoice';
+    // Logo
+    if(logoData){
+        var pos=document.getElementById('logoPosition').value;
+        var sz=document.getElementById('logoSize').value;
+        var op=document.getElementById('logoOpacity').value;
+        ['previewLogoCenterTop','previewLogoCenterImg','previewLogoMain','previewLogoCenterMiddle','previewLogoCenterMiddleImg'].forEach(function(id){
+            document.getElementById(id).style.display='none';
+        });
+        if(pos==='position2'){
+            document.getElementById('previewLogoCenterTop').style.display='block';
+            var img=document.getElementById('previewLogoCenterImg');
+            img.style.display='block';img.src=logoData;
+            img.style.transform='scale('+(sz/100)+')';img.style.opacity=op/100;
+        }else if(pos==='position3'){
+            document.getElementById('previewLogoCenterMiddle').style.display='block';
+            var img=document.getElementById('previewLogoCenterMiddleImg');
+            img.style.display='block';img.src=logoData;
+            img.style.transform='scale('+(sz/100)+')';img.style.opacity=op/100;
+        }else{
+            var img=document.getElementById('previewLogoMain');
+            img.style.display='block';img.src=logoData;
+            img.style.transform='scale('+(sz/100)+')';img.style.opacity=op/100;
+        }
+    }else{
+        ['previewLogoCenterTop','previewLogoCenterImg','previewLogoMain','previewLogoCenterMiddle','previewLogoCenterMiddleImg'].forEach(function(id){
+            document.getElementById(id).style.display='none';
+        });
+    }
+    document.getElementById('previewDocType').textContent=isInv?'FACTURE':'DEVIS';
+    document.getElementById('previewNumber').textContent='N° '+(document.getElementById('docNumber').value||'---');
+    document.getElementById('previewCompanyName').textContent=document.getElementById('companyName').value||'---';
+    var ci='';
+    var ca=document.getElementById('companyAddress').value;if(ca)ci+='<p>'+ca.replace(/\n/g,'<br>')+'</p>';
+    var ce=document.getElementById('companyEmail').value;if(ce)ci+='<p>'+ce+'</p>';
+    var cp=document.getElementById('companyPhone').value;if(cp)ci+='<p>Tél: '+cp+'</p>';
+    var cs=document.getElementById('companySiret').value;if(cs)ci+='<p>SIRET: '+cs+'</p>';
+    var cv=document.getElementById('companyVAT').value;if(cv)ci+='<p>TVA: '+cv+'</p>';
+    document.getElementById('previewCompanyInfo').innerHTML=ci;
+    var cli='';
+    var cn=document.getElementById('clientName').value;if(cn)cli+='<p><strong>'+cn+'</strong></p>';
+    var cla=document.getElementById('clientAddress').value;if(cla)cli+='<p>'+cla.replace(/\n/g,'<br>')+'</p>';
+    var cle=document.getElementById('clientEmail').value;if(cle)cli+='<p>'+cle+'</p>';
+    var clp=document.getElementById('clientPhone').value;if(clp)cli+='<p>Tél: '+clp+'</p>';
+    document.getElementById('previewClient').innerHTML=cli||'<p>---</p>';
+    if(document.getElementById('differentDelivery').checked){
+        var da=document.getElementById('deliveryAddress').value;
+        if(da){document.getElementById('previewDelivery').style.display='block';document.getElementById('previewDeliveryAddress').innerHTML='<p>'+da.replace(/\n/g,'<br>')+'</p>';}
+        else document.getElementById('previewDelivery').style.display='none';
+    }else document.getElementById('previewDelivery').style.display='none';
+    var note=document.getElementById('optionalNote').value.trim();
+    if(note){document.getElementById('previewNote').textContent=note;document.getElementById('previewNote').style.display='block';}
+    else document.getElementById('previewNote').style.display='none';
+    var d=document.getElementById('docDate').value;
+    document.getElementById('previewDate').textContent=d?new Date(d+'T12:00').toLocaleDateString('fr-FR'):'---';
+    var dd=document.getElementById('dueDate').value;
+    document.getElementById('previewDueLabel').textContent=isInv?'Échéance':'Validité';
+    document.getElementById('previewDue').textContent=dd?new Date(dd+'T12:00').toLocaleDateString('fr-FR'):'---';
+    // Lignes
+    var lhtml='';
+    var hasLines=lines.some(function(l){return l.description;});
+    if(!hasLines){lhtml='<tr><td colspan="6" style="text-align:center;color:#999">Aucune ligne</td></tr>';}
+    else lines.forEach(function(l){
+        if(l.description){
+            var net=(l.quantity*l.priceHT*(1-l.discount/100));
+            lhtml+='<tr><td>'+l.description+'</td><td>'+l.quantity+'</td><td>'+l.priceHT.toFixed(2)+'</td><td>'+(l.discount>0?l.discount+'%':'-')+'</td><td>'+l.vat+'%</td><td>'+net.toFixed(2)+'</td></tr>';
+        }
+    });
+    document.getElementById('previewLines').innerHTML=lhtml;
+    var t=getTotals();
+    document.getElementById('previewTotalHT').textContent=t.ht.toFixed(2)+' €';
+    document.getElementById('previewTotalVAT').textContent=t.vat.toFixed(2)+' €';
+    document.getElementById('previewTotalTTC').textContent=t.ttc.toFixed(2)+' €';
+    var dep=parseFloat(document.getElementById('deposit').value)||0;
+    if(dep>0){
+        document.getElementById('previewDepositLine').style.display='block';
+        document.getElementById('previewDeposit').textContent=dep.toFixed(2)+' €';
+        document.getElementById('previewRemaining').textContent=(t.ttc-dep).toFixed(2)+' €';
+    }else document.getElementById('previewDepositLine').style.display='none';
+    document.getElementById('previewPaymentTerms').textContent=document.getElementById('paymentTerms').value||'';
+    var pm=document.getElementById('paymentMode').value;
+    document.getElementById('previewPayment').textContent=pm?'Paiement : '+pm:'';
+    var iban=document.getElementById('companyIBAN').value;
+    var bic=document.getElementById('companyBIC').value;
+    var ibanTxt='';
+    if(pm==='Virement bancaire'){if(iban)ibanTxt+='IBAN : '+iban;if(bic)ibanTxt+=(iban?' — ':'')+'BIC : '+bic;}
+    document.getElementById('previewIBAN').textContent=ibanTxt;
+    var vm=document.getElementById('vatMention').value;
+    var vt='';
+    if(vm==='article293b')vt="TVA non applicable, selon l'article 293B du code général des impôts.";
+    else if(vm==='autoliquidation')vt="TVA due par le preneur assujetti ; autoliquidation en application de l'article 242 nonies A, I-13° de l'annexe II au CGI.";
+    document.getElementById('previewVatMention').textContent=vt;
+    if(isInv&&document.getElementById('markAsPaid').checked)document.getElementById('stampPaid').style.display='block';
+    else document.getElementById('stampPaid').style.display='none';
+}
+
+// ── GÉNÉRATION PDF ────────────────────────────────────────
+function generatePDF(){
+    var cn=document.getElementById('companyName').value.trim();
+    var cl=document.getElementById('clientName').value.trim();
+    var dn=document.getElementById('docNumber').value.trim();
+    if(!cn||!cl||!dn){showToast('Veuillez remplir les champs obligatoires (*)','error');return;}
+    if(!lines.some(function(l){return l.description;})){showToast('Ajoutez au moins une ligne de prestation','error');return;}
+    try{
+        if(typeof window.jspdf==='undefined')throw new Error('Bibliothèque PDF non chargée');
+        var jsPDF=window.jspdf.jsPDF;
+        var doc=new jsPDF();
+        var isInv=document.querySelector('input[name="docType"]:checked').value==='invoice';
+        var theme=themes[document.getElementById('colorTheme').value];
+        function hexToRgb(h){var r=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(h);return r?{r:parseInt(r[1],16),g:parseInt(r[2],16),b:parseInt(r[3],16)}:{r:0,g:0,b:0};}
+        var pr=hexToRgb(theme.primary);
+        var lr=hexToRgb(theme.light);
+        var y=20;
+
+        // Logo
+        if(logoData){
+            var lpos=document.getElementById('logoPosition').value;
+            var lsz=parseInt(document.getElementById('logoSize').value);
+            var lop=parseInt(document.getElementById('logoOpacity').value)/100;
+            var ti=new Image();ti.src=logoData;
+            var ar=ti.width/ti.height||1;
+            var lw=10*(lsz/100),lh=lw/ar;
+            var lx,ly;
+            if(lpos==='position2'){lx=14;ly=y;y=ly+lh+5;}
+            else if(lpos==='position3'){lx=(210-lw)/2;ly=12;}
+            else{lx=14;ly=y;}
+            doc.saveGraphicsState();
+            doc.setGState(new doc.GState({opacity:lop}));
+            doc.addImage(logoData,'PNG',lx,ly,lw,lh);
+            doc.restoreGraphicsState();
+        }
+
+        var cx=14;
+        if(logoData&&document.getElementById('logoPosition').value==='position1')cx=14+lw+5;
+
+        doc.setFontSize(11);doc.setFont(undefined,'bold');doc.text(cn,cx,y);y+=5;
+        doc.setFontSize(7);doc.setFont(undefined,'normal');
+        var ca=document.getElementById('companyAddress').value;
+        if(ca)doc.splitTextToSize(ca,80).forEach(function(l){doc.text(l,cx,y);y+=3.5;});
+        var ce=document.getElementById('companyEmail').value;if(ce){doc.text(ce,cx,y);y+=3.5;}
+        var cp=document.getElementById('companyPhone').value;if(cp){doc.text('Tél: '+cp,cx,y);y+=3.5;}
+        var cs=document.getElementById('companySiret').value;if(cs){doc.text('SIRET: '+cs,cx,y);y+=3.5;}
+        var cv=document.getElementById('companyVAT').value;if(cv){doc.text('TVA: '+cv,cx,y);}
+
+        // Titre
+        doc.setFontSize(22);doc.setFont(undefined,'bold');
+        doc.setTextColor(pr.r,pr.g,pr.b);
+        doc.text(isInv?'FACTURE':'DEVIS',196,20,{align:'right'});
+        doc.setFontSize(10);doc.setTextColor(120);
+        doc.text('N° '+dn,196,27,{align:'right'});
+        doc.setFontSize(8);doc.setFont(undefined,'normal');doc.setTextColor(0);
+        doc.text('Date: '+new Date(document.getElementById('docDate').value+'T12:00').toLocaleDateString('fr-FR'),196,33,{align:'right'});
+        var dlbl=isInv?'Échéance':'Validité';
+        doc.text(dlbl+': '+new Date(document.getElementById('dueDate').value+'T12:00').toLocaleDateString('fr-FR'),196,38,{align:'right'});
+
+        // Séparateur
+        var sy=Math.max(y,43)+3;
+        doc.setDrawColor(220);doc.setLineWidth(0.3);doc.line(14,sy,196,sy);sy+=5;
+
+        // Client
+        var csy=sy;
+        doc.setFontSize(7);doc.setFont(undefined,'bold');doc.setTextColor(120);doc.text('CLIENT',14,sy);
+        sy+=4;doc.setFontSize(9);doc.setFont(undefined,'normal');doc.setTextColor(0);
+        doc.text(cl,14,sy);sy+=4;
+        doc.setFontSize(8);
+        var cla=document.getElementById('clientAddress').value;
+        if(cla)doc.splitTextToSize(cla,80).forEach(function(l){doc.text(l,14,sy);sy+=3.5;});
+        var cle=document.getElementById('clientEmail').value;if(cle){doc.text(cle,14,sy);sy+=3.5;}
+        var clp=document.getElementById('clientPhone').value;if(clp){doc.text('Tél: '+clp,14,sy);sy+=3.5;}
+
+        // Livraison
+        if(document.getElementById('differentDelivery').checked){
+            var da=document.getElementById('deliveryAddress').value;
+            if(da){
+                var dy=csy;
+                doc.setFont(undefined,'bold');doc.setFontSize(7);doc.setTextColor(120);doc.text('LIVRAISON',115,dy);dy+=4;
+                doc.setFont(undefined,'normal');doc.setFontSize(8);doc.setTextColor(0);
+                doc.splitTextToSize(da,80).forEach(function(l){doc.text(l,115,dy);dy+=3.5;});
+            }
+        }
+
+        // Note
+        var note=document.getElementById('optionalNote').value.trim();
+        if(note){
+            sy+=2;doc.setDrawColor(220);doc.setLineWidth(0.2);doc.line(14,sy,196,sy);sy+=4;
+            doc.setFontSize(8);doc.setTextColor(0);doc.text(note,14,sy);sy+=2;
+        }
+
+        // Tableau
+        sy+=4;doc.setDrawColor(220);doc.line(14,sy,196,sy);sy+=5;
+        doc.setFillColor(lr.r,lr.g,lr.b);doc.rect(14,sy-5,182,8,'F');
+        doc.setFont(undefined,'bold');doc.setFontSize(7);
+        doc.setTextColor(pr.r,pr.g,pr.b);
+        doc.text('DESCRIPTION',14,sy);doc.text('QTÉ',115,sy,{align:'right'});
+        doc.text('P.U. HT',138,sy,{align:'right'});doc.text('REM.',158,sy,{align:'right'});
+        doc.text('TVA',173,sy,{align:'right'});doc.text('TOTAL HT',196,sy,{align:'right'});
+        doc.setTextColor(0);doc.setDrawColor(pr.r,pr.g,pr.b);doc.setLineWidth(0.5);
+        doc.line(14,sy+3,196,sy+3);
+        sy+=7;doc.setFont(undefined,'normal');doc.setFontSize(8);doc.setTextColor(0);
+
+        lines.forEach(function(line,index){
+            if(line.description){
+                if(index>0)sy+=2;
+                var lht=line.quantity*line.priceHT;
+                var total=(lht-lht*(line.discount/100)).toFixed(2);
+                var desc=doc.splitTextToSize(line.description,90);
+                var dh=desc.length*3.5;
+                var ay=sy+(dh/2)-1;
+                doc.text(desc,14,sy);
+                doc.text(line.quantity.toString(),115,ay,{align:'right'});
+                doc.text(line.priceHT.toFixed(2),138,ay,{align:'right'});
+                doc.text(line.discount>0?line.discount+'%':'-',158,ay,{align:'right'});
+                doc.text(line.vat+'%',173,ay,{align:'right'});
+                doc.text(total,196,ay,{align:'right'});
+                sy+=dh+1;
+                doc.setDrawColor(230);doc.setLineWidth(0.1);doc.line(14,sy,196,sy);
+                // Nouvelle page si nécessaire
+                if(sy>220){doc.addPage();sy=20;}
+            }
+        });
+
+        // Totaux — position dynamique après les lignes
+        var totY=Math.max(sy+10,200);
+        if(totY>250){doc.addPage();totY=20;}
+
+        var t=getTotals();
+        doc.setDrawColor(220);doc.setLineWidth(0.3);doc.line(14,totY,196,totY);totY+=5;
+        doc.setFont(undefined,'normal');doc.setFontSize(9);
+        doc.text('Total HT:',140,totY);doc.text(t.ht.toFixed(2)+' EUR',196,totY,{align:'right'});totY+=5;
+        doc.text('Total TVA:',140,totY);doc.text(t.vat.toFixed(2)+' EUR',196,totY,{align:'right'});totY+=8;
+        doc.setDrawColor(200);doc.setLineWidth(0.3);doc.line(140,totY-5,196,totY-5);
+        doc.setFont(undefined,'bold');doc.setFontSize(12);
+        doc.setTextColor(pr.r,pr.g,pr.b);
+        doc.text('Total TTC:',140,totY);doc.text(t.ttc.toFixed(2)+' EUR',196,totY,{align:'right'});
+        doc.setTextColor(0);
+
+        var dep=parseFloat(document.getElementById('deposit').value)||0;
+        if(dep>0){
+            totY+=5;doc.setFont(undefined,'normal');doc.setFontSize(9);
+            doc.text('Acompte versé:',140,totY);doc.text(dep.toFixed(2)+' EUR',196,totY,{align:'right'});totY+=5;
+            doc.setFont(undefined,'bold');
+            doc.text('Reste à payer:',140,totY);doc.text((t.ttc-dep).toFixed(2)+' EUR',196,totY,{align:'right'});
+        }
+
+        // Tampon PAYÉ
+        if(isInv&&document.getElementById('markAsPaid').checked){
+            doc.saveGraphicsState();
+            doc.setDrawColor(220,38,38);doc.setLineWidth(3);doc.setTextColor(220,38,38);
+            doc.setFontSize(24);doc.setFont(undefined,'bold');
+            var stX=155,stY=totY+20;
+            doc.rect(stX,stY-8,40,14);
+            doc.text('PAYÉ',stX+20,stY+2,{align:'center',angle:-8});
+            doc.restoreGraphicsState();doc.setTextColor(0);
+        }
+
+        // Footer — dynamique
+        var footY=Math.max(totY+30,270);
+        if(footY>285){doc.addPage();footY=20;}
+        doc.setDrawColor(220);doc.setLineWidth(0.1);doc.line(14,footY-4,196,footY-4);
+        doc.setFont(undefined,'normal');doc.setFontSize(7);doc.setTextColor(100);
+        var pt=document.getElementById('paymentTerms').value;
+        if(pt){doc.setFont(undefined,'bold');doc.setTextColor(0);doc.text(pt,14,footY);footY+=3.5;doc.setFont(undefined,'normal');doc.setTextColor(100);}
+        var pm=document.getElementById('paymentMode').value;
+        doc.text('Paiement : '+pm,14,footY);footY+=3.5;
+        // IBAN
+        var iban=document.getElementById('companyIBAN').value;
+        var bic=document.getElementById('companyBIC').value;
+        if(pm==='Virement bancaire'&&(iban||bic)){
+            var ibanTxt='';
+            if(iban)ibanTxt+='IBAN : '+iban;if(bic)ibanTxt+=(iban?' — ':'')+'BIC : '+bic;
+            doc.text(ibanTxt,14,footY);footY+=3.5;
+        }
+        var notes=document.getElementById('notes').value;
+        if(notes){footY+=2;doc.setTextColor(0);doc.setFontSize(7);var nl=doc.splitTextToSize(notes,180);doc.text(nl,14,footY);footY+=nl.length*3;doc.setTextColor(100);}
+        var vm=document.getElementById('vatMention').value;
+        if(vm==='article293b'){footY+=2;doc.setFont(undefined,'bold');doc.text(doc.splitTextToSize("TVA non applicable, selon l'article 293B du code général des impôts.",180),14,footY);doc.setFont(undefined,'normal');}
+        else if(vm==='autoliquidation'){footY+=2;doc.setFont(undefined,'bold');doc.text(doc.splitTextToSize("TVA due par le preneur assujetti ; autoliquidation en application de l'article 242 nonies A, I-13° de l'annexe II au CGI.",180),14,footY);doc.setFont(undefined,'normal');}
+
+        // Téléchargement
+        var fname=(isInv?'Facture-':'Devis-')+dn+'.pdf';
+        var blob=doc.output('blob');
+        var url=URL.createObjectURL(blob);
+        var a=document.createElement('a');a.href=url;a.download=fname;a.style.display='none';
+        document.body.appendChild(a);a.click();
+        setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+        showToast('PDF téléchargé : '+fname,'success');
+
+    }catch(err){
+        console.error(err);
+        showToast('Erreur : '+err.message,'error');
+    }
+}
+
+document.addEventListener('DOMContentLoaded',function(){init();});
+</script>
+</body>
+</html>
