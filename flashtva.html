@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur TVA Gratuit | FlashTools</title>
+    <meta name="description" content="Calcul TVA instantané : HT→TTC, TTC→HT, tous les taux (20%, 10%, 5.5%, 2.1%). Seuils franchise 2026. Gratuit, rapide et éducatif.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:#0a0e27; --surface:#111827; --card:#1e293b; --border:#334155;
+            --text:#f1f5f9; --muted:#94a3b8; --cyan:#06b6d4; --violet:#8b5cf6;
+            --green:#10b981; --orange:#f59e0b; --red:#ef4444;
+            --cyan-glow:rgba(6,182,212,0.18); --violet-glow:rgba(139,92,246,0.15);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Space Grotesk',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:24px 16px 60px; cursor:pointer; }
+        body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(6,182,212,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(6,182,212,0.04) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; z-index:0; }
+        .wrap { position:relative; z-index:1; max-width:1100px; margin:0 auto; }
+
+        .header { text-align:center; padding:40px 20px 32px; }
+        .logo-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(6,182,212,0.1); border:1px solid rgba(6,182,212,0.3); border-radius:100px; padding:6px 16px; font-size:0.78em; font-weight:600; color:var(--cyan); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:20px; }
+        .logo-badge::before { content:''; width:7px; height:7px; border-radius:50%; background:var(--cyan); animation:pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+        .header h1 { font-size:clamp(1.8em,5vw,2.8em); font-weight:700; line-height:1.2; margin-bottom:12px; }
+        .header h1 span { background:linear-gradient(135deg,var(--cyan),var(--violet)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .header p { color:var(--muted); font-size:1.05em; }
+
+        .layout { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:32px; }
+        .card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:32px; position:relative; overflow:hidden; }
+        .card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--cyan),var(--violet)); }
+        .card-title { font-size:1em; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:24px; }
+
+        .tabs { display:flex; background:var(--card); border-radius:10px; padding:4px; gap:4px; margin-bottom:28px; }
+        .tab { flex:1; padding:10px 8px; border:none; border-radius:7px; background:transparent; color:var(--muted); font-family:'Space Grotesk',sans-serif; font-size:0.82em; font-weight:600; cursor:pointer; transition:all 0.2s; text-align:center; }
+        .tab.active { background:linear-gradient(135deg,var(--cyan),var(--violet)); color:white; }
+        .tab:hover:not(.active) { color:var(--text); background:rgba(255,255,255,0.05); }
+
+        .field { margin-bottom:20px; }
+        .field label { display:block; font-size:0.88em; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px; }
+        .input-wrap { position:relative; }
+        .input-wrap input,.input-wrap select { width:100%; background:var(--card); border:1.5px solid var(--border); border-radius:10px; padding:14px 48px 14px 16px; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:1.1em; font-weight:600; transition:all 0.2s; appearance:none; }
+        .input-wrap select { font-family:'Space Grotesk',sans-serif; font-size:1em; cursor:pointer; }
+        .input-wrap input:focus,.input-wrap select:focus { outline:none; border-color:var(--cyan); box-shadow:0 0 0 3px var(--cyan-glow); }
+        .input-suffix { position:absolute; right:16px; top:50%; transform:translateY(-50%); font-weight:700; color:var(--muted); font-size:0.95em; pointer-events:none; }
+        .rate-hint { font-size:0.82em; color:var(--muted); margin-top:6px; }
+
+        .quick { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:10px; }
+        .quick-btn { padding:8px; background:var(--card); border:1px solid var(--border); border-radius:7px; color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.82em; font-weight:600; cursor:pointer; transition:all 0.2s; }
+        .quick-btn:hover { border-color:var(--cyan); color:var(--cyan); background:var(--cyan-glow); }
+
+        .result { background:var(--card); border:1px solid rgba(6,182,212,0.3); border-radius:12px; padding:24px; margin-top:24px; display:none; }
+        .result.visible { display:block; animation:fadeIn 0.3s ease; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        .result-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border); }
+        .result-row:last-child { border-bottom:none; padding-top:14px; margin-top:4px; }
+        .result-row label { font-size:0.9em; color:var(--muted); }
+        .result-row .val { font-family:'JetBrains Mono',monospace; font-weight:600; font-size:1em; color:var(--text); }
+        .result-row.total .val { font-size:1.35em; background:linear-gradient(135deg,var(--cyan),var(--violet)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+
+        .actions { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:16px; }
+        .btn { padding:12px; border-radius:9px; border:none; font-family:'Space Grotesk',sans-serif; font-size:0.88em; font-weight:600; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:6px; }
+        .btn-primary { background:linear-gradient(135deg,var(--cyan),var(--violet)); color:white; }
+        .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 20px var(--cyan-glow); }
+        .btn-ghost { background:var(--card); border:1px solid var(--border); color:var(--muted); }
+        .btn-ghost:hover { border-color:var(--cyan); color:var(--cyan); }
+
+        .compare { margin-top:24px; display:none; }
+        .compare.visible { display:block; animation:fadeIn 0.3s ease; }
+        .compare-title { font-size:0.82em; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:10px; }
+        .compare-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+        .compare-cell { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 10px; text-align:center; }
+        .compare-cell .rate-label { font-size:0.75em; color:var(--cyan); font-weight:700; margin-bottom:4px; }
+        .compare-cell .ttc-val { font-family:'JetBrains Mono',monospace; font-size:0.88em; font-weight:600; color:var(--text); }
+        .compare-cell .tva-val { font-size:0.72em; color:var(--muted); margin-top:3px; }
+
+        /* JAUGE FRANCHISE */
+        .jauge-section { margin-top:24px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; }
+        .jauge-title { font-size:0.82em; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:14px; }
+        .jauge-row { display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; margin-bottom:12px; }
+        .jauge-input { background:var(--surface); border:1.5px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:0.95em; font-weight:600; transition:all 0.2s; appearance:none; outline:none; }
+        .jauge-input:focus { border-color:var(--cyan); box-shadow:0 0 0 2px var(--cyan-glow); }
+        .jauge-select { background:var(--surface); border:1.5px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--text); font-family:'Space Grotesk',sans-serif; font-size:0.88em; font-weight:600; appearance:none; cursor:pointer; outline:none; }
+        .jauge-bar-wrap { background:rgba(255,255,255,0.06); border-radius:8px; height:12px; overflow:hidden; margin-bottom:8px; }
+        .jauge-bar-fill { height:100%; border-radius:8px; transition:width 0.5s ease, background 0.3s; }
+        .jauge-info { display:flex; justify-content:space-between; font-size:0.8em; }
+        .jauge-ca-val { font-family:'JetBrains Mono',monospace; font-weight:600; color:var(--text); }
+        .jauge-seuil-val { color:var(--muted); }
+        .jauge-status { margin-top:8px; font-size:0.82em; font-weight:600; padding:6px 12px; border-radius:6px; display:none; }
+        .jauge-status.show { display:block; }
+        .jauge-status.ok { background:rgba(16,185,129,0.12); color:var(--green); }
+        .jauge-status.warn { background:rgba(245,158,11,0.12); color:var(--orange); }
+        .jauge-status.danger { background:rgba(239,68,68,0.12); color:var(--red); }
+
+        /* LIEN FLASHAGENDA */
+        .agenda-link { display:flex; align-items:center; gap:14px; background:rgba(6,182,212,0.06); border:1px solid rgba(6,182,212,0.2); border-radius:12px; padding:16px 20px; margin-top:16px; text-decoration:none; transition:all 0.2s; cursor:pointer; }
+        .agenda-link:hover { background:rgba(6,182,212,0.12); border-color:var(--cyan); }
+        .agenda-link-icon { font-size:1.6em; flex-shrink:0; }
+        .agenda-link-text { flex:1; }
+        .agenda-link-title { font-size:0.9em; font-weight:700; color:var(--cyan); margin-bottom:2px; }
+        .agenda-link-sub { font-size:0.78em; color:var(--muted); }
+        .agenda-link-arrow { color:var(--cyan); font-size:1.2em; }
+
+        .guide-panel { display:flex; flex-direction:column; gap:16px; }
+        .info-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; }
+        .info-card h3 { font-size:0.95em; font-weight:700; color:var(--text); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+        .info-card h3 .dot { width:8px; height:8px; border-radius:50%; background:var(--cyan); flex-shrink:0; }
+
+        .taux-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .taux-item { background:var(--card); border-radius:9px; padding:14px; border-left:3px solid var(--cyan); }
+        .taux-item:nth-child(2) { border-left-color:var(--violet); }
+        .taux-item:nth-child(3) { border-left-color:var(--green); }
+        .taux-item:nth-child(4) { border-left-color:var(--orange); }
+        .taux-item .pct { font-family:'JetBrains Mono',monospace; font-size:1.4em; font-weight:700; color:var(--cyan); line-height:1; margin-bottom:4px; }
+        .taux-item:nth-child(2) .pct { color:var(--violet); }
+        .taux-item:nth-child(3) .pct { color:var(--green); }
+        .taux-item:nth-child(4) .pct { color:var(--orange); }
+        .taux-item .name { font-size:0.78em; font-weight:600; color:var(--text); margin-bottom:6px; }
+        .taux-item .examples { font-size:0.73em; color:var(--muted); line-height:1.5; }
+
+        .formula-block { background:#0d1117; border-radius:8px; padding:14px 16px; font-family:'JetBrains Mono',monospace; font-size:0.82em; line-height:1.9; border:1px solid var(--border); }
+        .formula-block .comment { color:#6e7681; }
+        .formula-block .code { color:var(--cyan); }
+        .formula-block .example { color:var(--green); }
+
+        .seuil-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border); font-size:0.88em; }
+        .seuil-row:last-of-type { border-bottom:none; }
+        .seuil-row .seuil-label { color:var(--muted); }
+        .seuil-row .seuil-val { font-family:'JetBrains Mono',monospace; font-weight:600; color:var(--green); }
+
+        .history-list { display:flex; flex-direction:column; gap:8px; max-height:200px; overflow-y:auto; }
+        .history-list::-webkit-scrollbar { width:4px; }
+        .history-list::-webkit-scrollbar-track { background:var(--card); }
+        .history-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+        .history-item { background:var(--card); border-radius:8px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; border:1px solid transparent; transition:all 0.2s; }
+        .history-item:hover { border-color:var(--cyan); }
+        .history-item .hi-left { font-size:0.82em; color:var(--muted); }
+        .history-item .hi-right { font-family:'JetBrains Mono',monospace; font-size:0.88em; font-weight:600; color:var(--cyan); }
+        .no-history { text-align:center; color:var(--muted); font-size:0.85em; padding:20px; }
+
+        .full-card { margin-top:24px; }
+
+        .toast { position:fixed; bottom:28px; right:28px; background:var(--green); color:white; padding:12px 22px; border-radius:10px; font-size:0.9em; font-weight:600; opacity:0; transform:translateY(10px); transition:all 0.25s; z-index:999; pointer-events:none; }
+        .toast.show { opacity:1; transform:translateY(0); }
+
+        .faq { margin-top:8px; }
+        .faq-item { border-bottom:1px solid var(--border); }
+        .faq-q { width:100%; background:none; border:none; color:var(--text); font-family:'Space Grotesk',sans-serif; font-size:0.92em; font-weight:600; padding:16px 0; cursor:pointer; display:flex; justify-content:space-between; align-items:center; text-align:left; gap:12px; }
+        .faq-q .arrow { color:var(--muted); font-size:0.85em; transition:transform 0.2s; flex-shrink:0; }
+        .faq-item.open .arrow { transform:rotate(180deg); color:var(--cyan); }
+        .faq-a { display:none; padding:0 0 16px; color:var(--muted); font-size:0.88em; line-height:1.7; }
+        .faq-item.open .faq-a { display:block; animation:fadeIn 0.2s; }
+
+        @media (max-width:860px) { .layout{grid-template-columns:1fr} .taux-grid{grid-template-columns:1fr 1fr} .compare-grid{grid-template-columns:repeat(2,1fr)} }
+        @media (max-width:480px) { .card{padding:20px} .tabs{flex-wrap:wrap} .tab{font-size:0.78em;padding:8px 6px} .quick{grid-template-columns:repeat(4,1fr)} .actions{grid-template-columns:1fr 1fr} .actions .btn:last-child{grid-column:span 2} .jauge-row{grid-template-columns:1fr} }
+    </style>
+</head>
+<body>
+<div class="wrap">
+
+    <div class="header">
+        <div class="logo-badge">FlashTools · Calculateur TVA</div>
+        <h1>Calcul TVA <span>instantané</span></h1>
+        <p>HT → TTC · TTC → HT · Tous les taux · Seuils franchise 2026</p>
+    </div>
+
+    <div class="layout">
+
+        <!-- CALCULATEUR -->
+        <div class="card">
+            <p class="card-title">Calculateur</p>
+
+            <div class="tabs">
+                <button class="tab active" onclick="setMode('ht',this)">HT → TTC</button>
+                <button class="tab" onclick="setMode('ttc',this)">TTC → HT</button>
+                <button class="tab" onclick="setMode('tva',this)">Calculer depuis TVA</button>
+            </div>
+
+            <div class="field">
+                <label id="field-label">Montant HT</label>
+                <div class="input-wrap">
+                    <input type="number" id="amount" placeholder="0.00" step="0.01" min="0" inputmode="decimal" oninput="calc()">
+                    <span class="input-suffix">€</span>
+                </div>
+                <div class="quick">
+                    <button class="quick-btn" onclick="setAmt(50)">50</button>
+                    <button class="quick-btn" onclick="setAmt(100)">100</button>
+                    <button class="quick-btn" onclick="setAmt(500)">500</button>
+                    <button class="quick-btn" onclick="setAmt(1000)">1 000</button>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Taux TVA</label>
+                <div class="input-wrap">
+                    <select id="rate" onchange="calc()">
+                        <option value="20">20% — Taux normal</option>
+                        <option value="10">10% — Taux intermédiaire</option>
+                        <option value="5.5">5.5% — Taux réduit</option>
+                        <option value="2.1">2.1% — Taux super réduit</option>
+                        <option value="custom">Taux personnalisé...</option>
+                    </select>
+                </div>
+                <div class="rate-hint" id="rate-hint">Majorité des biens et services</div>
+            </div>
+
+            <div class="field" id="custom-field" style="display:none">
+                <label>Taux personnalisé (%)</label>
+                <div class="input-wrap">
+                    <input type="number" id="custom-rate" placeholder="0.0" step="0.1" min="0" max="100" inputmode="decimal" oninput="calc()">
+                    <span class="input-suffix">%</span>
+                </div>
+            </div>
+
+            <div class="result" id="result">
+                <div class="result-row">
+                    <label>Montant HT</label>
+                    <span class="val" id="r-ht">—</span>
+                </div>
+                <div class="result-row">
+                    <label>TVA <span id="r-rate-label">20%</span></label>
+                    <span class="val" id="r-tva">—</span>
+                </div>
+                <div class="result-row total">
+                    <label>Montant TTC</label>
+                    <span class="val" id="r-ttc">—</span>
+                </div>
+            </div>
+
+            <div class="compare" id="compare">
+                <p class="compare-title">Comparaison tous taux</p>
+                <div class="compare-grid" id="compare-grid"></div>
+            </div>
+
+            <!-- JAUGE FRANCHISE -->
+            <div class="jauge-section">
+                <p class="jauge-title">📊 Ma jauge franchise TVA 2026</p>
+                <div class="jauge-row">
+                    <input type="number" class="jauge-input" id="jauge-ca" placeholder="Mon CA annuel (€)" inputmode="decimal" oninput="updateJauge()">
+                    <select class="jauge-select" id="jauge-type" onchange="updateJauge()">
+                        <option value="services">Services (37 500 €)</option>
+                        <option value="ventes">Ventes (85 000 €)</option>
+                    </select>
+                </div>
+                <div class="jauge-bar-wrap">
+                    <div class="jauge-bar-fill" id="jauge-bar" style="width:0%;background:var(--green)"></div>
+                </div>
+                <div class="jauge-info">
+                    <span class="jauge-ca-val" id="jauge-ca-display">0 €</span>
+                    <span class="jauge-seuil-val" id="jauge-seuil-display">Seuil de base : 37 500 €</span>
+                </div>
+                <div class="jauge-status" id="jauge-status"></div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" onclick="copyResult()">Copier</button>
+                <button class="btn btn-ghost" onclick="invertMode()">Inverser</button>
+                <button class="btn btn-ghost" onclick="resetAll()">Effacer</button>
+            </div>
+        </div>
+
+        <!-- PANNEAU DROIT -->
+        <div class="guide-panel">
+
+            <div class="info-card">
+                <h3><span class="dot"></span>Les 4 taux de TVA en France</h3>
+                <div class="taux-grid">
+                    <div class="taux-item"><div class="pct">20%</div><div class="name">Taux normal</div><div class="examples">Vêtements, électronique, services, restaurants</div></div>
+                    <div class="taux-item"><div class="pct">10%</div><div class="name">Intermédiaire</div><div class="examples">Hôtels, transports, travaux d'amélioration</div></div>
+                    <div class="taux-item"><div class="pct">5.5%</div><div class="name">Réduit</div><div class="examples">Alimentation, livres, énergie, cantines</div></div>
+                    <div class="taux-item"><div class="pct">2.1%</div><div class="name">Super réduit</div><div class="examples">Médicaments remboursés, presse, spectacles</div></div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3><span class="dot" style="background:var(--violet)"></span>Formules de calcul</h3>
+                <div class="formula-block">
+                    <div class="comment">// HT → TTC</div>
+                    <div class="code">TTC = HT × (1 + taux/100)</div>
+                    <div class="example">ex: 100 × 1.20 = 120€</div>
+                    <br>
+                    <div class="comment">// TTC → HT</div>
+                    <div class="code">HT  = TTC / (1 + taux/100)</div>
+                    <div class="example">ex: 120 / 1.20 = 100€</div>
+                    <br>
+                    <div class="comment">// TVA seule</div>
+                    <div class="code">TVA = HT × (taux/100)</div>
+                    <div class="example">ex: 100 × 0.20 = 20€</div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3><span class="dot" style="background:var(--green)"></span>Seuils franchise TVA 2026</h3>
+                <div class="seuil-row"><span class="seuil-label">Ventes / hébergement — seuil de base</span><span class="seuil-val">85 000 €</span></div>
+                <div class="seuil-row"><span class="seuil-label">Ventes / hébergement — seuil majoré</span><span class="seuil-val">93 500 €</span></div>
+                <div class="seuil-row"><span class="seuil-label">Services / libéral — seuil de base</span><span class="seuil-val">37 500 €</span></div>
+                <div class="seuil-row"><span class="seuil-label">Services / libéral — seuil majoré</span><span class="seuil-val">41 250 €</span></div>
+                <p style="font-size:0.76em;color:var(--muted);margin-top:12px;line-height:1.6;">
+                    <strong style="color:var(--orange)">Zone de tolérance :</strong> dépassement seuil de base sans dépasser le seuil majoré → TVA au 1er janvier suivant. Au-delà du seuil majoré : TVA due dès le jour du dépassement.<br><br>
+                    Sous les seuils, mention obligatoire : <em>"TVA non applicable, art. 293B du CGI"</em>
+                </p>
+
+                <!-- LIEN FLASHAGENDA -->
+                <a class="agenda-link" href="flashagenda.html" target="_blank">
+                    <span class="agenda-link-icon">📅</span>
+                    <div class="agenda-link-text">
+                        <div class="agenda-link-title">Suivre vos échéances TVA</div>
+                        <div class="agenda-link-sub">FlashAgenda Fiscal — calendrier personnalisé, provisions, guide complet</div>
+                    </div>
+                    <span class="agenda-link-arrow">→</span>
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- HISTORIQUE -->
+    <div class="card full-card">
+        <p class="card-title">Historique des calculs <span style="font-size:0.75em;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;">(sauvegardé automatiquement)</span></p>
+        <div class="history-list" id="history-list">
+            <div class="no-history">Aucun calcul effectué</div>
+        </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="card full-card">
+        <p class="card-title">Questions fréquentes</p>
+        <div class="faq">
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">Suis-je concerné par la TVA ?<span class="arrow">▼</span></button>
+                <div class="faq-a">Vous devez facturer la TVA dès que votre chiffre d'affaires dépasse les seuils de franchise (37 500€ pour les services, 85 000€ pour les ventes en 2026). En dessous, vous êtes en franchise de TVA et mentionnez "TVA non applicable, art. 293B du CGI" sur vos factures. Vous pouvez aussi opter volontairement pour la TVA à tout moment — utile si vous avez beaucoup d'achats professionnels à déduire.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">C'est quoi la zone de tolérance (seuil majoré) ?<span class="arrow">▼</span></button>
+                <div class="faq-a">Si vous dépassez votre seuil de base (37 500€ ou 85 000€) sans dépasser le seuil majoré (41 250€ ou 93 500€), vous n'êtes pas immédiatement assujetti : la TVA ne s'appliquera qu'à partir du 1er janvier de l'année suivante. En revanche, si vous franchissez le seuil majoré, la TVA est due dès le jour du dépassement — pas de délai. Surveillez votre CA en temps réel pour anticiper.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">Quelle différence entre TVA collectée et TVA déductible ?<span class="arrow">▼</span></button>
+                <div class="faq-a">La TVA collectée est celle que vous encaissez sur vos ventes — vous la reversez à l'État. La TVA déductible est celle que vous avez payée sur vos achats professionnels — vous la récupérez. Vous déclarez la différence. Si TVA collectée > TVA déductible : vous payez. Si l'inverse : l'État vous rembourse (crédit de TVA). Ce mécanisme est l'un des grands avantages d'être assujetti à la TVA quand on a des achats importants.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">Comment choisir le bon taux ?<span class="arrow">▼</span></button>
+                <div class="faq-a">Le taux dépend de la nature exacte du bien ou service. Le taux normal de 20% s'applique par défaut à tout ce qui n'est pas expressément listé dans les taux réduits. En cas de doute, consultez impots.gouv.fr ou un expert-comptable — appliquer le mauvais taux expose à des redressements, même de bonne foi.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">Quand et comment déclarer la TVA ?<span class="arrow">▼</span></button>
+                <div class="faq-a">La fréquence dépend de votre régime. Régime réel normal : déclaration mensuelle (formulaire CA3). Régime réel simplifié : deux acomptes semestriels + déclaration annuelle CA12. La déclaration se fait en ligne sur impots.gouv.fr. Le paiement est simultané à la déclaration. En cas de CA nul : cochez la case "néant" en haut du formulaire CA3 et validez — la déclaration reste obligatoire.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">TVA intracommunautaire : que savoir ?<span class="arrow">▼</span></button>
+                <div class="faq-a">Dès que vous achetez ou vendez avec un professionnel d'un autre pays de l'UE, vous avez besoin d'un numéro de TVA intracommunautaire (format FR + 2 chiffres + SIRET), obtenu gratuitement auprès de votre SIE. Pour les ventes B2B intra-UE, vous facturez hors taxe si votre client fournit son numéro valide. Pour les ventes aux particuliers UE, des règles spécifiques s'appliquent au-delà de 10 000€/an (guichet OSS).</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">Erreurs courantes à éviter<span class="arrow">▼</span></button>
+                <div class="faq-a">Confondre HT et TTC sur les devis et factures. Appliquer le mauvais taux sans vérification. Oublier de surveiller l'approche des seuils. Ne pas récupérer la TVA sur les achats professionnels. Déclarer en retard — des pénalités s'appliquent dès le lendemain de l'échéance. Et confondre TVA sur encaissements (date du paiement) avec TVA sur débits (date de la facture).</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let mode = 'ht';
+let calcHistory = [];
+const HIST_KEY = 'flashtva_history';
+const JAUGE_KEY = 'flashtva_jauge';
+
+const hints = {
+    '20':'Majorité des biens et services',
+    '10':'Restauration sur place, hôtels, transports',
+    '5.5':'Alimentation, livres, énergie, cantines scolaires',
+    '2.1':'Médicaments remboursés, presse, spectacles vivants',
+    'custom':'Saisissez votre taux ci-dessus'
+};
+
+const labels = { ht:'Montant HT', ttc:'Montant TTC', tva:'Montant TVA' };
+
+// ===== JAUGE FRANCHISE =====
+const SEUILS = {
+    services: { base: 37500, majore: 41250 },
+    ventes:   { base: 85000, majore: 93500 }
+};
+
+function updateJauge() {
+    const ca = parseFloat(document.getElementById('jauge-ca').value) || 0;
+    const type = document.getElementById('jauge-type').value;
+    const { base, majore } = SEUILS[type];
+
+    // Sauvegarder
+    try { localStorage.setItem(JAUGE_KEY, JSON.stringify({ ca: document.getElementById('jauge-ca').value, type })); } catch(e) {}
+
+    const pct = Math.min((ca / majore) * 100, 100);
+    const bar = document.getElementById('jauge-bar');
+    bar.style.width = pct + '%';
+
+    let color = 'var(--green)';
+    if (ca > base) color = 'var(--orange)';
+    if (ca > majore) color = 'var(--red)';
+    bar.style.background = color;
+
+    document.getElementById('jauge-ca-display').textContent = ca.toLocaleString('fr-FR') + ' €';
+    document.getElementById('jauge-seuil-display').textContent = 'Seuil majoré : ' + majore.toLocaleString('fr-FR') + ' €';
+
+    const status = document.getElementById('jauge-status');
+    status.classList.add('show');
+    if (ca === 0) { status.classList.remove('show'); return; }
+
+    if (ca <= base) {
+        status.className = 'jauge-status show ok';
+        status.textContent = '✓ Franchise TVA active — ' + (base - ca).toLocaleString('fr-FR') + ' € de marge avant le seuil de base';
+    } else if (ca <= majore) {
+        status.className = 'jauge-status show warn';
+        status.textContent = '⚠ Seuil de base dépassé — TVA au 1er janvier prochain. Marge : ' + (majore - ca).toLocaleString('fr-FR') + ' € avant assujettissement immédiat';
+    } else {
+        status.className = 'jauge-status show danger';
+        status.textContent = '🔴 Seuil majoré dépassé — TVA due dès le jour du dépassement. Contactez votre SIE immédiatement.';
+    }
+}
+
+function loadJauge() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(JAUGE_KEY) || 'null');
+        if (!saved) return;
+        if (saved.ca) document.getElementById('jauge-ca').value = saved.ca;
+        if (saved.type) document.getElementById('jauge-type').value = saved.type;
+        updateJauge();
+    } catch(e) {}
+}
+
+// ===== CALCUL =====
+function setMode(m, el) {
+    mode = m;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('field-label').textContent = labels[m];
+    calc();
+}
+
+function setAmt(v) {
+    document.getElementById('amount').value = v;
+    calc();
+}
+
+function getRate() {
+    const sel = document.getElementById('rate').value;
+    if (sel === 'custom') return parseFloat(document.getElementById('custom-rate').value) || 0;
+    return parseFloat(sel);
+}
+
+function calc() {
+    const sel = document.getElementById('rate').value;
+    document.getElementById('custom-field').style.display = sel === 'custom' ? 'block' : 'none';
+    document.getElementById('rate-hint').textContent = hints[sel] || '';
+
+    const amount = parseFloat(document.getElementById('amount').value) || 0;
+    const rate = getRate();
+
+    if (!amount) {
+        document.getElementById('result').classList.remove('visible');
+        document.getElementById('compare').classList.remove('visible');
+        return;
+    }
+
+    let ht, tva, ttc;
+    if (mode === 'ht') {
+        ht = amount; tva = ht * rate / 100; ttc = ht + tva;
+    } else if (mode === 'ttc') {
+        ttc = amount; ht = ttc / (1 + rate / 100); tva = ttc - ht;
+    } else {
+        tva = amount; ht = rate > 0 ? tva / (rate / 100) : 0; ttc = ht + tva;
+    }
+
+    document.getElementById('r-ht').textContent = fmt(ht);
+    document.getElementById('r-tva').textContent = fmt(tva);
+    document.getElementById('r-ttc').textContent = fmt(ttc);
+    const rLabel = rate % 1 === 0 ? rate + '%' : rate.toFixed(1) + '%';
+    document.getElementById('r-rate-label').textContent = rLabel;
+    document.getElementById('result').classList.add('visible');
+
+    if (mode === 'ht') {
+        buildCompare(ht);
+        document.getElementById('compare').classList.add('visible');
+    } else {
+        document.getElementById('compare').classList.remove('visible');
+    }
+
+    addHistory(ht, tva, ttc, rate);
+}
+
+function buildCompare(ht) {
+    const rates = [20, 10, 5.5, 2.1];
+    const colors = ['var(--cyan)', 'var(--violet)', 'var(--green)', 'var(--orange)'];
+    document.getElementById('compare-grid').innerHTML = rates.map((r, i) => {
+        const t = ht * r / 100;
+        const tc = ht + t;
+        return `<div class="compare-cell">
+            <div class="rate-label" style="color:${colors[i]}">${r}%</div>
+            <div class="ttc-val">${fmt(tc)}</div>
+            <div class="tva-val">+${fmt(t)} TVA</div>
+        </div>`;
+    }).join('');
+}
+
+// ===== HISTORIQUE PERSISTANT =====
+function addHistory(ht, tva, ttc, rate) {
+    const item = { ht, tva, ttc, rate, time: new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) };
+    calcHistory.unshift(item);
+    if (calcHistory.length > 8) calcHistory.pop();
+    saveHistory();
+    renderHistory();
+}
+
+function saveHistory() {
+    try { localStorage.setItem(HIST_KEY, JSON.stringify(calcHistory)); } catch(e) {}
+}
+
+function loadHistory() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
+        calcHistory = saved;
+        renderHistory();
+    } catch(e) {}
+}
+
+function renderHistory() {
+    const el = document.getElementById('history-list');
+    if (!calcHistory.length) {
+        el.innerHTML = '<div class="no-history">Aucun calcul effectué</div>';
+        return;
+    }
+    el.innerHTML = calcHistory.map((h, i) => `
+        <div class="history-item" onclick="loadHistoryItem(${i})">
+            <span class="hi-left">${h.time} · ${h.rate}% · HT ${fmt(h.ht)}</span>
+            <span class="hi-right">TTC ${fmt(h.ttc)}</span>
+        </div>`).join('');
+}
+
+function loadHistoryItem(i) {
+    const h = calcHistory[i];
+    mode = 'ht';
+    document.querySelectorAll('.tab').forEach((t, idx) => t.classList.toggle('active', idx === 0));
+    document.getElementById('field-label').textContent = 'Montant HT';
+    document.getElementById('amount').value = h.ht.toFixed(2);
+    document.getElementById('rate').value = [20, 10, 5.5, 2.1].includes(h.rate) ? h.rate : 'custom';
+    calc();
+}
+
+function fmt(n) { return n.toFixed(2) + ' €'; }
+
+function copyResult() {
+    const ht = document.getElementById('r-ht').textContent;
+    const tva = document.getElementById('r-tva').textContent;
+    const ttc = document.getElementById('r-ttc').textContent;
+    const rate = document.getElementById('r-rate-label').textContent;
+    if (ht === '—') { showToast('Aucun résultat à copier'); return; }
+    navigator.clipboard.writeText(`HT : ${ht}\nTVA (${rate}) : ${tva}\nTTC : ${ttc}`)
+        .then(() => showToast('Résultat copié'))
+        .catch(() => showToast('Erreur de copie'));
+}
+
+function invertMode() {
+    const tabs = document.querySelectorAll('.tab');
+    if (mode === 'ht') setMode('ttc', tabs[1]);
+    else setMode('ht', tabs[0]);
+}
+
+function resetAll() {
+    document.getElementById('amount').value = '';
+    document.getElementById('rate').value = '20';
+    document.getElementById('custom-rate').value = '';
+    document.getElementById('custom-field').style.display = 'none';
+    document.getElementById('result').classList.remove('visible');
+    document.getElementById('compare').classList.remove('visible');
+    document.getElementById('rate-hint').textContent = hints['20'];
+    setMode('ht', document.querySelectorAll('.tab')[0]);
+}
+
+function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ===== INIT =====
+window.addEventListener('load', function() {
+    loadHistory();
+    loadJauge();
+});
+</script>
+</body>
+</html>
