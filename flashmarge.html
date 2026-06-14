@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur de Marge Gratuit | FlashTools</title>
+    <meta name="description" content="Calculez votre marge commerciale, taux de marge, coefficient multiplicateur et prix de vente. Gratuit, instantané, éducatif.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:#0a0e27; --surface:#111827; --card:#1e293b; --border:#334155;
+            --text:#f1f5f9; --muted:#94a3b8; --cyan:#06b6d4; --violet:#8b5cf6;
+            --green:#10b981; --orange:#f59e0b; --red:#ef4444;
+            --cyan-glow:rgba(6,182,212,0.18); --violet-glow:rgba(139,92,246,0.15);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Space Grotesk',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:24px 16px 60px; cursor:pointer; }
+        body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(6,182,212,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(6,182,212,0.04) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; z-index:0; }
+        .wrap { position:relative; z-index:1; max-width:1100px; margin:0 auto; }
+
+        .header { text-align:center; padding:40px 20px 32px; }
+        .logo-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(6,182,212,0.1); border:1px solid rgba(6,182,212,0.3); border-radius:100px; padding:6px 16px; font-size:0.78em; font-weight:600; color:var(--cyan); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:20px; }
+        .logo-badge::before { content:''; width:7px; height:7px; border-radius:50%; background:var(--cyan); animation:pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+        .header h1 { font-size:clamp(1.8em,5vw,2.8em); font-weight:700; line-height:1.2; margin-bottom:12px; }
+        .header h1 span { background:linear-gradient(135deg,var(--cyan),var(--violet)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .header p { color:var(--muted); font-size:1.05em; }
+
+        .layout { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:32px; }
+        .card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:32px; position:relative; overflow:hidden; }
+        .card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--cyan),var(--violet)); }
+        .card-title { font-size:1em; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:24px; }
+
+        .tabs { display:flex; background:var(--card); border-radius:10px; padding:4px; gap:4px; margin-bottom:28px; }
+        .tab { flex:1; padding:10px 6px; border:none; border-radius:7px; background:transparent; color:var(--muted); font-family:'Space Grotesk',sans-serif; font-size:0.82em; font-weight:600; cursor:pointer; transition:all 0.2s; text-align:center; line-height:1.3; white-space:nowrap; }
+        .tab.active { background:linear-gradient(135deg,var(--cyan),var(--violet)); color:white; }
+        .tab:hover:not(.active) { color:var(--text); background:rgba(255,255,255,0.05); }
+
+        .field { margin-bottom:20px; }
+        .field label { display:block; font-size:0.88em; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px; }
+        .input-wrap { position:relative; }
+        .input-wrap input { width:100%; background:var(--card); border:1.5px solid var(--border); border-radius:10px; padding:14px 48px 14px 16px; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:1.1em; font-weight:600; transition:all 0.2s; appearance:none; outline:none; }
+        .input-wrap input:focus { border-color:var(--cyan); box-shadow:0 0 0 3px var(--cyan-glow); }
+        .input-suffix { position:absolute; right:16px; top:50%; transform:translateY(-50%); font-weight:700; color:var(--muted); font-size:0.95em; pointer-events:none; }
+        .field-hint { font-size:0.8em; color:var(--muted); margin-top:6px; line-height:1.5; }
+
+        .quick { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:10px; }
+        .quick-btn { padding:8px; background:var(--card); border:1px solid var(--border); border-radius:7px; color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.82em; font-weight:600; cursor:pointer; transition:all 0.2s; }
+        .quick-btn:hover { border-color:var(--cyan); color:var(--cyan); background:var(--cyan-glow); }
+
+        /* URSSAF SECTION */
+        .urssaf-section { background:var(--card); border:1px solid rgba(139,92,246,0.25); border-radius:10px; padding:16px; margin-bottom:20px; }
+        .urssaf-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:0; }
+        .urssaf-title { font-size:0.82em; font-weight:700; color:var(--violet); display:flex; align-items:center; gap:6px; }
+        .urssaf-toggle { appearance:none; width:36px; height:20px; background:var(--border); border-radius:10px; cursor:pointer; position:relative; transition:background 0.2s; flex-shrink:0; border:none; }
+        .urssaf-toggle:checked { background:var(--violet); }
+        .urssaf-toggle::after { content:''; position:absolute; left:2px; top:2px; width:16px; height:16px; background:white; border-radius:50%; transition:left 0.2s; }
+        .urssaf-toggle:checked::after { left:18px; }
+        .urssaf-fields { display:none; margin-top:14px; padding-top:14px; border-top:1px solid var(--border); }
+        .urssaf-fields.open { display:block; }
+        .urssaf-select { width:100%; background:var(--surface); border:1.5px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--text); font-family:'Space Grotesk',sans-serif; font-size:0.88em; font-weight:600; appearance:none; cursor:pointer; outline:none; }
+        .urssaf-select:focus { border-color:var(--violet); }
+
+        .result { background:var(--card); border:1px solid rgba(6,182,212,0.3); border-radius:12px; padding:24px; margin-top:24px; display:none; }
+        .result.visible { display:block; animation:fadeIn 0.3s ease; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+        .result-main { text-align:center; padding:20px; background:var(--surface); border-radius:10px; margin-bottom:16px; border:1px solid var(--border); }
+        .result-main-label { font-size:0.82em; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:8px; }
+        .result-main-value { font-family:'JetBrains Mono',monospace; font-size:2.4em; font-weight:700; background:linear-gradient(135deg,var(--green),var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .result-main-value.negative { background:linear-gradient(135deg,var(--red),var(--orange)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+
+        .result-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+        .result-cell { background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:14px; text-align:center; }
+        .result-cell-label { font-size:0.76em; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px; }
+        .result-cell-value { font-family:'JetBrains Mono',monospace; font-size:1.25em; font-weight:700; color:var(--cyan); }
+        .result-cell:nth-child(2) .result-cell-value { color:var(--violet); }
+        .result-cell:nth-child(3) .result-cell-value { color:var(--orange); }
+        .result-cell:nth-child(4) .result-cell-value { color:var(--green); }
+        .result-cell-sub { font-size:0.72em; color:var(--muted); margin-top:4px; }
+
+        /* MARGE NETTE URSSAF */
+        .result-nette { margin-top:12px; background:rgba(139,92,246,0.08); border:1px solid rgba(139,92,246,0.2); border-radius:9px; padding:14px; display:none; }
+        .result-nette.show { display:block; }
+        .result-nette-label { font-size:0.76em; color:var(--violet); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px; font-weight:600; }
+        .result-nette-row { display:flex; justify-content:space-between; font-size:0.85em; padding:4px 0; }
+        .result-nette-row span:first-child { color:var(--muted); }
+        .result-nette-row span:last-child { font-family:'JetBrains Mono',monospace; font-weight:600; color:var(--text); }
+        .result-nette-total { display:flex; justify-content:space-between; font-size:0.9em; padding:8px 0 0; margin-top:6px; border-top:1px solid rgba(139,92,246,0.2); }
+        .result-nette-total span:first-child { color:var(--violet); font-weight:700; }
+        .result-nette-total span:last-child { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--violet); }
+
+        .margin-bar { margin-top:16px; padding:12px 16px; border-radius:9px; font-size:0.85em; font-weight:600; display:none; }
+        .margin-bar.low    { background:rgba(239,68,68,0.12);  border:1px solid rgba(239,68,68,0.3);  color:var(--red); }
+        .margin-bar.medium { background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.3); color:var(--orange); }
+        .margin-bar.good   { background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); color:var(--green); }
+        .margin-bar.negative { background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:var(--red); }
+
+        /* LIEN FLASHTVA */
+        .tva-link { display:flex; align-items:center; gap:12px; background:rgba(6,182,212,0.06); border:1px solid rgba(6,182,212,0.2); border-radius:10px; padding:14px 16px; margin-top:16px; text-decoration:none; transition:all 0.2s; cursor:pointer; }
+        .tva-link:hover { background:rgba(6,182,212,0.12); border-color:var(--cyan); }
+        .tva-link-text { flex:1; }
+        .tva-link-title { font-size:0.85em; font-weight:700; color:var(--cyan); margin-bottom:2px; }
+        .tva-link-sub { font-size:0.75em; color:var(--muted); }
+
+        .actions { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:16px; }
+        .btn { padding:12px; border-radius:9px; border:none; font-family:'Space Grotesk',sans-serif; font-size:0.88em; font-weight:600; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:6px; }
+        .btn-primary { background:linear-gradient(135deg,var(--cyan),var(--violet)); color:white; }
+        .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 20px var(--cyan-glow); }
+        .btn-ghost { background:var(--card); border:1px solid var(--border); color:var(--muted); }
+        .btn-ghost:hover { border-color:var(--cyan); color:var(--cyan); }
+
+        .guide-panel { display:flex; flex-direction:column; gap:16px; }
+        .info-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; }
+        .info-card h3 { font-size:0.95em; font-weight:700; color:var(--text); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+        .info-card h3 .dot { width:8px; height:8px; border-radius:50%; background:var(--cyan); flex-shrink:0; }
+
+        .formula-block { background:#0d1117; border-radius:8px; padding:14px 16px; font-family:'JetBrains Mono',monospace; font-size:0.82em; line-height:1.9; border:1px solid var(--border); }
+        .formula-block .comment { color:#6e7681; }
+        .formula-block .code { color:var(--cyan); }
+        .formula-block .example { color:var(--green); }
+
+        .bench-table { width:100%; border-collapse:collapse; }
+        .bench-table th { font-size:0.75em; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; padding:8px 10px; text-align:left; border-bottom:1px solid var(--border); }
+        .bench-table td { font-size:0.85em; padding:10px 10px; border-bottom:1px solid rgba(51,65,85,0.5); color:var(--muted); }
+        .bench-table tr:last-child td { border-bottom:none; }
+        .bench-table td:last-child { font-family:'JetBrains Mono',monospace; font-weight:600; color:var(--cyan); }
+        .bench-table tr.highlight td { color:var(--text); }
+
+        .history-list { display:flex; flex-direction:column; gap:8px; max-height:200px; overflow-y:auto; }
+        .history-list::-webkit-scrollbar { width:4px; }
+        .history-list::-webkit-scrollbar-track { background:var(--card); }
+        .history-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+        .history-item { background:var(--card); border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; border:1px solid transparent; transition:all 0.2s; }
+        .history-item:hover { border-color:var(--cyan); }
+        .hi-left { font-size:0.82em; color:var(--muted); }
+        .hi-right { font-family:'JetBrains Mono',monospace; font-size:0.88em; font-weight:600; color:var(--cyan); }
+        .no-history { text-align:center; color:var(--muted); font-size:0.85em; padding:20px; }
+
+        .faq-item { border-bottom:1px solid var(--border); }
+        .faq-q { width:100%; background:none; border:none; color:var(--text); font-family:'Space Grotesk',sans-serif; font-size:0.92em; font-weight:600; padding:16px 0; cursor:pointer; display:flex; justify-content:space-between; align-items:center; text-align:left; gap:12px; }
+        .faq-q .arrow { color:var(--muted); font-size:0.85em; transition:transform 0.2s; flex-shrink:0; }
+        .faq-item.open .arrow { transform:rotate(180deg); color:var(--cyan); }
+        .faq-a { display:none; padding:0 0 16px; color:var(--muted); font-size:0.88em; line-height:1.7; }
+        .faq-item.open .faq-a { display:block; animation:fadeIn 0.2s; }
+        .faq-a strong { color:var(--text); }
+        .faq-highlight { background:var(--card); border-radius:8px; padding:12px 14px; margin-top:10px; border-left:3px solid var(--cyan); font-size:0.95em; }
+
+        .full-card { margin-top:24px; }
+        .toast { position:fixed; bottom:28px; right:28px; background:var(--green); color:white; padding:12px 22px; border-radius:10px; font-size:0.9em; font-weight:600; opacity:0; transform:translateY(10px); transition:all 0.25s; z-index:999; pointer-events:none; }
+        .toast.show { opacity:1; transform:translateY(0); }
+
+        @media (max-width:860px) { .layout{grid-template-columns:1fr} }
+        @media (max-width:480px) {
+            .card{padding:20px}
+            .tab{font-size:0.75em;padding:8px 4px}
+            .quick{grid-template-columns:repeat(4,1fr)}
+            .actions{grid-template-columns:1fr 1fr}
+            .actions .btn:last-child{grid-column:span 2}
+            .result-grid{grid-template-columns:1fr 1fr}
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+
+    <div class="header">
+        <div class="logo-badge">FlashTools · Calculateur de Marge</div>
+        <h1>Marge <span>commerciale</span></h1>
+        <p>Taux de marge · Coefficient · Prix de vente · Benchmarks sectoriels</p>
+    </div>
+
+    <div class="layout">
+
+        <div class="card">
+            <p class="card-title">Calculateur</p>
+
+            <div class="tabs">
+                <button class="tab active" onclick="setMode('marge',this)">Ma marge</button>
+                <button class="tab" onclick="setMode('vente',this)">Prix vente</button>
+                <button class="tab" onclick="setMode('achat',this)">Prix achat max</button>
+            </div>
+
+            <!-- MODE MARGE -->
+            <div id="inputs-marge">
+                <div class="field">
+                    <label>Prix d'achat HT</label>
+                    <div class="input-wrap">
+                        <input type="number" id="achat" placeholder="0.00" step="0.01" min="0" inputmode="decimal" oninput="calc()">
+                        <span class="input-suffix">€</span>
+                    </div>
+                    <div class="quick">
+                        <button class="quick-btn" onclick="setVal('achat',50)">50</button>
+                        <button class="quick-btn" onclick="setVal('achat',100)">100</button>
+                        <button class="quick-btn" onclick="setVal('achat',500)">500</button>
+                        <button class="quick-btn" onclick="setVal('achat',1000)">1 000</button>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Prix de vente HT</label>
+                    <div class="input-wrap">
+                        <input type="number" id="vente" placeholder="0.00" step="0.01" min="0" inputmode="decimal" oninput="calc()">
+                        <span class="input-suffix">€</span>
+                    </div>
+                    <p class="field-hint">Travaillez toujours en HT — la TVA n'est pas votre argent</p>
+                </div>
+            </div>
+
+            <!-- MODE PRIX DE VENTE -->
+            <div id="inputs-vente" style="display:none">
+                <div class="field">
+                    <label>Prix d'achat HT</label>
+                    <div class="input-wrap">
+                        <input type="number" id="achat2" placeholder="0.00" step="0.01" min="0" inputmode="decimal" oninput="calc()">
+                        <span class="input-suffix">€</span>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Taux de marge souhaité</label>
+                    <div class="input-wrap">
+                        <input type="number" id="marge-pct" placeholder="0" step="1" min="0" inputmode="decimal" oninput="calc()">
+                        <span class="input-suffix">%</span>
+                    </div>
+                    <p class="field-hint">En % du prix d'achat — ex: 100% = vous doublez votre mise</p>
+                </div>
+            </div>
+
+            <!-- MODE ACHAT MAX -->
+            <div id="inputs-achat" style="display:none">
+                <div class="field">
+                    <label>Prix de vente HT visé</label>
+                    <div class="input-wrap">
+                        <input type="number" id="vente2" placeholder="0.00" step="0.01" min="0" inputmode="decimal" oninput="calc()">
+                        <span class="input-suffix">€</span>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Marge minimale requise</label>
+                    <div class="input-wrap">
+                        <input type="number" id="marge-pct2" placeholder="0" step="1" min="0" inputmode="decimal" oninput="calc()">
+                        <span class="input-suffix">%</span>
+                    </div>
+                    <p class="field-hint">Prix d'achat max pour atteindre cette marge</p>
+                </div>
+            </div>
+
+            <!-- SIMULATEUR URSSAF -->
+            <div class="urssaf-section">
+                <div class="urssaf-header">
+                    <div class="urssaf-title">🧮 Simuler les charges micro-entrepreneur</div>
+                    <input type="checkbox" class="urssaf-toggle" id="urssaf-toggle" onchange="toggleUrssaf()">
+                </div>
+                <div class="urssaf-fields" id="urssaf-fields">
+                    <div class="field" style="margin-bottom:0">
+                        <label style="font-size:0.82em;margin-bottom:6px">Type d'activité</label>
+                        <select class="urssaf-select" id="urssaf-type" onchange="calc()">
+                            <option value="21.2">BIC Services / Artisans — 21,2%</option>
+                            <option value="12.3">BIC Vente / Commerce — 12,3%</option>
+                            <option value="25.6">BNC Libéral non réglementé (SSI) — 25,6%</option>
+                            <option value="23.2">BNC Libéral réglementé (Cipav) — 23,2%</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESULT -->
+            <div class="result" id="result">
+                <div class="result-main">
+                    <div class="result-main-label" id="main-label">Marge brute</div>
+                    <div class="result-main-value" id="main-value">—</div>
+                </div>
+                <div class="result-grid">
+                    <div class="result-cell">
+                        <div class="result-cell-label">Taux de marge</div>
+                        <div class="result-cell-value" id="r-taux-marge">—</div>
+                        <div class="result-cell-sub">Sur prix d'achat</div>
+                    </div>
+                    <div class="result-cell">
+                        <div class="result-cell-label">Coefficient</div>
+                        <div class="result-cell-value" id="r-coef">—</div>
+                        <div class="result-cell-sub">Multiplicateur</div>
+                    </div>
+                    <div class="result-cell">
+                        <div class="result-cell-label">Taux de marque</div>
+                        <div class="result-cell-value" id="r-marque">—</div>
+                        <div class="result-cell-sub">Sur prix de vente</div>
+                    </div>
+                    <div class="result-cell">
+                        <div class="result-cell-label">Marge en euros</div>
+                        <div class="result-cell-value" id="r-marge-eur">—</div>
+                        <div class="result-cell-sub">Bénéfice brut</div>
+                    </div>
+                </div>
+
+                <!-- MARGE NETTE URSSAF -->
+                <div class="result-nette" id="result-nette">
+                    <div class="result-nette-label">📊 Après charges sociales (taux 2026)</div>
+                    <div class="result-nette-row"><span>CA (prix de vente HT)</span><span id="nette-ca">—</span></div>
+                    <div class="result-nette-row"><span>Cotisations URSSAF</span><span id="nette-urssaf" style="color:var(--red)">—</span></div>
+                    <div class="result-nette-row"><span>Prix d'achat</span><span id="nette-achat" style="color:var(--red)">—</span></div>
+                    <div class="result-nette-total"><span>Marge nette estimée</span><span id="nette-total">—</span></div>
+                </div>
+
+                <div class="margin-bar" id="margin-bar"></div>
+            </div>
+
+            <!-- LIEN FLASHTVA -->
+            <a class="tva-link" href="flashtva.html" target="_blank">
+                <span style="font-size:1.4em">🧾</span>
+                <div class="tva-link-text">
+                    <div class="tva-link-title">Vous travaillez en HT ?</div>
+                    <div class="tva-link-sub">Convertir vos montants HT / TTC → FlashTVA</div>
+                </div>
+                <span style="color:var(--cyan)">→</span>
+            </a>
+
+            <div class="actions">
+                <button class="btn btn-primary" onclick="copyResult()">Copier</button>
+                <button class="btn btn-ghost" onclick="nextMode()">Changer</button>
+                <button class="btn btn-ghost" onclick="resetAll()">Effacer</button>
+            </div>
+        </div>
+
+        <!-- PANNEAU DROIT -->
+        <div class="guide-panel">
+
+            <div class="info-card">
+                <h3><span class="dot"></span>Les 4 indicateurs</h3>
+                <div class="formula-block">
+                    <div class="comment">// Marge brute (€)</div>
+                    <div class="code">Marge = Vente − Achat</div>
+                    <div class="example">ex: 150 − 50 = 100 €</div>
+                    <br>
+                    <div class="comment">// Taux de marge (sur achat)</div>
+                    <div class="code">T.marge = (Marge / Achat) × 100</div>
+                    <div class="example">ex: (100/50) × 100 = 200 %</div>
+                    <br>
+                    <div class="comment">// Coefficient multiplicateur</div>
+                    <div class="code">Coef = Vente / Achat</div>
+                    <div class="example">ex: 150 / 50 = ×3</div>
+                    <br>
+                    <div class="comment">// Taux de marque (sur vente)</div>
+                    <div class="code">T.marque = (Marge / Vente) × 100</div>
+                    <div class="example">ex: (100/150) × 100 = 66.7 %</div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3><span class="dot" style="background:var(--violet)"></span>Benchmarks sectoriels</h3>
+                <table class="bench-table">
+                    <thead><tr><th>Secteur</th><th>Taux de marge</th></tr></thead>
+                    <tbody>
+                        <tr><td>Commerce alimentaire</td><td>20 – 30 %</td></tr>
+                        <tr><td>Commerce non-alimentaire</td><td>40 – 60 %</td></tr>
+                        <tr><td>Restauration</td><td>60 – 70 %</td></tr>
+                        <tr class="highlight"><td>Mode / Vêtements</td><td>100 – 150 %</td></tr>
+                        <tr class="highlight"><td>Artisanat d'art</td><td>100 – 300 %</td></tr>
+                        <tr><td>E-commerce (produits physiques)</td><td>30 – 50 %</td></tr>
+                        <tr><td>Logiciels / digital</td><td>200 – 500 %</td></tr>
+                        <tr><td>Cosmétiques / beauté</td><td>150 – 300 %</td></tr>
+                    </tbody>
+                </table>
+                <p style="font-size:0.75em;color:var(--muted);margin-top:10px;">Taux de marge = bénéfice / coût d'achat × 100. Ces chiffres sont des moyennes — votre situation varie selon vos charges.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- HISTORIQUE -->
+    <div class="card full-card">
+        <p class="card-title">Historique des calculs <span style="font-size:0.75em;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;">(sauvegardé automatiquement)</span></p>
+        <div class="history-list" id="history-list">
+            <div class="no-history">Aucun calcul effectué</div>
+        </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="card full-card">
+        <p class="card-title">Questions fréquentes</p>
+        <div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">Marge vs Marque : quelle différence ?<span class="arrow">▼</span></button>
+                <div class="faq-a">C'est la confusion la plus fréquente. Le <strong>taux de marge</strong> se calcule par rapport au prix d'achat — il mesure la rentabilité de votre investissement. Le <strong>taux de marque</strong> se calcule par rapport au prix de vente — il indique quelle part de chaque euro encaissé est du bénéfice brut.
+                    <div class="faq-highlight">Achat 100€ · Vente 150€ · Marge 50€<br>→ Taux de marge : 50% (50/100)<br>→ Taux de marque : 33.3% (50/150)<br>Le secteur du commerce utilise souvent le taux de marque, l'industrie le taux de marge.</div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">Quelle marge appliquer pour être rentable ?<span class="arrow">▼</span></button>
+                <div class="faq-a">La marge brute doit couvrir toutes vos charges avant de générer du bénéfice : loyer, assurances, emballage, frais de livraison, frais bancaires, charges sociales, et votre rémunération. Une marge de 50% ne signifie pas que vous gagnez 50% net.
+                    <div class="faq-highlight">Méthode : calculez d'abord votre seuil de rentabilité (charges fixes ÷ taux de marque), puis fixez votre prix en conséquence. Ne jamais partir du prix concurrent sans avoir vérifié votre propre structure de coûts.</div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">Comment fixer son prix de vente ?<span class="arrow">▼</span></button>
+                <div class="faq-a">Trois approches complémentaires. <strong>Par le coût</strong> : prix d'achat × coefficient. <strong>Par le marché</strong> : prix acceptable par vos clients, puis vérifier la marge. <strong>Par la valeur perçue</strong> : ce que le client est prêt à payer — pertinent pour l'artisanat et les créations uniques.
+                    <div class="faq-highlight">La bonne méthode combine les trois : calculez votre prix plancher, vérifiez la cohérence marché, ajustez selon la valeur perçue.</div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">Marge négative : que faire ?<span class="arrow">▼</span></button>
+                <div class="faq-a">Une marge négative signifie que vous vendez moins cher que vous n'achetez — chaque vente génère une perte. Le calculateur affiche la perte en rouge pour que vous puissiez visualiser l'écart. Pour corriger : soit augmenter le prix de vente, soit réduire le coût d'achat (négocier fournisseur, acheter en volume), soit revoir le produit. <strong>Ne jamais raisonner "on compensera par le volume" sur une marge négative</strong> — le volume ne fait qu'amplifier la perte.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">Erreurs courantes à éviter<span class="arrow">▼</span></button>
+                <div class="faq-a"><strong>Confondre marge brute et bénéfice net</strong> — la marge ne tient pas compte de vos charges. <strong>Raisonner en TTC</strong> — travaillez toujours en HT, la TVA ne vous appartient pas. <strong>Copier les prix concurrents</strong> — leurs coûts sont différents des vôtres. <strong>Négliger les petits coûts</strong> — emballage, étiquettes, commissions marketplace, frais bancaires : ça s'accumule vite.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">Micro-entrepreneur : comment calculer ma rentabilité réelle ?<span class="arrow">▼</span></button>
+                <div class="faq-a">En micro-entreprise, vos cotisations sociales sont calculées sur votre chiffre d'affaires (pas sur votre bénéfice). Taux 2026 : 12,3% (vente), 21,2% (services/artisans), 25,6% (BNC SSI). Activez le simulateur URSSAF dans le calculateur pour voir votre marge nette après charges sociales.
+                    <div class="faq-highlight">Marge nette micro = Prix vente − Prix achat − Cotisations URSSAF (sur prix de vente).<br>C'est votre revenu réellement disponible avant IR.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let mode = 'marge';
+let calcHistory = [];
+let lastResult = null;
+const HIST_KEY = 'flashmarge_history';
+
+// ===== URSSAF =====
+function toggleUrssaf() {
+    const checked = document.getElementById('urssaf-toggle').checked;
+    document.getElementById('urssaf-fields').classList.toggle('open', checked);
+    calc();
+}
+
+function getUrssafRate() {
+    if (!document.getElementById('urssaf-toggle').checked) return 0;
+    return parseFloat(document.getElementById('urssaf-type').value) || 0;
+}
+
+// ===== MODES =====
+function setMode(m, el) {
+    mode = m;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    ['marge','vente','achat'].forEach(id => {
+        document.getElementById('inputs-' + id).style.display = id === m ? 'block' : 'none';
+    });
+    hideResult();
+    calc();
+}
+
+function nextMode() {
+    const modes = ['marge','vente','achat'];
+    const tabs = document.querySelectorAll('.tab');
+    const next = (modes.indexOf(mode) + 1) % 3;
+    setMode(modes[next], tabs[next]);
+}
+
+function setVal(id, v) {
+    document.getElementById(id).value = v;
+    calc();
+}
+
+function hideResult() {
+    document.getElementById('result').classList.remove('visible');
+}
+
+function calc() {
+    if (mode === 'marge') calcMarge();
+    if (mode === 'vente') calcVente();
+    if (mode === 'achat') calcAchat();
+}
+
+function showResult(mainLabel, mainValue, tauxMarge, coef, marque, margeEur, achatVal, venteVal, isNegative) {
+    const mainEl = document.getElementById('main-value');
+    document.getElementById('main-label').textContent = mainLabel;
+    mainEl.textContent = fmt(mainValue);
+    mainEl.className = 'result-main-value' + (isNegative ? ' negative' : '');
+
+    document.getElementById('r-taux-marge').textContent = tauxMarge.toFixed(1) + ' %';
+    document.getElementById('r-coef').textContent = isFinite(coef) ? '×' + coef.toFixed(2) : '—';
+    document.getElementById('r-marque').textContent = isFinite(marque) ? marque.toFixed(1) + ' %' : '—';
+    document.getElementById('r-marge-eur').textContent = fmt(margeEur);
+
+    // Indicateur niveau
+    const bar = document.getElementById('margin-bar');
+    bar.style.display = 'block';
+    if (isNegative) {
+        bar.className = 'margin-bar negative';
+        bar.textContent = '⚠ Marge négative — vous vendez moins cher que vous n\'achetez. Chaque vente génère une perte.';
+    } else if (tauxMarge < 30) {
+        bar.className = 'margin-bar low';
+        bar.textContent = 'Marge faible — vérifiez que vos charges fixes sont couvertes';
+    } else if (tauxMarge < 80) {
+        bar.className = 'margin-bar medium';
+        bar.textContent = 'Marge correcte — pensez à intégrer toutes vos charges (emballage, frais, etc.)';
+    } else {
+        bar.className = 'margin-bar good';
+        bar.textContent = 'Bonne marge — assurez-vous que le prix reste compétitif sur votre marché';
+    }
+
+    // Simulateur URSSAF
+    const urssafRate = getUrssafRate();
+    const netteEl = document.getElementById('result-nette');
+    if (urssafRate > 0 && venteVal > 0) {
+        const urssafAmt = venteVal * urssafRate / 100;
+        const netteAmt = venteVal - achatVal - urssafAmt;
+        document.getElementById('nette-ca').textContent = fmt(venteVal);
+        document.getElementById('nette-urssaf').textContent = '−' + fmt(urssafAmt) + ' (' + urssafRate + '%)';
+        document.getElementById('nette-achat').textContent = '−' + fmt(achatVal);
+        document.getElementById('nette-total').textContent = fmt(netteAmt);
+        document.getElementById('nette-total').style.color = netteAmt >= 0 ? 'var(--violet)' : 'var(--red)';
+        netteEl.classList.add('show');
+    } else {
+        netteEl.classList.remove('show');
+    }
+
+    document.getElementById('result').classList.add('visible');
+    lastResult = { mainLabel, mainValue, tauxMarge, coef, marque, margeEur, achatVal, venteVal, isNegative };
+    addHistory(achatVal, venteVal, tauxMarge, margeEur);
+}
+
+function calcMarge() {
+    const a = parseFloat(document.getElementById('achat').value) || 0;
+    const v = parseFloat(document.getElementById('vente').value) || 0;
+    if (!a || !v) { hideResult(); return; }
+    const marge = v - a;
+    const isNeg = marge < 0;
+    const tauxMarge = a > 0 ? (marge / a) * 100 : 0;
+    const coef = a > 0 ? v / a : 0;
+    const marque = v > 0 ? (marge / v) * 100 : 0;
+    showResult('Marge brute', marge, tauxMarge, coef, marque, marge, a, v, isNeg);
+}
+
+function calcVente() {
+    const a = parseFloat(document.getElementById('achat2').value) || 0;
+    const p = parseFloat(document.getElementById('marge-pct').value) || 0;
+    if (!a || !p) { hideResult(); return; }
+    const v = a * (1 + p / 100);
+    const marge = v - a;
+    showResult('Prix de vente HT', v, p, v / a, (marge / v) * 100, marge, a, v, false);
+}
+
+function calcAchat() {
+    const v = parseFloat(document.getElementById('vente2').value) || 0;
+    const p = parseFloat(document.getElementById('marge-pct2').value) || 0;
+    if (!v || !p) { hideResult(); return; }
+    const a = v / (1 + p / 100);
+    const marge = v - a;
+    showResult("Prix d'achat max HT", a, p, v / a, (marge / v) * 100, marge, a, v, false);
+}
+
+function fmt(n) {
+    return new Intl.NumberFormat('fr-FR', {
+        style:'currency', currency:'EUR',
+        minimumFractionDigits:0, maximumFractionDigits:2
+    }).format(n);
+}
+
+// ===== HISTORIQUE PERSISTANT =====
+function addHistory(achat, vente, taux, marge) {
+    const time = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+    calcHistory.unshift({ achat, vente, taux, marge, time });
+    if (calcHistory.length > 8) calcHistory.pop();
+    saveHistory();
+    renderHistory();
+}
+
+function saveHistory() {
+    try { localStorage.setItem(HIST_KEY, JSON.stringify(calcHistory)); } catch(e) {}
+}
+
+function loadHistory() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
+        calcHistory = saved;
+        renderHistory();
+    } catch(e) {}
+}
+
+function renderHistory() {
+    const el = document.getElementById('history-list');
+    if (!calcHistory.length) {
+        el.innerHTML = '<div class="no-history">Aucun calcul effectué</div>';
+        return;
+    }
+    el.innerHTML = calcHistory.map((h, i) => `
+        <div class="history-item" onclick="loadHistoryItem(${i})">
+            <span class="hi-left">${h.time} · Achat ${fmt(h.achat)} → Vente ${fmt(h.vente)}</span>
+            <span class="hi-right" style="color:${h.taux < 0 ? 'var(--red)' : 'var(--cyan)'}">${h.taux.toFixed(1)}%</span>
+        </div>`).join('');
+}
+
+function loadHistoryItem(i) {
+    const h = calcHistory[i];
+    setMode('marge', document.querySelectorAll('.tab')[0]);
+    document.getElementById('achat').value = h.achat.toFixed(2);
+    document.getElementById('vente').value = h.vente.toFixed(2);
+    calc();
+}
+
+function copyResult() {
+    if (!lastResult) { showToast('Aucun résultat à copier'); return; }
+    const r = lastResult;
+    const urssafRate = getUrssafRate();
+    let txt = `${r.mainLabel} : ${fmt(r.mainValue)}\nTaux de marge : ${r.tauxMarge.toFixed(1)}%\nCoefficient : ×${r.coef.toFixed(2)}\nTaux de marque : ${r.marque.toFixed(1)}%\nMarge brute : ${fmt(r.margeEur)}`;
+    if (urssafRate > 0) {
+        const urssafAmt = r.venteVal * urssafRate / 100;
+        const netteAmt = r.venteVal - r.achatVal - urssafAmt;
+        txt += `\n\nAprès charges URSSAF (${urssafRate}%) :\nCotisations : −${fmt(urssafAmt)}\nMarge nette estimée : ${fmt(netteAmt)}`;
+    }
+    navigator.clipboard.writeText(txt)
+        .then(() => showToast('Résultat copié'))
+        .catch(() => showToast('Erreur de copie'));
+}
+
+function resetAll() {
+    ['achat','vente','achat2','marge-pct','vente2','marge-pct2'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    lastResult = null;
+    document.getElementById('urssaf-toggle').checked = false;
+    document.getElementById('urssaf-fields').classList.remove('open');
+    hideResult();
+    setMode('marge', document.querySelectorAll('.tab')[0]);
+}
+
+function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const was = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+    if (!was) item.classList.add('open');
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+window.addEventListener('load', loadHistory);
+</script>
+</body>
+</html>
