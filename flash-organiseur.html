@@ -887,63 +887,104 @@ function folderIconFor(files) {
 
 // ── EXPORT ZIP ──────────────────────────────────────────
 async function exportZip(singleId=null) {
-  const toExport = singleId ? folders.filter(f=>f.id===singleId&&f.files.length) : folders.filter(f=>f.files.length);
+  const toExport = singleId
+    ? folders.filter(f=>f.id===singleId&&f.files.length)
+    : folders.filter(f=>f.files.length);
   if(!toExport.length){showAlert('Aucun fichier à exporter','info');return;}
   setProcessing(true,'Préparation…');
   try{
     await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
-    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
-    if(!window.pdfjsLib){
-      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
-      window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    // pdf-lib pour reconstruire les PDFs sans perte (pas de canvas)
+    if(!window.PDFLib){
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js');
     }
-    const zip=new window.JSZip();
-    for(const folder of toExport){
+
+    const zip = new window.JSZip();
+    const numbered = document.getElementById('cbNumber').checked;
+
+    // Ordre des dossiers = ordre visuel dans folders[]
+    for(let di=0; di<toExport.length; di++){
+      const folder = toExport[di];
       setProcessing(true,'Dossier : '+folder.name);
-      const zf=singleId?zip:zip.folder(folder.name.replace(/[\\/:*?"<>|]/g,'_'));
-      const pdfGroups={},others=[];
-      folder.files.forEach(f=>f.originalPdf&&f.pageNum?(pdfGroups[f.originalPdf]=pdfGroups[f.originalPdf]||[]).push(f):others.push(f));
-      const numbered=document.getElementById('cbNumber').checked;
-      let idx=1;
-      for(const[name,pages]of Object.entries(pdfGroups)){
-        setProcessing(true,'PDF : '+name);
-        try{
-          const pdfDoc=await window.pdfjsLib.getDocument({data:await pages[0].file.arrayBuffer()}).promise;
-          const{jsPDF}=window.jspdf;let doc=null;
-          for(let i=0;i<pages.length;i++){
-            const pg=await pdfDoc.getPage(pages[i].pageNum);
-            const vp=pg.getViewport({scale:2});
-            const cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;
-            const cx=cv.getContext('2d');cx.fillStyle='white';cx.fillRect(0,0,vp.width,vp.height);
-            await pg.render({canvasContext:cx,viewport:vp}).promise;
-            const img=cv.toDataURL('image/png');
-            const w=vp.width/2*72/96,h=vp.height/2*72/96;
-            if(!doc)doc=new jsPDF({orientation:w>h?'l':'p',unit:'pt',format:[w,h]});
-            else doc.addPage([w,h],w>h?'l':'p');
-            doc.addImage(img,'PNG',0,0,w,h);
-          }
-          let fn=name.replace(/[\\/:*?"<>|]/g,'_');
-          if(!fn.endsWith('.pdf'))fn+='.pdf';
-          if(numbered)fn=String(idx++).padStart(2,'0')+' - '+fn;
-          zf.file(fn,doc.output('blob'));
-        }catch(e){console.error(e);}
+
+      // Nom du dossier avec préfixe si numérotation activée
+      let folderName = folder.name.replace(/[\\/:*?"<>|]/g,'_');
+      if(numbered && !singleId){
+        folderName = String(di+1).padStart(2,'0')+' - '+folderName;
       }
-      for(const f of others){
-        if(!f.file)continue;
-        const ext=getExt(f.file.name);
-        let fn=getBase(f.name).replace(/[\\/:*?"<>|]/g,'_')+ext;
-        if(numbered)fn=String(idx++).padStart(2,'0')+' - '+fn;
-        zf.file(fn,await f.file.arrayBuffer());
+      const zf = singleId ? zip : zip.folder(folderName);
+
+      // Grouper les pages PDF issues du même fichier source
+      const pdfGroups={}, others=[];
+      folder.files.forEach(f=>{
+        if(f.originalPdf && f.pageNum!=null){
+          (pdfGroups[f.originalPdf]=pdfGroups[f.originalPdf]||[]).push(f);
+        } else {
+          others.push(f);
+        }
+      });
+
+      // Reconstituer l'ordre visuel : mélanger PDFs groupés et autres
+      // selon la position du premier représentant dans folder.files
+      const orderedItems = [];
+      const seenPdf = new Set();
+      folder.files.forEach(f=>{
+        if(f.originalPdf && f.pageNum!=null){
+          if(!seenPdf.has(f.originalPdf)){
+            seenPdf.add(f.originalPdf);
+            orderedItems.push({type:'pdf', key:f.originalPdf, pages:pdfGroups[f.originalPdf]});
+          }
+        } else {
+          orderedItems.push({type:'file', f});
+        }
+      });
+
+      let idx=1;
+      for(const item of orderedItems){
+        if(item.type==='pdf'){
+          setProcessing(true,'PDF : '+item.key);
+          try{
+            // Reconstruction sans perte via pdf-lib
+            const pages = item.pages;
+            const srcBuf = await pages[0].file.arrayBuffer();
+            const srcDoc = await PDFLib.PDFDocument.load(srcBuf);
+            const newDoc = await PDFLib.PDFDocument.create();
+            // Trier les pages par pageNum
+            const sorted = [...pages].sort((a,b)=>a.pageNum-b.pageNum);
+            const indices = sorted.map(p=>p.pageNum-1);
+            const copied = await newDoc.copyPages(srcDoc, indices);
+            copied.forEach(p=>newDoc.addPage(p));
+            const pdfBytes = await newDoc.save();
+            let fn = item.key.replace(/[\\/:*?"<>|]/g,'_');
+            if(!fn.toLowerCase().endsWith('.pdf')) fn+='.pdf';
+            if(numbered) fn = String(idx++).padStart(2,'0')+' - '+fn;
+            zf.file(fn, pdfBytes);
+          }catch(e){console.error('PDF err',e);}
+        } else {
+          const f = item.f;
+          if(!f.file) continue;
+          const ext = getExt(f.file.name);
+          let fn = getBase(f.name).replace(/[\\/:*?"<>|]/g,'_')+ext;
+          if(numbered) fn = String(idx++).padStart(2,'0')+' - '+fn;
+          zf.file(fn, await f.file.arrayBuffer());
+        }
       }
     }
+
     setProcessing(true,'Compression…');
-    const blob=await zip.generateAsync({type:'blob',compression:'DEFLATE'});
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download=singleId?toExport[0].name+'.zip':'flashorganiseur-'+new Date().toISOString().slice(0,10)+'.zip';
-    a.click();URL.revokeObjectURL(a.href);
-    showAlert('ZIP téléchargé !','success');
-  }catch(e){console.error(e);showAlert('Erreur export','error');}
+    const blob = await zip.generateAsync({type:'blob',compression:'DEFLATE'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = singleId
+      ? toExport[0].name+'.zip'
+      : 'flashorganiseur-'+new Date().toISOString().slice(0,10)+'.zip';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showAlert('ZIP téléchargé — ordre conservé !','success');
+  }catch(e){
+    console.error(e);
+    showAlert('Erreur export : '+e.message,'error');
+  }
   setProcessing(false);
 }
 
