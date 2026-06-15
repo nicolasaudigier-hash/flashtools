@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Générateur de Mots de Passe — FlashTools</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0E27;--surface:#111827;--card:#1e293b;
+  --border:rgba(255,255,255,0.07);
+  --cyan:#06B6D4;--violet:#8B5CF6;--green:#10B981;
+  --orange:#F59E0B;--red:#EF4444;
+  --text:#F1F5F9;--muted:#64748B;
+  --cyan-glow:rgba(6,182,212,0.2);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:24px 16px 60px;-webkit-text-size-adjust:100%;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(6,182,212,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(6,182,212,.025) 1px,transparent 1px);
+  background-size:40px 40px;}
+.wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;}
+
+/* HEADER */
+.header{text-align:center;margin-bottom:28px;}
+.logo-badge{display:inline-block;font-size:.7em;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan);border:1px solid rgba(6,182,212,.3);border-radius:20px;padding:5px 14px;margin-bottom:12px;}
+.header h1{font-size:clamp(1.5em,4vw,2.2em);font-weight:800;line-height:1.1;margin-bottom:6px;}
+.header h1 span{background:linear-gradient(135deg,var(--cyan),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.header p{color:var(--muted);font-size:.88em;}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:1fr 360px;gap:16px;align-items:start;}
+@media(max-width:780px){.layout{grid-template-columns:1fr;}body{padding:12px 10px;}.wrap{padding:0;}}
+@media(max-width:520px){
+  body{padding:8px 8px;}
+  .header{margin-bottom:18px;}.header p{font-size:.78em;line-height:1.4;}
+  .card-inner{padding:14px 12px;}
+  .tabs{gap:2px;padding:3px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab-btn{padding:8px 6px;font-size:.68em;min-width:0;flex-shrink:0;}
+  .pw-text{font-size:.9em;line-height:1.55;}
+  .pw-icons{gap:4px;}.icon-btn{width:34px;height:34px;font-size:.95em;}
+  .slider-row{gap:8px;}.range-val{min-width:28px;font-size:.85em;}
+  .tog-grid{grid-template-columns:1fr;}.tog{font-size:.8em;padding:9px 11px;}
+  .btn-row{grid-template-columns:1fr 1fr;gap:6px;}.btn{padding:11px 8px;font-size:.82em;}
+  .wc-btns{gap:4px;}.wc-btn{padding:7px 10px;font-size:.78em;}
+  .sep-picker{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px;}
+  .sep-picker::-webkit-scrollbar{display:none;}
+  .sep-btn{flex-shrink:0;padding:6px 10px;font-size:.78em;}
+  .phrase-box{padding:10px;gap:4px;}.w-chip{font-size:.78em;padding:3px 7px;}
+  .phrase-legend{gap:8px;}.pl-item{font-size:.7em;}
+  .age-btns{flex-wrap:wrap;gap:5px;}.age-btn{padding:6px 10px;font-size:.75em;}
+  .ir-row{flex-direction:column;gap:6px;align-items:flex-start;}.ir-copy{align-self:flex-end;}.ir-pw{font-size:.82em;}
+  .opt-variant{padding:10px 11px;}.opt-top{flex-direction:column;gap:6px;}.opt-top .ir-copy{align-self:flex-end;}.opt-pw{font-size:.8em;}
+  .score-wrap{gap:12px;}.score-circle{width:58px;height:58px;}.score-circle svg{width:58px;height:58px;}
+  .si-level{font-size:.9em;}.si-crack{font-size:.72em;}
+  .ch{font-size:.7em;padding:2px 4px;}.char-legend{gap:6px;}.cl-i{font-size:.65em;}
+  .tip{font-size:.74em;}.sep-suggestion{padding:8px 10px;}.sep-var{flex-wrap:wrap;gap:6px;}
+  .input-wrap input{font-size:.85em;padding:10px 11px;}.dr{font-size:.75em;}
+  .mw-variants{gap:8px;}.mw-variant{padding:10px 12px;}
+  .memo-display{font-size:.82em;padding:10px 12px;}
+}
+@media(max-width:380px){.tab-btn{font-size:.62em;padding:7px 3px;}.pw-text{font-size:.82em;}.tog-grid{grid-template-columns:1fr;}.btn{font-size:.78em;}.wc-btn{padding:6px 8px;font-size:.74em;}}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.card-bar{height:3px;background:linear-gradient(90deg,var(--cyan),var(--violet));}
+.card-inner{padding:22px;}
+
+/* TABS */
+.tabs{display:flex;background:var(--card);border-radius:10px;padding:4px;gap:3px;margin-bottom:22px;}
+.tab-btn{flex:1;padding:9px 4px;border:none;background:transparent;color:var(--muted);font-family:'Syne',sans-serif;font-size:.76em;font-weight:700;border-radius:7px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.tab-btn.active{background:linear-gradient(135deg,var(--cyan),var(--violet));color:#fff;}
+.tab-btn:hover:not(.active){color:var(--text);}
+.tab-pane{display:none;}.tab-pane.active{display:block;}
+
+/* PW HERO BOX */
+.pw-hero{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 14px 12px;margin-bottom:14px;}
+.pw-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;}
+.pw-text{flex:1;font-family:'JetBrains Mono',monospace;font-size:1.05em;font-weight:500;word-break:break-all;line-height:1.65;color:var(--text);min-height:26px;}
+.pw-text.empty{color:var(--muted);font-size:.85em;font-family:'Syne',sans-serif;font-style:italic;}
+.pw-text.masked{filter:blur(5px);user-select:none;}
+.pw-icons{display:flex;gap:5px;flex-shrink:0;}
+.icon-btn{width:36px;height:36px;border:1px solid var(--border);background:var(--surface);border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.8em;color:var(--muted);transition:all .2s;touch-action:manipulation;}
+.icon-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.icon-btn.ok{border-color:var(--green);color:var(--green);}
+
+/* STRENGTH */
+.sw-row{display:flex;align-items:center;gap:10px;}
+.sw-track{flex:1;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;}
+.sw-fill{height:100%;border-radius:4px;transition:width .45s ease,background .4s;}
+.sw-label{font-size:.78em;font-weight:700;min-width:70px;text-align:right;}
+.sw-entropy{font-family:'JetBrains Mono',monospace;font-size:.68em;color:var(--muted);margin-top:4px;text-align:right;}
+.sw-entropy span{color:var(--cyan);}
+
+/* HIBP */
+.hibp{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:9px;font-size:.78em;font-weight:600;margin-top:10px;border:1px solid;}
+.hibp-safe{background:rgba(16,185,129,.07);border-color:rgba(16,185,129,.3);color:var(--green);}
+.hibp-pwned{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.3);color:var(--red);}
+.hibp-loading{background:rgba(6,182,212,.07);border-color:rgba(6,182,212,.2);color:var(--cyan);}
+.hibp-fail{background:rgba(100,116,139,.07);border-color:rgba(100,116,139,.2);color:var(--muted);}
+
+/* FIELD */
+.field{margin-bottom:16px;}
+.field>label{display:block;font-size:.72em;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px;}
+
+/* SLIDER */
+.slider-row{display:flex;align-items:center;gap:12px;}
+.range{flex:1;-webkit-appearance:none;height:4px;background:var(--card);border-radius:2px;outline:none;cursor:pointer;}
+.range::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--violet));cursor:pointer;box-shadow:0 0 8px var(--cyan-glow);}
+.range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--violet));border:none;}
+.range-val{font-family:'JetBrains Mono',monospace;font-size:1em;font-weight:700;color:var(--cyan);min-width:28px;text-align:right;}
+
+/* TOGGLES */
+.tog-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.tog{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:9px 11px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s;font-size:.8em;font-weight:600;color:var(--muted);user-select:none;}
+.tog.on{border-color:rgba(6,182,212,.4);color:var(--text);background:rgba(6,182,212,.06);}
+.tog input{display:none;}
+.tog-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;transition:all .2s;}
+.tog.on .tog-dot{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 6px var(--cyan-glow);}
+
+/* BUTTONS */
+.btn{width:100%;padding:11px;border:none;border-radius:9px;font-family:'Syne',sans-serif;font-size:.85em;font-weight:700;cursor:pointer;transition:all .2s;touch-action:manipulation;}
+.btn-primary{background:linear-gradient(135deg,var(--cyan),var(--violet));color:#fff;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px var(--cyan-glow);}
+.btn-ghost{background:var(--card);border:1px solid var(--border);color:var(--muted);}
+.btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;}
+
+/* INPUT */
+.input-wrap input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:11px 14px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.9em;outline:none;transition:border-color .2s;}
+.input-wrap input:focus{border-color:rgba(6,182,212,.5);}
+.input-wrap input::placeholder{color:var(--muted);}
+.input-error{margin-top:6px;padding:7px 11px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.25);border-radius:7px;font-size:.75em;color:var(--red);display:none;}
+
+/* AGE SELECTOR */
+.age-selector{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.age-btn{padding:6px 12px;background:var(--card);border:1px solid var(--border);border-radius:7px;color:var(--muted);font-family:'Syne',sans-serif;font-size:.78em;font-weight:700;cursor:pointer;transition:all .2s;}
+.age-btn.active{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.4);color:var(--orange);}
+.age-advice{padding:10px 13px;border-radius:9px;font-size:.79em;font-weight:600;border:1px solid;display:none;margin-bottom:14px;}
+.advice-old{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.3);color:var(--red);}
+.advice-mid{background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.3);color:var(--orange);}
+.advice-new{background:rgba(16,185,129,.07);border-color:rgba(16,185,129,.3);color:var(--green);}
+
+/* IMPROVE RESULTS */
+.imp-result{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:12px;display:none;}
+.ir-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.ir-row:last-child{border-bottom:none;}
+.ir-left{flex:1;}
+.ir-label{font-size:.7em;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:3px;}
+.ir-pw{font-family:'JetBrains Mono',monospace;font-size:.88em;font-weight:700;word-break:break-all;line-height:1.5;}
+.ir-copy{padding:5px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.73em;font-weight:700;color:var(--muted);font-family:'Syne',sans-serif;transition:all .2s;flex-shrink:0;margin-top:2px;}
+.ir-copy:hover{border-color:var(--cyan);color:var(--cyan);}
+
+/* RIGHT PANEL */
+.panel{display:flex;flex-direction:column;gap:14px;}
+.detail-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;}
+.dc-title{font-size:.7em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+.dc-title::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--cyan);}
+
+/* SCORE CIRCLE */
+.score-wrap{display:flex;align-items:center;gap:16px;margin-bottom:14px;}
+.score-circle{position:relative;width:70px;height:70px;flex-shrink:0;}
+.score-circle svg{width:70px;height:70px;transform:rotate(-90deg);}
+.sc-bg{fill:none;stroke:var(--card);stroke-width:7;}
+.sc-fill{fill:none;stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset .5s ease,stroke .4s;}
+.sc-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.sc-pct{font-family:'JetBrains Mono',monospace;font-size:.95em;font-weight:700;}
+.sc-sub{font-size:.52em;color:var(--muted);font-weight:600;}
+.score-info{flex:1;}
+.si-level{font-size:1em;font-weight:800;margin-bottom:3px;}
+.si-crack{font-size:.77em;color:var(--muted);}
+.si-crack strong{color:var(--text);}
+
+.dr{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:.8em;}
+.dr:last-child{border-bottom:none;}
+.dr-l{color:var(--muted);font-weight:600;}
+.dr-v{font-family:'JetBrains Mono',monospace;font-weight:700;}
+.c-good{color:var(--green);}.c-warn{color:var(--orange);}.c-bad{color:var(--red);}.c-cyan{color:var(--cyan);}
+
+/* CHAR MAP */
+.char-map{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px;}
+.ch{font-family:'JetBrains Mono',monospace;font-size:.76em;font-weight:700;padding:2px 5px;border-radius:4px;}
+.ch-U{background:rgba(6,182,212,.14);color:var(--cyan);}
+.ch-L{background:rgba(139,92,246,.14);color:var(--violet);}
+.ch-N{background:rgba(16,185,129,.14);color:var(--green);}
+.ch-S{background:rgba(245,158,11,.14);color:var(--orange);}
+.char-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.cl-i{display:flex;align-items:center;gap:5px;font-size:.7em;color:var(--muted);font-weight:600;}
+.cl-d{width:7px;height:7px;border-radius:2px;}
+
+/* TIPS */
+.tip{display:flex;align-items:flex-start;gap:8px;font-size:.78em;color:var(--muted);line-height:1.45;margin-bottom:9px;}
+.tip:last-child{margin-bottom:0;}
+.tip-dot{width:5px;height:5px;border-radius:50%;background:var(--cyan);flex-shrink:0;margin-top:5px;}
+
+/* ANALYZE */
+.a-advice{padding:10px 13px;border-radius:9px;font-size:.8em;margin-top:12px;border:1px solid;}
+.a-good{background:rgba(16,185,129,.07);border-color:rgba(16,185,129,.25);color:var(--green);}
+.a-warn{background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.25);color:var(--orange);}
+.a-warn ul{margin-left:14px;margin-top:4px;font-weight:400;}
+.a-warn li{margin-bottom:3px;}
+
+/* SEP PICKER */
+.sep-picker{display:flex;flex-wrap:wrap;gap:6px;}
+.sep-btn{padding:6px 11px;background:var(--card);border:1px solid var(--border);border-radius:7px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.82em;font-weight:700;cursor:pointer;transition:all .2s;}
+.sep-btn.active{background:rgba(6,182,212,.1);border-color:rgba(6,182,212,.5);color:var(--cyan);}
+.sep-btn:hover:not(.active){border-color:rgba(6,182,212,.3);color:var(--text);}
+.w-sep-chip{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.85em;font-weight:700;padding:0 2px;opacity:.7;}
+
+/* SEP SUGGESTION dans Améliorer */
+.sep-suggestion{padding:10px 12px;background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.15);border-radius:10px;margin:8px 0 4px;}
+.sep-var{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);}
+.sep-var:last-child{border-bottom:none;padding-bottom:0;}
+.sep-chip{font-family:'JetBrains Mono',monospace;font-size:.9em;font-weight:800;color:var(--cyan);min-width:20px;text-align:center;}
+
+/* ═══════════════════════════════
+   ONGLET MES MOTS
+   ═══════════════════════════════ */
+.mw-input-row{display:flex;gap:8px;margin-bottom:14px;}
+.mw-input-row input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:11px 14px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.9em;outline:none;transition:border-color .2s;}
+.mw-input-row input:focus{border-color:rgba(6,182,212,.5);}
+.mw-input-row input::placeholder{color:var(--muted);}
+
+.memo-display{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 16px;margin-bottom:14px;display:none;}
+.memo-phrase{font-size:.85em;color:var(--muted);margin-bottom:6px;font-style:italic;line-height:1.5;}
+.memo-phrase strong{color:var(--cyan);font-style:normal;}
+
+.mw-variants{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+.mw-variant{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:12px 14px;transition:border-color .2s;}
+.mw-variant:hover{border-color:rgba(6,182,212,.3);}
+.mw-variant-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;}
+.mw-variant-meta{flex:1;}
+.mw-variant-label{font-size:.72em;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:2px;}
+.mw-variant-note{font-size:.7em;color:var(--muted);line-height:1.4;margin-top:2px;}
+.mw-variant-pw{font-family:'JetBrains Mono',monospace;font-size:.95em;font-weight:700;word-break:break-all;line-height:1.6;margin-bottom:8px;}
+.mw-variant-score{display:flex;align-items:center;gap:8px;}
+.mw-best{border-color:rgba(6,182,212,.35);background:rgba(6,182,212,.03);}
+.mw-badge{display:inline-block;font-size:.64em;font-weight:700;padding:2px 7px;border-radius:4px;margin-left:6px;vertical-align:middle;background:rgba(6,182,212,.15);color:var(--cyan);border:1px solid rgba(6,182,212,.3);}
+
+/* Style sélection de style */
+.style-picker{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.style-btn{padding:6px 11px;background:var(--card);border:1px solid var(--border);border-radius:7px;color:var(--muted);font-family:'Syne',sans-serif;font-size:.76em;font-weight:700;cursor:pointer;transition:all .2s;}
+.style-btn.active{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.5);color:var(--violet);}
+.style-btn:hover:not(.active){border-color:rgba(139,92,246,.3);color:var(--text);}
+
+/* HACK SHIELD — panneau droite */
+.hack-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;display:none;}
+.hack-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:.77em;}
+.hack-row:last-child{border-bottom:none;}
+.hack-icon{font-size:.9em;flex-shrink:0;margin-top:1px;}
+.hack-info{flex:1;}
+.hack-name{font-weight:700;color:var(--text);margin-bottom:2px;}
+.hack-desc{color:var(--muted);line-height:1.4;}
+.hack-status{font-size:.7em;font-weight:700;padding:2px 8px;border-radius:5px;flex-shrink:0;margin-top:1px;}
+.hs-ok{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.3);}
+.hs-warn{background:rgba(245,158,11,.12);color:var(--orange);border:1px solid rgba(245,158,11,.3);}
+.hs-bad{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.3);}
+
+/* OPTIMIZE VARIANTS */
+.opt-variant{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 13px;margin-bottom:9px;}
+.opt-variant:last-child{margin-bottom:0;}
+.opt-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:7px;}
+.opt-meta{flex:1;}
+.opt-label{font-size:.75em;font-weight:700;color:var(--text);margin-bottom:2px;}
+.opt-note{font-size:.7em;color:var(--muted);}
+.opt-pw{font-family:'JetBrains Mono',monospace;font-size:.88em;font-weight:700;word-break:break-all;line-height:1.5;margin-bottom:8px;}
+.opt-score{display:flex;align-items:center;gap:8px;}
+.opt-variant-hl{border-color:rgba(6,182,212,.35)!important;background:rgba(6,182,212,.04);}
+.opt-badge{display:inline-block;font-size:.65em;font-weight:700;padding:2px 7px;border-radius:4px;margin-left:6px;vertical-align:middle;}
+.opt-badge-best{background:rgba(6,182,212,.15);color:var(--cyan);border:1px solid rgba(6,182,212,.3);}
+.opt-badge-full{background:rgba(139,92,246,.15);color:var(--violet);border:1px solid rgba(139,92,246,.3);}
+
+/* PHRASE CHIPS */
+.phrase-box{display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;min-height:52px;margin-bottom:14px;}
+.w-chip{font-family:'JetBrains Mono',monospace;font-size:.85em;font-weight:700;padding:4px 9px;border-radius:6px;}
+.w-subj{background:rgba(6,182,212,.12);color:var(--cyan);border:1px solid rgba(6,182,212,.25);}
+.w-verb{background:rgba(139,92,246,.12);color:var(--violet);border:1px solid rgba(139,92,246,.25);}
+.w-adj{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.25);}
+.w-compl{background:rgba(245,158,11,.12);color:var(--orange);border:1px solid rgba(245,158,11,.25);}
+.w-sym{background:rgba(245,158,11,.18);color:var(--orange);border:1px solid rgba(245,158,11,.4);font-weight:800;}
+.phrase-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.pl-item{display:flex;align-items:center;gap:5px;font-size:.7em;color:var(--muted);font-weight:600;}
+.pl-dot{width:7px;height:7px;border-radius:2px;}
+
+/* WC BTNS */
+.wc-btns{display:flex;gap:6px;}
+.wc-btn{flex:1;padding:8px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:'Syne',sans-serif;font-size:.8em;font-weight:700;cursor:pointer;transition:all .2s;}
+.wc-btn.active{background:rgba(6,182,212,.1);border-color:rgba(6,182,212,.5);color:var(--cyan);}
+
+/* SUR MESURE */
+.profile-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px;}
+@media(max-width:520px){.profile-grid{grid-template-columns:repeat(2,1fr);}}
+.profile-btn{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 8px;cursor:pointer;text-align:center;transition:all .2s;font-family:'Syne',sans-serif;}
+.profile-btn:hover{border-color:rgba(6,182,212,.4);}
+.profile-btn.active{border-color:rgba(6,182,212,.5);background:rgba(6,182,212,.07);}
+.pb-icon{font-size:1.3em;display:block;margin-bottom:4px;}
+.pb-name{font-size:.75em;font-weight:700;color:var(--text);display:block;}
+.pb-note{font-size:.62em;color:var(--muted);display:block;margin-top:2px;line-height:1.3;}
+.sym-picker{display:flex;flex-wrap:wrap;gap:5px;}
+.sym-btn{width:32px;height:32px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.85em;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;}
+.sym-btn.active{background:rgba(6,182,212,.1);border-color:rgba(6,182,212,.5);color:var(--cyan);}
+.constraint-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:.8em;}
+.constraint-row:last-child{border-bottom:none;}
+.cr-label{color:var(--muted);font-weight:600;}
+.cr-val{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--cyan);}
+.len-row{display:flex;align-items:center;gap:10px;}
+.len-inputs{display:flex;align-items:center;gap:8px;}
+.len-input{width:52px;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:6px 8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.85em;text-align:center;outline:none;}
+.len-input:focus{border-color:rgba(6,182,212,.5);}
+.len-sep{color:var(--muted);font-size:.8em;}
+.profile-info{padding:8px 12px;border-radius:8px;font-size:.75em;font-weight:600;background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.15);color:var(--cyan);margin-bottom:14px;display:none;line-height:1.5;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="header">
+  <div class="logo-badge">FlashTools · Sécurité</div>
+  <h1>Générateur de <span>mots de passe</span></h1>
+  <p>Sur mesure · Mes mots · Améliorer · Analyser · Vérification fuite HIBP</p>
+</div>
+
+<div class="layout">
+
+<!-- ══════════ GAUCHE ══════════ -->
+<div class="card">
+  <div class="card-bar"></div>
+  <div class="card-inner">
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('custom',this)">🎯 Sur mesure</button>
+      <button class="tab-btn" onclick="switchTab('mywords',this)">✏️ Mes mots</button>
+      <button class="tab-btn" onclick="switchTab('improve',this)">⚡ Améliorer</button>
+      <button class="tab-btn" onclick="switchTab('analyze',this)">📊 Analyser</button>
+    </div>
+
+    <!-- TAB SUR MESURE -->
+    <div id="tab-custom" class="tab-pane active">
+
+      <div class="field">
+        <label>Profil rapide</label>
+        <div class="profile-grid" id="profile-grid"></div>
+        <div class="profile-info" id="profile-info"></div>
+      </div>
+
+      <div class="field">
+        <label>Longueur (min / max)</label>
+        <div class="len-row">
+          <div class="len-inputs">
+            <input type="number" class="len-input" id="len-min" value="16" min="4" max="128" oninput="onLenChange()">
+            <span class="len-sep">à</span>
+            <input type="number" class="len-input" id="len-max" value="32" min="4" max="128" oninput="onLenChange()">
+          </div>
+          <span style="font-size:.75em;color:var(--muted);margin-left:8px" id="len-preview"></span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Composition</label>
+        <div class="tog-grid">
+          <div class="tog on" id="tog-cu-upper" onclick="togCu('upper')"><input type="checkbox" id="cu-upper" checked><div class="tog-dot"></div>Majuscules A-Z</div>
+          <div class="tog on" id="tog-cu-lower" onclick="togCu('lower')"><input type="checkbox" id="cu-lower" checked><div class="tog-dot"></div>Minuscules a-z</div>
+          <div class="tog on" id="tog-cu-num" onclick="togCu('num')"><input type="checkbox" id="cu-num" checked><div class="tog-dot"></div>Chiffres 0-9</div>
+          <div class="tog on" id="tog-cu-sym" onclick="togCu('sym')"><input type="checkbox" id="cu-sym" checked><div class="tog-dot"></div>Symboles</div>
+          <div class="tog" id="tog-cu-excl" onclick="togCu('excl')"><input type="checkbox" id="cu-excl"><div class="tog-dot"></div>Exclure 0O1lI</div>
+          <div class="tog" id="tog-cu-noambig" onclick="togCu('noambig')"><input type="checkbox" id="cu-noambig"><div class="tog-dot"></div>Sans espaces</div>
+          <div class="tog" id="tog-cu-blocks" onclick="togCu('blocks')"><input type="checkbox" id="cu-blocks"><div class="tog-dot"></div>Lisible en blocs</div>
+        </div>
+      </div>
+
+      <div class="field" id="sym-field">
+        <label>Symboles autorisés <span style="color:var(--muted);font-weight:400;font-size:.9em">(cliquer pour activer/désactiver)</span></label>
+        <div class="sym-picker" id="sym-picker"></div>
+      </div>
+
+      <div class="pw-hero" style="margin-top:4px">
+        <div class="pw-top">
+          <div class="pw-text empty" id="cu-pw">Cliquez sur Générer</div>
+          <div class="pw-icons">
+            <button class="icon-btn" id="cu-eye" onclick="cuMask()" title="Masquer">👁</button>
+            <button class="icon-btn" onclick="generateCustom()" title="Regénérer">↻</button>
+            <button class="icon-btn" id="cu-copy" onclick="copyEl('cu-pw','cu-copy')" title="Copier">⎘</button>
+          </div>
+        </div>
+        <div id="cu-sw-row" style="display:none">
+          <div class="sw-row">
+            <div class="sw-track"><div class="sw-fill" id="cu-fill"></div></div>
+            <span class="sw-label" id="cu-lbl"></span>
+          </div>
+          <div class="sw-entropy">Entropie <span id="cu-ent"></span> bits</div>
+        </div>
+        <div id="cu-hibp"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="generateCustom()">Générer</button>
+        <button class="btn btn-ghost" onclick="resetCustom()">Réinitialiser</button>
+      </div>
+    </div>
+
+    <!-- TAB MES MOTS -->
+    <div id="tab-mywords" class="tab-pane">
+
+      <div class="field">
+        <label>Entrez vos mots (séparés par des espaces)</label>
+        <div class="mw-input-row">
+          <input type="text" id="mw-input" placeholder="ex : chien pizza lune soleil robot" maxlength="120" oninput="onMwInput()">
+        </div>
+        <div class="input-error" id="mw-error">Entrez au moins un mot pour générer des variantes.</div>
+      </div>
+
+      <div class="field">
+        <label>Style d'encodage</label>
+        <div class="style-picker" id="style-picker"></div>
+      </div>
+
+      <div class="memo-display" id="memo-display">
+        <div class="memo-phrase" id="memo-phrase"></div>
+      </div>
+
+      <div class="mw-variants" id="mw-variants"></div>
+
+      <button class="btn btn-primary" onclick="generateMyWords()" style="margin-bottom:8px">Générer les variantes</button>
+    </div>
+
+    <!-- TAB AMÉLIORER -->
+    <div id="tab-improve" class="tab-pane">
+      <div class="field">
+        <label>Votre mot de passe actuel</label>
+        <div class="input-wrap">
+          <input type="text" id="imp-input" placeholder="Ex: MonChien2023" oninput="onImpInput()">
+        </div>
+        <div class="input-error" id="imp-error">Saisissez un mot de passe à améliorer.</div>
+      </div>
+
+      <div class="field">
+        <label>Depuis combien de temps ?</label>
+        <div class="age-selector">
+          <button class="age-btn" onclick="setAge('new',this)">Récent (&lt;6 mois)</button>
+          <button class="age-btn" onclick="setAge('mid',this)">1-2 ans</button>
+          <button class="age-btn active" onclick="setAge('old',this)">2+ ans</button>
+          <button class="age-btn" onclick="setAge('unknown',this)">Je ne sais pas</button>
+        </div>
+        <div class="age-advice" id="age-advice"></div>
+      </div>
+
+      <div class="field">
+        <label>Méthodes d'amélioration</label>
+        <div class="tog-grid">
+          <div class="tog on" id="tog-imp-sub" onclick="togImp('sub')"><input type="checkbox" id="imp-sub" checked><div class="tog-dot"></div>Substitutions a→@ e→3</div>
+          <div class="tog on" id="tog-imp-ext" onclick="togImp('ext')"><input type="checkbox" id="imp-ext" checked><div class="tog-dot"></div>Allonger (séquence mémorable)</div>
+          <div class="tog on" id="tog-imp-var" onclick="togImp('var')"><input type="checkbox" id="imp-var" checked><div class="tog-dot"></div>Générer 3 variantes</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="improvePassword()">Améliorer ce mot de passe</button>
+      <div class="imp-result" id="imp-result"></div>
+      <div id="imp-hibp"></div>
+    </div>
+
+    <!-- TAB ANALYSER -->
+    <div id="tab-analyze" class="tab-pane">
+      <div class="field">
+        <label>Mot de passe à analyser</label>
+        <div class="input-wrap">
+          <input type="text" id="ana-input" placeholder="Saisissez un mot de passe…" oninput="doAnalyze()">
+        </div>
+      </div>
+      <div id="ana-results"></div>
+      <div id="ana-hibp"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════ DROITE ══════════ -->
+<div class="panel">
+
+  <div class="detail-card" id="dc-main">
+    <div class="dc-title">Analyse en temps réel</div>
+    <div id="dc-content">
+      <div style="color:var(--muted);font-size:.82em;text-align:center;padding:16px 0">Générez ou saisissez un mot de passe</div>
+    </div>
+  </div>
+
+  <!-- HACK SHIELD -->
+  <div class="hack-card" id="hack-card">
+    <div class="dc-title">Résistance aux attaques</div>
+    <div id="hack-rows"></div>
+  </div>
+
+  <div class="detail-card" id="dc-chars" style="display:none">
+    <div class="dc-title">Carte des caractères</div>
+    <div class="char-map" id="char-map"></div>
+    <div class="char-legend">
+      <div class="cl-i"><div class="cl-d" style="background:var(--cyan)"></div>Majuscule</div>
+      <div class="cl-i"><div class="cl-d" style="background:var(--violet)"></div>Minuscule</div>
+      <div class="cl-i"><div class="cl-d" style="background:var(--green)"></div>Chiffre</div>
+      <div class="cl-i"><div class="cl-d" style="background:var(--orange)"></div>Symbole</div>
+    </div>
+  </div>
+
+  <div class="detail-card">
+    <div class="dc-title">Bonnes pratiques</div>
+    <div class="tip"><div class="tip-dot"></div>16+ caractères minimum pour tout compte important</div>
+    <div class="tip"><div class="tip-dot"></div>Un mot de passe unique par service, sans exception</div>
+    <div class="tip"><div class="tip-dot"></div>Renouvelez vos mots de passe critiques tous les 2 ans</div>
+    <div class="tip"><div class="tip-dot"></div>Une phrase mémorable longue bat un mot court complexe</div>
+    <div class="tip"><div class="tip-dot"></div>Activez le 2FA sur tous vos comptes critiques</div>
+    <div class="tip"><div class="tip-dot"></div>Utilisez Bitwarden ou 1Password pour les retenir</div>
+  </div>
+
+</div>
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════
+// DONNÉES PHRASES
+// ═══════════════════════════════
+const SUJETS=['Mon chat','Ma pieuvre','Le robot','Mon voisin','La licorne','Un pingouin','Le facteur','Ma grand-mère','Le yéti','Mon chien','La sirène','Un extraterrestre','Le boulanger','Mon hamster','La baleine','Mon dentiste','Le dragon','Ma tortue','Le plombier','Ma sorcière','Un astronaute','Mon perroquet','Un vampire','Le jardinier','Ma voisine','Le fantôme','Un archéologue','La fée','Mon oncle','Le professeur','Un ninja','La princesse','Mon coiffeur','Le cuisinier','Un détective','Ma cousine','Un cosmonaute','Mon cheval','Le pharmacien','Un zombie','Le banquier','Mon renard','Un loup-garou','La bibliothécaire','Mon lapin','Le maire','Le livreur','Le forgeron','La comptable','Un chevalier','Mon pingouin','La reine','Un pirate','Le savant fou','Mon hibou','La sorcière','Un gladiateur','Le pêcheur','Un viking','Le pompier','Un lutin','Mon hérisson','La magicienne','Un druide','Le cartographe','Ma grenouille','Un alchimiste','Le berger','La détective','Un gnome','Mon dauphin','La fauconnière'];
+const VERBES=['mange','cuisine','déteste','collectionne','photographie','cherche','réinvente','fabrique','oublie','découpe','transporte','surveille','apprécie','expédie','arrose','dévore','construit','démantèle','lance','attrape','invente','cache','trouve','prépare','nettoie','dessine','raconte','explique','imagine','admire','examine','distribue','propose','commande','pilote','conduit','achète','échange','livre','recycle','analyse','observe','décore','recouvre','transforme','installe','répare','mesure','remplace','partage','classe','promène','repeint','vend','gère','peint','importe','exporte','calcule','emporte','confectionne','déballe','expérimente','programme','bidouille','trimballe','déguste','inventorie','récolte','trie','empile','stocke','grignote','mijote','saupoudre','astique','bricole','cartographie','modélise','déchiffre','contemple','esquisse','perfectionne','démystifie','jongle','calibre','documente'];
+const ADJS_NUM=[2,3,4,5,6,7,8,9,11,12,13,14,15,16,17,18,19,21,23,24,27,33,42,66,77,88,99];
+const COMPLS=['pizzas au chocolat','chaussettes en laine','tournevis dorés','baguettes magnétiques','cactus volants','nuages en sucre','robots dansants','stylos invisibles','fromages lunaires','tapis électriques','canards en plastique','écharpes cosmiques','biscuits radioactifs','lampes à huile','crabes roses','sous-marins en papier','chapeaux magnétiques','clés sans serrure','horloges sous-marines','boussoles inutiles','parapluies carrés','bottes de sept lieues','crayons explosifs','casques à plumes','montres en fromage','bicyclettes volantes','boucliers en chocolat','épées en mousse','théières quantiques','gants de boxe dorés','dictionnaires parlants','miroirs déformants','trampolines miniatures','lunettes à rayon X','sacs sans fond','compas ensorcelés','tableaux qui bougent','trottinettes à vapeur','ceintures lévitantes','globes terraqués','filets à papillons','pelotes de laine bleue','cartes au trésor fausses','boulons phosphorescents','coussins magnétiques','fusées en carton','puzzles infinis','cerfs-volants sonores','boites à musique','masques de plongée'];
+const COMPLS_COURT=['des lasers','des pizzas','des crabes','des robots','des cactus','des magnets','des éponges','des miroirs','des nuages','des boulons','des fusées','des crayons','des casques','des stylos','des bottes','des gants','des drones','des cristaux','des pendules','des aimants','des lanternes','des masques','des sabliers','des cordes','des puzzles','des coussins','des armures','des ballons','des capsules','des circuits','des bulles','des blocs','des radars','des capteurs','des modules','des tambours','des ressorts','des turbines','des pistons','des engrenages'];
+const EXTRAS=['avec joie','très vite','chaque nuit','sans raison','sous la pluie','en chantant','depuis hier','pour toujours','en silence','à reculons','avec entrain','à midi pile','depuis toujours','en secret','sans filet','à toute vitesse','avec méthode','en pyjama','depuis ce matin','à contre-coeur','sans hésiter','avec soin','en douce','au dernier moment','sans relâche','avec passion','par hasard','sans permission','avec conviction'];
+const LIEUX=['au bord du lac','sur la lune','dans le grenier','devant la télé','au supermarché','sous un arc-en-ciel','derrière le frigo','dans un sous-marin','au sommet du volcan','sous le lit','dans l\'espace','au fond de l\'océan','sur un iceberg','dans la forêt','au bout du monde','sur un nuage','dans une grotte','au milieu du désert','sous la mer','dans un château','au pôle nord','sur un radeau','dans un labyrinthe','au sommet d\'une tour','dans une capsule'];
+const SYMS=['!','@','#','$','?','*','-','_','.','|'];
+const SEP_OPTIONS=[{id:'space',label:'Espace',val:' '},{id:'dash',label:'Tiret -',val:'-'},{id:'under',label:'Underscore _',val:'_'},{id:'dot',label:'Point .',val:'.'},{id:'at',label:'Arobase @',val:'@'},{id:'plus',label:'Plus +',val:'+'},{id:'bang',label:'Excl. !',val:'!'},{id:'pipe',label:'Pipe |',val:'|'}];
+
+// Symboles clavier uniquement — & % ^ ` ~ \ { } [ ] exclus
+const SAFE_SYMS=['!','@','#','$','*','?','-','_','.','+','|',':',';'];
+const EXT_SONORE=['Oasis','Alpaga','Ekko','Igloo','Ondine','Aura','Eden','Iris','Nova','Blaze','Storm','Flash','Nexus','Pixel','Cobra','Drift','Soleil','Lune','Terra','Moka','Zenith','Vega','Kora','Nyx'];
+// EXT_SYMS : symboles seuls, sans chiffre collé — entropie propre
+const EXT_SYMS=['!','@','#','$','*','?','_','.'];
+
+const _history={};
+function pickNoRepeat(arr,key,memory=6){
+  if(!_history[key])_history[key]=[];
+  const hist=_history[key];
+  let pool=arr.filter(x=>!hist.includes(x));
+  if(pool.length===0){_history[key]=[];pool=[...arr];}
+  const v=new Uint32Array(1);crypto.getRandomValues(v);
+  const chosen=pool[v[0]%pool.length];
+  hist.push(chosen);if(hist.length>memory)hist.shift();return chosen;
+}
+
+let phraseSep=' ',wcCount=4,ageMode='old',rndIsMasked=false;
+let currentPw='';
+
+function pick(arr){const v=new Uint32Array(1);crypto.getRandomValues(v);return arr[v[0]%arr.length];}
+function pickInt(n){const v=new Uint32Array(1);crypto.getRandomValues(v);return v[0]%n;}
+
+// ═══════════════════════════════
+// TABS
+// ═══════════════════════════════
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ═══════════════════════════════
+// TAB SUR MESURE
+// ═══════════════════════════════
+const PROFILES=[
+  {id:'bank',   icon:'🏦', name:'Banque / Finance',  note:'Max sécurité',
+   min:16,max:32, upper:true,lower:true,num:true,sym:true,excl:true,blocks:false,
+   syms:['!','@','#','$','*','?'],
+   info:'Longueur 16-32 · Tous types · Symboles stricts · 0O1lI exclus — les banques acceptent rarement tous les symboles.'},
+  {id:'email',  icon:'📧', name:'Email / Google',     note:'Très fort',
+   min:16,max:32, upper:true,lower:true,num:true,sym:true,excl:false,blocks:false,
+   syms:['!','@','#','$','*','?','-','_','.'],
+   info:'Longueur 16-32 · Tous types · Large choix de symboles — Gmail et Outlook acceptent presque tout.'},
+  {id:'social', icon:'📱', name:'Réseau social',      note:'Fort',
+   min:14,max:28, upper:true,lower:true,num:true,sym:true,excl:false,blocks:true,
+   syms:['!','@','#','$','*','?','-','_'],
+   info:'Longueur 14-28 · Blocs lisibles activés — structure visuelle agréable, facile à taper sur mobile.'},
+  {id:'gaming', icon:'🎮', name:'Gaming',             note:'Pratique + fort',
+   min:12,max:20, upper:true,lower:true,num:true,sym:false,excl:true,blocks:true,
+   syms:[],
+   info:'Longueur 12-20 · Blocs lisibles activés · Sans symboles — structure rythmée, idéale pour clavier console ou virtuel.'},
+  {id:'admin',  icon:'⚙️', name:'Admin / SSH',        note:'Entropie max',
+   min:24,max:64, upper:true,lower:true,num:true,sym:true,excl:false,blocks:false,
+   syms:['!','@','#','$','*','?','-','_','.','|',':','+'],
+   info:'Longueur 24-64 · Tous types · Tous symboles clavier — les accès SSH et serveurs n\'ont aucune restriction.'},
+  {id:'wifi',   icon:'📶', name:'Wi-Fi / Box',        note:'Long + mémorable',
+   min:20,max:40, upper:true,lower:true,num:true,sym:true,excl:true,blocks:true,
+   syms:['-','_','.','!','#'],
+   info:'Longueur 20-40 · Blocs lisibles · Symboles simples — facile à taper sur TV, console ou clavier virtuel.'},
+];
+
+const ALL_SYMS=['!','@','#','$','*','?','-','_','.','+','|',':',';'];
+let cuActiveSyms=new Set(ALL_SYMS);
+let cuIsMasked=false;
+let activeProfile=null;
+
+function buildProfileGrid(){
+  const grid=document.getElementById('profile-grid');
+  PROFILES.forEach(p=>{
+    const btn=document.createElement('button');
+    btn.className='profile-btn';
+    btn.id='pb-'+p.id;
+    btn.innerHTML=`<span class="pb-icon">${p.icon}</span><span class="pb-name">${p.name}</span><span class="pb-note">${p.note}</span>`;
+    btn.onclick=()=>selectProfile(p);
+    grid.appendChild(btn);
+  });
+}
+
+function selectProfile(p){
+  activeProfile=p;
+  document.querySelectorAll('.profile-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pb-'+p.id).classList.add('active');
+  // Appliquer les contraintes
+  document.getElementById('len-min').value=p.min;
+  document.getElementById('len-max').value=p.max;
+  setTogCu('upper',p.upper);setTogCu('lower',p.lower);
+  setTogCu('num',p.num);setTogCu('sym',p.sym);
+  setTogCu('excl',p.excl);
+  setTogCu('blocks',p.blocks||false);
+  // Symboles
+  cuActiveSyms=new Set(p.syms);
+  document.getElementById('sym-field').style.display=p.sym?'block':'none';
+  updateSymPicker();
+  // Info
+  const info=document.getElementById('profile-info');
+  info.textContent=p.info;info.style.display='block';
+  updateLenPreview();
+  generateCustom();
+}
+
+function setTogCu(k,val){
+  document.getElementById('cu-'+k).checked=val;
+  document.getElementById('tog-cu-'+k).classList.toggle('on',val);
+}
+
+function buildSymPicker(){
+  const picker=document.getElementById('sym-picker');
+  ALL_SYMS.forEach(s=>{
+    const btn=document.createElement('button');
+    btn.className='sym-btn active';
+    btn.textContent=s;
+    btn.dataset.sym=s;
+    btn.onclick=()=>{
+      if(cuActiveSyms.has(s)){if(cuActiveSyms.size>1)cuActiveSyms.delete(s);}
+      else cuActiveSyms.add(s);
+      updateSymPicker();
+    };
+    picker.appendChild(btn);
+  });
+}
+function updateSymPicker(){
+  document.querySelectorAll('.sym-btn').forEach(b=>{
+    b.classList.toggle('active',cuActiveSyms.has(b.dataset.sym));
+  });
+}
+
+function togCu(k){
+  const cb=document.getElementById('cu-'+k);
+  const tog=document.getElementById('tog-cu-'+k);
+  cb.checked=!cb.checked;tog.classList.toggle('on',cb.checked);
+  if(k==='sym'){
+    document.getElementById('sym-field').style.display=cb.checked?'block':'none';
+  }
+  activeProfile=null;
+  document.querySelectorAll('.profile-btn').forEach(b=>b.classList.remove('active'));
+}
+
+function onLenChange(){
+  activeProfile=null;
+  document.querySelectorAll('.profile-btn').forEach(b=>b.classList.remove('active'));
+  updateLenPreview();
+}
+function updateLenPreview(){
+  const mn=parseInt(document.getElementById('len-min').value)||8;
+  const mx=parseInt(document.getElementById('len-max').value)||32;
+  document.getElementById('len-preview').textContent=`→ génère ${mn}-${mx} car.`;
+}
+
+function generateCustom(){
+  const mn=Math.max(4,parseInt(document.getElementById('len-min').value)||16);
+  const mx=Math.max(mn,parseInt(document.getElementById('len-max').value)||32);
+  const len=mn+pickInt(mx-mn+1);
+  const upper=document.getElementById('cu-upper').checked;
+  const lower=document.getElementById('cu-lower').checked;
+  const num=document.getElementById('cu-num').checked;
+  const sym=document.getElementById('cu-sym').checked;
+  const excl=document.getElementById('cu-excl').checked;
+  const blocks=document.getElementById('cu-blocks').checked;
+  let cs='';
+  if(upper)cs+=excl?'ABCDEFGHJKLMNPQRSTUVWXYZ':'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  if(lower)cs+=excl?'abcdefghijkmnopqrstuvwxyz':'abcdefghijklmnopqrstuvwxyz';
+  if(num)cs+=excl?'23456789':'0123456789';
+  if(sym&&cuActiveSyms.size>0)cs+=[...cuActiveSyms].join('');
+  if(!cs)cs='abcdefghijklmnopqrstuvwxyz';
+
+  // Génération cryptographique
+  let pw='';
+  const arr=new Uint32Array(len);crypto.getRandomValues(arr);
+  for(let i=0;i<len;i++)pw+=cs[arr[i]%cs.length];
+
+  // Injection garantie d'un char par type actif si absent
+  const inject=[];
+  const UCS=excl?'ABCDEFGHJKLMNPQRSTUVWXYZ':'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const LCS=excl?'abcdefghijkmnopqrstuvwxyz':'abcdefghijklmnopqrstuvwxyz';
+  const NCS=excl?'23456789':'0123456789';
+  if(upper&&!/[A-Z]/.test(pw))inject.push(UCS[pickInt(UCS.length)]);
+  if(lower&&!/[a-z]/.test(pw))inject.push(LCS[pickInt(LCS.length)]);
+  if(num&&!/[0-9]/.test(pw))inject.push(NCS[pickInt(NCS.length)]);
+  if(sym&&cuActiveSyms.size>0){
+    const sa=[...cuActiveSyms];
+    if(!sa.some(s=>pw.includes(s)))inject.push(sa[pickInt(sa.length)]);
+  }
+  let pwarr=pw.split('');
+  inject.forEach(c=>{pwarr[pickInt(pwarr.length)]=c;});
+  pw=pwarr.join('');
+
+  // ─── FACTEUR ESTHÉTIQUE : blocs lisibles ───────────────────────────────
+  // Principe : réorganise les chars en blocs de 4 séparés par un symbole fixe.
+  // Zéro impact sur l'entropie — mêmes caractères, ordre différent.
+  // Structure : [bloc alpha/num 4] + [sep] + [bloc alpha/num 4] + ...
+  // Le séparateur est choisi parmi les symboles actifs (ou '-' par défaut).
+  if(blocks){
+    // Chars "contenu" (non-symboles) et symboles séparément
+    const BLOCK_SEP=([...cuActiveSyms].find(s=>['-','_','.'].includes(s)))||'-';
+    // Charset de contenu sans le séparateur lui-même
+    const contentCs=cs.split('').filter(c=>c!==BLOCK_SEP).join('')||cs;
+    // Taille de bloc : 3 ou 4 selon longueur totale
+    const bsize=len<=16?3:4;
+    // Nombre de blocs : on cible len chars de contenu + séparateurs entre blocs
+    // Longueur réelle avec séparateurs : nBlocs*bsize + (nBlocs-1)
+    const nBlocs=Math.round(len/(bsize+1))||2;
+    const totalContent=nBlocs*bsize;
+    const barr=new Uint32Array(totalContent);crypto.getRandomValues(barr);
+    let content='';for(let i=0;i<totalContent;i++)content+=contentCs[barr[i]%contentCs.length];
+    // Injection garantie dans le contenu
+    const inj2=[];
+    if(upper&&!/[A-Z]/.test(content))inj2.push(UCS[pickInt(UCS.length)]);
+    if(lower&&!/[a-z]/.test(content))inj2.push(LCS[pickInt(LCS.length)]);
+    if(num&&!/[0-9]/.test(content))inj2.push(NCS[pickInt(NCS.length)]);
+    const carr=content.split('');
+    inj2.forEach(c=>{carr[pickInt(carr.length)]=c;});
+    content=carr.join('');
+    // Découpe en blocs
+    const blocsArr=[];
+    for(let i=0;i<nBlocs;i++)blocsArr.push(content.slice(i*bsize,(i+1)*bsize));
+    pw=blocsArr.join(BLOCK_SEP);
+  }
+  // ───────────────────────────────────────────────────────────────────────
+
+  cuIsMasked=false;
+  const el=document.getElementById('cu-pw');
+  el.className='pw-text';el.textContent=pw;
+  document.getElementById('cu-eye').textContent='👁';
+  showSW(pw,'cu-fill','cu-lbl','cu-ent','cu-sw-row');
+  updateDetail(pw);updateHackShield(pw);
+  checkHIBP(pw,'cu-hibp');
+}
+
+function cuMask(){
+  cuIsMasked=!cuIsMasked;
+  document.getElementById('cu-pw').classList.toggle('masked',cuIsMasked);
+  document.getElementById('cu-eye').textContent=cuIsMasked?'🙈':'👁';
+}
+function resetCustom(){
+  cuIsMasked=false;activeProfile=null;
+  document.querySelectorAll('.profile-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('cu-pw').className='pw-text empty';
+  document.getElementById('cu-pw').textContent='Cliquez sur Générer';
+  document.getElementById('cu-sw-row').style.display='none';
+  document.getElementById('cu-hibp').innerHTML='';
+  document.getElementById('profile-info').style.display='none';
+  document.getElementById('len-min').value=16;
+  document.getElementById('len-max').value=32;
+  setTogCu('upper',true);setTogCu('lower',true);setTogCu('num',true);setTogCu('sym',true);setTogCu('excl',false);setTogCu('blocks',false);
+  cuActiveSyms=new Set(ALL_SYMS);updateSymPicker();
+  document.getElementById('sym-field').style.display='block';
+  updateLenPreview();resetDetail();
+}
+
+// ═══════════════════════════════
+// TAB MES MOTS
+// ═══════════════════════════════
+
+// Table de substitution visuelle — symboles clavier uniquement
+const SUBS_VIS={
+  'a':'@','A':'@',
+  'e':'3','E':'3',
+  'i':'!','I':'1',
+  'o':'0','O':'0',
+  's':'$','S':'$',
+  't':'7','T':'7',
+  'l':'1','L':'1',
+  'g':'9','G':'9',
+  'b':'8','B':'8',
+};
+
+// Styles d'encodage disponibles
+const MW_STYLES=[
+  {id:'leet',     label:'Leet speak',    note:'Substitutions visuelles classiques (a→@ e→3 s→$)'},
+  {id:'pascal',   label:'PascalCase',    note:'Chaque mot commence par une Majuscule, tout attaché'},
+  {id:'sepnum',   label:'Sep + chiffre', note:'Séparateur entre chaque mot + chiffre final'},
+  {id:'initials', label:'Initiales',     note:'Initiales encadrées de symboles forts'},
+  {id:'mirror',   label:'Miroir leet',   note:'Leet speak partiel + majuscules alternées'},
+  {id:'mixed',    label:'Mixte fort',    note:'Combinaison PascalCase + leet + symbole'},
+  {id:'phono',    label:'Phonétique',    note:'Réécriture phonétique — se lit à voix haute, illisible pour un dictionnaire'},
+];
+let mwStyle='leet';
+
+// ═══════════════════════════════
+// TABLE PHONÉTIQUE — 100% JS pur, zéro dépendance
+// Règles ordonnées du plus long au plus court pour éviter les conflits
+// Sons français → variantes d'écriture alternatives (toutes clavier standard)
+// ═══════════════════════════════
+// Table phonétique — algo séquentiel gauche→droite, règles longues en premier
+// 100% JS pur, zéro dépendance, symboles clavier uniquement
+const PHONO_RULES=[
+  ['eaux','o'],['ille','iy'],['ieux','yu'],['eau','o'],['eux','u'],
+  ['aux','o'],['ain','in'],['ein','in'],['oin','wan'],['oeu','u'],
+  ['aie','ey'],['oie','wa'],['ouil','uy'],['uil','uy'],['eil','ey'],
+  ['ien','yen'],['ion','yon'],['ial','yal'],['ian','yan'],
+  ['uit','wit'],['uie','wi'],
+  ['ou','oo'],['oi','wa'],['au','o'],['eu','u'],['ai','ey'],
+  ['ei','ey'],['an','en'],['am','en'],['en','an'],['em','an'],
+  ['in','yn'],['im','yn'],['on','on'],['om','on'],
+  ['un','un'],['um','un'],['ch','sh'],['ph','f'],['gn','ny'],
+  ['qu','k'],['gu','g'],['ge','j'],['gi','j'],['th','t'],
+  ['é','ey'],['è','eh'],['ê','eh'],['ë','e'],['à','a'],
+  ['â','a'],['î','i'],['ï','i'],['ô','o'],['û','u'],
+  ['ù','u'],['ü','u'],['œ','u'],['æ','ey'],
+  ['ll','l'],['ss','s'],['tt','t'],['pp','p'],['nn','n'],['mm','m'],
+];
+
+// Variante renforcée : sons + substitutions chiffres/symboles clavier
+const PHONO_RULES2=[
+  ['eaux','0'],['ille','iy'],['ieux','yu'],['eau','0'],['eux','u'],
+  ['aux','0'],['ain','1n'],['ein','1n'],['oin','w@n'],['oeu','u'],
+  ['aie','3y'],['oie','w@'],['ouil','uy'],['uil','uy'],['eil','3y'],
+  ['ien','yen'],['ion','yon'],['uit','wit'],['uie','wi'],
+  ['ou','00'],['oi','w@'],['au','0'],['eu','u'],['ai','3y'],
+  ['ei','3y'],['an','@n'],['am','@n'],['en','@n'],['em','@n'],
+  ['in','1n'],['im','1n'],['on','0n'],['om','0n'],
+  ['un','un'],['ch','$h'],['ph','f'],['gn','ny'],['qu','k'],
+  ['ge','j'],['gi','j'],['th','t'],
+  ['é','3y'],['è','3h'],['ê','3h'],['à','@'],['â','@'],
+  ['î','1'],['ô','0'],['û','u'],['ù','u'],['œ','u'],
+  ['ll','l'],['ss','$'],['tt','t'],['a','@'],['e','3'],['i','1'],['o','0'],
+];
+
+function _applyPhono(word, rules){
+  let w=word.toLowerCase();
+  let result='';
+  let i=0;
+  while(i<w.length){
+    let matched=false;
+    for(const [from,to] of rules){
+      if(w.slice(i,i+from.length)===from){
+        result+=to; i+=from.length; matched=true; break;
+      }
+    }
+    if(!matched){result+=w[i];i++;}
+  }
+  return result||w;
+}
+function phonoWord(word){return _applyPhono(word,PHONO_RULES);}
+function phonoWord2(word){return _applyPhono(word,PHONO_RULES2);}
+
+function leet(w){return w.split('').map(c=>SUBS_VIS[c]||c).join('');}
+function leetPartial(w){return w.split('').map((c,i)=>i%2===0&&SUBS_VIS[c]?SUBS_VIS[c]:c).join('');}
+function cap(w){return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();}
+function altCase(w){return w.split('').map((c,i)=>i%2===0?c.toUpperCase():c.toLowerCase()).join('');}
+
+function buildMwVariants(words){
+  // Séparateur sûr choisi parmi SAFE_SYMS non espace
+  const SEP_POOL=['-','_','.','|',':','!','@','#'];
+  const sep1=SEP_POOL[pickInt(SEP_POOL.length)];
+  const sep2=SEP_POOL.filter(s=>s!==sep1)[pickInt(SEP_POOL.length-1)];
+  const num=String(pick(ADJS_NUM));
+  const sym=pick(EXT_SYMS);
+  const sym2=EXT_SYMS.filter(s=>s!==sym)[pickInt(EXT_SYMS.length-1)];
+
+  // Phrase mémo affichée
+  const phraseOrigine=words.join(' ');
+
+  const variants=[
+    {
+      style:'leet',
+      label:'Leet speak',
+      pw:words.map(leet).join(sep1)+sym+num,
+      memo:`${phraseOrigine} → substitutions visuelles (a→@ e→3 s→$) + "${sep1}" + "${sym}${num}"`,
+      note:`Lecture : ${words.join(' ')}`,
+    },
+    {
+      style:'pascal',
+      label:'PascalCase',
+      pw:words.map(cap).join('')+sym+num,
+      memo:`${phraseOrigine} → chaque mot en Majuscule collé + "${sym}${num}"`,
+      note:`Universel — compatible tous les sites`,
+    },
+    {
+      style:'sepnum',
+      label:'Sep + chiffre',
+      pw:words.join(sep1)+sep1+num+sym,
+      memo:`${phraseOrigine} → séparateur "${sep1}" entre chaque mot + ${num}${sym}`,
+      note:`Structure visible, facile à taper`,
+    },
+    {
+      style:'initials',
+      label:'Initiales',
+      pw:sym+words.map(w=>w.charAt(0).toUpperCase()).join('')+sym2+num+sym,
+      memo:`${phraseOrigine} → initiales ${words.map(w=>w.charAt(0).toUpperCase()).join('')} encadrées de "${sym}" "${sym2}"`,
+      note:`Court mais fort — mémorisé par la phrase`,
+    },
+    {
+      style:'mirror',
+      label:'Miroir leet',
+      pw:words.map((w,i)=>i%2===0?leetPartial(w):altCase(w)).join(sep2)+sym+num,
+      memo:`${phraseOrigine} → alternance leet partiel / casse alternée + "${sep2}${sym}${num}"`,
+      note:`Structure mémorable visuellement unique`,
+    },
+    {
+      style:'mixed',
+      label:'Mixte fort',
+      pw:words.map(w=>cap(leetPartial(w))).join(sep1)+sym+num+sym2,
+      memo:`${phraseOrigine} → PascalCase + leet partiel + "${sep1}" + "${sym}${num}${sym2}"`,
+      note:`Maximum de variété — recommandé comptes sensibles`,
+    },
+    {
+      style:'phono',
+      label:'Phonétique',
+      pw:words.map(w=>cap(phonoWord(w))).join(sep1)+sym+num,
+      memo:`${words.map(w=>w+' → '+phonoWord(w)).join('  •  ')} — se lit à voix haute, illisible pour un dictionnaire`,
+      note:`Mémorisé à l'oreille, invisible aux attaques par dictionnaire`,
+    },
+    {
+      style:'phono',
+      label:'Phonétique renforcé',
+      pw:words.map(phonoWord2).join(sep2)+sym2+num,
+      memo:`${words.map(w=>w+' → '+phonoWord2(w)).join('  •  ')} — sons + substitutions symboles`,
+      note:`Double couche : phonétique + leet — entropie maximale`,
+    },
+  ];
+  return{variants,phraseOrigine};
+}
+
+let mwWords=[];
+
+function onMwInput(){
+  document.getElementById('mw-error').style.display='none';
+}
+
+function generateMyWords(){
+  const raw=document.getElementById('mw-input').value.trim();
+  if(!raw){
+    document.getElementById('mw-error').style.display='block';
+    return;
+  }
+  // max 4 mots, nettoyage
+  mwWords=raw.split(/\s+/).slice(0,4).map(w=>w.replace(/[^a-zA-ZÀ-ÿ0-9]/g,''));
+  if(!mwWords.length||!mwWords[0]){
+    document.getElementById('mw-error').style.display='block';
+    return;
+  }
+
+  const{variants,phraseOrigine}=buildMwVariants(mwWords);
+
+  // Mémo visuel
+  const memoEl=document.getElementById('memo-display');
+  const memoPhrase=document.getElementById('memo-phrase');
+  memoEl.style.display='block';
+  memoPhrase.innerHTML=`Vos mots : <strong>${escHtml(phraseOrigine)}</strong> — chaque variante ci-dessous "lit" visuellement cette phrase.`;
+
+  // Scores pour trouver le meilleur
+  const scored=variants.map(v=>({...v,sc:calcStrength(v.pw)}));
+  const bestScore=Math.max(...scored.map(v=>v.sc.score));
+
+  const container=document.getElementById('mw-variants');
+  container.innerHTML=scored.map(v=>{
+    const isBest=v.sc.score===bestScore;
+    const id='mw'+Math.random().toString(36).slice(2,8);
+    return`<div class="mw-variant${isBest?' mw-best':''}">
+      <div class="mw-variant-top">
+        <div class="mw-variant-meta">
+          <div class="mw-variant-label">${v.label}${isBest?'<span class="mw-badge">Recommandé</span>':''}</div>
+          <div class="mw-variant-note">${escHtml(v.memo)}</div>
+        </div>
+        <button class="ir-copy" onclick="cpText('${id}',this)">Copier</button>
+      </div>
+      <div class="mw-variant-pw" id="${id}" style="color:${v.sc.color}">${escHtml(v.pw)}</div>
+      <div class="mw-variant-score">
+        <div class="sw-track" style="flex:1"><div class="sw-fill" style="width:${v.sc.score}%;background:${v.sc.color}"></div></div>
+        <span style="font-size:.7em;font-weight:700;color:${v.sc.color};min-width:65px;text-align:right">${v.sc.label}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Analyse sur la variante recommandée
+  const best=scored.find(v=>v.sc.score===bestScore);
+  updateDetail(best.pw);
+  updateHackShield(best.pw);
+  checkHIBP(best.pw,'mw-hibp');
+}
+
+// conteneur HIBP pour Mes mots
+// (inséré dynamiquement sous les variants)
+function ensureMwHibp(){
+  let el=document.getElementById('mw-hibp');
+  if(!el){
+    el=document.createElement('div');el.id='mw-hibp';
+    document.getElementById('mw-variants').after(el);
+  }
+  return el;
+}
+
+// ═══════════════════════════════
+// TAB AMÉLIORER
+// ═══════════════════════════════
+const AGE_MSGS={
+  old:{cls:'advice-old',t:'⚠ Plus de 2 ans — très probablement exposé. Remplacez-le ou allongez-le avec une séquence unique que vous seul connaissez.'},
+  mid:{cls:'advice-mid',t:'Prudence — renouveler un mot de passe de 1-2 ans reste une bonne pratique sur les comptes sensibles.'},
+  new:{cls:'advice-new',t:'Bon réflexe de vérifier ! Votre mot de passe est récent, mais on peut toujours l\'optimiser.'},
+  unknown:{cls:'advice-mid',t:'Si vous ne savez plus depuis quand, c\'est le signe qu\'il est temps de le changer.'}
+};
+function setAge(mode,btn){
+  ageMode=mode;
+  document.querySelectorAll('.age-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const m=AGE_MSGS[mode];
+  const box=document.getElementById('age-advice');
+  box.className='age-advice '+m.cls;box.textContent=m.t;box.style.display='block';
+}
+function togImp(k){
+  const cb=document.getElementById('imp-'+k);
+  const tog=document.getElementById('tog-imp-'+k);
+  cb.checked=!cb.checked;tog.classList.toggle('on',cb.checked);
+}
+function onImpInput(){
+  const pw=document.getElementById('imp-input').value;
+  document.getElementById('imp-error').style.display='none';
+  if(pw)updateDetail(pw);
+}
+
+// Table substitutions Améliorer — symboles clavier uniquement
+const SUBS_IMP={'a':'@','A':'4','e':'3','E':'3','i':'!','I':'1','o':'0','O':'0','s':'$','S':'5','t':'7','T':'7','l':'1','g':'9','b':'8'};
+function substitute(pw){return pw.split('').map(c=>(Math.random()>0.45&&SUBS_IMP[c])?SUBS_IMP[c]:c).join('');}
+
+function extendMelodic(pw){
+  const lastChar=pw.slice(-1).toLowerCase();
+  const endsVowel='aeiouéèêëàùôîï'.includes(lastChar);
+  const candidates=EXT_SONORE.filter(w=>{
+    const startsVowel='aeiouéèêë'.includes(w.charAt(0).toLowerCase());
+    return endsVowel?!startsVowel:startsVowel;
+  });
+  const word=pick(candidates.length?candidates:EXT_SONORE);
+  // Symbole seul, propre
+  return pw+pick(EXT_SYMS)+word;
+}
+
+function detectSep(pw){
+  const candidates=['-','_','.','+','@','!','|',':',';'];
+  let best=null,bestCount=0;
+  candidates.forEach(s=>{
+    const count=(pw.match(new RegExp('\\'+s,'g'))||[]).length;
+    if(count>bestCount){bestCount=count;best=s;}
+  });
+  return bestCount>=2?best:null;
+}
+
+function improvePassword(){
+  const orig=document.getElementById('imp-input').value.trim();
+  if(!orig){
+    document.getElementById('imp-error').style.display='block';
+    return;
+  }
+  const doSub=document.getElementById('imp-sub').checked;
+  const doExt=document.getElementById('imp-ext').checked;
+  const doVar=document.getElementById('imp-var').checked;
+  const alreadyHasNum=/[0-9]/.test(orig);
+
+  function symOnly(){return pick(SAFE_SYMS);}
+  function extClean(pw){
+    const lastChar=pw.slice(-1).toLowerCase();
+    const endsVowel='aeiouéèêëàùôîï'.includes(lastChar);
+    const candidates=EXT_SONORE.filter(w=>{
+      const sv='aeiouéèêë'.includes(w.charAt(0).toLowerCase());
+      return endsVowel?!sv:sv;
+    });
+    const word=pick(candidates.length?candidates:EXT_SONORE);
+    const suffix=alreadyHasNum?symOnly():pick(EXT_SYMS);
+    return pw+suffix+word;
+  }
+
+  let results=[];
+  if(doSub)results.push({label:'Substitutions (a→@ e→3 i→! s→$…)',pw:substitute(orig)});
+  if(doExt)results.push({label:'Allongé — séquence mémorable',pw:extClean(orig)});
+  if(doVar){
+    results.push({label:'Variante A — combo fort',pw:extClean(substitute(orig))});
+    const year='20'+String(24+pickInt(5));
+    const symB=symOnly();
+    results.push({label:'Variante B — date + symbole',pw:substitute(orig)+symB+year});
+    results.push({label:'Variante C — mot fort suffixé',pw:orig.charAt(0).toUpperCase()+orig.slice(1)+pick(EXT_SYMS)+pick(EXT_SONORE)});
+  }
+  if(!results.length)results.push({label:'Version allongée',pw:extClean(orig)});
+
+  const detectedSep=detectSep(orig);
+  const ALT_SEPS=SAFE_SYMS.filter(s=>s!==detectedSep&&s!==orig[0]);
+
+  const box=document.getElementById('imp-result');
+  box.style.display='block';
+  let html=`<div class="ir-row"><div class="ir-left"><div class="ir-label">Original</div><div class="ir-pw" style="color:var(--muted)">${escHtml(orig)}</div></div></div>`;
+
+  if(detectedSep){
+    const alts=ALT_SEPS.slice(0,4).map(s=>{
+      const replaced=orig.replaceAll(detectedSep,s);
+      const sid='ir'+Math.random().toString(36).slice(2,8);
+      const sc=calcStrength(replaced);
+      return`<div class="sep-var"><span class="sep-chip">${s}</span><span class="ir-pw" id="${sid}" style="color:${sc.color}">${escHtml(replaced)}</span><button class="ir-copy" onclick="cpText('${sid}',this)">Copier</button></div>`;
+    }).join('');
+    html+=`<div class="sep-suggestion"><div class="ir-label" style="margin-bottom:8px">Remplacer "<span style="color:var(--cyan)">${detectedSep}</span>" par… (même phrase, jointure différente)</div>${alts}</div>`;
+  }
+
+  results.forEach(r=>{
+    const s=calcStrength(r.pw);
+    const id='ir'+Math.random().toString(36).slice(2,8);
+    html+=`<div class="ir-row"><div class="ir-left"><div class="ir-label">${r.label}</div><div class="ir-pw" id="${id}" style="color:${s.color}">${escHtml(r.pw)}</div></div><button class="ir-copy" onclick="cpText('${id}',this)">Copier</button></div>`;
+  });
+  box.innerHTML=html;
+  updateDetail(results[0].pw);
+  updateHackShield(results[0].pw);
+  checkHIBP(results[0].pw,'imp-hibp');
+}
+
+// ═══════════════════════════════
+// TAB ANALYSER
+// ═══════════════════════════════
+function doAnalyze(){
+  const pw=document.getElementById('ana-input').value;
+  const cont=document.getElementById('ana-results');
+  if(!pw){cont.innerHTML='';resetDetail();document.getElementById('ana-hibp').innerHTML='';return;}
+  const s=calcStrength(pw);
+  let html=`<div style="margin-top:12px"><div class="sw-row" style="margin-bottom:5px"><div class="sw-track"><div class="sw-fill" style="width:${s.score}%;background:${s.color}"></div></div><span class="sw-label" style="color:${s.color}">${s.label}</span></div><div class="sw-entropy">Entropie <span>${s.entropy.toFixed(1)}</span> bits</div></div>`;
+  if(s.advice.length){
+    html+=`<div class="a-advice a-warn"><strong>Améliorations possibles :</strong><ul>${s.advice.map(a=>`<li>${a}</li>`).join('')}</ul></div>`;
+  }else{
+    html+=`<div class="a-advice a-good">Excellent — robuste et bien diversifié.</div>`;
+  }
+  cont.innerHTML=html;
+  updateDetail(pw);
+  updateHackShield(pw);
+  // HIBP dans conteneur dédié séparé — pas dans ana-results
+  checkHIBP(pw,'ana-hibp');
+}
+
+// ═══════════════════════════════
+// FORCE
+// ═══════════════════════════════
+function calcStrength(pw){
+  const len=pw.length;
+  const hasL=/[a-z]/.test(pw),hasU=/[A-Z]/.test(pw),hasN=/[0-9]/.test(pw),hasS=/[^a-zA-Z0-9]/.test(pw);
+  const space=(hasL?26:0)+(hasU?26:0)+(hasN?10:0)+(hasS?32:0)||26;
+  const entropy=len*Math.log2(space);
+  let score=Math.min(100,Math.round(entropy/128*100));
+  const variety=(hasL?1:0)+(hasU?1:0)+(hasN?1:0)+(hasS?1:0);
+  if(variety===4)score=Math.min(100,score+6);
+  else if(variety===3)score=Math.min(100,score+3);
+  if(/123|234|345|456|567|678|789|abc|bcd|qwerty|azerty/i.test(pw))score=Math.max(0,score-15);
+  if(/(.)\1{2,}/.test(pw))score=Math.max(0,score-8);
+  if(/password|motdepasse|admin|root/i.test(pw))score=Math.max(0,score-20);
+  const advice=[];
+  if(len<12)advice.push('Utilisez au moins 12 caractères');
+  if(!hasL)advice.push('Ajoutez des minuscules');
+  if(!hasU)advice.push('Ajoutez des majuscules');
+  if(!hasN)advice.push('Ajoutez des chiffres');
+  if(!hasS)advice.push('Ajoutez des symboles');
+  if(/123|234/.test(pw))advice.push('Évitez les séquences numériques');
+  let label,color;
+  if(score<20){label='Très faible';color='#EF4444';}
+  else if(score<40){label='Faible';color='#F97316';}
+  else if(score<58){label='Moyen';color='#F59E0B';}
+  else if(score<72){label='Bon';color='#84cc16';}
+  else if(score<88){label='Fort';color='#10B981';}
+  else{label='Très fort';color='#06B6D4';}
+  return{score,label,color,entropy,advice,hasL,hasU,hasN,hasS,len};
+}
+
+// ═══════════════════════════════
+// STRENGTH DISPLAY
+// ═══════════════════════════════
+function showSW(pw,fillId,lblId,entId,rowId){
+  const s=calcStrength(pw);
+  document.getElementById(rowId).style.display='block';
+  document.getElementById(fillId).style.cssText=`width:${s.score}%;background:${s.color}`;
+  document.getElementById(lblId).style.color=s.color;
+  document.getElementById(lblId).textContent=s.label;
+  document.getElementById(entId).textContent=s.entropy.toFixed(1);
+}
+
+// ═══════════════════════════════
+// DETAIL PANEL
+// ═══════════════════════════════
+function crackTime(e){
+  if(e>128)return 'Milliards d\'années';
+  if(e>100)return 'Millions d\'années';
+  if(e>80)return 'Plusieurs années';
+  if(e>65)return 'Plusieurs mois';
+  if(e>50)return 'Quelques jours';
+  if(e>35)return 'Quelques heures';
+  if(e>20)return 'Quelques minutes';
+  return 'Instantané';
+}
+function updateDetail(pw){
+  const s=calcStrength(pw);
+  const C=2*Math.PI*29;
+  const offset=C*(1-s.score/100);
+  document.getElementById('dc-content').innerHTML=`
+    <div class="score-wrap">
+      <div class="score-circle">
+        <svg viewBox="0 0 70 70"><circle class="sc-bg" cx="35" cy="35" r="29"/><circle class="sc-fill" cx="35" cy="35" r="29" stroke="${s.color}" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}"/></svg>
+        <div class="sc-text"><span class="sc-pct" style="color:${s.color}">${s.score}</span><span class="sc-sub">/100</span></div>
+      </div>
+      <div class="score-info">
+        <div class="si-level" style="color:${s.color}">${s.label}</div>
+        <div class="si-crack">Crack estimé :<br><strong>${crackTime(s.entropy)}</strong></div>
+      </div>
+    </div>
+    <div class="dr"><span class="dr-l">Longueur</span><span class="dr-v ${s.len>=16?'c-good':s.len>=12?'c-warn':'c-bad'}">${s.len} car.</span></div>
+    <div class="dr"><span class="dr-l">Entropie</span><span class="dr-v ${s.entropy>=80?'c-good':s.entropy>=50?'c-warn':'c-bad'}">${s.entropy.toFixed(0)} bits</span></div>
+    <div class="dr"><span class="dr-l">Majuscules</span><span class="dr-v ${s.hasU?'c-good':'c-bad'}">${s.hasU?'✓':'✗'}</span></div>
+    <div class="dr"><span class="dr-l">Minuscules</span><span class="dr-v ${s.hasL?'c-good':'c-bad'}">${s.hasL?'✓':'✗'}</span></div>
+    <div class="dr"><span class="dr-l">Chiffres</span><span class="dr-v ${s.hasN?'c-good':'c-bad'}">${s.hasN?'✓':'✗'}</span></div>
+    <div class="dr"><span class="dr-l">Symboles</span><span class="dr-v ${s.hasS?'c-good':'c-bad'}">${s.hasS?'✓':'✗'}</span></div>
+  `;
+  if(pw.length<=64){
+    document.getElementById('dc-chars').style.display='block';
+    document.getElementById('char-map').innerHTML=pw.split('').map(c=>{
+      const cls=/[A-Z]/.test(c)?'ch-U':/[a-z]/.test(c)?'ch-L':/[0-9]/.test(c)?'ch-N':'ch-S';
+      return`<span class="ch ${cls}">${c==='<'?'&lt;':c==='>'?'&gt;':c}</span>`;
+    }).join('');
+  }else{document.getElementById('dc-chars').style.display='none';}
+}
+function resetDetail(){
+  document.getElementById('dc-content').innerHTML='<div style="color:var(--muted);font-size:.82em;text-align:center;padding:16px 0">Générez ou saisissez un mot de passe</div>';
+  document.getElementById('dc-chars').style.display='none';
+  document.getElementById('hack-card').style.display='none';
+}
+
+// ═══════════════════════════════
+// HACK SHIELD — résistance aux attaques
+// ═══════════════════════════════
+const ATTACKS=[
+  {
+    id:'brute',
+    name:'Brute force',
+    desc:'Teste toutes les combinaisons possibles de caractères, une par une.',
+    what:'Paré par : longueur + variété de types de caractères.',
+    ok:(s)=>s.score>=58,
+    warn:(s)=>s.score>=35&&s.score<58,
+  },
+  {
+    id:'dict',
+    name:'Attaque par dictionnaire',
+    desc:'Teste des listes de millions de mots courants, prénoms, dates et expressions.',
+    what:'Paré par : mots non courants, substitutions, absurdité.',
+    ok:(pw,s)=>s.len>=10&&!/^[a-zA-Z]+$/.test(pw)&&!/^\d+$/.test(pw),
+    warn:(pw,s)=>s.len>=8&&s.hasS,
+  },
+  {
+    id:'rule',
+    name:'Rule-based (variations)',
+    desc:'Génère des variantes intelligentes : MonChat → M0nCh@t, MonChat2024!, MonChat!',
+    what:'Paré par : substitutions non prévisibles + longueur 14+.',
+    ok:(pw,s)=>s.len>=14&&s.hasS&&s.hasN,
+    warn:(pw,s)=>s.len>=10&&(s.hasS||s.hasN),
+  },
+  {
+    id:'stuffing',
+    name:'Credential stuffing',
+    desc:'Réutilise des identifiants volés dans d\'autres fuites de données.',
+    what:'Paré par : un mot de passe unique par site + vérification HIBP.',
+    ok:()=>true,// toujours "à vérifier" — dépend de l'unicité
+    warn:()=>false,
+    always:'info',// affiche toujours en info
+  },
+  {
+    id:'mask',
+    name:'Mask attack (patterns)',
+    desc:'Exploite les patterns courants : Majuscule+mots+chiffres+symbole final.',
+    what:'Paré par : structure inhabituelle, séparateurs au milieu, pas de mot reconnaissable.',
+    ok:(pw,s)=>s.len>=16&&!/^[A-Z][a-z]+\d+[!@#$]$/.test(pw),
+    warn:(pw,s)=>s.len>=12,
+  },
+];
+
+function updateHackShield(pw){
+  const s=calcStrength(pw);
+  const card=document.getElementById('hack-card');
+  const rows=document.getElementById('hack-rows');
+  card.style.display='block';
+
+  rows.innerHTML=ATTACKS.map(a=>{
+    let statusCls,statusTxt;
+    if(a.always==='info'){
+      statusCls='hs-warn';statusTxt='À vérifier';
+    }else{
+      const isOk=a.ok(pw,s);
+      const isWarn=!isOk&&a.warn(pw,s);
+      if(isOk){statusCls='hs-ok';statusTxt='Résiste';}
+      else if(isWarn){statusCls='hs-warn';statusTxt='Partiel';}
+      else{statusCls='hs-bad';statusTxt='Vulnérable';}
+    }
+    return`<div class="hack-row">
+      <div class="hack-info">
+        <div class="hack-name">${a.name}</div>
+        <div class="hack-desc">${a.desc}</div>
+        <div class="hack-desc" style="margin-top:2px;color:var(--cyan);font-size:.68em">${a.what}</div>
+      </div>
+      <span class="hack-status ${statusCls}">${statusTxt}</span>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════
+// COPIER
+// ═══════════════════════════════
+function copyEl(elId,btnId){
+  const el=document.getElementById(elId);
+  if(!el||el.classList.contains('empty'))return;
+  navigator.clipboard.writeText(el.textContent).then(()=>{
+    const btn=document.getElementById(btnId);
+    btn.textContent='✓';btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent='⎘';btn.classList.remove('ok');},1800);
+  });
+}
+function cpText(id,btn){
+  navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>{
+    btn.textContent='✓';btn.style.color='var(--green)';
+    setTimeout(()=>{btn.textContent='Copier';btn.style.color='';},1600);
+  });
+}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ═══════════════════════════════
+// HIBP
+// ═══════════════════════════════
+async function checkHIBP(pw,containerId){
+  const cont=document.getElementById(containerId);
+  if(!cont)return;
+  cont.innerHTML='';
+  const badge=document.createElement('div');
+  badge.className='hibp hibp-loading';
+  badge.textContent='⟳ Vérification dans les bases de fuites…';
+  cont.appendChild(badge);
+  try{
+    const buf=await crypto.subtle.digest('SHA-1',new TextEncoder().encode(pw));
+    const hex=Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
+    const prefix=hex.slice(0,5),suffix=hex.slice(5);
+    const res=await fetch('https://api.pwnedpasswords.com/range/'+prefix);
+    if(!res.ok)throw new Error('network');
+    const txt=await res.text();
+    const found=txt.split('\n').find(l=>l.split(':')[0]===suffix);
+    if(found){
+      const n=parseInt(found.split(':')[1]);
+      badge.className='hibp hibp-pwned';
+      badge.textContent='⚠ Trouvé dans '+n.toLocaleString('fr-FR')+' fuites — à changer !';
+    }else{
+      badge.className='hibp hibp-safe';
+      badge.textContent='✓ Absent des bases de fuites connues';
+    }
+  }catch(e){
+    badge.className='hibp hibp-fail';
+    badge.textContent='ℹ Vérification indisponible (réseau)';
+  }
+}
+
+// ═══════════════════════════════
+// INIT
+// ═══════════════════════════════
+(function(){
+  // Sur mesure — profils + sym picker
+  buildProfileGrid();
+  buildSymPicker();
+  updateLenPreview();
+
+  // Style picker pour Mes mots
+  const sp=document.getElementById('style-picker');
+  MW_STYLES.forEach(s=>{
+    const btn=document.createElement('button');
+    btn.className='style-btn'+(s.id===mwStyle?' active':'');
+    btn.textContent=s.label;btn.title=s.note;
+    btn.onclick=()=>{
+      mwStyle=s.id;
+      document.querySelectorAll('.style-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+    };
+    sp.appendChild(btn);
+  });
+
+  // Conseil d'âge par défaut
+  const m=AGE_MSGS['old'];
+  const box=document.getElementById('age-advice');
+  box.className='age-advice '+m.cls;box.textContent=m.t;box.style.display='block';
+
+  generateCustom();
+})();
+</script>
+</body>
+</html>
