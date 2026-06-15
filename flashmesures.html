@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>FlashMesures — Convertisseur universel</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cyan:#06B6D4;--cyan-dim:#0891B2;--violet:#8B5CF6;--violet-dim:#7C3AED;--amber:#F59E0B;--green:#10B981;--bg:#0A0E1A;--bg2:#0F1525;--bg3:#151D30;--bg4:#1C2640;--bg5:#222E4A;--border:rgba(6,182,212,0.15);--border2:rgba(139,92,246,0.15);--text:#E2E8F0;--text2:#94A3B8;--text3:#64748B}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;cursor:pointer}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 25%,rgba(6,182,212,0.05) 0%,transparent 55%),radial-gradient(ellipse at 80% 75%,rgba(139,92,246,0.05) 0%,transparent 55%);pointer-events:none;z-index:0}
+header{position:sticky;top:0;z-index:100;background:rgba(10,14,26,0.93);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);padding:0 16px;height:54px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:8px;font-size:1.05rem;font-weight:800;letter-spacing:-0.5px}
+.logo-icon{width:30px;height:30px;background:linear-gradient(135deg,var(--cyan),var(--violet));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:0.85rem}
+.logo-flash{color:var(--cyan)}
+.header-right{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--text3)}
+.container{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:20px 14px 80px}
+.search-wrap{position:relative;margin-bottom:18px}
+.search-input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:600;padding:12px 44px 12px 14px;outline:none;transition:all 0.2s}
+.search-input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(6,182,212,0.1)}
+.search-input::placeholder{color:var(--text3);font-weight:400}
+.search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:1rem;display:none}
+.search-clear.visible{display:block}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:22px}
+.cat-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:'Syne',sans-serif;font-size:0.76rem;font-weight:600;padding:9px 12px;border-radius:12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px;white-space:nowrap;width:100%}
+.cat-btn:hover{border-color:rgba(6,182,212,0.3);color:var(--text)}
+.cat-btn:active{transform:scale(0.97)}
+.cat-btn.active{background:rgba(6,182,212,0.12);border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 12px rgba(6,182,212,0.15)}
+.cat-btn .cat-icon{font-size:1rem;flex-shrink:0}
+.cat-btn .cat-label{overflow:hidden;text-overflow:ellipsis}
+@media(max-width:600px){
+  .cat-grid{display:none}
+  .mobile-cat-bar{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(10,14,26,0.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:8px 10px 12px;gap:6px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+  .mobile-cat-bar::-webkit-scrollbar{display:none}
+  .mobile-cat-btn{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--text3);font-family:'Syne',sans-serif;font-size:0.6rem;font-weight:600;padding:4px 8px;border-radius:10px;cursor:pointer;transition:all 0.2s;min-width:48px}
+  .mobile-cat-btn .m-icon{font-size:1.2rem}
+  .mobile-cat-btn.active{color:var(--cyan);background:rgba(6,182,212,0.1)}
+  .container{padding-bottom:100px}
+}
+@media(min-width:601px){.mobile-cat-bar{display:none}}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:16px}
+.card-head{padding:16px 18px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.card-icon{width:38px;height:38px;flex-shrink:0;background:linear-gradient(135deg,rgba(6,182,212,0.18),rgba(139,92,246,0.18));border:1px solid rgba(6,182,212,0.25);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.15rem}
+.card-title{font-size:1rem;font-weight:700}
+.card-desc{font-size:0.73rem;color:var(--text3);margin-top:2px}
+.tabs{display:flex;gap:3px;padding:12px 16px 0;background:var(--bg2)}
+.tab{background:transparent;border:none;font-family:'Syne',sans-serif;font-size:0.76rem;font-weight:600;color:var(--text3);padding:7px 13px;border-radius:8px;cursor:pointer;transition:all 0.2s}
+.tab.active{background:rgba(6,182,212,0.12);color:var(--cyan)}
+.tab:active{transform:scale(0.97)}
+.card-body{padding:18px 16px}
+.conv-stack{display:flex;flex-direction:column;gap:12px}
+.conv-field label{display:block;font-size:0.68rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;font-family:'JetBrains Mono',monospace;margin-bottom:7px}
+.field-group{display:flex;border:1px solid var(--border);border-radius:11px;overflow:hidden;transition:border-color 0.2s}
+.field-group:focus-within{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(6,182,212,0.1)}
+.field-group input{flex:1;background:var(--bg3);border:none;outline:none;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:1.05rem;font-weight:500;padding:13px 13px;min-width:0}
+.field-group input::placeholder{color:var(--text3)}
+.field-group input[readonly]{color:var(--cyan)}
+.field-group select{background:var(--bg4);border:none;border-left:1px solid var(--border);outline:none;color:var(--cyan);font-family:'Syne',sans-serif;font-size:0.8rem;font-weight:700;padding:13px 10px;cursor:pointer;min-width:100px;max-width:130px;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2306B6D4' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
+.field-group select option{background:var(--bg2);color:var(--text)}
+.swap-center{display:flex;justify-content:center;margin:4px 0}
+.swap-btn{width:44px;height:44px;border-radius:50%;background:var(--bg4);border:1px solid var(--border2);color:var(--violet);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:all 0.25s}
+.swap-btn:active{transform:rotate(180deg) scale(0.92);background:rgba(139,92,246,0.15)}
+.result-box{background:linear-gradient(135deg,rgba(6,182,212,0.07),rgba(139,92,246,0.07));border:1px solid rgba(6,182,212,0.18);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:14px}
+.result-val{font-family:'JetBrains Mono',monospace;font-size:1.2rem;font-weight:500;color:var(--cyan)}
+.result-formula{font-size:0.72rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.copy-btn{background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.25);color:var(--cyan);font-family:'Syne',sans-serif;font-size:0.72rem;font-weight:700;padding:6px 13px;border-radius:7px;cursor:pointer;transition:all 0.2s}
+.copy-btn:active{transform:scale(0.95)}
+.copy-btn.ok{color:var(--green);border-color:var(--green);background:rgba(16,185,129,0.1)}
+.ref-wrap{border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-top:4px}
+.ref-head{background:var(--bg4);padding:9px 14px;font-size:0.68rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;font-family:'JetBrains Mono',monospace;display:flex;justify-content:space-between}
+.ref-row{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-top:1px solid rgba(255,255,255,0.04);font-size:0.82rem;transition:background 0.15s}
+.ref-row:active{background:rgba(6,182,212,0.05)}
+.ref-unit{color:var(--text2);font-weight:600}
+.ref-sym{color:var(--text3);font-size:0.74rem}
+.ref-val{font-family:'JetBrains Mono',monospace;color:var(--cyan);font-size:0.8rem}
+.multi-top{display:flex;gap:0;border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:14px}
+.multi-top input{flex:1;background:var(--bg3);border:none;outline:none;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:500;padding:13px 13px;min-width:0}
+.multi-top input::placeholder{color:var(--text3)}
+.multi-top select{background:var(--bg4);border:none;border-left:1px solid var(--border);outline:none;color:var(--cyan);font-family:'Syne',sans-serif;font-size:0.8rem;font-weight:700;padding:13px 10px;cursor:pointer;min-width:100px;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2306B6D4' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
+.multi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:9px}
+.multi-cell{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 12px;cursor:pointer;transition:all 0.2s}
+.multi-cell:active{border-color:var(--cyan);background:rgba(6,182,212,0.07)}
+.multi-unit{font-size:0.68rem;color:var(--text3);margin-bottom:3px}
+.multi-val{font-family:'JetBrains Mono',monospace;font-size:0.9rem;color:var(--text);font-weight:500}
+.veto-table{width:100%;border-collapse:collapse;font-size:0.8rem}
+.veto-table th{background:var(--bg4);color:var(--text3);font-size:0.68rem;text-transform:uppercase;letter-spacing:0.8px;font-family:'JetBrains Mono',monospace;padding:9px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.veto-table td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text2)}
+.veto-table td:first-child{color:var(--cyan);font-family:'JetBrains Mono',monospace;font-weight:500}
+.veto-table tr:last-child td{border-bottom:none}
+.veto-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.veto-tab{background:var(--bg3);border:1px solid var(--border);color:var(--text3);font-family:'Syne',sans-serif;font-size:0.74rem;font-weight:600;padding:6px 12px;border-radius:16px;cursor:pointer;transition:all 0.2s}
+.veto-tab.active{background:rgba(6,182,212,0.12);border-color:var(--cyan);color:var(--cyan)}
+/* HISTORIQUE */
+.hist-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px;display:none}
+.hist-card.has-items{display:block}
+.hist-title{font-size:0.68rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;font-family:'JetBrains Mono',monospace;margin-bottom:10px}
+.hist-list{display:flex;flex-direction:column;gap:6px}
+.hist-item{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.2s;font-size:0.8rem}
+.hist-item:hover{border-color:var(--cyan)}
+.hist-from{color:var(--text2)}
+.hist-to{color:var(--cyan);font-family:'JetBrains Mono',monospace;font-weight:500}
+/* DEVISE LINK */
+.devise-link{display:flex;align-items:center;gap:12px;background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:14px 16px;text-decoration:none;transition:all 0.2s}
+.devise-link:hover{background:rgba(139,92,246,0.12);border-color:var(--violet)}
+.devise-link-text{flex:1}
+.devise-link-title{font-size:0.85em;font-weight:700;color:var(--violet);margin-bottom:2px}
+.devise-link-sub{font-size:0.75em;color:var(--text3)}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:0.8rem;color:var(--cyan);opacity:0;transition:all 0.3s;z-index:999;white-space:nowrap;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.no-results{text-align:center;padding:40px 20px;color:var(--text3);font-size:0.85rem}
+@media(max-width:480px){.multi-grid{grid-template-columns:1fr 1fr}.card-head{padding:14px 14px 12px}.card-body{padding:14px 12px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"><span><span class="logo-flash">Flash</span>Mesures</span></div>
+  <div class="header-right">v2.1</div>
+</header>
+<div class="container">
+  <div class="search-wrap">
+    <input class="search-input" id="searchInput" type="text" placeholder="🔍 Rechercher une unité ou catégorie…" oninput="filterCategories()" autocomplete="off">
+    <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+  </div>
+  <div class="cat-grid" id="catGrid"></div>
+  <div class="mobile-cat-bar" id="mobileCatBar"></div>
+
+  <!-- HISTORIQUE -->
+  <div class="hist-card" id="histCard">
+    <div class="hist-title">🕐 Dernières conversions</div>
+    <div class="hist-list" id="histList"></div>
+  </div>
+
+  <!-- LIEN FLASHDEVISES -->
+  <a class="devise-link" href="flashdevises.html" target="_blank" id="deviseLink" style="display:none;margin-bottom:16px">
+    <span style="font-size:1.4em">💱</span>
+    <div class="devise-link-text">
+      <div class="devise-link-title">Convertisseur de devises</div>
+      <div class="devise-link-sub">EUR, USD, GBP, JPY, MAD, XOF et 40+ devises — taux en temps réel → FlashDevises</div>
+    </div>
+    <span style="color:var(--violet)">→</span>
+  </a>
+
+  <div class="card" id="mainCard">
+    <div class="card-head">
+      <div class="card-icon" id="cardIcon">📏</div>
+      <div><div class="card-title" id="cardTitle">Longueur</div><div class="card-desc" id="cardDesc">Mètres, pieds, pouces, miles…</div></div>
+    </div>
+    <div class="tabs" id="tabsBar">
+      <button class="tab active" onclick="switchTab('conv',this)">Convertir</button>
+      <button class="tab" onclick="switchTab('table',this)">Tableau</button>
+      <button class="tab" onclick="switchTab('multi',this)">Tout</button>
+    </div>
+    <div class="card-body">
+      <div id="tab-conv"></div>
+      <div id="tab-table" style="display:none"></div>
+      <div id="tab-multi" style="display:none"></div>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+<script>
+const CATS = [
+  {id:'longueur',label:'Longueur',icon:'📏',desc:'Mètres, pieds, pouces, miles…',base:'m',units:[
+    {id:'km',label:'Kilomètre',sym:'km',to:1000},{id:'m',label:'Mètre',sym:'m',to:1},
+    {id:'cm',label:'Centimètre',sym:'cm',to:0.01},{id:'mm',label:'Millimètre',sym:'mm',to:0.001},
+    {id:'µm',label:'Micromètre',sym:'µm',to:1e-6},{id:'mi',label:'Mile',sym:'mi',to:1609.344},
+    {id:'yd',label:'Yard',sym:'yd',to:0.9144},{id:'ft',label:'Pied',sym:'ft',to:0.3048},
+    {id:'in',label:'Pouce',sym:'in',to:0.0254},{id:'nmi',label:'Mille marin',sym:'nmi',to:1852},
+    {id:'ly',label:'Année-lumière',sym:'al',to:9.461e15}
+  ]},
+  {id:'masse',label:'Masse',icon:'⚖️',desc:'Kilogrammes, livres, onces…',base:'kg',units:[
+    {id:'t',label:'Tonne',sym:'t',to:1000},{id:'kg',label:'Kilogramme',sym:'kg',to:1},
+    {id:'g',label:'Gramme',sym:'g',to:0.001},{id:'mg',label:'Milligramme',sym:'mg',to:1e-6},
+    {id:'lb',label:'Livre',sym:'lb',to:0.453592},{id:'oz',label:'Once',sym:'oz',to:0.0283495},
+    {id:'st',label:'Stone',sym:'st',to:6.35029},{id:'ct',label:'Carat',sym:'ct',to:0.0002}
+  ]},
+  {id:'surface',label:'Surface',icon:'🔲',desc:'m², ares, hectares, acres…',base:'m2',units:[
+    {id:'km2',label:'km²',sym:'km²',to:1e6},{id:'m2',label:'Mètre²',sym:'m²',to:1},
+    {id:'cm2',label:'cm²',sym:'cm²',to:1e-4},{id:'mm2',label:'mm²',sym:'mm²',to:1e-6},
+    {id:'ha',label:'Hectare',sym:'ha',to:10000},{id:'a',label:'Are',sym:'a',to:100},
+    {id:'ac',label:'Acre',sym:'ac',to:4046.86},{id:'ft2',label:'Pied²',sym:'ft²',to:0.092903},
+    {id:'yd2',label:'Yard²',sym:'yd²',to:0.836127},{id:'mi2',label:'Mile²',sym:'mi²',to:2.59e6}
+  ]},
+  {id:'volume',label:'Volume',icon:'🧊',desc:'Litres, gallons, fl oz…',base:'L',units:[
+    {id:'m3',label:'Mètre³',sym:'m³',to:1000},{id:'hL',label:'Hectolitre',sym:'hL',to:100},
+    {id:'L',label:'Litre',sym:'L',to:1},{id:'cL',label:'Centilitre',sym:'cL',to:0.01},
+    {id:'mL',label:'Millilitre',sym:'mL',to:0.001},{id:'galUS',label:'Gallon US',sym:'gal',to:3.78541},
+    {id:'galUK',label:'Gallon UK',sym:'UK gal',to:4.54609},{id:'qt',label:'Quart US',sym:'qt',to:0.946353},
+    {id:'pt',label:'Pinte US',sym:'pt',to:0.473176},{id:'cup',label:'Tasse US',sym:'cup',to:0.236588},
+    {id:'floz',label:'fl oz US',sym:'fl oz',to:0.0295735},{id:'ft3',label:'Pied³',sym:'ft³',to:28.3168}
+  ]},
+  {id:'temperature',label:'Température',icon:'🌡️',desc:'°C, °F, K, °R',base:'C',special:true,units:[
+    {id:'C',label:'Celsius',sym:'°C'},{id:'F',label:'Fahrenheit',sym:'°F'},
+    {id:'K',label:'Kelvin',sym:'K'},{id:'R',label:'Rankine',sym:'°R'}
+  ]},
+  {id:'vitesse',label:'Vitesse',icon:'💨',desc:'km/h, m/s, mph, nœuds…',base:'ms',units:[
+    {id:'ms',label:'m/s',sym:'m/s',to:1},{id:'kmh',label:'km/h',sym:'km/h',to:1/3.6},
+    {id:'mph',label:'mph',sym:'mph',to:0.44704},{id:'kt',label:'Nœud',sym:'kt',to:0.514444},
+    {id:'fts',label:'ft/s',sym:'ft/s',to:0.3048},{id:'mach',label:'Mach',sym:'Mach',to:340.29}
+  ]},
+  {id:'temps',label:'Temps',icon:'⏱️',desc:'Secondes, minutes, heures…',base:'s',units:[
+    {id:'an',label:'Année',sym:'an',to:31536000},{id:'mois',label:'Mois',sym:'mois',to:2628000},
+    {id:'sem',label:'Semaine',sym:'sem',to:604800},{id:'j',label:'Jour',sym:'j',to:86400},
+    {id:'h',label:'Heure',sym:'h',to:3600},{id:'min',label:'Minute',sym:'min',to:60},
+    {id:'s',label:'Seconde',sym:'s',to:1},{id:'ms2',label:'Milliseconde',sym:'ms',to:0.001}
+  ]},
+  {id:'energie',label:'Énergie',icon:'⚡',desc:'Joules, kWh, cal, BTU…',base:'J',units:[
+    {id:'J',label:'Joule',sym:'J',to:1},{id:'kJ',label:'Kilojoule',sym:'kJ',to:1000},
+    {id:'MJ',label:'Mégajoule',sym:'MJ',to:1e6},{id:'Wh',label:'Watt-heure',sym:'Wh',to:3600},
+    {id:'kWh',label:'kWh',sym:'kWh',to:3600000},{id:'cal',label:'Calorie',sym:'cal',to:4.184},
+    {id:'kcal',label:'Kilocalorie',sym:'kcal',to:4184},{id:'BTU',label:'BTU',sym:'BTU',to:1055.06}
+  ]},
+  {id:'puissance',label:'Puissance',icon:'🔋',desc:'Watts, chevaux, BTU/h…',base:'W',units:[
+    {id:'W',label:'Watt',sym:'W',to:1},{id:'kW',label:'Kilowatt',sym:'kW',to:1000},
+    {id:'MW',label:'Mégawatt',sym:'MW',to:1e6},{id:'cv',label:'Cheval-vapeur',sym:'cv',to:735.499},
+    {id:'hp',label:'Horsepower',sym:'hp',to:745.7},{id:'btu_h',label:'BTU/h',sym:'BTU/h',to:0.293071}
+  ]},
+  {id:'pression',label:'Pression',icon:'💧',desc:'Pascal, bar, psi, atm…',base:'Pa',units:[
+    {id:'Pa',label:'Pascal',sym:'Pa',to:1},{id:'hPa',label:'Hectopascal',sym:'hPa',to:100},
+    {id:'kPa',label:'Kilopascal',sym:'kPa',to:1000},{id:'bar',label:'Bar',sym:'bar',to:100000},
+    {id:'mbar',label:'Millibar',sym:'mbar',to:100},{id:'atm',label:'Atmosphère',sym:'atm',to:101325},
+    {id:'psi',label:'PSI',sym:'psi',to:6894.76},{id:'mmHg',label:'mmHg',sym:'mmHg',to:133.322}
+  ]},
+  {id:'angle',label:'Angle',icon:'📐',desc:'Degrés, radians, grades…',base:'deg',units:[
+    {id:'deg',label:'Degré',sym:'°',to:1},{id:'rad',label:'Radian',sym:'rad',to:180/Math.PI},
+    {id:'grad',label:'Grade',sym:'gr',to:0.9},{id:'turn',label:'Tour',sym:'tr',to:360}
+  ]},
+  {id:'donnees',label:'Données',icon:'💾',desc:'Bits, octets, Go, To…',base:'B',units:[
+    {id:'b',label:'Bit',sym:'b',to:0.125},{id:'B',label:'Octet',sym:'B',to:1},
+    {id:'KB',label:'Kilooctet',sym:'KB',to:1000},{id:'MB',label:'Mégaoctet',sym:'MB',to:1e6},
+    {id:'GB',label:'Gigaoctet',sym:'GB',to:1e9},{id:'TB',label:'Téraoctet',sym:'TB',to:1e12},
+    {id:'KiB',label:'Kibioctet',sym:'KiB',to:1024},{id:'MiB',label:'Mébioctet',sym:'MiB',to:1048576},
+    {id:'GiB',label:'Gibioctet',sym:'GiB',to:1073741824}
+  ]},
+  {id:'carburant',label:'Carburant',icon:'⛽',desc:'L/100km, mpg, km/L…',base:'L100',special:true,specialType:'carburant',units:[
+    {id:'L100',label:'L/100km',sym:'L/100km',to:1},{id:'kmL',label:'km/L',sym:'km/L',to:null},
+    {id:'mpgUS',label:'mpg US',sym:'mpg US',to:null},{id:'mpgUK',label:'mpg UK',sym:'mpg UK',to:null}
+  ]},
+  {id:'cuisine',label:'Cuisine',icon:'🍳',desc:'Tasses, cuillères, fl oz, four…',base:'mL',units:[
+    {id:'mL',label:'Millilitre',sym:'mL',to:1},{id:'cL',label:'Centilitre',sym:'cL',to:10},
+    {id:'L',label:'Litre',sym:'L',to:1000},{id:'cup_us',label:'Tasse US',sym:'cup',to:236.588},
+    {id:'cup_fr',label:'Tasse FR (25cL)',sym:'tasse',to:250},{id:'tbsp',label:'Cuil. à soupe',sym:'c.s.',to:15},
+    {id:'tsp',label:'Cuil. à café',sym:'c.c.',to:5},{id:'floz',label:'fl oz',sym:'fl oz',to:29.5735},
+    {id:'pinch',label:'Pincée',sym:'pinc.',to:0.3}
+  ]},
+  {id:'vetements',label:'Vêtements',icon:'👕',desc:'Tailles FR/EU/UK/US',special:true,specialType:'vetements'},
+  {id:'pointures',label:'Pointures',icon:'👟',desc:'EU/UK/US/JP/CM',special:true,specialType:'pointures'},
+  {id:'calories',label:'Calories',icon:'🥗',desc:'kcal, kJ, et aliments courants',base:'kcal',units:[
+    {id:'kcal',label:'Kilocalorie (kcal)',sym:'kcal',to:1},{id:'cal',label:'Calorie (cal)',sym:'cal',to:0.001},
+    {id:'kJ',label:'Kilojoule (kJ)',sym:'kJ',to:0.239006},{id:'J',label:'Joule (J)',sym:'J',to:0.000239},
+    {id:'Wh',label:'Watt-heure',sym:'Wh',to:0.860421}
+  ]},
+  {id:'devises',label:'Devises',icon:'💱',desc:'EUR, USD, GBP, JPY… taux réels',special:true,specialType:'devises'}
+];
+
+// FOUR (thermostat) — données vérifiées
+const THERMOSTAT = [
+  {th:1,c:140,f:275,label:'Douceur (meringues, déshydratation)'},
+  {th:2,c:150,f:300,label:'Très doux (fruits confits, séchage)'},
+  {th:3,c:165,f:325,label:'Doux (pâtisseries délicates, macarons)'},
+  {th:4,c:180,f:355,label:'Moyen (gâteaux, biscuits, cakes)'},
+  {th:5,c:190,f:375,label:'Moyen-chaud (tartes, quiches)'},
+  {th:6,c:200,f:390,label:'Chaud (pizzas, pains, rôtis)'},
+  {th:7,c:210,f:410,label:'Très chaud (feuilletés, croissants)'},
+  {th:8,c:230,f:445,label:'Très chaud (pizza napolitaine, saisir)'},
+  {th:9,c:250,f:480,label:'Maximum (pizzas, pain artisanal)'},
+];
+
+const VETO_DATA = {
+  femme_haut:[
+    {fr:'34',eu:'34',uk:'6',us:'XS/2',it:'38',label:'XS',tp:'78-80cm'},
+    {fr:'36',eu:'36',uk:'8',us:'S/4',it:'40',label:'XS-S',tp:'82-84cm'},
+    {fr:'38',eu:'38',uk:'10',us:'S/6',it:'42',label:'S',tp:'86-88cm'},
+    {fr:'40',eu:'40',uk:'12',us:'M/8',it:'44',label:'M',tp:'90-92cm'},
+    {fr:'42',eu:'42',uk:'14',us:'L/10',it:'46',label:'L',tp:'94-96cm'},
+    {fr:'44',eu:'44',uk:'16',us:'XL/12',it:'48',label:'XL',tp:'98-100cm'},
+    {fr:'46',eu:'46',uk:'18',us:'2XL/14',it:'50',label:'XXL',tp:'102-106cm'},
+    {fr:'48',eu:'48',uk:'20',us:'3XL/16',it:'52',label:'3XL',tp:'108-112cm'},
+    {fr:'50',eu:'50',uk:'22',us:'4XL/18',it:'54',label:'4XL',tp:'114-118cm'},
+  ],
+  femme_bas:[
+    {fr:'34',us_w:'24-25',tt:'60-62cm',th:'84-86cm',label:'XS'},
+    {fr:'36',us_w:'26',tt:'64-66cm',th:'88-90cm',label:'XS-S'},
+    {fr:'38',us_w:'27-28',tt:'68-70cm',th:'92-94cm',label:'S'},
+    {fr:'40',us_w:'29-30',tt:'72-74cm',th:'96-98cm',label:'M'},
+    {fr:'42',us_w:'31-32',tt:'76-78cm',th:'100-102cm',label:'L'},
+    {fr:'44',us_w:'33-34',tt:'80-82cm',th:'104-106cm',label:'XL'},
+    {fr:'46',us_w:'35-36',tt:'84-86cm',th:'108-110cm',label:'XXL'},
+    {fr:'48',us_w:'37-38',tt:'88-90cm',th:'112-114cm',label:'3XL'},
+    {fr:'50',us_w:'39-40',tt:'92-94cm',th:'116-118cm',label:'4XL'},
+  ],
+  femme_jean:[
+    {fr:'34',w:'W24',tt:'61cm',label:'XS'},{fr:'36',w:'W25-26',tt:'64-66cm',label:'XS-S'},
+    {fr:'38',w:'W27-28',tt:'69-71cm',label:'S'},{fr:'40',w:'W29-30',tt:'74-76cm',label:'M'},
+    {fr:'42',w:'W31-32',tt:'79-81cm',label:'L'},{fr:'44',w:'W33-34',tt:'84-86cm',label:'XL'},
+    {fr:'46',w:'W35-36',tt:'89-91cm',label:'XXL'},{fr:'48',w:'W37-38',tt:'94-96cm',label:'3XL'},
+  ],
+  homme_haut:[
+    {fr:'44',eu:'44',uk:'34',us:'XS',it:'44',label:'XS',tp:'84-88cm'},
+    {fr:'46',eu:'46',uk:'36',us:'S',it:'46',label:'S',tp:'90-94cm'},
+    {fr:'48',eu:'48',uk:'38',us:'M',it:'48',label:'M',tp:'96-100cm'},
+    {fr:'50',eu:'50',uk:'40',us:'L',it:'50',label:'L',tp:'102-106cm'},
+    {fr:'52',eu:'52',uk:'42',us:'XL',it:'52',label:'XL',tp:'108-112cm'},
+    {fr:'54',eu:'54',uk:'44',us:'2XL',it:'54',label:'XXL',tp:'114-118cm'},
+    {fr:'56',eu:'56',uk:'46',us:'3XL',it:'56',label:'3XL',tp:'120-124cm'},
+    {fr:'58',eu:'58',uk:'48',us:'4XL',it:'58',label:'4XL',tp:'126-130cm'},
+  ],
+  homme_chemise:[
+    {fr:'36',col_cm:'36cm',col_in:'14"',label:'XS'},{fr:'37',col_cm:'37cm',col_in:'14.5"',label:'XS-S'},
+    {fr:'38',col_cm:'38cm',col_in:'15"',label:'S'},{fr:'39',col_cm:'39cm',col_in:'15.5"',label:'S-M'},
+    {fr:'40',col_cm:'40cm',col_in:'15.75"',label:'M'},{fr:'41',col_cm:'41cm',col_in:'16"',label:'M-L'},
+    {fr:'42',col_cm:'42cm',col_in:'16.5"',label:'L'},{fr:'43',col_cm:'43cm',col_in:'17"',label:'L-XL'},
+    {fr:'44',col_cm:'44cm',col_in:'17.5"',label:'XL'},{fr:'45',col_cm:'45cm',col_in:'17.75"',label:'XL-2XL'},
+    {fr:'46',col_cm:'46cm',col_in:'18"',label:'2XL'},
+  ],
+  homme_jean:[
+    {fr:'38',w:'W28',l_std:'L30/32',tt:'71-73cm'},{fr:'40',w:'W30',l_std:'L30/32',tt:'76-78cm'},
+    {fr:'42',w:'W32',l_std:'L32/34',tt:'81-83cm'},{fr:'44',w:'W34',l_std:'L32/34',tt:'86-88cm'},
+    {fr:'46',w:'W36',l_std:'L32/34',tt:'91-93cm'},{fr:'48',w:'W38',l_std:'L32/34',tt:'96-98cm'},
+    {fr:'50',w:'W40',l_std:'L32/34',tt:'101-103cm'},{fr:'52',w:'W42',l_std:'L32/34',tt:'106-108cm'},
+  ],
+  enfant:[
+    {age:'2 ans',fr:'86',uk:'18-24M',us:'2T',h:'86cm'},{age:'3 ans',fr:'92',uk:'2-3Y',us:'3T',h:'92cm'},
+    {age:'4 ans',fr:'98',uk:'3-4Y',us:'4T',h:'98cm'},{age:'5 ans',fr:'104',uk:'4-5Y',us:'5',h:'104cm'},
+    {age:'6 ans',fr:'110',uk:'5-6Y',us:'6',h:'110cm'},{age:'7 ans',fr:'116',uk:'6-7Y',us:'7',h:'116cm'},
+    {age:'8 ans',fr:'122',uk:'7-8Y',us:'8',h:'122cm'},{age:'10 ans',fr:'134',uk:'9-10Y',us:'10',h:'134cm'},
+    {age:'12 ans',fr:'146',uk:'11-12Y',us:'12',h:'146cm'},{age:'14 ans',fr:'158',uk:'13-14Y',us:'14',h:'158cm'},
+  ],
+};
+
+const POINT_DATA = {
+  adulte:[
+    {eu:'36',uk:'3.5',us_f:'5.5',us_m:'4',jp:'225',cm:'22.5'},
+    {eu:'37',uk:'4',us_f:'6',us_m:'4.5',jp:'230',cm:'23'},
+    {eu:'38',uk:'5',us_f:'7',us_m:'5.5',jp:'235',cm:'23.5'},
+    {eu:'39',uk:'5.5',us_f:'7.5',us_m:'6',jp:'240',cm:'24'},
+    {eu:'40',uk:'6.5',us_f:'8.5',us_m:'7',jp:'250',cm:'25'},
+    {eu:'41',uk:'7',us_f:'9',us_m:'7.5',jp:'255',cm:'25.5'},
+    {eu:'42',uk:'8',us_f:'10',us_m:'8.5',jp:'260',cm:'26'},
+    {eu:'43',uk:'9',us_f:'11',us_m:'9.5',jp:'270',cm:'27'},
+    {eu:'44',uk:'9.5',us_f:'11.5',us_m:'10',jp:'275',cm:'27.5'},
+    {eu:'45',uk:'10.5',us_f:'12.5',us_m:'11',jp:'280',cm:'28'},
+    {eu:'46',uk:'11',us_f:'13',us_m:'11.5',jp:'285',cm:'28.5'},
+    {eu:'47',uk:'12',us_f:'14',us_m:'12.5',jp:'295',cm:'29.5'},
+  ],
+  enfant:[
+    {eu:'20',uk:'4',us:'4',jp:'120',cm:'12'},{eu:'22',uk:'5',us:'5',jp:'130',cm:'13'},
+    {eu:'24',uk:'7',us:'7',jp:'145',cm:'14.5'},{eu:'26',uk:'8.5',us:'8.5',jp:'155',cm:'15.5'},
+    {eu:'28',uk:'10',us:'10',jp:'170',cm:'17'},{eu:'30',uk:'11.5',us:'11.5',jp:'180',cm:'18'},
+    {eu:'32',uk:'13',us:'13',jp:'195',cm:'19.5'},{eu:'34',uk:'2',us:'2',jp:'210',cm:'21'},
+  ]
+};
+
+const ALIMENTS = [
+  {nom:'Pomme (150g)',kcal:78},{nom:'Banane (120g)',kcal:107},{nom:'Orange (150g)',kcal:63},
+  {nom:'Pain blanc (50g)',kcal:133},{nom:'Riz cuit (100g)',kcal:130},{nom:'Pâtes cuites (100g)',kcal:157},
+  {nom:'Poulet grillé (100g)',kcal:165},{nom:'Bœuf haché (100g)',kcal:254},{nom:'Saumon (100g)',kcal:208},
+  {nom:'Œuf entier (60g)',kcal:86},{nom:'Lait entier (250mL)',kcal:163},{nom:'Yaourt nature (125g)',kcal:75},
+  {nom:'Fromage (30g)',kcal:114},{nom:'Beurre (10g)',kcal:72},{nom:'Huile olive (10mL)',kcal:90},
+  {nom:'Sucre (10g)',kcal:40},{nom:'Chocolat noir (30g)',kcal:161},{nom:'Café expresso',kcal:5},
+  {nom:'Coca-Cola (330mL)',kcal:139},{nom:'Bière (250mL)',kcal:105},
+];
+
+// ===== STATE =====
+let curCat = 'longueur';
+let curTab = 'conv';
+const HIST_KEY = 'flashmesures_hist';
+const PREF_KEY = 'flashmesures_pref';
+let convHistory = [];
+
+function getCat(id){ return CATS.find(c=>c.id===id); }
+
+// ===== HISTORIQUE =====
+function loadHistoire(){
+  try { convHistory = JSON.parse(localStorage.getItem(HIST_KEY)||'[]'); } catch(e){ convHistory=[]; }
+  renderHistoire();
+}
+function saveHistoire(entry){
+  convHistory.unshift(entry);
+  if(convHistory.length>5) convHistory.pop();
+  try { localStorage.setItem(HIST_KEY, JSON.stringify(convHistory)); } catch(e){}
+  renderHistoire();
+}
+function renderHistoire(){
+  const card = document.getElementById('histCard');
+  const list = document.getElementById('histList');
+  if(!convHistory.length){ card.classList.remove('has-items'); return; }
+  card.classList.add('has-items');
+  list.innerHTML = convHistory.map((h,i)=>`
+    <div class="hist-item" onclick="restoreHistory(${i})">
+      <span class="hist-from">${h.cat} · ${h.from}</span>
+      <span class="hist-to">${h.to}</span>
+    </div>`).join('');
+}
+function restoreHistory(i){
+  const h = convHistory[i];
+  if(h.catId) loadCat(h.catId);
+}
+
+// ===== INIT =====
+function init(){
+  // Charger la dernière catégorie visitée
+  try {
+    const pref = JSON.parse(localStorage.getItem(PREF_KEY)||'null');
+    if(pref && pref.cat && getCat(pref.cat)) curCat = pref.cat;
+  } catch(e){}
+  renderCats(CATS);
+  loadHistoire();
+  loadCat(curCat);
+}
+
+function renderCats(list){
+  const grid = document.getElementById('catGrid');
+  grid.innerHTML = list.map(c=>`
+    <button class="cat-btn${c.id===curCat?' active':''}" onclick="loadCat('${c.id}')" id="catBtn_${c.id}">
+      <span class="cat-icon">${c.icon}</span><span class="cat-label">${c.label}</span>
+    </button>`).join('');
+  const bar = document.getElementById('mobileCatBar');
+  bar.innerHTML = CATS.map(c=>`
+    <button class="mobile-cat-btn${c.id===curCat?' active':''}" onclick="loadCat('${c.id}')" id="mBtn_${c.id}">
+      <span class="m-icon">${c.icon}</span>
+      <span>${c.label.length>7?c.label.substring(0,7)+'…':c.label}</span>
+    </button>`).join('');
+}
+
+// ===== RECHERCHE =====
+function filterCategories(){
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  document.getElementById('searchClear').classList.toggle('visible', q.length>0);
+  if(!q){ renderCats(CATS); return; }
+  const filtered = CATS.filter(c=>
+    c.label.toLowerCase().includes(q)||
+    (c.desc&&c.desc.toLowerCase().includes(q))||
+    (c.units&&c.units.some(u=>u.label.toLowerCase().includes(q)||u.sym.toLowerCase().includes(q)))
+  );
+  renderCats(filtered);
+  if(filtered.length===1) loadCat(filtered[0].id);
+}
+function clearSearch(){
+  document.getElementById('searchInput').value='';
+  document.getElementById('searchClear').classList.remove('visible');
+  renderCats(CATS);
+}
+
+// ===== CHARGER CATÉGORIE =====
+function loadCat(id){
+  curCat = id;
+  try { localStorage.setItem(PREF_KEY, JSON.stringify({cat:id})); } catch(e){}
+  const cat = getCat(id);
+  document.getElementById('cardIcon').textContent = cat.icon;
+  document.getElementById('cardTitle').textContent = cat.label;
+  document.getElementById('cardDesc').textContent = cat.desc;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.toggle('active',b.id==='catBtn_'+id));
+  document.querySelectorAll('.mobile-cat-btn').forEach(b=>b.classList.toggle('active',b.id==='mBtn_'+id));
+  const mBtn = document.getElementById('mBtn_'+id);
+  if(mBtn) mBtn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  // Lien devises
+  document.getElementById('deviseLink').style.display = (id==='devises') ? 'flex' : 'none';
+  const isSpecialOnly = cat.specialType==='vetements'||cat.specialType==='pointures'||cat.specialType==='devises';
+  document.getElementById('tabsBar').style.display = isSpecialOnly ? 'none' : 'flex';
+  if(isSpecialOnly) curTab='special'; else { curTab='conv'; document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===0)); }
+  renderCurrentTab();
+}
+
+function switchTab(name, btn){
+  curTab = name;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderCurrentTab();
+}
+
+// ===== RENDER DISPATCH — une seule fonction propre =====
+function renderCurrentTab(){
+  const cat = getCat(curCat);
+  ['conv','table','multi'].forEach(t=>{ document.getElementById('tab-'+t).style.display='none'; });
+  if(cat.specialType==='vetements'){ renderVetements(); return; }
+  if(cat.specialType==='pointures'){ renderPointures(); return; }
+  if(cat.specialType==='carburant'){ renderCarburant(); return; }
+  if(cat.specialType==='devises'){ renderDevisesLink(); return; }
+  if(cat.id==='calories' && curTab==='conv'){ renderCalories(); return; }
+  if(cat.id==='cuisine' && curTab==='conv'){ renderCuisineConv(cat); return; }
+  if(curTab==='conv') renderConv(cat);
+  else if(curTab==='table') renderTable(cat);
+  else if(curTab==='multi') renderMulti(cat);
+}
+
+// ===== DEVISES LINK =====
+function renderDevisesLink(){
+  const el = document.getElementById('tab-conv');
+  el.innerHTML = `<div style="text-align:center;padding:30px 0">
+    <div style="font-size:2rem;margin-bottom:12px">💱</div>
+    <div style="font-size:0.9rem;color:var(--text2);margin-bottom:16px">Les conversions de devises nécessitent des taux en temps réel.</div>
+    <a href="flashdevises.html" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.3);color:var(--violet);padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:700;font-size:0.88rem">
+      Ouvrir FlashDevises →
+    </a>
+  </div>`;
+  el.style.display='block';
+}
+
+// ===== CUISINE avec thermostat four =====
+function renderCuisineConv(cat){
+  const el = document.getElementById('tab-conv');
+  const opts = cat.units.map(u=>`<option value="${u.id}">${u.sym} — ${u.label}</option>`).join('');
+  el.innerHTML = `
+    <div class="conv-stack">
+      <div><label>Valeur à convertir</label>
+        <div class="field-group">
+          <input type="number" id="inVal" placeholder="0" oninput="doConvert()" step="any" inputmode="decimal">
+          <select id="inUnit" onchange="doConvert()">${opts}</select>
+        </div>
+      </div>
+      <div class="swap-center"><button class="swap-btn" onclick="swapUnits()" title="Inverser">⇄</button></div>
+      <div><label>Résultat</label>
+        <div class="field-group">
+          <input type="number" id="outVal" placeholder="—" readonly>
+          <select id="outUnit" onchange="doConvert()">${opts}</select>
+        </div>
+      </div>
+    </div>
+    <div class="result-box">
+      <div><div class="result-val" id="resBig">—</div><div class="result-formula" id="resForm"></div></div>
+      <button class="copy-btn" id="copyBtn" onclick="copyRes()">Copier</button>
+    </div>
+    <div style="margin-top:18px">
+      <div style="font-size:0.72rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;font-family:'JetBrains Mono',monospace;margin-bottom:10px">🔥 Thermostat four → °C / °F</div>
+      <div style="overflow-x:auto;border-radius:11px;border:1px solid var(--border)">
+        <table style="width:100%;border-collapse:collapse;font-size:0.78rem">
+          <thead><tr style="background:var(--bg4)">
+            <th style="padding:8px 10px;text-align:left;color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.68rem;text-transform:uppercase;border-bottom:1px solid var(--border)">Th.</th>
+            <th style="padding:8px 10px;text-align:left;color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.68rem;text-transform:uppercase;border-bottom:1px solid var(--border)">°C</th>
+            <th style="padding:8px 10px;text-align:left;color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.68rem;text-transform:uppercase;border-bottom:1px solid var(--border)">°F</th>
+            <th style="padding:8px 10px;text-align:left;color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:0.68rem;text-transform:uppercase;border-bottom:1px solid var(--border)">Usage</th>
+          </tr></thead>
+          <tbody>${THERMOSTAT.map(r=>`
+            <tr style="border-top:1px solid rgba(255,255,255,0.04)">
+              <td style="padding:8px 10px;color:var(--cyan);font-family:'JetBrains Mono',monospace;font-weight:700">${r.th}</td>
+              <td style="padding:8px 10px;color:var(--text2)">${r.c}°C</td>
+              <td style="padding:8px 10px;color:var(--text2)">${r.f}°F</td>
+              <td style="padding:8px 10px;color:var(--text3);font-size:0.72rem">${r.label}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  el.style.display='block';
+  document.getElementById('inUnit').value = cat.units[0].id;
+  document.getElementById('outUnit').value = cat.units[4].id;
+}
+
+// ===== CONVERSION STANDARD =====
+function toBase(val,uid,cat){
+  if(cat.special&&cat.id==='temperature'){
+    if(uid==='C')return val; if(uid==='F')return(val-32)*5/9;
+    if(uid==='K')return val-273.15; if(uid==='R')return(val-491.67)*5/9;
+  }
+  return val*(cat.units.find(u=>u.id===uid).to);
+}
+function fromBase(base,uid,cat){
+  if(cat.special&&cat.id==='temperature'){
+    if(uid==='C')return base; if(uid==='F')return base*9/5+32;
+    if(uid==='K')return base+273.15; if(uid==='R')return(base+273.15)*9/5;
+  }
+  return base/(cat.units.find(u=>u.id===uid).to);
+}
+function fmt(n){
+  if(n===null||isNaN(n))return'—';
+  if(n===0)return'0';
+  if(Math.abs(n)>=0.0001&&Math.abs(n)<1e10)return parseFloat(n.toPrecision(7)).toString();
+  return n.toExponential(4);
+}
+
+function renderConv(cat){
+  const el = document.getElementById('tab-conv');
+  const opts = cat.units.map(u=>`<option value="${u.id}">${u.sym} — ${u.label}</option>`).join('');
+  el.innerHTML = `<div class="conv-stack">
+    <div><label>Valeur à convertir</label>
+      <div class="field-group">
+        <input type="number" id="inVal" placeholder="0" oninput="doConvert()" step="any" inputmode="decimal">
+        <select id="inUnit" onchange="doConvert()">${opts}</select>
+      </div>
+    </div>
+    <div class="swap-center"><button class="swap-btn" onclick="swapUnits()" title="Inverser">⇄</button></div>
+    <div><label>Résultat</label>
+      <div class="field-group">
+        <input type="number" id="outVal" placeholder="—" readonly>
+        <select id="outUnit" onchange="doConvert()">${opts}</select>
+      </div>
+    </div>
+  </div>
+  <div class="result-box">
+    <div><div class="result-val" id="resBig">—</div><div class="result-formula" id="resForm"></div></div>
+    <button class="copy-btn" id="copyBtn" onclick="copyRes()">Copier</button>
+  </div>`;
+  el.style.display='block';
+  document.getElementById('inUnit').value = cat.units[0].id;
+  document.getElementById('outUnit').value = cat.units[1]?cat.units[1].id:cat.units[0].id;
+}
+
+function doConvert(){
+  const cat = getCat(curCat);
+  if(cat.specialType==='carburant'){ doCarburantCalc(); return; }
+  const val = parseFloat(document.getElementById('inVal').value);
+  const fid = document.getElementById('inUnit').value;
+  const tid = document.getElementById('outUnit').value;
+  if(isNaN(val)){ document.getElementById('outVal').value=''; document.getElementById('resBig').textContent='—'; document.getElementById('resForm').textContent=''; return; }
+  const base = toBase(val,fid,cat);
+  const res = fromBase(base,tid,cat);
+  const fr = fmt(res);
+  document.getElementById('outVal').value=fr;
+  const fu=cat.units.find(u=>u.id===fid), tu=cat.units.find(u=>u.id===tid);
+  document.getElementById('resBig').textContent=fr+' '+tu.sym;
+  document.getElementById('resForm').textContent=val+' '+fu.sym+' → '+tu.sym;
+  // Sauvegarder dans historique
+  saveHistoire({ catId:curCat, cat:cat.label, from:val+' '+fu.sym, to:fr+' '+tu.sym });
+}
+
+function swapUnits(){
+  const a=document.getElementById('inUnit').value, b=document.getElementById('outUnit').value;
+  document.getElementById('inUnit').value=b; document.getElementById('outUnit').value=a;
+  const cur=document.getElementById('outVal').value;
+  if(cur) document.getElementById('inVal').value=cur;
+  doConvert();
+}
+function copyRes(){
+  const v=document.getElementById('resBig').textContent;
+  if(v==='—')return;
+  navigator.clipboard.writeText(v).then(()=>{
+    const b=document.getElementById('copyBtn');
+    b.textContent='✓ Copié';b.classList.add('ok');
+    setTimeout(()=>{b.textContent='Copier';b.classList.remove('ok');},1500);
+  });
+}
+
+function renderTable(cat){
+  const el=document.getElementById('tab-table');
+  if(cat.special&&cat.id==='temperature'){
+    el.innerHTML=`<div class="ref-wrap"><div class="ref-head"><span>Unité</span><span>Formule depuis °C</span></div>
+      ${cat.units.map(u=>{let f=u.id==='F'?'°C × 9/5 + 32':u.id==='K'?'°C + 273.15':u.id==='R'?'(°C + 273.15) × 9/5':'Référence';
+        return`<div class="ref-row"><span class="ref-unit">${u.label} <span class="ref-sym">(${u.sym})</span></span><span class="ref-val">${f}</span></div>`;}).join('')}
+    </div>`;
+  } else {
+    const base=cat.units.find(u=>u.id===cat.base);
+    el.innerHTML=`<div class="ref-wrap"><div class="ref-head"><span>Unité</span><span>= ? ${base.sym}</span></div>
+      ${cat.units.map(u=>`<div class="ref-row"><span class="ref-unit">${u.label} <span class="ref-sym">(${u.sym})</span></span><span class="ref-val">${fmt(u.to/base.to)} ${base.sym}</span></div>`).join('')}
+    </div>`;
+  }
+  el.style.display='block';
+}
+
+function renderMulti(cat){
+  const el=document.getElementById('tab-multi');
+  const opts=cat.units.map(u=>`<option value="${u.id}">${u.sym} — ${u.label}</option>`).join('');
+  el.innerHTML=`<div class="multi-top"><input type="number" id="mVal" placeholder="Valeur…" oninput="doMulti()" step="any" inputmode="decimal"><select id="mUnit" onchange="doMulti()">${opts}</select></div><div class="multi-grid" id="mGrid"></div>`;
+  el.style.display='block';
+}
+function doMulti(){
+  const cat=getCat(curCat);
+  const val=parseFloat(document.getElementById('mVal').value);
+  const fid=document.getElementById('mUnit').value;
+  const grid=document.getElementById('mGrid');
+  if(isNaN(val)){grid.innerHTML='';return;}
+  const base=toBase(val,fid,cat);
+  grid.innerHTML=cat.units.filter(u=>u.id!==fid).map(u=>{
+    const r=fromBase(base,u.id,cat);const fv=fmt(r);
+    return`<div class="multi-cell" onclick="toast('Copié : ${fv} ${u.sym}');navigator.clipboard.writeText('${fv} ${u.sym}')"><div class="multi-unit">${u.label}</div><div class="multi-val">${fv} <span style="color:var(--text3);font-size:0.72rem">${u.sym}</span></div></div>`;
+  }).join('');
+}
+
+function renderCarburant(){
+  const el=document.getElementById('tab-conv');
+  el.innerHTML=`<div class="conv-stack"><div><label>Consommation en L/100km</label>
+    <div class="field-group">
+      <input type="number" id="fuelIn" placeholder="Ex: 7.5" oninput="doCarburantCalc()" step="any" inputmode="decimal">
+      <select style="background:var(--bg4);border:none;border-left:1px solid var(--border);outline:none;color:var(--cyan);font-family:Syne,sans-serif;font-size:0.8rem;font-weight:700;padding:13px 10px;min-width:100px"><option>L/100km</option></select>
+    </div></div></div>
+  <div class="result-box" style="flex-direction:column;align-items:flex-start;gap:10px" id="fuelResults"><div style="color:var(--text3);font-size:0.82rem">Entre une valeur pour voir les équivalences</div></div>
+  <div style="margin-top:16px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px">
+    <div style="font-size:0.72rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;font-family:'JetBrains Mono',monospace;margin-bottom:10px">Calculateur de coût trajet</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <div style="flex:1;min-width:100px"><label style="font-size:0.68rem;color:var(--text3);display:block;margin-bottom:5px">Distance (km)</label><input type="number" id="tripDist" placeholder="100" oninput="doTripCost()" style="width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:0.9rem;padding:9px 10px;outline:none" inputmode="decimal"></div>
+      <div style="flex:1;min-width:100px"><label style="font-size:0.68rem;color:var(--text3);display:block;margin-bottom:5px">Prix carburant (€/L)</label><input type="number" id="fuelPrice" placeholder="1.85" value="1.85" oninput="doTripCost()" style="width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:0.9rem;padding:9px 10px;outline:none" inputmode="decimal"></div>
+    </div>
+    <div id="tripResult" style="margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:0.9rem;color:var(--amber)"></div>
+  </div>`;
+  el.style.display='block';
+}
+function doCarburantCalc(){
+  const v=parseFloat(document.getElementById('fuelIn').value);
+  const el=document.getElementById('fuelResults');
+  if(isNaN(v)||v<=0){el.innerHTML='<div style="color:var(--text3);font-size:0.82rem">Entre une valeur pour voir les équivalences</div>';return;}
+  const kmL=100/v, mpgUS=235.214/v, mpgUK=282.481/v;
+  el.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%">
+    <div><div style="font-size:0.68rem;color:var(--text3);margin-bottom:2px">km/L</div><div style="font-family:'JetBrains Mono',monospace;color:var(--cyan);font-size:1rem">${kmL.toFixed(2)}</div></div>
+    <div><div style="font-size:0.68rem;color:var(--text3);margin-bottom:2px">mpg US</div><div style="font-family:'JetBrains Mono',monospace;color:var(--cyan);font-size:1rem">${mpgUS.toFixed(1)}</div></div>
+    <div><div style="font-size:0.68rem;color:var(--text3);margin-bottom:2px">mpg UK</div><div style="font-family:'JetBrains Mono',monospace;color:var(--cyan);font-size:1rem">${mpgUK.toFixed(1)}</div></div>
+    <div><div style="font-size:0.68rem;color:var(--text3);margin-bottom:2px">L/100km</div><div style="font-family:'JetBrains Mono',monospace;color:var(--cyan);font-size:1rem">${v.toFixed(2)}</div></div>
+  </div>`;
+  doTripCost();
+}
+function doTripCost(){
+  const cons=parseFloat(document.getElementById('fuelIn')?.value);
+  const dist=parseFloat(document.getElementById('tripDist')?.value);
+  const price=parseFloat(document.getElementById('fuelPrice')?.value);
+  const el=document.getElementById('tripResult');
+  if(!el)return;
+  if(isNaN(cons)||isNaN(dist)||isNaN(price)||cons<=0||dist<=0||price<=0){el.textContent='';return;}
+  el.textContent=`Coût estimé : ${((cons/100)*dist*price).toFixed(2)} € pour ${dist} km`;
+}
+
+function renderVetements(){
+  const el=document.getElementById('tab-conv');
+  el.innerHTML=`<div class="veto-tabs">
+    <button class="veto-tab active" onclick="showVetoTab('femme_haut',this)">👩 F. Haut</button>
+    <button class="veto-tab" onclick="showVetoTab('femme_bas',this)">👗 F. Bas</button>
+    <button class="veto-tab" onclick="showVetoTab('femme_jean',this)">👖 F. Jean</button>
+    <button class="veto-tab" onclick="showVetoTab('homme_haut',this)">👨 H. Haut</button>
+    <button class="veto-tab" onclick="showVetoTab('homme_chemise',this)">👔 Chemise</button>
+    <button class="veto-tab" onclick="showVetoTab('homme_jean',this)">👖 H. Jean</button>
+    <button class="veto-tab" onclick="showVetoTab('enfant',this)">🧒 Enfant</button>
+  </div><div id="vetoContent"></div>`;
+  el.style.display='block';
+  showVetoTab('femme_haut',null);
+}
+function showVetoTab(type,btn){
+  if(btn){ document.querySelectorAll('.veto-tab').forEach(t=>t.classList.remove('active')); btn.classList.add('active'); }
+  const data=VETO_DATA[type];
+  let headers,cols,note='';
+  if(type==='femme_haut'){headers=['FR','UK','US','IT','Label','Tour poitrine'];cols=['fr','uk','us','it','label','tp'];note='Basé sur le tour de poitrine.'}
+  else if(type==='femme_bas'){headers=['FR','W US','Label','Tour taille','Tour hanches'];cols=['fr','us_w','label','tt','th'];note='Basé sur tour de taille + hanches.'}
+  else if(type==='femme_jean'){headers=['FR','W (pouces)','Tour de taille','Label'];cols=['fr','w','tt','label'];note='Jean femme : W = Waist (tour de taille).'}
+  else if(type==='homme_haut'){headers=['FR/EU','UK','US','IT','Label','Tour poitrine'];cols=['fr','uk','us','it','label','tp'];note='Basé sur le tour de poitrine.'}
+  else if(type==='homme_chemise'){headers=['Taille col','Col (cm)','Col (pouces)','Label'];cols=['fr','col_cm','col_in','label'];note='Taille = tour de cou au-dessus de la pomme d\'Adam.'}
+  else if(type==='homme_jean'){headers=['FR','W (pouces)','Longueur std','Tour de taille'];cols=['fr','w','l_std','tt'];note='W = Waist (taille), L = Length (entrejambe). Ex : W32/L32 = FR42.'}
+  else{headers=['Âge indicatif','FR/EU','UK','US','Hauteur'];cols=['age','fr','uk','us','h'];note='⚠️ Se baser sur la hauteur plutôt que l\'âge.';}
+  document.getElementById('vetoContent').innerHTML=`
+    <div style="overflow-x:auto;border-radius:11px;border:1px solid var(--border);margin-bottom:10px">
+      <table class="veto-table"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+      <tbody>${data.map(r=>`<tr>${cols.map(c=>`<td>${r[c]||'—'}</td>`).join('')}</tr>`).join('')}</tbody></table>
+    </div>
+    <div style="font-size:0.72rem;color:var(--text3);font-family:'JetBrains Mono',monospace;line-height:1.6">
+      💡 ${note}<br>⚠️ Ces tableaux sont indicatifs. Les tailles varient selon les marques — consultez toujours le guide des tailles spécifique à la marque avant d'acheter.
+    </div>`;
+}
+
+function renderPointures(){
+  const el=document.getElementById('tab-conv');
+  el.innerHTML=`<div class="veto-tabs">
+    <button class="veto-tab active" onclick="showPointTab('adulte',this)">👟 Adulte</button>
+    <button class="veto-tab" onclick="showPointTab('enfant',this)">👶 Enfant</button>
+  </div><div id="pointContent"></div>`;
+  el.style.display='block';
+  showPointTab('adulte',null);
+}
+function showPointTab(type,btn){
+  if(btn){ document.querySelectorAll('.veto-tab').forEach(t=>t.classList.remove('active')); btn.classList.add('active'); }
+  const data=POINT_DATA[type];
+  const isA=type==='adulte';
+  const headers=isA?['EU','UK','US F','US H','JP','CM']:['EU','UK','US','JP','CM'];
+  const cols=isA?['eu','uk','us_f','us_m','jp','cm']:['eu','uk','us','jp','cm'];
+  document.getElementById('pointContent').innerHTML=`<div style="overflow-x:auto;border-radius:11px;border:1px solid var(--border)">
+    <table class="veto-table"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+    <tbody>${data.map(r=>`<tr>${cols.map(c=>`<td>${r[c]||'—'}</td>`).join('')}</tr>`).join('')}</tbody></table>
+  </div>`;
+}
+
+function renderCalories(){
+  const cat=getCat('calories');
+  const el=document.getElementById('tab-conv');
+  const opts=cat.units.map(u=>`<option value="${u.id}">${u.sym} — ${u.label}</option>`).join('');
+  el.innerHTML=`<div class="conv-stack">
+    <div><label>Valeur à convertir</label>
+      <div class="field-group"><input type="number" id="inVal" placeholder="0" oninput="doConvert()" step="any" inputmode="decimal"><select id="inUnit" onchange="doConvert()">${opts}</select></div>
+    </div>
+    <div class="swap-center"><button class="swap-btn" onclick="swapUnits()" title="Inverser">⇄</button></div>
+    <div><label>Résultat</label>
+      <div class="field-group"><input type="number" id="outVal" placeholder="—" readonly><select id="outUnit" onchange="doConvert()">${opts}</select></div>
+    </div>
+  </div>
+  <div class="result-box"><div><div class="result-val" id="resBig">—</div><div class="result-formula" id="resForm"></div></div><button class="copy-btn" id="copyBtn" onclick="copyRes()">Copier</button></div>
+  <div style="margin-top:18px">
+    <div style="font-size:0.72rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;font-family:'JetBrains Mono',monospace;margin-bottom:10px">🥗 Calories aliments courants</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+      ${ALIMENTS.map(a=>`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:9px 11px;cursor:pointer" onclick="document.getElementById('inVal').value=${a.kcal};document.getElementById('inUnit').value='kcal';doConvert()">
+        <div style="font-size:0.73rem;color:var(--text2)">${a.nom}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:var(--amber)">${a.kcal} kcal</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+  el.style.display='block';
+  document.getElementById('inUnit').value=cat.units[0].id;
+  document.getElementById('outUnit').value=cat.units[2].id;
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+init();
+</script>
+</body>
+</html>
