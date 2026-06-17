@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlashDetox — Veille anti-fake news</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0A0E27;
+      --bg2: #111827;
+      --surface: #1E293B;
+      --cyan: #06B6D4;
+      --violet: #8B5CF6;
+      --text: #F1F5F9;
+      --text2: #94A3B8;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --border: #334155;
+      --gradient: linear-gradient(135deg, #06B6D4, #8B5CF6);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px; left: -200px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(6,182,212,0.06) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -200px; right: -200px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+
+    .app {
+      position: relative; z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 16px 60px;
+    }
+
+    .header {
+      padding: 24px 0 18px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.4rem;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo-sub {
+      font-size: 0.7rem;
+      color: var(--text2);
+      margin-top: 2px;
+    }
+
+    .last-update {
+      font-size: 0.7rem;
+      color: var(--text2);
+      text-align: right;
+      line-height: 1.5;
+    }
+
+    .last-update strong {
+      color: var(--cyan);
+      display: block;
+      font-size: 0.68rem;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 24px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px 8px;
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab.active {
+      background: var(--bg2);
+      color: var(--cyan);
+      box-shadow: 0 0 12px rgba(6,182,212,0.12);
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .fiche {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .fiche:hover { border-color: rgba(6,182,212,0.25); }
+
+    .fiche-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .fiche-affirmation {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    .fiche-score {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .fiche-bar-bg {
+      height: 3px;
+      background: var(--bg);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .fiche-bar-fill { height: 100%; border-radius: 10px; }
+
+    .fiche-contexte {
+      font-size: 0.83rem;
+      line-height: 1.6;
+      color: var(--text2);
+      margin-bottom: 12px;
+    }
+
+    .fiche-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .fiche-historique {
+      font-size: 0.72rem;
+      color: var(--text2);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex: 1;
+    }
+
+    .hist-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--violet);
+      flex-shrink: 0;
+    }
+
+    .btn-approfondir {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--cyan);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .btn-approfondir:hover {
+      background: rgba(6,182,212,0.08);
+      border-color: var(--cyan);
+    }
+
+    .fiche-detail {
+      display: none;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      animation: fadeUp 0.3s ease both;
+    }
+
+    .fiche-detail.open { display: block; }
+
+    .detail-block { margin-bottom: 12px; }
+
+    .detail-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .detail-label .dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .detail-text {
+      font-size: 0.84rem;
+      line-height: 1.65;
+      color: var(--text2);
+    }
+
+    .detail-text.conclusion {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .sources {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .source-item {
+      font-size: 0.76rem;
+      color: var(--text2);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .source-item::before {
+      content: '';
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .score-high { color: var(--success); }
+    .score-mid  { color: var(--warning); }
+    .score-low  { color: var(--danger);  }
+    .bar-high   { background: var(--success); }
+    .bar-mid    { background: var(--warning); }
+    .bar-low    { background: var(--danger);  }
+
+    .loading-state {
+      text-align: center;
+      padding: 50px 20px;
+    }
+
+    .spinner {
+      width: 38px; height: 38px;
+      border: 3px solid var(--border);
+      border-top-color: var(--cyan);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    .spinner.violet { border-top-color: var(--violet); }
+
+    .loading-text {
+      color: var(--text2);
+      font-size: 0.82rem;
+    }
+
+    .error-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text2);
+      font-size: 0.84rem;
+    }
+
+    .disclaimer {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text2);
+      opacity: 0.85;
+      margin-top: 28px;
+      line-height: 1.6;
+      padding: 12px 16px;
+      background: var(--surface);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div>
+      <div class="logo">FlashDetox</div>
+      <div class="logo-sub">par FlashTools.fr</div>
+    </div>
+    <div class="last-update" id="lastUpdate"></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('semaine', this)">Fake news — semaine</button>
+    <button class="tab" onclick="switchTab('tendances', this)">Tendances douteuses</button>
+  </div>
+
+  <div class="panel active" id="panel-semaine">
+    <div id="content-semaine">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <div class="loading-text">Chargement...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-tendances">
+    <div id="content-tendances">
+      <div class="loading-state">
+        <div class="spinner violet"></div>
+        <div class="loading-text">Chargement...</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="disclaimer">Analyse basée sur les sources web disponibles au moment de la génération.<br>Un score de probabilité ne constitue pas une vérité absolue.</p>
+
+</div>
+
+<script>
+  function scoreClass(s) { return s >= 60 ? 'score-high' : s >= 35 ? 'score-mid' : 'score-low'; }
+  function barClass(s)   { return s >= 60 ? 'bar-high'  : s >= 35 ? 'bar-mid'  : 'bar-low';  }
+
+  // Échappe le HTML — nécessaire dès que le contenu vient d'une vraie source
+  // externe (générée chaque semaine) et non plus uniquement de données figées
+  // écrites à la main dans ce fichier.
+  function esc(str) {
+    return String(str ?? '').replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  let tendancesLoaded = false;
+
+  function switchTab(tab, el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('panel-' + tab).classList.add('active');
+    if (tab === 'tendances' && !tendancesLoaded) loadTendances();
+  }
+
+  function renderFiches(items, containerId) {
+    const container = document.getElementById(containerId);
+    if (!items || items.length === 0) {
+      container.innerHTML = '<div class="error-state">Aucune donnée disponible pour le moment.</div>';
+      return;
+    }
+    container.innerHTML = items.map((item, i) => `
+      <div class="fiche" style="animation-delay:${i * 0.07}s">
+        <div class="fiche-top">
+          <div class="fiche-affirmation">${esc(item.affirmation)}</div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div class="fiche-score ${scoreClass(item.score)}">${esc(item.score)}%</div>
+            <div style="font-size:0.6rem;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;margin-top:-2px;">probabilité vraie</div>
+          </div>
+        </div>
+        <div class="fiche-bar-bg">
+          <div class="fiche-bar-fill ${barClass(item.score)}" style="width:${Math.max(0, Math.min(100, Number(item.score) || 0))}%"></div>
+        </div>
+        <div class="fiche-contexte">${esc(item.contexte)}</div>
+        <div class="fiche-footer">
+          <div class="fiche-historique">
+            <span class="hist-dot"></span>${esc(item.historique)}
+          </div>
+          <button class="btn-approfondir" onclick="toggleDetail(this)">Approfondir</button>
+        </div>
+        <div class="fiche-detail">
+          <div class="detail-block">
+            <div class="detail-label" style="color:var(--cyan)">
+              <span class="dot" style="background:var(--cyan)"></span>Ce que le web dit
+            </div>
+            <div class="detail-text">${esc(item.web)}</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label" style="color:var(--warning)">
+              <span class="dot" style="background:var(--warning)"></span>Analyse
+            </div>
+            <div class="detail-text">${esc(item.analyse)}</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label" style="color:var(--success)">
+              <span class="dot" style="background:var(--success)"></span>Conclusion
+            </div>
+            <div class="detail-text conclusion">${esc(item.conclusion)}</div>
+          </div>
+          ${item.sources && item.sources.length > 0 ? `
+          <div class="detail-block">
+            <div class="detail-label" style="color:var(--text2)">
+              <span class="dot" style="background:var(--text2)"></span>Sources
+            </div>
+            <div class="sources">${item.sources.map(s => `<div class="source-item">${esc(s)}</div>`).join('')}</div>
+          </div>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function toggleDetail(btn) {
+    const detail = btn.closest('.fiche').querySelector('.fiche-detail');
+    detail.classList.toggle('open');
+    btn.textContent = detail.classList.contains('open') ? 'Réduire' : 'Approfondir';
+  }
+
+  // Affiche la vraie date de génération du fichier JSON (champ "generatedAt"),
+  // pas simplement la date du jour — sinon l'en-tête laisserait croire à un
+  // contenu frais même quand la génération hebdomadaire a échoué.
+  function showUpdateDate(generatedAt) {
+    const el = document.getElementById('lastUpdate');
+    if (generatedAt) {
+      const d = new Date(generatedAt);
+      el.innerHTML = `Semaine du<strong>${d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>`;
+    } else {
+      el.innerHTML = `<strong style="color:var(--warning)">Contenu de démonstration</strong>`;
+    }
+  }
+
+  async function loadSemaine() {
+    try {
+      const res = await fetch('./data/flashdetox-semaine.json');
+      if (!res.ok) throw new Error('fichier semaine introuvable');
+      const data = await res.json();
+      showUpdateDate(data.generatedAt);
+      renderFiches(data.items, 'content-semaine');
+    } catch (e) {
+      console.warn('FlashDetox — fichier de données semaine indisponible, contenu de démo affiché.', e);
+      showUpdateDate(null);
+      renderFiches(demoSemaine(), 'content-semaine');
+    }
+  }
+
+  async function loadTendances() {
+    tendancesLoaded = true;
+    try {
+      const res = await fetch('./data/flashdetox-tendances.json');
+      if (!res.ok) throw new Error('fichier tendances introuvable');
+      const data = await res.json();
+      renderFiches(data.items, 'content-tendances');
+    } catch (e) {
+      console.warn('FlashDetox — fichier de données tendances indisponible, contenu de démo affiché.', e);
+      renderFiches(demoTendances(), 'content-tendances');
+    }
+  }
+
+  function demoSemaine() {
+    return [
+      {
+        affirmation: "Le réchauffement climatique marque une pause depuis 10 ans",
+        score: 7,
+        contexte: "Affirmation appuyée sur des graphiques tronqués, largement partagée sur les réseaux sociaux.",
+        historique: "Réapparaît depuis 2013 — souvent liée aux négociations climatiques",
+        web: "Les données satellitaires et les relevés océaniques montrent une hausse continue. Les années 2014-2024 comptent parmi les plus chaudes jamais enregistrées.",
+        analyse: "L'affirmation repose sur une sélection partielle des données. En choisissant une année exceptionnellement chaude comme point de départ, on crée l'illusion d'une stagnation.",
+        conclusion: "Très probablement fausse. Le consensus scientifique et les données disponibles la contredisent clairement.",
+        sources: ["NASA GISS Surface Temperature", "NOAA Global Climate Report", "WMO State of the Global Climate"]
+      },
+      {
+        affirmation: "L'IA va supprimer 50% des emplois d'ici 2030",
+        score: 18,
+        contexte: "Chiffre repris dans les médias, issu d'études aux méthodologies très variables.",
+        historique: "Variantes de cette affirmation circulent depuis 2013 — le chiffre change selon les sources",
+        web: "L'OCDE évalue à 14% la part des emplois fortement automatisables. Les études sérieuses parlent de transformation plutôt que de suppression massive.",
+        analyse: "La distinction entre transformation et suppression est essentielle. Historiquement, les révolutions technologiques créent autant d'emplois qu'elles en détruisent, avec des délais d'adaptation.",
+        conclusion: "Très probablement exagérée. Une transformation significative est certaine, une suppression de 50% est peu probable à cette échéance.",
+        sources: ["OCDE — Automatisation et emploi", "McKinsey Global Institute", "WEF Future of Jobs Report"]
+      },
+      {
+        affirmation: "Les réseaux sociaux sont conçus intentionnellement pour rendre les enfants dépendants",
+        score: 62,
+        contexte: "Portée par d'anciens ingénieurs de Meta et des chercheurs en psychologie comportementale.",
+        historique: "Débat relancé en 2021 après les révélations de Frances Haugen",
+        web: "Des documents internes de Meta révèlent des mécanismes conçus pour maximiser le temps passé. Des études montrent des effets sur le système dopaminergique.",
+        analyse: "Les plateformes optimisent l'engagement, ce qui produit des effets similaires à la dépendance. L'intentionnalité explicite reste difficile à prouver juridiquement.",
+        conclusion: "Partiellement fondée. Les mécanismes existent, leur intentionnalité précise reste débattue.",
+        sources: ["WSJ — The Facebook Files", "American Psychological Association", "Rapport Sénat français 2023"]
+      }
+    ];
+  }
+
+  function demoTendances() {
+    return [
+      {
+        affirmation: "Les pesticides dans les fruits sont inoffensifs aux doses consommées",
+        score: 41,
+        contexte: "Portée par certains syndicats agricoles, contestée par des associations de consommateurs.",
+        historique: "Débat permanent depuis les années 2000 — relancé à chaque rapport de l'ANSES",
+        web: "Les autorités sanitaires établissent des limites par substance. Les effets cocktail de plusieurs résidus simultanés sont moins documentés.",
+        analyse: "Vraie pour chaque substance isolée. L'effet cumulatif de multiples résidus est moins bien documenté et fait l'objet de recherches actives.",
+        conclusion: "Incertaine. Valide pour chaque substance prise isolément, potentiellement insuffisante pour les effets combinés.",
+        sources: ["ANSES — Résidus de pesticides", "EFSA — Pesticide residues in food", "Générations Futures 2024"]
+      },
+      {
+        affirmation: "Les migrants coûtent plus à l'État qu'ils ne rapportent",
+        score: 22,
+        contexte: "Très présente dans le débat politique français, utilisée par plusieurs partis.",
+        historique: "Sujet récurrent dans les débats électoraux depuis 2012",
+        web: "Les études économiques montrent des résultats nuancés selon les populations, le niveau d'éducation et la durée de résidence.",
+        analyse: "Le calcul dépend fortement des paramètres choisis : génération considérée, type d'immigration, horizon temporel. Les études à court terme diffèrent des études sur deux générations.",
+        conclusion: "Trop simpliste pour être validée ou réfutée globalement. Le contexte et les paramètres changent radicalement la réponse.",
+        sources: ["France Stratégie — Immigration et marché du travail", "OCDE — Perspectives des migrations", "INSEE 2023"]
+      }
+    ];
+  }
+
+  loadSemaine();
+</script>
+</body>
+</html>
