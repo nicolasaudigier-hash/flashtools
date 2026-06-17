@@ -1,0 +1,2061 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlashTréso | FlashTools</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cy:#06B6D4;--cy2:#0891B2;--cyg:rgba(6,182,212,0.12);
+  --vi:#8B5CF6;--vig:rgba(139,92,246,0.12);
+  --gr:#10B981;--grg:rgba(16,185,129,0.12);
+  --am:#F59E0B;--amg:rgba(245,158,11,0.12);
+  --rd:#EF4444;--rdg:rgba(239,68,68,0.12);
+  --bg:#0A0E1A;--bg3:#151D30;--bg4:#1C2640;--bg5:#232E4A;
+  --bo:rgba(6,182,212,0.1);--bo2:rgba(255,255,255,0.05);
+  --tx:#E2E8F0;--tx2:#A8B8CC;--tx3:#8899AA;
+  --mn:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;padding-bottom:90px}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 10% 15%,rgba(6,182,212,0.05) 0%,transparent 40%),radial-gradient(ellipse at 90% 85%,rgba(139,92,246,0.05) 0%,transparent 40%);pointer-events:none;z-index:0}
+.hdr{position:sticky;top:0;z-index:100;background:rgba(10,14,26,0.95);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-bottom:1px solid var(--bo);padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.lt{font-size:1.05rem;font-weight:800;letter-spacing:-.5px}
+.lf{color:var(--cy)}.ls{color:var(--tx)}
+.hdr-btns{display:flex;gap:5px;flex-shrink:0}
+.hbtn{padding:6px 10px;border-radius:8px;border:none;font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+.hbtn-save{background:var(--cyg);color:var(--cy);border:1px solid rgba(6,182,212,.25)}
+.hbtn-load{background:var(--vig);color:var(--vi);border:1px solid rgba(139,92,246,.25)}
+.progress-wrap{background:rgba(255,255,255,.02);border-bottom:1px solid var(--bo2);padding:8px 14px 6px}
+.pb-steps{display:flex;gap:4px;margin-bottom:5px}
+.pb-step{flex:1;height:3px;background:rgba(255,255,255,.06);border-radius:2px;transition:background .3s}
+.pb-step.done{background:var(--cy)}.pb-step.active{background:rgba(6,182,212,.45)}
+.pb-lbls{display:flex}
+.pb-lbl{flex:1;font-size:.57rem;color:var(--tx3);font-weight:600;text-align:center}
+.pb-lbl.done{color:var(--cy)}.pb-lbl.active{color:var(--tx2)}
+.nav{position:-webkit-sticky;position:sticky;top:59px;z-index:99;background:rgba(10,14,26,0.95);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-bottom:1px solid var(--bo2);display:flex;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nt{flex:1;min-width:62px;padding:9px 4px;background:none;border:none;color:var(--tx3);font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:2px}
+.nt .ic{font-size:.85rem}
+.nt.on{color:var(--cy);border-bottom-color:var(--cy)}
+.pg{display:none;padding:14px;position:relative;z-index:1}
+.pg.on{display:block;animation:fi .22s ease}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.pg-intro{font-size:.75rem;color:var(--tx2);line-height:1.6;margin-bottom:12px;padding:9px 12px;background:var(--bg3);border:1px solid var(--bo2);border-left:3px solid var(--cy);border-radius:0 9px 9px 0}
+.pg-intro strong{color:var(--cy)}
+.card{background:var(--bg3);border:1px solid var(--bo2);border-radius:14px;padding:14px;margin-bottom:11px}
+.ct{font-size:.65rem;font-weight:700;color:#8899AA;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:11px;display:flex;align-items:center;gap:7px}
+.dot{width:5px;height:5px;border-radius:50%;display:inline-block;flex-shrink:0}
+.st{font-size:.98rem;font-weight:800;margin-bottom:4px}
+.ss{font-size:.75rem;color:var(--tx2);margin-bottom:14px;line-height:1.5}
+.ig{margin-bottom:10px}
+.il{font-size:.7rem;font-weight:700;color:var(--tx2);margin-bottom:4px;display:flex;align-items:center;justify-content:space-between}
+.il span{color:var(--tx3);font-weight:400;font-family:var(--mn);font-size:.65rem}
+.if{width:100%;background:var(--bg4);border:1px solid var(--bo2);border-radius:9px;padding:10px 11px;color:var(--tx);font-family:var(--mn);font-size:.86rem;outline:none;transition:border-color .2s}
+.if:focus{border-color:var(--cy)}
+.if::placeholder{color:var(--tx3)}
+.if-lg{font-size:1.05rem;padding:11px}
+.ir{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sel{width:100%;background:var(--bg4);border:1px solid var(--bo2);border-radius:9px;padding:10px 11px;color:var(--tx);font-family:'Syne',sans-serif;font-size:.8rem;outline:none;cursor:pointer;-webkit-appearance:none}
+.sel:focus{border-color:var(--cy)}
+.al{border-radius:9px;padding:9px 12px;margin-bottom:10px;font-size:.73rem;line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.ai{font-size:.86rem;flex-shrink:0;margin-top:1px}
+.a-cy{background:var(--cyg);border:1px solid rgba(6,182,212,.18);color:var(--tx2)}
+.a-gr{background:var(--grg);border:1px solid rgba(16,185,129,.18);color:var(--tx2)}
+.a-am{background:var(--amg);border:1px solid rgba(245,158,11,.18);color:var(--tx2)}
+.a-rd{background:var(--rdg);border:1px solid rgba(239,68,68,.18);color:var(--tx2)}
+.a-vi{background:var(--vig);border:1px solid rgba(139,92,246,.18);color:var(--tx2)}
+.rb{background:var(--bg4);border-radius:9px;padding:10px 12px;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--bo2);gap:8px}
+.rb-l{flex:1}
+.rb-n{font-size:.79rem;font-weight:700;margin-bottom:1px}
+.rb-d{font-size:.64rem;color:var(--tx3);line-height:1.3}
+.rb-v{font-family:var(--mn);font-size:.93rem;font-weight:600;text-align:right;flex-shrink:0}
+.hbox{border-radius:12px;padding:14px 15px;margin-bottom:11px;text-align:center}
+.hbox-cy{background:linear-gradient(135deg,rgba(6,182,212,.12),rgba(139,92,246,.08));border:1px solid rgba(6,182,212,.2)}
+.hbox-gr{background:linear-gradient(135deg,rgba(16,185,129,.12),rgba(6,182,212,.06));border:1px solid rgba(16,185,129,.2)}
+.hbox-am{background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(239,68,68,.06));border:1px solid rgba(245,158,11,.2)}
+.hbox-l{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:4px}
+.hbox-v{font-family:var(--mn);font-size:1.75rem;font-weight:600;margin-bottom:2px;line-height:1}
+.hbox-s{font-size:.69rem;color:var(--tx2)}
+.ch-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bo2)}
+.ch-item:last-child{border-bottom:none}
+.ch-cb{width:16px;height:16px;border-radius:5px;border:1.5px solid var(--bo2);background:var(--bg4);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.66rem;transition:all .2s}
+.ch-cb.on{background:var(--cy);border-color:var(--cy);color:#0A0E1A}
+.ch-info{flex:1}
+.ch-n{font-size:.77rem;font-weight:600;margin-bottom:1px}
+.ch-d{font-size:.63rem;color:var(--tx3)}
+.ch-inp{width:75px;background:var(--bg5);border:1px solid var(--bo2);border-radius:7px;padding:5px 7px;color:var(--tx);font-family:var(--mn);font-size:.76rem;outline:none;text-align:right}
+.ch-inp:focus{border-color:var(--cy)}
+.rempart-box{border-radius:14px;padding:16px;margin-bottom:14px;border:2px solid rgba(6,182,212,.3);background:linear-gradient(135deg,rgba(6,182,212,.07),rgba(139,92,246,.04));position:relative;overflow:hidden}
+.rempart-phase{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--cy);margin-bottom:6px}
+.rempart-titre{font-size:.9rem;font-weight:800;margin-bottom:4px;color:var(--tx)}
+.rempart-desc{font-size:.72rem;color:var(--tx2);line-height:1.5;margin-bottom:12px}
+.rempart-jauge-wrap{margin-bottom:8px}
+.rempart-jauge-top{display:flex;justify-content:space-between;margin-bottom:5px;font-size:.68rem}
+.rempart-jauge-lbl{color:var(--tx2);font-weight:600}
+.rempart-jauge-val{font-family:var(--mn);color:var(--cy);font-weight:700}
+.rempart-track{height:10px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden}
+.rempart-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--cy),var(--vi));transition:width .8s cubic-bezier(.4,0,.2,1)}
+.rempart-eta{font-size:.67rem;color:var(--tx3);margin-top:5px;font-family:var(--mn)}
+.rempart-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.rempart-stat{background:rgba(255,255,255,.04);border-radius:8px;padding:9px 11px;text-align:center}
+.rempart-stat-l{font-size:.6rem;color:var(--tx3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.8px}
+.rempart-stat-v{font-family:var(--mn);font-size:1rem;font-weight:700}
+.flux-box{background:var(--bg4);border-radius:12px;padding:14px;margin-bottom:11px;border:1px solid var(--bo2)}
+.flux-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.flux-row:last-child{border-bottom:none}
+.flux-l{flex:1}
+.flux-n{font-size:.79rem;font-weight:700}
+.flux-d{font-size:.63rem;color:var(--tx3);margin-top:1px}
+.flux-v{font-family:var(--mn);font-size:.95rem;font-weight:700;text-align:right;flex-shrink:0}
+.flux-arr{text-align:center;font-size:.75rem;color:var(--tx3);padding:3px 0}
+.flux-total{background:rgba(255,255,255,.03);border-radius:9px;padding:11px 13px;display:flex;align-items:center;justify-content:space-between;margin-top:10px;border:1px solid rgba(6,182,212,.15)}
+.vir-choice{background:var(--bg3);border:1px solid var(--bo2);border-radius:13px;padding:14px;margin-bottom:11px}
+.vir-modes{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:12px}
+.vir-mode{padding:9px 6px;background:var(--bg4);border:1px solid var(--bo2);border-radius:9px;cursor:pointer;text-align:center;transition:all .2s;font-family:'Syne',sans-serif}
+.vir-mode.on{border-color:rgba(6,182,212,.5);background:var(--cyg)}
+.vir-mode-ico{font-size:1rem;display:block;margin-bottom:3px}
+.vir-mode-n{font-size:.7rem;font-weight:700;color:var(--tx)}
+.vir-mode-d{font-size:.61rem;color:var(--tx3);margin-top:1px;line-height:1.3}
+.vir-mode.on .vir-mode-n{color:var(--cy)}
+.vir-result{background:var(--bg4);border-radius:10px;padding:13px;border:1px solid var(--bo2)}
+.vir-result-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.vir-result-lbl{font-size:.7rem;color:var(--tx2);font-weight:600}
+.vir-result-val{font-family:var(--mn);font-size:1.4rem;font-weight:700;color:var(--cy)}
+.vir-result-detail{font-size:.67rem;color:var(--tx3);line-height:1.5}
+.surplus-pro{border-radius:12px;padding:14px;border:2px solid rgba(16,185,129,.3);background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(6,182,212,.04));margin-bottom:11px}
+.surplus-pro-lbl{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--gr);margin-bottom:4px}
+.surplus-pro-val{font-family:var(--mn);font-size:1.9rem;font-weight:700;color:var(--gr);margin-bottom:2px;line-height:1}
+.surplus-pro-desc{font-size:.7rem;color:var(--tx2);line-height:1.45}
+.surplus-perso{border-radius:12px;padding:14px;border:2px solid rgba(245,158,11,.3);background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(16,185,129,.04));margin-bottom:11px}
+.surplus-perso-lbl{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--am);margin-bottom:4px}
+.surplus-perso-val{font-family:var(--mn);font-size:1.9rem;font-weight:700;color:var(--am);margin-bottom:2px;line-height:1}
+.surplus-perso-desc{font-size:.7rem;color:var(--tx2);line-height:1.45}
+.mc{border-radius:12px;padding:13px;margin-bottom:10px;border:1px solid;position:relative;overflow:hidden}
+.mc::before{content:'';position:absolute;top:-20px;right:-20px;width:65px;height:65px;border-radius:50%;opacity:.07}
+.m-tp{background:rgba(6,182,212,.05);border-color:rgba(6,182,212,.2)}.m-tp::before{background:var(--cy)}
+.m-ex{background:rgba(245,158,11,.05);border-color:rgba(245,158,11,.2)}.m-ex::before{background:var(--am)}
+.m-pe{background:rgba(16,185,129,.05);border-color:rgba(16,185,129,.2)}.m-pe::before{background:var(--gr)}
+.m-li{background:rgba(139,92,246,.05);border-color:rgba(139,92,246,.2)}.m-li::before{background:var(--vi)}
+.m-in{background:rgba(6,182,212,.03);border-color:rgba(6,182,212,.12)}
+.mh{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.mn2{font-size:.86rem;font-weight:800;margin-bottom:2px}
+.mr2{font-size:.66rem;color:var(--tx2);line-height:1.35}
+.ma{text-align:right;flex-shrink:0;margin-left:10px}
+.sol-wrap{display:flex;align-items:center;gap:5px}
+.sol-btn{font-family:var(--mn);font-size:.92rem;font-weight:600;cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px;border:none;background:transparent;padding:0;color:inherit}
+.sol-inp{font-family:var(--mn);font-size:.88rem;font-weight:600;width:88px;background:var(--bg5);border:1px solid var(--cy);border-radius:7px;padding:4px 7px;color:var(--tx);outline:none;display:none}
+.mt2{font-family:var(--mn);font-size:.62rem;color:var(--tx3)}
+.pb2{height:5px;background:rgba(255,255,255,.05);border-radius:10px;overflow:hidden;margin:6px 0 4px}
+.pf{height:100%;border-radius:10px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.pi{display:flex;justify-content:space-between;font-size:.62rem;color:var(--tx3);font-family:var(--mn)}
+.vr{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);border-radius:8px;padding:8px 10px;margin-top:7px;gap:7px}
+.vl{font-size:.69rem;color:var(--tx2);flex:1}
+.vi2{width:70px;background:var(--bg5);border:1px solid var(--bo2);border-radius:7px;padding:5px 7px;color:var(--tx);font-family:var(--mn);font-size:.79rem;outline:none;text-align:right}
+.vi2:focus{border-color:var(--cy)}
+.vu{font-family:var(--mn);font-size:.69rem;color:var(--tx3)}
+.liv-bloc{background:var(--bg4);border-radius:10px;padding:11px;margin-bottom:7px;border:1px solid var(--bo2)}
+.liv-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.liv-name{font-size:.8rem;font-weight:700}
+.liv-taux{font-family:var(--mn);font-size:.78rem;font-weight:600}
+.liv-row{display:flex;gap:8px;align-items:center;margin-bottom:5px}
+.liv-lbl{font-size:.67rem;color:var(--tx2);flex:1}
+.liv-inp{width:88px;background:var(--bg5);border:1px solid var(--bo2);border-radius:7px;padding:5px 7px;color:var(--tx);font-family:var(--mn);font-size:.78rem;outline:none;text-align:right}
+.liv-inp:focus{border-color:var(--cy)}
+.plafond-tag{display:inline-flex;align-items:center;gap:5px;font-size:.64rem;font-weight:700;padding:3px 7px;border-radius:7px;margin-top:4px}
+.plafond-ok{background:var(--grg);color:var(--gr);border:1px solid rgba(16,185,129,.2)}
+.plafond-warn{background:var(--amg);color:var(--am);border:1px solid rgba(245,158,11,.2)}
+.plafond-full{background:var(--rdg);color:var(--rd);border:1px solid rgba(239,68,68,.2)}
+.inv-bloc{background:var(--bg4);border-radius:10px;padding:12px;margin-bottom:8px;border:1px solid var(--bo2)}
+.inv-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.inv-name{font-size:.82rem;font-weight:700}
+.inv-taux{font-family:var(--mn);font-size:.78rem;font-weight:600}
+.inv-desc{font-size:.66rem;color:var(--tx3);line-height:1.4;margin-bottom:7px}
+.inv-row{display:flex;gap:8px;align-items:center;margin-bottom:4px}
+.inv-lbl{font-size:.67rem;color:var(--tx2);flex:1}
+.inv-inp{width:88px;background:var(--bg5);border:1px solid var(--bo2);border-radius:7px;padding:5px 7px;color:var(--tx);font-family:var(--mn);font-size:.78rem;outline:none;text-align:right}
+.inv-inp:focus{border-color:var(--cy)}
+.ri{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--bo2)}
+.ri:last-child{border-bottom:none}
+.rd2{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.rin{flex:1}
+.rn{font-size:.79rem;font-weight:600;margin-bottom:1px}
+.rw{font-size:.64rem;color:var(--tx3)}
+.rv{font-family:var(--mn);font-size:.82rem;font-weight:600;text-align:right}
+.rp{font-size:.59rem;color:var(--tx3)}
+.rg{background:var(--bg4);border-left:3px solid var(--cy);padding:10px 12px;margin-bottom:7px}
+.rgt{font-size:.73rem;font-weight:700;color:var(--cy);margin-bottom:3px}
+.rgd{font-size:.7rem;color:var(--tx2);line-height:1.45}
+.ptabs{display:flex;gap:6px;margin-bottom:13px}
+.ptab{flex:1;padding:8px 5px;background:var(--bg4);border:1px solid var(--bo2);border-radius:8px;color:var(--tx3);font-family:'Syne',sans-serif;font-size:.64rem;font-weight:700;cursor:pointer;text-align:center;transition:all .2s}
+.ptab.on{background:var(--cyg);border-color:rgba(6,182,212,.3);color:var(--cy)}
+.cag{background:linear-gradient(135deg,rgba(139,92,246,.1),rgba(6,182,212,.1));border:1px solid rgba(139,92,246,.22);border-radius:13px;padding:18px 14px;text-align:center;margin-bottom:11px}
+.cagl{font-size:.63rem;color:var(--vi);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:5px}
+.caga{font-family:var(--mn);font-size:1.85rem;font-weight:600;color:var(--tx);margin-bottom:3px;line-height:1}
+.stabs{display:flex;gap:6px;margin-bottom:11px}
+.stab{flex:1;padding:7px;background:var(--bg4);border:1px solid var(--bo2);border-radius:8px;color:var(--tx3);font-family:'Syne',sans-serif;font-size:.64rem;font-weight:700;cursor:pointer;text-align:center;transition:all .2s}
+.stab.on{background:var(--cyg);border-color:rgba(6,182,212,.3);color:var(--cy)}
+.ptbl{width:100%;border-collapse:collapse;font-size:.7rem}
+.ptbl th{font-family:var(--mn);font-size:.57rem;color:var(--tx3);text-align:left;padding:5px;border-bottom:1px solid var(--bo2);text-transform:uppercase;letter-spacing:.8px}
+.ptbl td{padding:6px 5px;border-bottom:1px solid rgba(255,255,255,.025);font-family:var(--mn)}
+.ptbl tr:last-child td{border-bottom:none}
+.hl{color:var(--cy);font-weight:600}
+.big{color:var(--gr);font-weight:700}
+.btn{width:100%;padding:12px;border-radius:10px;border:none;font-family:'Syne',sans-serif;font-size:.83rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-cy{background:linear-gradient(135deg,var(--cy),var(--cy2));color:#0A0E1A}
+.btn-cy:hover{opacity:.9;transform:translateY(-1px)}
+.tog{width:38px;height:21px;background:var(--bg5);border-radius:11px;border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.tog.on{background:var(--cy)}
+.tog::after{content:'';position:absolute;top:2.5px;left:2.5px;width:16px;height:16px;background:white;border-radius:50%;transition:transform .2s}
+.tog.on::after{transform:translateX(17px)}
+.togrow{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bo2)}
+.togrow:last-child{border-bottom:none}
+.togn{font-size:.79rem;font-weight:600}
+.togd{font-size:.62rem;color:var(--tx3)}
+.conseil-box{background:linear-gradient(135deg,var(--cyg),var(--vig));border:1px solid rgba(6,182,212,.2);border-radius:12px;padding:13px;margin-bottom:11px}
+.cb-ico{font-size:1.05rem;margin-bottom:4px}
+.cb-txt{font-size:.76rem;color:var(--tx2);line-height:1.5}
+.cb-act{display:inline-block;margin-top:6px;font-size:.7rem;font-weight:700;color:var(--cy);background:var(--cyg);padding:4px 10px;border-radius:7px;border:1px solid rgba(6,182,212,.2)}
+.cpt-item{background:var(--bg4);border-radius:9px;padding:10px 11px;margin-bottom:7px;border:1px solid var(--bo2)}
+.cpt-hdr{display:flex;align-items:center;gap:8px}
+.cpt-n{font-size:.78rem;font-weight:700}
+.cpt-d{font-size:.62rem;color:var(--tx3);margin-top:1px}
+.cpt-tag{font-size:.59rem;font-weight:700;padding:2px 7px;border-radius:7px;margin-left:auto;flex-shrink:0}
+.div{height:1px;background:var(--bo2);margin:10px 0}
+.patrim{background:linear-gradient(135deg,rgba(6,182,212,.1),rgba(139,92,246,.08));border:1px solid rgba(6,182,212,.2);border-radius:13px;padding:16px 14px;text-align:center;margin-bottom:11px}
+.patrim-l{font-size:.63rem;color:var(--cy);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:5px}
+.patrim-v{font-family:var(--mn);font-size:1.85rem;font-weight:600;color:var(--tx);line-height:1;margin-bottom:4px}
+.disclaimer{margin:18px 14px 0;padding:11px 13px;background:rgba(255,255,255,.02);border:1px solid var(--bo2);border-radius:9px;font-size:.64rem;color:var(--tx3);line-height:1.65;text-align:center}
+.disclaimer strong{color:var(--tx2)}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(18px);background:var(--bg3);border:1px solid var(--cy);border-radius:10px;padding:9px 16px;font-size:.76rem;font-weight:600;color:var(--cy);z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#import-file{display:none}
+@media(max-width:420px){.ir{grid-template-columns:1fr}.vir-modes{grid-template-columns:1fr 1fr}}
+@media(max-width:380px){.hdr{padding:9px 11px}.lt{font-size:.93rem}.pg{padding:11px}.card{padding:12px}.if-lg{font-size:.98rem}.hbtn{font-size:.62rem;padding:5px 7px}}
+input[type="number"],select{font-size:16px}
+@media(min-width:480px){input[type="number"],select{font-size:inherit}}
+html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+.tog{min-width:38px;min-height:21px}.btn{min-height:46px}.sel{min-height:42px}.if{min-height:42px}.nt{min-height:50px}
+.hor-btn{flex:1;padding:7px;background:var(--bg4);border:1px solid var(--bo2);border-radius:8px;color:var(--tx3);font-family:'Syne',sans-serif;font-size:.64rem;font-weight:700;cursor:pointer;text-align:center;transition:all .2s}
+.hor-btn.on{background:var(--cyg);border-color:rgba(6,182,212,.3);color:var(--cy)}
+.scen-btn{flex:1;padding:7px;background:var(--bg4);border:1px solid var(--bo2);border-radius:8px;color:var(--tx3);font-family:'Syne',sans-serif;font-size:.64rem;font-weight:700;cursor:pointer;text-align:center;transition:all .2s}
+.scen-btn.on{background:var(--cyg);border-color:rgba(6,182,212,.3);color:var(--cy)}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="logo"><span style="font-size:1.35rem;line-height:1">💎</span><div class="lt"><span class="lf">Flash</span><span class="ls">Tréso</span></div></div>
+  <div class="hdr-btns">
+    <button class="hbtn hbtn-load" onclick="triggerImport()">📂 Reprendre</button>
+    <button class="hbtn hbtn-save" onclick="exportData()">💾 Sauvegarder</button>
+  </div>
+</div>
+
+<div id="mobile-banner" style="display:none;background:linear-gradient(135deg,rgba(239,68,68,.12),rgba(245,158,11,.08));border-bottom:2px solid rgba(239,68,68,.3);padding:12px 14px;font-size:.75rem;color:var(--tx2);line-height:1.6">
+  <div style="font-weight:700;color:var(--rd);margin-bottom:3px">📱 Application non optimisée pour mobile</div>
+  FlashTréso nécessite de nombreuses saisies et affiche des graphiques de projection. Sur mobile, l'expérience est dégradée. <strong style="color:var(--tx)">Utilise de préférence un ordinateur ou une tablette</strong> pour une utilisation confortable.
+  <div style="margin-top:6px">
+    <button onclick="document.getElementById('mobile-banner').style.display='none'" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:7px;color:var(--tx2);font-size:.72rem;padding:4px 10px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700">Continuer quand même</button>
+  </div>
+</div>
+<script>if(window.innerWidth < 768) document.getElementById('mobile-banner').style.display='block';</script>
+
+<input type="file" id="import-file" accept=".json" onchange="importData(event)">
+
+<div class="progress-wrap">
+  <div class="pb-steps"><div class="pb-step active" id="pbs-0"></div><div class="pb-step" id="pbs-1"></div><div class="pb-step" id="pbs-2"></div><div class="pb-step" id="pbs-3"></div><div class="pb-step" id="pbs-4"></div></div>
+  <div class="pb-lbls"><span class="pb-lbl active" id="pbl-0">Profil</span><span class="pb-lbl" id="pbl-1">Pro</span><span class="pb-lbl" id="pbl-2">Perso</span><span class="pb-lbl" id="pbl-3">Réserves</span><span class="pb-lbl" id="pbl-4">Projections</span></div>
+</div>
+
+<nav class="nav">
+  <button class="nt on" onclick="showPg('start',this,0)"><span class="ic">👤</span>Profil</button>
+  <button class="nt" onclick="showPg('pro',this,1)"><span class="ic">💼</span>Pro</button>
+  <button class="nt" onclick="showPg('perso',this,2)"><span class="ic">🏠</span>Perso</button>
+  <button class="nt" onclick="showPg('reserves',this,3)"><span class="ic">🛡️</span>Réserves</button>
+  <button class="nt" onclick="showPg('proj',this,4)"><span class="ic">📈</span>Projections</button>
+</nav>
+
+<!-- ═══ PROFIL ═══ -->
+<div id="pg-start" class="pg on">
+  <div class="pg-intro">Remplis les informations de ton activité. <strong>Tes données restent sur ton appareil</strong> — "Sauvegarder" pour conserver ta session.</div>
+  <div class="st">Mon profil</div><div class="ss">Quelques questions pour adapter les calculs à ta situation.</div>
+  <div class="card">
+    <div class="ct"><span class="dot" style="background:var(--cy)"></span>Activité principale</div>
+    <div class="ig"><div class="il">Type d'activité principale</div>
+      <select class="sel" id="s-type" onchange="updStart()">
+        <option value="" disabled selected style="color:var(--tx3)">Choisir...</option>
+        <option value="services">Prestations de services (BIC)</option>
+        <option value="ventes">Vente de marchandises (BIC)</option>
+        <option value="liberal">Profession libérale (BNC)</option>
+      </select>
+    </div>
+    <div class="ig"><div class="il">CA mensuel moyen — activité principale <span>HT</span></div>
+      <input class="if if-lg" type="number" id="s-ca" placeholder="3 000" onblur="updStart()" onkeydown="if(event.key==='Enter'){this.blur();}">
+    </div>
+    <div id="s-cma-row" class="ig" style="display:none">
+      <div class="il">Artisan inscrit CMA ? <span>Chambre des Métiers</span></div>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button id="s-cma-non" onclick="setCMA(false)" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--cy);background:var(--cyg);color:var(--cy);font-family:'Syne',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer">Non — CCI</button>
+        <button id="s-cma-oui" onclick="setCMA(true)" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--bo2);background:var(--bg4);color:var(--tx3);font-family:'Syne',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer">Oui — CMA</button>
+      </div>
+      <div id="s-cma-info" class="al a-am" style="margin-top:7px;display:none"><span class="ai">ℹ️</span><div style="font-size:.69rem" id="s-cma-txt"></div></div>
+    </div>
+    <div class="ig"><div class="il">Assujetti à la TVA ?</div>
+      <select class="sel" id="s-tva" onchange="updStart()">
+        <option value="non">Non — franchise en base</option>
+        <option value="oui">Oui — je collecte la TVA</option>
+      </select>
+    </div>
+    <div class="ig">
+      <div class="il">Versement Libératoire (VFL) — IR payé avec les cotisations ?
+        <span>Sous conditions de RFR — vérifier sur avis d'imposition N-2</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button id="s-vfl-oui" onclick="setVFL(true)" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--cy);background:var(--cyg);color:var(--cy);font-family:'Syne',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer">Oui — VFL actif</button>
+        <button id="s-vfl-non" onclick="setVFL(false)" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--bo2);background:var(--bg4);color:var(--tx3);font-family:'Syne',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer">Non — prélèvement source</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct"><span class="dot" style="background:var(--vi)"></span>Activité secondaire</div>
+    <div class="al a-cy" style="margin-bottom:10px"><span class="ai">💡</span><div style="font-size:.71rem">Si tu exerces deux activités (ex : prestations + vente), chacune a ses propres taux URSSAF, IR, CFP et taxe consulaire. Les provisions sont calculées séparément.</div></div>
+    <div class="ig">
+      <div class="il">Tu as une activité secondaire ?</div>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button id="s-sec-non" onclick="setSecondaire(false)" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--cy);background:var(--cyg);color:var(--cy);font-family:'Syne',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer">Non</button>
+        <button id="s-sec-oui" onclick="setSecondaire(true)" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--bo2);background:var(--bg4);color:var(--tx3);font-family:'Syne',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer">Oui</button>
+      </div>
+    </div>
+    <div id="s-sec-row" style="display:none">
+      <div class="ig"><div class="il">Type d'activité secondaire</div>
+        <select class="sel" id="s-type2" onchange="updStart()">
+          <option value="" disabled selected style="color:var(--tx3)">Choisir...</option>
+          <option value="services">Prestations de services (BIC)</option>
+          <option value="ventes">Vente de marchandises (BIC)</option>
+          <option value="liberal">Profession libérale (BNC)</option>
+        </select>
+      </div>
+      <div class="ig"><div class="il">CA mensuel moyen — activité secondaire <span>HT</span></div>
+        <input class="if" type="number" id="s-ca2" placeholder="1 000" onblur="updStart()" onkeydown="if(event.key==='Enter'){this.blur();}">
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct"><span class="dot" style="background:var(--am)"></span>Mes comptes</div>
+    <div class="togrow"><div><div class="togn">Compte courant</div><div class="togd">Compte bancaire principal</div></div><button class="tog on" id="tg-cc" onclick="togC('cc')"></button></div>
+    <div class="togrow"><div><div class="togn">Compte pro dédié</div><div class="togd">Séparé du compte perso</div></div><button class="tog" id="tg-cpro" onclick="togC('cpro')"></button></div>
+    <div class="togrow"><div><div class="togn">💧 Livret A</div><div class="togd">Ouvert</div></div><button class="tog on" id="tg-la" onclick="togC('la')"></button></div>
+    <div class="togrow"><div><div class="togn">⭐ LEP</div><div class="togd">Livret Épargne Populaire — 2,5%</div></div><button class="tog" id="tg-lep" onclick="togC('lep')"></button></div>
+    <div class="togrow"><div><div class="togn">🌿 LDDS</div><div class="togd">Livret Développement Durable — 1,5%</div></div><button class="tog" id="tg-ldds" onclick="togC('ldds')"></button></div>
+    <div class="togrow"><div><div class="togn">PEA</div><div class="togd">Plan Épargne Actions</div></div><button class="tog" id="tg-pea" onclick="togC('pea')"></button></div>
+    <div class="togrow"><div><div class="togn">CTO / Assurance Vie</div><div class="togd">Investissement long terme</div></div><button class="tog" id="tg-inv" onclick="togC('inv')"></button></div>
+  </div>
+  <div class="card">
+    <div class="ct"><span class="dot" style="background:var(--vi)"></span>Comptes supplémentaires <span style="font-size:.6rem;font-weight:400;color:var(--tx3);margin-left:4px;text-transform:none;letter-spacing:0">optionnel</span></div>
+    <div id="extra-comptes-list"></div>
+    <button onclick="addCompte()" style="width:100%;padding:9px;border-radius:9px;border:1px dashed rgba(6,182,212,.3);background:transparent;color:var(--cy);font-family:'Syne',sans-serif;font-size:.76rem;font-weight:700;cursor:pointer;margin-top:4px">+ Ajouter un compte</button>
+  </div>
+  <div id="conseil-box" style="display:none"><div class="conseil-box"><div class="cb-ico" id="cb-ico">💡</div><div class="cb-txt" id="cb-txt"></div><div class="cb-act" id="cb-act" style="display:none"></div></div></div>
+</div>
+
+<!-- ═══ PRO ═══ -->
+<div id="pg-pro" class="pg">
+  <div class="pg-intro"><strong>Étape 1 — Encaissement pro.</strong> Saisis ce que tu as encaissé. Choisis combien tu te verses. Ce qui reste construit ton rempart.</div>
+  <div class="st">Encaissement pro</div>
+  <div class="ss">CA → Obligations → Disponible → Tu choisis ton virement → Rempart.</div>
+  <div class="card">
+    <div class="ct"><span class="dot" style="background:var(--cy)"></span>Ce mois</div>
+    <div class="ig"><div class="il">CA encaissé <span>HT</span></div><input class="if if-lg" type="number" id="p-ca" placeholder="3 500" onblur="calcPro()" onkeydown="if(event.key==='Enter'){this.blur();}"></div>
+    <div id="p-tva-bloc" style="display:none">
+      <div class="rb" style="border-color:rgba(239,68,68,.25);background:var(--rdg)">
+        <div class="rb-l"><div class="rb-n" style="color:var(--rd)">🔒 TVA collectée — intouchable</div><div class="rb-d"><span id="p-tva-ht"></span> HT → <strong id="p-tva-ttc"></strong> TTC</div></div>
+        <div class="rb-v" style="color:var(--rd)" id="p-tva-v">0€</div>
+      </div>
+    </div>
+    <div id="p-ca2-bloc" style="display:none" class="ig">
+      <div class="il">CA activité secondaire <span>HT · pré-rempli depuis Profil, modifiable</span></div>
+      <input class="if" type="number" id="p-ca2-input" placeholder="—"
+        style="border-color:rgba(139,92,246,.3)"
+        onblur="S.ca2=parseFloat(this.value)||0;calcPro()"
+        onkeydown="if(event.key==='Enter'){this.blur()}">
+      <div style="font-size:.63rem;color:var(--tx3);margin-top:4px" id="p-ca2-type-lbl">—</div>
+    </div>
+    <div class="ig" style="margin-bottom:0"><div class="il">Solde actuel du compte pro</div><input class="if" type="number" id="p-treso" placeholder="0" onblur="calcPro()" onkeydown="if(event.key==='Enter'){this.blur();}"></div>
+  </div>
+  <div class="card" id="p-prov-card" style="display:none">
+    <div class="ct"><span class="dot" style="background:var(--rd)"></span>Ce que l'État prend</div>
+    <div style="background:var(--bg4);border-radius:10px;overflow:hidden;border:1px solid var(--bo2);margin-bottom:8px">
+      <div style="font-size:.62rem;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;padding:7px 12px;border-bottom:1px solid var(--bo2)" id="p-act1-lbl">Activité principale</div>
+      <div class="flux-row"><div class="flux-l"><div class="flux-n">URSSAF</div><div class="flux-d" id="p-urssaf-lbl">—</div></div><div class="flux-v" style="color:var(--rd)" id="p-urssaf-v">—</div></div>
+      <div class="flux-row" id="p-ir-row"><div class="flux-l"><div class="flux-n" id="p-ir-nom">IR</div><div class="flux-d" id="p-ir-lbl">—</div></div><div class="flux-v" style="color:var(--rd)" id="p-ir-v">—</div></div>
+      <div class="flux-row"><div class="flux-l"><div class="flux-n">CFP</div><div class="flux-d" id="p-cfp-lbl">—</div></div><div class="flux-v" style="color:var(--rd)" id="p-cfp-v">—</div></div>
+      <div class="flux-row" id="p-tfcc-row"><div class="flux-l"><div class="flux-n">Taxe consulaire <span id="p-tfcc-chambre" style="font-size:.61rem;color:var(--tx3)"></span></div><div class="flux-d" id="p-tfcc-lbl">—</div></div><div class="flux-v" style="color:var(--rd)" id="p-tfcc-v">—</div></div>
+    </div>
+    <div id="p-act2-bloc" style="display:none;background:var(--bg4);border-radius:10px;overflow:hidden;border:1px solid rgba(139,92,246,.2);margin-bottom:8px">
+      <div style="font-size:.62rem;font-weight:700;color:var(--vi);text-transform:uppercase;letter-spacing:1px;padding:7px 12px;border-bottom:1px solid var(--bo2)">Activité secondaire — <span id="p-act2-type-lbl">—</span></div>
+      <div class="flux-row"><div class="flux-l"><div class="flux-n">URSSAF</div><div class="flux-d" id="p-urssaf2-lbl">—</div></div><div class="flux-v" style="color:var(--rd)" id="p-urssaf2-v">—</div></div>
+      <div class="flux-row"><div class="flux-l"><div class="flux-n">IR</div><div class="flux-d" id="p-ir2-lbl">—</div></div><div class="flux-v" style="color:var(--rd)" id="p-ir2-v">—</div></div>
+      <div class="flux-row"><div class="flux-l"><div class="flux-n">CFP</div></div><div class="flux-v" style="color:var(--rd)" id="p-cfp2-v">—</div></div>
+      <div class="flux-row"><div class="flux-l"><div class="flux-n">Taxe consulaire</div><div class="flux-d" id="p-tfcc2-lbl">—</div></div><div class="flux-v" style="color:var(--rd)" id="p-tfcc2-v">—</div></div>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(239,68,68,.1),rgba(245,158,11,.06));border:2px solid rgba(239,68,68,.3);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div>
+        <div style="font-size:.75rem;font-weight:800;color:var(--rd)">Total — Ce que l'État prend</div>
+        <div style="font-size:.63rem;color:var(--tx3);margin-top:2px" id="p-oblig-detail">URSSAF + IR + CFP + taxes</div>
+      </div>
+      <div style="font-family:var(--mn);font-size:1.4rem;font-weight:700;color:var(--rd)" id="p-oblig-total">—</div>
+    </div>
+    <div style="background:var(--bg4);border-radius:10px;overflow:hidden;border:1px solid var(--bo2)">
+      <div class="flux-row">
+        <div class="flux-l">
+          <div class="flux-n">CFE</div>
+          <div class="flux-d" id="p-cfe-lbl">—</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:5px">
+            <span style="font-size:.62rem;color:var(--tx3)">Réel/an :</span>
+            <input type="number" id="p-cfe-custom" placeholder="Saisir" style="width:76px;background:var(--bg5);border:1px solid var(--bo2);border-radius:6px;padding:4px 6px;color:var(--tx);font-family:var(--mn);font-size:.72rem;outline:none" onblur="calcPro()" onkeydown="if(event.key==='Enter'){this.blur();}">
+            <span style="font-size:.62rem;color:var(--tx3)">€ ⚠ varie selon commune</span>
+          </div>
+        </div>
+        <div class="flux-v" style="color:var(--rd)" id="p-cfe-v">—</div>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="p-charges-card" style="display:none">
+    <div class="ct"><span class="dot" style="background:var(--am)"></span>Charges pro ce mois</div>
+    <div class="al a-am" style="margin-bottom:10px"><span class="ai">☑️</span><div style="font-size:.7rem">Coche les cases correspondantes aux charges que tu as réellement ce mois, puis renseigne le montant.</div></div>
+    <div id="p-charges-list">
+      <div class="ch-item"><div class="ch-cb on" onclick="togCh(this)">✓</div><div class="ch-info"><div class="ch-n">Frais bancaires pro</div></div><input class="ch-inp" type="number" placeholder="12" onblur="calcPro()" onkeydown="if(event.key==='Enter'){this.blur();}"></div>
+      <div class="ch-item"><div class="ch-cb" onclick="togCh(this)"></div><div class="ch-info"><div class="ch-n">Assurance pro</div></div><input class="ch-inp" type="number" placeholder="80" onblur="calcPro()" onkeydown="if(event.key==='Enter'){this.blur();}"></div>
+      <div class="ch-item"><div class="ch-cb" onclick="togCh(this)"></div><div class="ch-info"><div class="ch-n">Abonnements pro</div></div><input class="ch-inp" type="number" placeholder="60" onblur="calcPro()" onkeydown="if(event.key==='Enter'){this.blur();}"></div>
+      <div class="ch-item"><div class="ch-cb" onclick="togCh(this)"></div><div class="ch-info"><div class="ch-n">Déplacements pro</div></div><input class="ch-inp" type="number" placeholder="100" onblur="calcPro()" onkeydown="if(event.key==='Enter'){this.blur();}"></div>
+      <div class="ch-item"><div class="ch-cb" onclick="togCh(this)"></div><div class="ch-info"><div class="ch-n">Sous-traitance</div></div><input class="ch-inp" type="number" placeholder="0" onblur="calcPro()" onkeydown="if(event.key==='Enter'){this.blur();}"></div>
+      <div class="ch-item"><div class="ch-cb" onclick="togCh(this)"></div><div class="ch-info"><div class="ch-n">Autres</div></div><input class="ch-inp" type="number" placeholder="0" onblur="calcPro()" onkeydown="if(event.key==='Enter'){this.blur();}"></div>
+    </div>
+  </div>
+  <div id="p-dispo-box" style="display:none">
+    <div style="border-radius:13px;padding:15px 16px;margin-bottom:11px;background:linear-gradient(135deg,rgba(6,182,212,.1),rgba(139,92,246,.06));border:2px solid rgba(6,182,212,.25);text-align:center">
+      <div style="font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--cy);margin-bottom:5px">Disponible avant virement</div>
+      <div style="font-family:var(--mn);font-size:2rem;font-weight:700;color:var(--cy);line-height:1;margin-bottom:3px" id="p-dispo-val">—</div>
+      <div style="font-size:.68rem;color:var(--tx2)" id="p-dispo-detail">CA − obligations − charges</div>
+    </div>
+  </div>
+  <div class="card" id="vir-choice" style="display:none">
+    <div class="ct"><span class="dot" style="background:var(--cy)"></span>Combien tu te verses ?</div>
+    <div style="background:var(--bg4);border-radius:10px;padding:12px 13px;margin-bottom:8px;border:1px solid rgba(6,182,212,.2)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
+        <span style="font-size:.75rem;font-weight:700;color:var(--cy)">🛡️ Minimum vital</span>
+        <span style="font-family:var(--mn);font-size:1.1rem;font-weight:700;color:var(--cy)" id="vir-min-val">—</span>
+      </div>
+      <div style="font-size:.67rem;color:var(--tx3)" id="vir-min-detail">Calculé depuis tes fixes Perso · Va dans Perso d'abord</div>
+    </div>
+    <div style="background:var(--bg4);border-radius:10px;padding:12px 13px;margin-bottom:8px;border:1px solid var(--bo2)">
+      <div style="font-size:.75rem;font-weight:700;color:var(--tx);margin-bottom:8px">✏️ Montant que tu souhaites te verser</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <input type="number" id="vir-espere" placeholder="ex: 2 500"
+          style="flex:1;background:var(--bg5);border:1px solid var(--bo2);border-radius:9px;padding:10px 12px;color:var(--tx);font-family:var(--mn);font-size:1rem;outline:none;transition:border-color .2s"
+          onblur="calcVirResult()" onkeydown="if(event.key==='Enter'){this.blur();}">
+        <span style="font-family:var(--mn);font-size:.8rem;color:var(--tx3)">€</span>
+      </div>
+      <div style="font-size:.66rem;color:var(--tx3);margin-top:5px">Laisse vide pour utiliser le minimum vital</div>
+    </div>
+    <div id="vir-result-box" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);border-radius:9px;padding:11px 13px;border:1px solid var(--bo2)">
+        <div>
+          <div style="font-size:.7rem;color:var(--tx2);font-weight:600;margin-bottom:2px">Tu te verses</div>
+          <div style="font-size:.64rem;color:var(--tx3)" id="vir-result-note">—</div>
+        </div>
+        <div style="font-family:var(--mn);font-size:1.4rem;font-weight:700;color:var(--cy)" id="vir-montant">—</div>
+      </div>
+    </div>
+  </div>
+  <div class="surplus-pro" id="surplus-pro-box" style="display:none">
+    <div class="surplus-pro-lbl">Surplus pro — alimente le rempart</div>
+    <div class="surplus-pro-val" id="surplus-pro-val">0€</div>
+    <div class="surplus-pro-desc" id="surplus-pro-desc">Ce montant reste sur ton compte pro.</div>
+  </div>
+  <div class="rempart-box" id="rempart-box" style="display:none">
+    <div class="rempart-phase" id="rempart-phase">Phase 1 — Construction</div>
+    <div class="rempart-titre" id="rempart-titre">Ton premier rempart</div>
+    <div style="margin-top:8px;background:rgba(255,255,255,.04);border-radius:9px;padding:9px 11px">
+      <div style="font-size:.66rem;color:var(--tx2);font-weight:700;margin-bottom:5px">Objectif du rempart <span style="color:var(--tx3);font-weight:400">— libre ou suggéré (2 mois de CA)</span></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="number" id="rempart-obj-input" placeholder="—" style="width:100px;background:var(--bg5);border:1px solid var(--bo2);border-radius:7px;padding:6px 9px;color:var(--cy);font-family:var(--mn);font-size:.85rem;outline:none;text-align:right" onblur="setRempartObj()" onkeydown="if(event.key==='Enter'){this.blur()}">
+        <span style="font-family:var(--mn);font-size:.78rem;color:var(--tx3)">€</span>
+        <button onclick="resetRempartObj()" style="background:var(--cyg);border:1px solid rgba(6,182,212,.2);border-radius:7px;padding:5px 8px;color:var(--cy);font-size:.63rem;font-weight:700;cursor:pointer">↺ Suggéré</button>
+      </div>
+      <div style="font-size:.6rem;color:#8899AA;margin-top:4px" id="rempart-obj-sugg-lbl">Suggestion : —</div>
+    </div>
+    <div class="rempart-jauge-wrap" style="margin-top:10px">
+      <div class="rempart-jauge-top">
+        <span class="rempart-jauge-lbl">Trésorerie pro</span>
+        <span class="rempart-jauge-val"><span id="rempart-cur">0€</span> / <span id="rempart-obj">—</span></span>
+      </div>
+      <div class="rempart-track"><div class="rempart-fill" id="rempart-fill" style="width:0%"></div></div>
+      <div class="rempart-eta" id="rempart-eta">—</div>
+    </div>
+    <div class="rempart-stats" style="margin-top:10px">
+      <div class="rempart-stat"><div class="rempart-stat-l">Surplus ce mois</div><div class="rempart-stat-v" id="rempart-surplus-v" style="color:var(--gr)">—</div></div>
+      <div class="rempart-stat"><div class="rempart-stat-l">Atteinte dans</div><div class="rempart-stat-v" id="rempart-delai" style="color:var(--cy)">—</div></div>
+    </div>
+    <div id="rempart-augmentation" style="display:none;margin-top:10px;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);border-radius:9px;padding:9px 12px">
+      <div style="font-size:.7rem;color:var(--gr);font-weight:700" id="rempart-aug-txt">—</div>
+      <div style="font-size:.63rem;color:var(--tx3);margin-top:2px" id="rempart-solde-estime">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PERSO ═══ -->
+<div id="pg-perso" class="pg">
+  <div class="pg-intro">Saisis tes dépenses. <strong>Le minimum vital</strong> (tes fixes) alimente le calcul du virement recommandé dans Pro. Ici tu vois ce qu'il te reste réellement.</div>
+  <div class="st">Compte perso</div><div class="ss">Ce qui arrive · Ce qui part · Ce qu'il reste.</div>
+  <div class="card">
+    <div class="ct"><span class="dot" style="background:var(--rd)"></span>Dépenses fixes — le minimum vital</div>
+    <div class="al a-am" style="margin-bottom:10px"><span class="ai">🔒</span><div style="font-size:.71rem">Ces montants définissent aussi le <strong>virement minimum</strong> recommandé dans l'onglet Pro.</div></div>
+    <div class="ir">
+      <div class="ig"><div class="il">Loyer / crédit</div><input class="if" type="number" id="pp-loyer" placeholder="700" onblur="dCalcPerso()" onkeydown="if(event.key==='Enter'){this.blur();}"></div>
+      <div class="ig"><div class="il">Énergie / internet</div><input class="if" type="number" id="pp-ener" placeholder="120" onblur="dCalcPerso()" onkeydown="if(event.key==='Enter'){this.blur();}"></div>
+    </div>
+    <div class="ir">
+      <div class="ig"><div class="il">Assurances perso</div><input class="if" type="number" id="pp-ass" placeholder="80" onblur="dCalcPerso()" onkeydown="if(event.key==='Enter'){this.blur();}"></div>
+      <div class="ig"><div class="il">Prêts mensuels</div><input class="if" type="number" id="pp-pret" placeholder="300" onblur="dCalcPerso()" onkeydown="if(event.key==='Enter'){this.blur();}"></div>
+    </div>
+    <div class="ir">
+      <div class="ig"><div class="il">Abonnements</div><input class="if" type="number" id="pp-abo" placeholder="50" onblur="dCalcPerso()" onkeydown="if(event.key==='Enter'){this.blur();}"></div>
+      <div class="ig"><div class="il">Transport</div><input class="if" type="number" id="pp-transp" placeholder="100" onblur="dCalcPerso()" onkeydown="if(event.key==='Enter'){this.blur();}"></div>
+    </div>
+    <div class="div"></div>
+    <div class="ct" style="margin-bottom:8px"><span class="dot" style="background:var(--am)"></span>Dépenses variables</div>
+    <div class="ig"><div class="il">Alimentation, sorties, divers</div><input class="if" type="number" id="pp-var" placeholder="500" onblur="dCalcPerso()" onkeydown="if(event.key==='Enter'){this.blur();}"></div>
+    <div class="ig"><div class="il">Impôts prélevés ce mois <span>IR source, taxe foncière</span></div><input class="if" type="number" id="pp-impot" placeholder="0" onblur="dCalcPerso()" onkeydown="if(event.key==='Enter'){this.blur();}"></div>
+    <div class="div"></div>
+    <div class="ct" style="margin-bottom:6px"><span class="dot" style="background:var(--vi)"></span>Mensualités épargne & placement</div>
+    <div class="ir">
+      <div class="ig"><div class="il">Épargne <span>ce mois</span></div><input class="if" type="number" id="pp-epargne-res" placeholder="0" readonly style="background:var(--bg5);color:var(--tx2);cursor:not-allowed"></div>
+      <div class="ig"><div class="il">Placement <span>ce mois</span></div><input class="if" type="number" id="pp-epargne-inv" placeholder="0" readonly style="background:var(--bg5);color:var(--tx2);cursor:not-allowed"></div>
+    </div>
+    <div style="font-size:.63rem;color:#8899AA;line-height:1.5;margin-top:-2px">↓ Se remplit automatiquement une fois les virements récurrents renseignés dans l'onglet <strong style="color:var(--vi)">Réserves</strong>.</div>
+  </div>
+  <div id="pp-besoins-box" style="display:none;border-radius:12px;padding:14px 15px;margin-bottom:11px;background:linear-gradient(135deg,rgba(239,68,68,.1),rgba(245,158,11,.07));border:2px solid rgba(239,68,68,.3);">
+    <div style="font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--rd);margin-bottom:5px">Tes besoins ce mois</div>
+    <div style="font-family:var(--mn);font-size:1.85rem;font-weight:700;color:var(--rd);line-height:1;margin-bottom:3px" id="pp-total-besoins">—</div>
+    <div style="font-size:.69rem;color:var(--tx2)" id="pp-total-besoins-d">fixes + variables + impôts + épargne</div>
+  </div>
+  <div class="card">
+    <div class="ct"><span class="dot" style="background:var(--cy)"></span>Virement reçu</div>
+    <div class="ig"><div class="il">Montant reçu ce mois</div>
+      <input class="if if-lg" type="number" id="pp-recu" placeholder="Saisir..." onblur="dCalcPerso()" onkeydown="if(event.key==='Enter'){this.blur();}">
+      <div style="font-size:.67rem;color:var(--cy);margin-top:5px;font-family:var(--mn)" id="pp-autofill-lbl"></div></div>
+  </div>
+  <div id="pp-result" style="display:none">
+    <div class="surplus-perso" id="surplus-perso-box">
+      <div class="surplus-perso-lbl">Ton surplus ce mois</div>
+      <div class="surplus-perso-val" id="pp-reste">0€</div>
+      <div class="surplus-perso-desc" id="pp-reste-desc">—</div>
+    </div>
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--tx3)"></span>Détail</div>
+      <div class="rb"><div class="rb-l"><div class="rb-n">Reçu</div></div><div class="rb-v" style="color:var(--gr)" id="pp-r-recu">0€</div></div>
+      <div class="rb"><div class="rb-l"><div class="rb-n">Fixes</div><div class="rb-d" id="pp-r-fixes-d">—</div></div><div class="rb-v" style="color:var(--rd)" id="pp-r-fixes">0€</div></div>
+      <div class="rb"><div class="rb-l"><div class="rb-n">Variables + impôts</div></div><div class="rb-v" style="color:var(--rd)" id="pp-r-var">0€</div></div>
+      <div class="rb" id="pp-r-epar-row" style="display:none"><div class="rb-l"><div class="rb-n">Épargne &amp; Placement</div><div class="rb-d">mensualités engagées ce mois</div></div><div class="rb-v" style="color:var(--vi)" id="pp-r-epar">0€</div></div>
+      <div style="height:1px;background:var(--am);opacity:.3;margin:7px 0"></div>
+      <div class="rb"><div class="rb-l"><div class="rb-n" style="color:var(--am)">→ Surplus à répartir</div></div><div class="rb-v" style="color:var(--am);font-size:1.05rem" id="pp-r-reste2">0€</div></div>
+    </div>
+    <div id="pp-conseil" style="display:none" class="al a-cy"><span class="ai">💡</span><div id="pp-conseil-txt"></div></div>
+  </div>
+</div>
+
+<!-- ═══ RÉSERVES ═══ -->
+<div id="pg-reserves" class="pg">
+  <div class="pg-intro">Tu as un surplus de <strong id="res-surplus-lbl">0€</strong> à répartir. Renseigne d'abord tes comptes, épargnes et investissements — la vue globale et tes remparts arrivent en bas de page.</div>
+  <div class="st">Ce que tu as · Ce que tu prévois</div>
+  <div class="ss">Réserves constituées · Épargne · Investissement.</div>
+  <div class="al a-am" id="res-urgent" style="display:none"><span class="ai">⚡</span><div id="res-urgent-txt"></div></div>
+  <div id="res-rep-card" style="display:none">
+    <div class="card"><div class="ct"><span class="dot" style="background:var(--am)"></span>Suggestion de répartition — <span id="res-surplus-lbl2" style="color:var(--am)">0€</span></div><div id="res-rep-items"></div></div>
+  </div>
+  <div class="mc m-li">
+    <div style="margin-bottom:10px">
+      <div class="mn2" style="color:var(--vi)">📊 Livrets réglementés</div>
+      <div class="mr2" style="margin-top:3px">Dans l'ordre — taux susceptibles d'évoluer</div>
+    </div>
+    <div style="background:rgba(255,255,255,.03);border-radius:9px;padding:9px 12px;margin-bottom:10px;border:1px solid var(--bo2)">
+      <div style="font-size:.65rem;font-weight:700;color:var(--tx2);margin-bottom:8px">Taux actuels <span style="color:var(--tx3);font-weight:400">— modifiables si changement</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div style="text-align:center">
+          <div style="font-size:.6rem;color:var(--tx3);margin-bottom:3px">⭐ LEP</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:2px">
+            <input type="number" id="taux-lep" value="2.5" step="0.1" min="0" max="10"
+              style="width:58px;background:var(--bg5);border:1px solid var(--bo2);border-radius:6px;padding:4px 6px;color:var(--am);font-family:var(--mn);font-size:.78rem;outline:none;text-align:center"
+              onblur="updTaux()" onkeydown="if(event.key==='Enter'){this.blur()}">
+            <span style="font-size:.65rem;color:var(--tx3)">%</span>
+          </div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:.6rem;color:var(--tx3);margin-bottom:3px">💧 Livret A</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:2px">
+            <input type="number" id="taux-la" value="1.5" step="0.1" min="0" max="10"
+              style="width:58px;background:var(--bg5);border:1px solid var(--bo2);border-radius:6px;padding:4px 6px;color:var(--cy);font-family:var(--mn);font-size:.78rem;outline:none;text-align:center"
+              onblur="updTaux()" onkeydown="if(event.key==='Enter'){this.blur()}">
+            <span style="font-size:.65rem;color:var(--tx3)">%</span>
+          </div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:.6rem;color:var(--tx3);margin-bottom:3px">🌿 LDDS</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:2px">
+            <input type="number" id="taux-ldds" value="1.5" step="0.1" min="0" max="10"
+              style="width:58px;background:var(--bg5);border:1px solid var(--bo2);border-radius:6px;padding:4px 6px;color:var(--gr);font-family:var(--mn);font-size:.78rem;outline:none;text-align:center"
+              onblur="updTaux()" onkeydown="if(event.key==='Enter'){this.blur()}">
+            <span style="font-size:.65rem;color:var(--tx3)">%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="liv-bloc">
+      <div class="liv-hdr"><div class="liv-name">⭐ LEP</div><div class="liv-taux" style="color:var(--am)">2,5% net</div></div>
+      <div class="liv-row"><span class="liv-lbl">Solde actuel</span><input class="liv-inp" type="number" id="sol-lep" placeholder="0" onblur="dUpdLivrets()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€</span></div>
+      <div class="liv-row"><span class="liv-lbl">Virement mensuel</span><input class="liv-inp" type="number" id="v-lep" placeholder="0" onblur="dUpdLivrets()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€/mois</span></div>
+      <div id="lep-status"></div>
+    </div>
+    <div class="liv-bloc">
+      <div class="liv-hdr"><div class="liv-name">💧 Livret A</div><div class="liv-taux" style="color:var(--cy)">1,5% net</div></div>
+      <div class="liv-row"><span class="liv-lbl">Solde actuel</span><input class="liv-inp" type="number" id="sol-la" placeholder="0" onblur="dUpdLivrets()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€</span></div>
+      <div class="liv-row"><span class="liv-lbl">Virement mensuel</span><input class="liv-inp" type="number" id="v-la" placeholder="0" onblur="dUpdLivrets()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€/mois</span></div>
+      <div id="la-status"></div>
+    </div>
+    <div class="liv-bloc">
+      <div class="liv-hdr"><div class="liv-name">🌿 LDDS</div><div class="liv-taux" style="color:var(--gr)">1,5% net</div></div>
+      <div class="liv-row"><span class="liv-lbl">Solde actuel</span><input class="liv-inp" type="number" id="sol-ldds" placeholder="0" onblur="dUpdLivrets()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€</span></div>
+      <div class="liv-row"><span class="liv-lbl">Virement mensuel</span><input class="liv-inp" type="number" id="v-ldds" placeholder="0" onblur="dUpdLivrets()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€/mois</span></div>
+      <div id="ldds-status"></div>
+    </div>
+    <div class="rb" style="margin-top:4px"><div class="rb-l"><div class="rb-n">Total livrets</div></div><div class="rb-v" style="color:var(--vi)" id="liv-total">0€</div></div>
+    <div class="rb"><div class="rb-l"><div class="rb-n">Intérêts annuels</div></div><div class="rb-v" style="color:var(--gr)" id="liv-interets">+0€/an</div></div>
+  </div>
+  <div class="mc m-in">
+    <div style="margin-bottom:10px"><div class="mn2" style="color:var(--cy)">📈 Investissement long terme</div><div class="mr2" style="margin-top:3px">Après les réserves constituées</div></div>
+    <div class="inv-bloc">
+      <div class="inv-hdr"><div class="inv-name">Actions — PEA</div><div class="inv-taux" style="color:var(--gr)">~7%/an · Exonéré après 5 ans</div></div>
+      <div class="inv-desc">Plan d'Épargne en Actions · Plafond 150 000€ · <strong>Ouvrir avec 1€ maintenant</strong> · Rendement historique — années négatives possibles</div>
+      <div class="inv-row"><span class="inv-lbl">Solde actuel</span><input class="inv-inp" type="number" id="inv-pea-sol" placeholder="0" onblur="dUpdRes()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€</span></div>
+      <div class="inv-row"><span class="inv-lbl">Virement mensuel</span><input class="inv-inp" type="number" id="inv-pea-v" placeholder="0" onblur="dUpdRes()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€/mois</span></div>
+      <div id="pea-plafond-status"></div>
+    </div>
+    <div class="inv-bloc">
+      <div class="inv-hdr"><div class="inv-name">Compte-titres / Assurance-vie / Retraite</div><div class="inv-taux" style="color:var(--am)">Long terme</div></div>
+      <div class="inv-desc">Compte-Titres Ordinaire (CTO) sans plafond · Assurance-vie avec avantage successoral · Plan d'Épargne Retraite (PER) si imposition élevée</div>
+      <div class="inv-row"><span class="inv-lbl">Solde total</span><input class="inv-inp" type="number" id="inv-autre-sol" placeholder="0" onblur="dUpdRes()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€</span></div>
+      <div class="inv-row"><span class="inv-lbl">Virement mensuel</span><input class="inv-inp" type="number" id="inv-autre-v" placeholder="0" onblur="dUpdRes()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€/mois</span></div>
+    </div>
+  </div>
+
+  <!-- VUE GLOBALE — synthèse patrimoniale actuelle (non projetée) -->
+  <div style="font-size:.62rem;font-weight:700;color:#8899AA;text-transform:uppercase;letter-spacing:1.5px;padding:14px 0 6px;border-top:1px solid rgba(255,255,255,.06);margin-top:6px">Vue globale — ce que tu as aujourd'hui</div>
+  <div class="card" style="border:1px solid rgba(6,182,212,.2);background:linear-gradient(135deg,rgba(6,182,212,.05),rgba(139,92,246,.03))">
+    <div class="ct"><span class="dot" style="background:var(--cy)"></span>Tes réserves — compte rattaché &amp; objectif</div>
+    <div id="vue-globale-reserves"></div>
+    <div style="height:1px;background:var(--bo2);margin:10px 0"></div>
+    <div class="ct" style="margin-bottom:8px"><span class="dot" style="background:var(--vi)"></span>Épargne &amp; investissement libre <span style="font-size:.6rem;font-weight:400;color:#8899AA;margin-left:4px;text-transform:none;letter-spacing:0">non affecté à une réserve</span></div>
+    <div id="vue-globale-libre"></div>
+    <div style="height:1px;background:rgba(6,182,212,.2);margin:10px 0"></div>
+    <div class="rb" style="background:rgba(6,182,212,.08);border-color:rgba(6,182,212,.25)">
+      <div class="rb-l"><div class="rb-n" style="color:var(--cy)">Total patrimoine actuel</div><div class="rb-d">Réserves + épargne/invest libre — sans double comptage</div></div>
+      <div class="rb-v" style="color:var(--cy);font-size:1.1rem" id="vue-globale-total">0€</div>
+    </div>
+  </div>
+
+  <div style="font-size:.62rem;font-weight:700;color:#8899AA;text-transform:uppercase;letter-spacing:1.5px;padding:10px 0 6px">Tes 3 remparts</div>
+  <div class="mc m-tp">
+    <div class="mh">
+      <div><div class="mn2" style="color:var(--cy)">🏦 Rempart — Trésorerie PRO</div><div class="mr2">1er rempart · Croît via le surplus pro validé chaque mois</div></div>
+      <div class="ma">
+        <div class="sol-wrap"><button class="sol-btn" style="color:var(--cy)" id="tp-cur" onclick="startEdit('tp')">0€</button><input class="sol-inp" type="number" id="tp-inp" onblur="commitEdit('tp')" onkeydown="if(event.key==='Enter')commitEdit('tp')"></div>
+        <div class="mt2">/ <span id="tp-obj-lbl">—</span></div>
+      </div>
+    </div>
+    <div class="pb2"><div class="pf" id="tp-bar" style="width:0%;background:linear-gradient(90deg,var(--cy),var(--vi))"></div></div>
+    <div class="pi"><span id="tp-pct">0%</span><span id="tp-eta">—</span></div>
+    <div style="margin-top:10px;background:rgba(255,255,255,.03);border-radius:9px;padding:10px 12px">
+      <div style="font-size:.67rem;color:var(--tx2);font-weight:700;margin-bottom:6px">Où est logé ce rempart ?</div>
+      <select class="sel" id="tp-cpt" style="font-size:.76rem;padding:7px 10px;margin-bottom:4px" onchange="onChangeCpt('tp')"></select>
+      <div style="font-size:.62rem;color:#8899AA">Par défaut : compte pro renseigné dans l'onglet Pro. Change-le si ton rempart est logé sur un autre compte (ex : compte courant dédié).</div>
+      <div id="tp-solde-manual" style="display:none;margin-top:8px">
+        <div style="font-size:.66rem;color:var(--tx2);margin-bottom:5px">Montant déjà de côté sur ce compte</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input class="vi2" type="number" id="tp-solde" style="width:110px" placeholder="0" onblur="commitSolde('tp',this.value)" onkeydown="if(event.key==='Enter'){this.blur();}">
+          <span class="vu">€</span>
+        </div>
+      </div>
+    </div>
+    <div class="vr" style="margin-top:10px"><span class="vl">Surplus pro ce mois</span><span style="font-family:var(--mn);font-size:.9rem;font-weight:600;color:var(--gr)" id="tp-surplus-lbl">+0€</span></div>
+    <div style="margin-top:10px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:11px 13px" id="tp-validation-zone">
+      <div style="font-size:.72rem;font-weight:700;color:var(--gr);margin-bottom:5px" id="tp-validation-titre">✅ Valider l'ajout de ce mois</div>
+      <div style="font-size:.66rem;color:#8899AA;margin-bottom:8px;line-height:1.5" id="tp-validation-desc">Confirme que le surplus pro du mois a bien été conservé sur le compte choisi ci-dessus. Le rempart augmente d'autant. Si ton virement n'était pas le bon, ajuste-le plutôt.</div>
+      <div style="display:flex;gap:7px">
+        <button onclick="validerSurplusPro()" id="tp-validation-btn" style="flex:1;padding:9px 6px;border-radius:8px;border:none;background:linear-gradient(135deg,var(--gr),#059669);color:#0A0E1A;font-family:'Syne',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer">+ Ajouter <span id="tp-btn-surplus">0€</span></button>
+        <button onclick="gotoChangerVirement()" style="flex:1;padding:9px 6px;border-radius:8px;border:1px solid rgba(6,182,212,.3);background:var(--cyg);color:var(--cy);font-family:'Syne',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer">✏️ Changer mon virement</button>
+      </div>
+      <div style="font-size:.63rem;color:#8899AA;margin-top:8px;line-height:1.5">
+        💡 Le rempart pro c'est d'abord ton <strong style="color:var(--tx)">filet de sécurité</strong> — puis un <strong style="color:var(--cy)">levier financier</strong> une fois constitué. À 2-3 mois de CA, tu peux envisager placements, investissements ou augmentation de ton virement perso.
+      </div>
+    </div>
+  </div>
+  <div class="mc m-ex">
+    <div class="mh">
+      <div><div class="mn2" style="color:var(--am)">🎯 Réserve Imprévus</div><div class="mr2">2e rempart · Se dépense et se reconstitue</div></div>
+      <div class="ma">
+        <div class="sol-wrap"><button class="sol-btn" style="color:var(--am)" id="ext-cur" onclick="startEdit('ext')">0€</button><input class="sol-inp" type="number" id="ext-inp" onblur="commitEdit('ext')" onkeydown="if(event.key==='Enter')commitEdit('ext')"></div>
+        <div class="mt2">/ <span id="ext-tar">1 500€</span></div>
+      </div>
+    </div>
+    <div class="pb2"><div class="pf" id="ext-bar" style="width:0%;background:var(--am)"></div></div>
+    <div class="pi"><span id="ext-pct">0%</span><span id="ext-eta">—</span></div>
+    <div id="ext-full-msg" style="display:none" class="al a-gr"><span class="ai">✅</span><div>Réserve constituée — maintiens ce niveau.</div></div>
+    <div style="margin-top:10px;background:rgba(255,255,255,.03);border-radius:9px;padding:10px 12px">
+      <div style="font-size:.67rem;color:var(--tx2);font-weight:700;margin-bottom:6px">Où est logée cette réserve ?</div>
+      <select class="sel" id="ext-cpt" style="font-size:.76rem;padding:7px 10px;margin-bottom:8px" onchange="onChangeCpt('ext')"></select>
+      <div id="ext-solde-manual" style="display:none">
+        <div style="font-size:.66rem;color:var(--tx2);margin-bottom:5px">Montant déjà de côté sur ce compte</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input class="vi2" type="number" id="ext-solde" style="width:110px" placeholder="0"
+            onblur="commitSolde('ext',this.value)"
+            onkeydown="if(event.key==='Enter'){this.blur();}">
+          <span class="vu">€</span>
+        </div>
+      </div>
+      <div id="ext-solde-auto" style="display:none">
+        <div class="al a-cy" style="margin-bottom:0;font-size:.69rem">
+          <span class="ai">↓</span>
+          <div>Repris automatiquement depuis Livrets · <strong>Renseigne le solde dans "Livrets réglementés" ci-dessus</strong><br>Solde actuel : <strong id="ext-solde-auto-val">—</strong></div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:9px;background:rgba(255,255,255,.03);border-radius:9px;padding:9px 11px">
+      <div style="font-size:.67rem;color:var(--tx2);font-weight:700;margin-bottom:6px">Objectif <span style="color:var(--tx3);font-weight:400">— libre ou suggéré</span></div>
+      <div class="al a-cy" style="margin-bottom:7px;font-size:.68rem"><span class="ai">💡</span><div>Pour commencer : même 300-500€ stabilisent. Augmente progressivement selon ta pression financière.</div></div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+        <input class="vi2" type="number" id="ext-obj" style="width:98px" placeholder="1500" oninput="updExtObj()" onblur="updExtObj()">
+        <span class="vu">€</span>
+        <button onclick="resetObj('ext')" style="background:var(--cyg);border:1px solid rgba(6,182,212,.2);border-radius:7px;padding:5px 8px;color:var(--cy);font-size:.65rem;font-weight:700;cursor:pointer">↺ Suggéré</button>
+      </div>
+      <div style="font-size:.62rem;color:var(--tx3)" id="ext-sugg-lbl">Suggestion : —</div>
+    </div>
+    <div class="vr" id="ext-vr-manuel"><span class="vl">Virement récurrent</span><input class="vi2" type="number" id="v-ext" value="50" onblur="dUpdRes()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€/mois</span></div>
+    <div id="ext-vr-livret" style="display:none;font-size:.65rem;color:#8899AA;line-height:1.5;background:rgba(255,255,255,.03);border-radius:8px;padding:8px 10px">↓ Le virement de cette réserve est piloté par le virement mensuel du livret choisi ci-dessus (<strong style="color:var(--am)" id="ext-vr-livret-val">—</strong>).</div>
+  </div>
+  <div class="mc m-pe">
+    <div class="mh">
+      <div><div class="mn2" style="color:var(--gr)">🏠 Réserve Perso</div><div class="mr2">3e rempart · Loyer, énergie, assurances, prêts</div></div>
+      <div class="ma">
+        <div style="font-family:var(--mn);font-size:.95rem;font-weight:600;color:var(--gr)" id="per-cur">0€</div>
+        <div class="mt2">/ <span id="per-tar">6 000€</span></div>
+      </div>
+    </div>
+    <div class="pb2"><div class="pf" id="per-bar" style="width:0%;background:var(--gr)"></div></div>
+    <div class="pi"><span id="per-pct">0%</span><span id="per-eta">—</span></div>
+    <div id="per-full-msg" style="display:none" class="al a-gr"><span class="ai">✅</span><div id="per-full-txt">Réserve constituée.</div></div>
+    <div style="margin-top:10px;background:rgba(255,255,255,.03);border-radius:9px;padding:10px 12px">
+      <div style="font-size:.67rem;color:var(--tx2);font-weight:700;margin-bottom:6px">Où est logée cette réserve ?</div>
+      <select class="sel" id="per-cpt" style="font-size:.76rem;padding:7px 10px;margin-bottom:8px" onchange="onChangeCpt('per')"></select>
+      <div id="per-solde-manual" style="display:none">
+        <div style="font-size:.66rem;color:var(--tx2);margin-bottom:5px">Montant déjà de côté sur ce compte</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input class="vi2" type="number" id="per-solde" style="width:110px" placeholder="0"
+            onblur="commitSolde('per',this.value)"
+            onkeydown="if(event.key==='Enter'){this.blur();}">
+          <span class="vu">€</span>
+        </div>
+      </div>
+      <div id="per-solde-auto" style="display:none">
+        <div class="al a-cy" style="margin-bottom:0;font-size:.69rem">
+          <span class="ai">↓</span>
+          <div>Repris automatiquement depuis Livrets · <strong>Renseigne le solde dans "Livrets réglementés" ci-dessus</strong><br>Solde actuel : <strong id="per-solde-auto-val">—</strong></div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:9px;background:rgba(255,255,255,.03);border-radius:9px;padding:9px 11px">
+      <div style="font-size:.67rem;color:var(--tx2);font-weight:700;margin-bottom:6px">Objectif <span style="color:var(--tx3);font-weight:400">— libre ou suggéré</span></div>
+      <div class="al a-am" style="margin-bottom:7px;font-size:.68rem"><span class="ai">📈</span><div>Chaque palier = <strong>tes dépenses fixes mensuelles</strong> (Perso) multipliées par 1, 3 ou 6 mois. Commence par 1 mois, puis monte progressivement à 6.</div></div>
+      <div style="font-size:.62rem;color:#8899AA;margin-bottom:6px" id="pal-fixes-lbl">Tes fixes mensuelles : —</div>
+      <div style="display:flex;gap:5px;margin-bottom:7px">
+        <button onclick="setPerPalier(1)" style="flex:1;padding:6px 4px;border-radius:7px;border:1px solid var(--bo2);background:var(--bg4);color:var(--tx3);font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;cursor:pointer" id="pal-1">1 mois<br><span style="font-size:.58rem;font-weight:400" id="pal-1-v"></span></button>
+        <button onclick="setPerPalier(3)" style="flex:1;padding:6px 4px;border-radius:7px;border:1px solid var(--bo2);background:var(--bg4);color:var(--tx3);font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;cursor:pointer" id="pal-3">3 mois<br><span style="font-size:.58rem;font-weight:400" id="pal-3-v"></span></button>
+        <button onclick="setPerPalier(6)" style="flex:1;padding:6px 4px;border-radius:7px;border:1px solid rgba(16,185,129,.4);background:var(--grg);color:var(--gr);font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;cursor:pointer" id="pal-6">6 mois ✓<br><span style="font-size:.58rem;font-weight:400" id="pal-6-v"></span></button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+        <input class="vi2" type="number" id="per-obj" style="width:98px" placeholder="6000" oninput="updPerObj()" onblur="updPerObj()">
+        <span class="vu">€</span>
+        <button onclick="resetObj('per')" style="background:var(--grg);border:1px solid rgba(16,185,129,.2);border-radius:7px;padding:5px 8px;color:var(--gr);font-size:.65rem;font-weight:700;cursor:pointer">↺ Suggéré</button>
+      </div>
+      <div style="font-size:.62rem;color:#8899AA" id="per-sugg-lbl">Suggestion : —</div>
+      <div id="per-depassement-lbl" style="display:none;margin-top:6px;font-size:.65rem;color:var(--am);line-height:1.5;background:var(--amg);border:1px solid rgba(245,158,11,.2);border-radius:7px;padding:6px 9px"></div>
+    </div>
+    <div class="vr" id="per-vr-manuel"><span class="vl">Virement récurrent</span><input class="vi2" type="number" id="v-per" value="100" onblur="dUpdRes()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€/mois</span></div>
+    <div id="per-vr-livret" style="display:none;font-size:.65rem;color:#8899AA;line-height:1.5;background:rgba(255,255,255,.03);border-radius:8px;padding:8px 10px">↓ Le virement de cette réserve est piloté par le virement mensuel du livret choisi ci-dessus (<strong style="color:var(--gr)" id="per-vr-livret-val">—</strong>).</div>
+  </div>
+
+  <div class="card">
+    <div class="ct"><span class="dot" style="background:var(--cy)"></span>Les 3 remparts — rappel</div>
+    <div class="rg"><div class="rgt">1er — Trésorerie pro</div><div class="rgd">Se constitue via le surplus pro validé chaque mois. Objectif : 2-3 mois de CA. Tant qu'il n'est pas atteint, verse-toi le minimum.</div></div>
+    <div class="rg" style="border-color:var(--am)"><div class="rgt" style="color:var(--am)">2e — Réserve Imprévus</div><div class="rgd">Absorbe les chocs perso sans toucher au pro. 1-2 mois de fixes. Se reconstitue après chaque utilisation.</div></div>
+    <div class="rg" style="border-color:var(--gr)"><div class="rgt" style="color:var(--gr)">3e — Réserve Perso</div><div class="rgd">6 mois de fixes. Une fois constituée, tu peux augmenter ton virement et commencer à investir.</div></div>
+  </div>
+</div>
+
+<!-- ═══ PROJECTIONS ═══ -->
+<div id="pg-proj" class="pg">
+  <div class="pg-intro">Simulateur de patrimoine. <strong>Rendements = moyennes historiques</strong> — les marchés peuvent baisser durablement. Ces projections sont indicatives.</div>
+  <div class="st">Projections & simulation</div>
+  <div class="ss">Patrimoine dans le temps · Courbes par enveloppe · Taux personnalisables.</div>
+  <div class="ptabs">
+    <button class="ptab on" onclick="showProj('epargne',this)">💰 Épargne garantie</button>
+    <button class="ptab" onclick="showProj('invest',this)">📈 Investissement</button>
+    <button class="ptab" onclick="showProj('total',this)">🏆 Patrimoine global</button>
+    <button class="ptab" onclick="showProj('simul',this)">🧮 Simulateur</button>
+  </div>
+
+  <!-- PATRIMOINE GLOBAL -->
+  <div id="proj-total" style="display:none">
+    <div class="patrim">
+      <div class="patrim-l">Patrimoine total</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">
+        <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px;text-align:center;cursor:pointer" onclick="setHorizon(10)">
+          <div style="font-size:.58rem;color:var(--tx3);margin-bottom:4px">Dans 10 ans</div>
+          <div style="font-family:var(--mn);font-size:1rem;font-weight:700;color:var(--cy)" id="patrim-10">—</div>
+        </div>
+        <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px;text-align:center;cursor:pointer" onclick="setHorizon(20)">
+          <div style="font-size:.58rem;color:var(--tx3);margin-bottom:4px">Dans 20 ans</div>
+          <div style="font-family:var(--mn);font-size:1rem;font-weight:700;color:var(--vi)" id="patrim-20-sm">—</div>
+        </div>
+        <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px;text-align:center;cursor:pointer" onclick="setHorizon(30)">
+          <div style="font-size:.58rem;color:var(--tx3);margin-bottom:4px">Dans 30 ans</div>
+          <div style="font-family:var(--mn);font-size:1rem;font-weight:700;color:var(--gr)" id="patrim-30">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--am)"></span>Tes 3 remparts dans la projection</div>
+      <div style="font-size:.68rem;color:#8899AA;margin-bottom:8px;line-height:1.5">Choisis comment Rempart/Imprévus/Perso apparaissent dans le calcul ci-dessous.</div>
+      <div style="display:flex;gap:6px">
+        <button class="scen-btn on" onclick="setModeReserveProj('actuel')" id="mode-rsv-actuel">Niveau actuel</button>
+        <button class="scen-btn" onclick="setModeReserveProj('objectif')" id="mode-rsv-objectif">Objectifs atteints</button>
+      </div>
+    </div>
+    <div class="card"><div class="ct"><span class="dot" style="background:var(--gr)"></span>Décomposition — horizon <span id="patrim-horizon-lbl" style="color:var(--cy)">20</span> ans</div><div id="patrim-detail"></div></div>
+    <div class="card"><div class="ct"><span class="dot" style="background:var(--cy)"></span>Vue consolidée</div><canvas id="chartTotal" height="115"></canvas></div>
+  </div>
+
+  <!-- INVESTISSEMENT -->
+  <div id="proj-invest" style="display:none">
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--cy)"></span>Taux par enveloppe <span style="font-size:.6rem;font-weight:400;color:var(--tx3);margin-left:4px;text-transform:none;letter-spacing:0">modifiables</span></div>
+      <div class="al a-am" style="margin-bottom:10px"><span class="ai">ℹ️</span><div style="font-size:.7rem">Ces 4 enveloppes peuvent toutes investir en ETF — même rendement brut potentiel, fiscalité différente à la sortie. L'assurance-vie en fonds euros est la seule à capital garanti, donc rendement plus faible.</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:var(--bg4);border-radius:9px;padding:10px 11px">
+          <div style="font-size:.65rem;font-weight:700;color:var(--vi);margin-bottom:6px">Actions (PEA) <span style="color:var(--tx3);font-weight:400">Exonéré impôt après 5 ans</span></div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input type="number" id="taux-pea" value="7" step="0.5" min="0" max="20" style="width:62px;background:var(--bg5);border:1px solid var(--bo2);border-radius:6px;padding:5px 7px;color:var(--vi);font-family:var(--mn);font-size:.82rem;outline:none;text-align:center" onblur="calcAllProj()" onkeydown="if(event.key==='Enter'){this.blur()}">
+            <span style="font-size:.7rem;color:var(--tx3)">%/an · ETF monde</span>
+          </div>
+        </div>
+        <div style="background:var(--bg4);border-radius:9px;padding:10px 11px">
+          <div style="font-size:.65rem;font-weight:700;color:var(--am);margin-bottom:6px">Compte-titres (CTO) <span style="color:var(--tx3);font-weight:400">Imposé 30%</span></div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input type="number" id="taux-cto" value="7" step="0.5" min="0" max="20" style="width:62px;background:var(--bg5);border:1px solid var(--bo2);border-radius:6px;padding:5px 7px;color:var(--am);font-family:var(--mn);font-size:.82rem;outline:none;text-align:center" onblur="calcAllProj()" onkeydown="if(event.key==='Enter'){this.blur()}">
+            <span style="font-size:.7rem;color:var(--tx3)">%/an · ETF monde</span>
+          </div>
+        </div>
+        <div style="background:var(--bg4);border-radius:9px;padding:10px 11px">
+          <div style="font-size:.65rem;font-weight:700;color:var(--cy);margin-bottom:6px">Assurance-vie sécurisée <span style="color:var(--tx3);font-weight:400">Capital garanti</span></div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input type="number" id="taux-av-euros" value="2.5" step="0.5" min="0" max="10" style="width:62px;background:var(--bg5);border:1px solid var(--bo2);border-radius:6px;padding:5px 7px;color:var(--cy);font-family:var(--mn);font-size:.82rem;outline:none;text-align:center" onblur="calcAllProj()" onkeydown="if(event.key==='Enter'){this.blur()}">
+            <span style="font-size:.7rem;color:var(--tx3)">%/an · garanti</span>
+          </div>
+        </div>
+        <div style="background:var(--bg4);border-radius:9px;padding:10px 11px">
+          <div style="font-size:.65rem;font-weight:700;color:var(--gr);margin-bottom:6px">Ass.-vie dynamique / Retraite <span style="color:var(--tx3);font-weight:400">Risque en capital</span></div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input type="number" id="taux-av-uc" value="6" step="0.5" min="0" max="20" style="width:62px;background:var(--bg5);border:1px solid var(--bo2);border-radius:6px;padding:5px 7px;color:var(--gr);font-family:var(--mn);font-size:.82rem;outline:none;text-align:center" onblur="calcAllProj()" onkeydown="if(event.key==='Enter'){this.blur()}">
+            <span style="font-size:.7rem;color:var(--tx3)">%/an · ETF + retraite</span>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:.62rem;color:#8899AA;margin-top:9px;line-height:1.6;background:rgba(255,255,255,.03);border-radius:8px;padding:8px 10px">
+        <strong style="color:var(--tx2)">Légende des abréviations</strong><br>
+        <strong style="color:var(--vi)">PEA</strong> = Plan d'Épargne en Actions · <strong style="color:var(--am)">CTO</strong> = Compte-Titres Ordinaire · <strong style="color:var(--cy)">AV €</strong> = Assurance-Vie en fonds euros (sécurisé) · <strong style="color:var(--gr)">AV UC / PER</strong> = Assurance-Vie en Unités de Compte / Plan d'Épargne Retraite (risqués, potentiel plus élevé)
+      </div>
+      <div style="font-size:.63rem;color:var(--tx3);margin-top:8px;line-height:1.5">
+        📅 Versements mensuels — DCA (Dollar Cost Averaging) · Lisse le prix d'entrée sur la durée<br>
+        ⚠ Rendements historiques non garantis · MSCI World : ~7-8%/an sur 20 ans mais avec -40% en 2008, -19% en 2022 · Investir comporte un risque de perte en capital
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--vi)"></span>Horizon de projection</div>
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <button class="hor-btn" onclick="setHorizon(10,this)" id="hor-10">10 ans</button>
+        <button class="hor-btn on" onclick="setHorizon(20,this)" id="hor-20">20 ans</button>
+        <button class="hor-btn" onclick="setHorizon(30,this)" id="hor-30">30 ans</button>
+        <button class="hor-btn" onclick="setHorizon(40,this)" id="hor-40">40 ans</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:.68rem;color:var(--tx2)">Personnalisé :</span>
+        <input type="number" id="hor-custom" min="1" max="40" placeholder="—" style="width:60px;background:var(--bg4);border:1px solid var(--bo2);border-radius:7px;padding:5px 8px;color:var(--tx);font-family:var(--mn);font-size:.8rem;outline:none;text-align:center" onblur="setHorizonCustom()" onkeydown="if(event.key==='Enter'){this.blur()}">
+        <span style="font-size:.68rem;color:var(--tx3)">ans (max 40)</span>
+      </div>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(139,92,246,.1),rgba(6,182,212,.08));border:1px solid rgba(139,92,246,.22);border-radius:13px;padding:16px;margin-bottom:11px">
+      <div style="font-size:.63rem;color:var(--vi);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:8px">Total investissement dans <span id="invest-horizon-lbl">20</span> ans</div>
+      <div style="font-family:var(--mn);font-size:2rem;font-weight:700;color:var(--tx);margin-bottom:10px;line-height:1" id="pj-tot">—</div>
+      <div id="pj-enveloppes" style="display:grid;grid-template-columns:1fr 1fr;gap:7px"></div>
+    </div>
+    <div class="card"><div class="ct"><span class="dot" style="background:var(--cy)"></span>Courbes par enveloppe</div><canvas id="chartInvest" height="120"></canvas></div>
+    <div class="card"><div class="ct"><span class="dot" style="background:var(--vi)"></span>Tableau</div>
+      <table class="ptbl"><thead><tr><th>Horizon</th><th style="color:var(--vi)">PEA</th><th style="color:var(--am)">CTO</th><th style="color:var(--cy)">AV €</th><th style="color:var(--gr)">AV UC</th><th>Total</th></tr></thead><tbody id="tbody-invest"></tbody></table>
+      <div style="font-size:.6rem;color:#8899AA;margin-top:8px;line-height:1.5">PEA = Actions (Plan d'Épargne en Actions) · CTO = Compte-Titres Ordinaire · AV € = Assurance-vie sécurisée · AV UC = Assurance-vie dynamique / Retraite</div>
+    </div>
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--am)"></span>Les règles qui ne changent pas</div>
+      <div class="rg" style="border-color:var(--am)">
+        <div class="rgt" style="color:var(--am)">Règle des 72 — combien d'années pour doubler ?</div>
+        <div class="rgd" style="line-height:1.6">
+          Divise <strong style="color:var(--am)">72</strong> par le taux annuel → tu obtiens le nombre d'années pour <strong style="color:var(--tx)">doubler ton capital</strong>.<br>
+          Exemple : à <strong id="r72t" style="color:var(--cy)">7</strong>%/an → 72 ÷ <span id="r72t2">7</span> = <strong id="r72r" style="color:var(--gr)">10,3 ans</strong>.<br>
+          <span style="color:#8899AA;font-size:.64rem">À 5% → 14,4 ans · À 10% → 7,2 ans · À 3% → 24 ans</span>
+        </div>
+      </div>
+      <div class="rg" style="border-color:var(--rd)"><div class="rgt" style="color:var(--rd)">1% de frais = −20% sur 20 ans</div><div class="rgd">ETF Amundi MSCI World : 0,12%/an. Les fonds actifs prennent 1-2%/an.</div></div>
+      <div class="rg" style="border-color:var(--gr)"><div class="rgt" style="color:var(--gr)">Le temps bat le taux</div><div class="rgd">50€/mois à 25 ans > 200€/mois à 40 ans — l'intérêt composé a besoin de temps.</div></div>
+      <div class="rg" style="border-color:var(--vi)"><div class="rgt" style="color:var(--vi)">PEA d'abord, toujours</div><div class="rgd">Exonéré IR après 5 ans. 1€ maintenant = 5 ans d'antériorité. Irreversible si tu attends.</div></div>
+    </div>
+  </div>
+
+  <!-- ÉPARGNE GARANTIE -->
+  <div id="proj-epargne">
+    <div class="al a-cy"><span class="ai">📅</span><div style="font-size:.71rem"><strong>Bon à savoir :</strong> les livrets réglementés (Livret A, LEP, LDDS) calculent les intérêts par quinzaine. Pour ne perdre aucun jour, programme tes versements <strong style="color:var(--cy)">juste avant le 1er ou le 16 du mois</strong> (ex : le 31 ou le 15) — un versement le 17 ne commence à rapporter que le 1er du mois suivant.</div></div>
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--vi)"></span>Horizon de projection</div>
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <button class="hor-btn" onclick="setHorizon(10,this)" id="hor2-10">10 ans</button>
+        <button class="hor-btn on" onclick="setHorizon(20,this)" id="hor2-20">20 ans</button>
+        <button class="hor-btn" onclick="setHorizon(30,this)" id="hor2-30">30 ans</button>
+        <button class="hor-btn" onclick="setHorizon(40,this)" id="hor2-40">40 ans</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:.68rem;color:var(--tx2)">Personnalisé :</span>
+        <input type="number" id="hor2-custom" min="1" max="40" placeholder="—" style="width:60px;background:var(--bg4);border:1px solid var(--bo2);border-radius:7px;padding:5px 8px;color:var(--tx);font-family:var(--mn);font-size:.8rem;outline:none;text-align:center" onblur="setHorizonCustom(this)" onkeydown="if(event.key==='Enter'){this.blur()}">
+        <span style="font-size:.68rem;color:var(--tx3)">ans (max 40, plafonné à 30 pour l'épargne garantie)</span>
+      </div>
+    </div>
+    <div class="card"><div class="ct"><span class="dot" style="background:var(--cy)"></span>Livrets actuels</div><div id="proj-liv-detail"></div></div>
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--vi)"></span>Projection sur <span id="epargne-horizon-lbl">20</span> ans</div>
+      <canvas id="chartEpargne" height="130"></canvas>
+      <table class="ptbl" style="margin-top:11px"><thead><tr><th>Horizon</th><th>Versé</th><th>Intérêts</th><th>Total</th></tr></thead><tbody id="tbody-epargne"></tbody></table>
+    </div>
+  </div>
+
+  <!-- SIMULATEUR -->
+  <div id="proj-simul" style="display:none">
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--am)"></span>Simulateur d'intérêts composés</div>
+      <div class="al a-cy" style="margin-bottom:12px"><span class="ai">🧮</span><div style="font-size:.71rem">Simule n'importe quel placement indépendamment de tes données. Modifie les paramètres et vois le résultat immédiatement.</div></div>
+      <div class="ir">
+        <div class="ig"><div class="il">Capital de départ</div><input class="if" type="number" id="sim-capital" placeholder="5000" onblur="calcSimul()" onkeydown="if(event.key==='Enter'){this.blur()}"></div>
+        <div class="ig"><div class="il">Versement mensuel</div><input class="if" type="number" id="sim-mensuel" placeholder="200" onblur="calcSimul()" onkeydown="if(event.key==='Enter'){this.blur()}"></div>
+      </div>
+      <div class="ir">
+        <div class="ig"><div class="il">Taux annuel <span>%</span></div><input class="if" type="number" id="sim-taux" placeholder="7" step="0.5" onblur="calcSimul()" onkeydown="if(event.key==='Enter'){this.blur()}"></div>
+        <div class="ig"><div class="il">Durée <span>1–40 ans</span></div><input class="if" type="number" id="sim-duree" placeholder="20" min="1" max="40" onblur="calcSimul()" onkeydown="if(event.key==='Enter'){this.blur()}"></div>
+      </div>
+      <div class="ig">
+        <div class="il">Fréquence de versement des intérêts</div>
+        <select class="sel" id="sim-freq" onchange="calcSimul()">
+          <option value="12">Mensuel (m=12) — ETF, épargne programmée</option>
+          <option value="4">Trimestriel (m=4) — dividendes US, SCPI</option>
+          <option value="2">Semestriel (m=2) — obligations entreprises</option>
+          <option value="1">Annuel (m=1) — livrets, AV fonds euros, actions FR</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--vi)"></span>Fréquence de versement par type de placement</div>
+      <div class="al a-cy" style="margin-bottom:10px"><span class="ai">ℹ️</span><div style="font-size:.69rem">Le simulateur calcule par défaut en <strong>mensuel (m=12)</strong> — pratique standard pour l'épargne programmée et les ETF en versements automatiques mensuels.</div></div>
+      <table class="ptbl" style="margin-bottom:10px">
+        <thead><tr><th>Type de placement</th><th>Fréquence usuelle</th><th>m</th></tr></thead>
+        <tbody>
+          <tr><td>Livret A, LEP, LDDS</td><td style="color:#8899AA">Annuel (31 déc.)</td><td class="hl">1</td></tr>
+          <tr><td>Assurance-vie fonds euros</td><td style="color:#8899AA">Annuel</td><td class="hl">1</td></tr>
+          <tr><td>Obligations d'État EU</td><td style="color:#8899AA">Annuel</td><td class="hl">1</td></tr>
+          <tr><td>Obligations entreprises EU</td><td style="color:#8899AA">Annuel ou semestriel</td><td class="hl">1–2</td></tr>
+          <tr><td>Actions FR (dividendes)</td><td style="color:#8899AA">Annuel</td><td class="hl">1</td></tr>
+          <tr><td>ETF distribution EU</td><td style="color:#8899AA">Trimestriel–semestriel</td><td class="hl">2–4</td></tr>
+          <tr><td>Actions US / ETF US</td><td style="color:#8899AA">Trimestriel</td><td class="hl">4</td></tr>
+          <tr><td>SCPI</td><td style="color:#8899AA">Mensuel ou trimestriel</td><td class="hl">4–12</td></tr>
+          <tr><td>ETF capitalisant / PEA</td><td style="color:#8899AA">Réinvesti auto → mensuel</td><td class="hl">12</td></tr>
+        </tbody>
+      </table>
+      <div class="al a-am"><span class="ai">⚠️</span><div style="font-size:.69rem"><strong>Confusion fréquente :</strong> un intervalle de 12 mois entre versements = m=1 (annuel), pas m=12. Dans la formule A = P(1 + r/m)^(m×t) : m=12 signifie <em>versement mensuel</em>, pas "tous les 12 mois".</div></div>
+    </div>
+    <div id="sim-result" style="display:none">
+      <div style="background:linear-gradient(135deg,rgba(6,182,212,.12),rgba(139,92,246,.08));border:1px solid rgba(6,182,212,.2);border-radius:13px;padding:16px;margin-bottom:11px;text-align:center">
+        <div style="font-size:.63rem;color:var(--cy);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:6px">Résultat final</div>
+        <div style="font-family:var(--mn);font-size:2.2rem;font-weight:700;color:var(--tx);line-height:1;margin-bottom:8px" id="sim-total">—</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+          <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:8px"><div style="font-size:.58rem;color:var(--tx3);margin-bottom:3px">Capital versé</div><div style="font-family:var(--mn);font-size:.92rem;font-weight:600;color:var(--tx2)" id="sim-verse">—</div></div>
+          <div style="background:rgba(16,185,129,.08);border-radius:8px;padding:8px"><div style="font-size:.58rem;color:var(--gr);margin-bottom:3px">Intérêts générés</div><div style="font-family:var(--mn);font-size:.92rem;font-weight:600;color:var(--gr)" id="sim-interets">—</div></div>
+        </div>
+      </div>
+      <div class="card"><div class="ct"><span class="dot" style="background:var(--cy)"></span>Courbe</div><canvas id="chartSimul" height="130"></canvas></div>
+      <div class="card"><div class="ct"><span class="dot" style="background:var(--vi)"></span>Tableau · max 40 ans</div>
+        <table class="ptbl"><thead><tr><th>Horizon</th><th>Versé</th><th>Intérêts</th><th>Total</th></tr></thead><tbody id="tbody-simul"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="disclaimer">
+  <strong>FlashTréso — outil d'aide à la gestion, ne remplace pas un expert-comptable.</strong><br>
+  Taux fiscaux 2026 · Sources URSSAF, impots.gouv.fr · Taux livrets au 01/08/2025 — révisés 2x/an<br>
+  Tes données restent sur ton appareil.
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+function debounce(fn, delay=180){let t;return function(...args){clearTimeout(t);t=setTimeout(()=>fn.apply(this,args),delay);}}
+const dCalcPro=debounce(calcPro);
+const dCalcPerso=debounce(calcPerso);
+const dUpdRes=debounce(updRes);
+const dUpdLivrets=debounce(updLivrets);
+
+const S={
+  type:'',ca:0,tva_assujetti:false,cma:false,vfl:true,secondaire:false,
+  cc:true,cpro:false,la:true,lep:false,ldds:false,pea:false,inv:false,
+  virMode:'min',
+  tp_a:0,ext_a:0,per_a:0,
+  surplusPro:0,surplusPerso:0,
+  r_fixes:0,r_var:0,
+  proj_taux:7,charts:{}
+};
+const TX={
+  services_cci:{urssaf:.212,ir:.017,cfp:.003,tfcc:.00044,tfcc_lbl:'CCI',label:'Services BIC · CCI — 21,2% URSSAF + 1,7% IR + 0,3% CFP + 0,044% CCI'},
+  services_cma:{urssaf:.212,ir:.017,cfp:.003,tfcc:.0048,tfcc_lbl:'CMA',label:'Services CMA — 21,2% URSSAF + 1,7% IR + 0,3% CFP + 0,48% CMA'},
+  ventes_cci:{urssaf:.123,ir:.010,cfp:.001,tfcc:.00015,tfcc_lbl:'CCI',label:'Ventes BIC · CCI — 12,3% URSSAF + 1,0% IR + 0,1% CFP'},
+  ventes_cma:{urssaf:.123,ir:.010,cfp:.001,tfcc:.0022,tfcc_lbl:'CMA',label:'Ventes CMA — 12,3% + 1,0% + 0,1% + 0,22% CMA'},
+  liberal:{urssaf:.256,ir:.022,cfp:.002,tfcc:0,tfcc_lbl:'',label:'Libéral BNC — 25,6% URSSAF + 2,2% IR + 0,2% CFP'},
+  mixte_cci:{urssaf:.175,ir:.014,cfp:.002,tfcc:.00020,tfcc_lbl:'CCI',label:'Mixte · CCI — taux pondérés estimés'},
+  mixte_cma:{urssaf:.175,ir:.014,cfp:.002,tfcc:.0035,tfcc_lbl:'CMA',label:'Mixte · CMA — taux pondérés estimés'}
+};
+const PLAFONDS={lep:10000,la:22950,ldds:12000,pea:150000};
+const TAUX_LIV_DEFAULT={lep:.025,la:.015,ldds:.015};
+let TAUX_LIV={...TAUX_LIV_DEFAULT};
+
+function updTaux(){
+  const t_lep=parseFloat(document.getElementById('taux-lep')?.value)||TAUX_LIV_DEFAULT.lep;
+  const t_la=parseFloat(document.getElementById('taux-la')?.value)||TAUX_LIV_DEFAULT.la;
+  const t_ldds=parseFloat(document.getElementById('taux-ldds')?.value)||TAUX_LIV_DEFAULT.ldds;
+  TAUX_LIV={lep:t_lep/100,la:t_la/100,ldds:t_ldds/100};
+  updLivrets();
+}
+function getTX(){const t=S.type||'services';if(t==='liberal')return TX.liberal;return TX[t+(S.cma?'_cma':'_cci')]||TX.services_cci;}
+function gv(id,d=0){const v=parseFloat(document.getElementById(id)?.value);return isNaN(v)?d:v;}
+function fmt(n){return Math.round(n).toLocaleString('fr-FR');}
+function fmtK(n){if(n>=1e6)return(n/1e6).toFixed(1).replace('.',',')+' M€';if(n>=10000)return(n/1000).toFixed(0)+' k€';if(n>=1000)return(n/1000).toFixed(1).replace('.',',')+' k€';return fmt(n)+'€';}
+function se(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+function sh(id,v=true){const e=document.getElementById(id);if(e)e.style.display=v?'block':'none';}
+function showToast(msg,dur=2600){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
+function updateProgress(step){for(let i=0;i<5;i++){const b=document.getElementById('pbs-'+i),l=document.getElementById('pbl-'+i);if(!b||!l)continue;b.className='pb-step'+(i<step?' done':i===step?' active':'');l.className='pb-lbl'+(i<step?' done':i===step?' active':'');}}
+function showPg(id,btn,step){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nt').forEach(t=>t.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  if(btn)btn.classList.add('on');
+  if(step!==undefined)updateProgress(step);
+  if(id==='reserves'){buildAllCompteOptions();updLivrets();updRes();}
+  if(id==='proj')calcAllProj();
+}
+function gotoChangerVirement(){
+  // Bascule vers l'onglet Pro et amène le focus sur le champ "montant à se verser"
+  const navBtns=document.querySelectorAll('.nt');
+  const proBtn=Array.from(navBtns).find(b=>b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'pro'"));
+  showPg('pro',proBtn,1);
+  setTimeout(()=>{
+    const champ=document.getElementById('vir-espere');
+    if(champ){champ.scrollIntoView({behavior:'smooth',block:'center'});champ.focus();}
+  },120);
+}
+const EDIT_MAP={tp:'tp_a',ext:'ext_a',per:'per_a'};
+function startEdit(k){const c=document.getElementById(k+'-cur'),i=document.getElementById(k+'-inp');if(!c||!i)return;i.value=S[EDIT_MAP[k]]||0;c.style.display='none';i.style.display='inline-block';i.focus();i.select();}
+function commitEdit(k){const c=document.getElementById(k+'-cur'),i=document.getElementById(k+'-inp');if(!c||!i)return;const v=parseFloat(i.value);if(!isNaN(v)&&v>=0)S[EDIT_MAP[k]]=v;i.style.display='none';c.style.display='inline-block';updRes();calcRempart();}
+function collectAllFields(){const f={};document.querySelectorAll('input[id],select[id]').forEach(el=>{if(el.type==='file')return;f[el.id]=el.value;});return f;}
+function exportData(){
+  const data={version:2,date:new Date().toISOString().slice(0,10),state:{...S,charts:{}},fields:collectAllFields()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='flashtreso-'+data.date+'.json';a.click();URL.revokeObjectURL(url);
+  showToast('✓ Sauvegardé — conserve ce fichier pour reprendre plus tard');
+}
+function triggerImport(){document.getElementById('import-file').click();}
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!data.fields)throw new Error('Format invalide');
+      Object.entries(data.fields).forEach(([id,val])=>{const el=document.getElementById(id);if(!el||el.type==='file')return;el.value=val;});
+      if(data.state)Object.keys(data.state).forEach(k=>{if(k!=='charts')S[k]=data.state[k];});
+      ['cc','cpro','la','lep','ldds','pea','inv'].forEach(k=>document.getElementById('tg-'+k)?.classList.toggle('on',S[k]));
+      updStart();calcPro();calcPerso();updLivrets();
+      showToast('✓ Session restaurée — '+data.date);
+    }catch(err){showToast('⚠ Fichier invalide');}
+    e.target.value='';
+  };
+  reader.readAsText(file);
+}
+function togC(n){S[n]=!S[n];document.getElementById('tg-'+n)?.classList.toggle('on',S[n]);updStart();}
+function _bs(active,col='cy'){const c=col==='cy'?'var(--cy)':col==='am'?'var(--am)':'var(--gr)';return active?`flex:1;padding:8px;border-radius:8px;border:1.5px solid ${c};background:${c}22;color:${c};font-family:'Syne',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer`:`flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--bo2);background:var(--bg4);color:var(--tx3);font-family:'Syne',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer`;}
+function setCMA(val){S.cma=val;document.getElementById('s-cma-oui').style.cssText=_bs(val,'am');document.getElementById('s-cma-non').style.cssText=_bs(!val,'cy');const info=document.getElementById('s-cma-info');if(val){info.style.display='flex';document.getElementById('s-cma-txt').innerHTML=`Taxe CMA : <strong>${S.type==='ventes'?'0,22%':'0,48%'} du CA HT</strong>`;}else info.style.display='none';calcPro();}
+function setSecondaire(val){
+  S.secondaire=val;
+  document.getElementById('s-sec-oui').style.cssText=_bs(val,'cy');
+  document.getElementById('s-sec-non').style.cssText=_bs(!val,'cy');
+  const row=document.getElementById('s-sec-row');
+  if(row)row.style.display=val?'block':'none';
+  updStart();
+}
+function gvCA2(){return S.secondaire?gv('s-ca2',0):0;}
+function getType2(){return document.getElementById('s-type2')?.value||'';}
+function getTX2(){
+  const t=getType2();if(!t||!S.secondaire)return null;
+  if(t==='liberal')return TX.liberal;
+  return TX[t+(S.cma?'_cma':'_cci')]||TX.services_cci;
+}
+function calcObligations(ca,tx){
+  if(!ca||!tx)return{urssaf:0,ir:0,cfp:0,tfcc:0,total:0};
+  const urssaf=Math.round(ca*tx.urssaf);
+  const ir=S.vfl?Math.round(ca*tx.ir):0;
+  const cfp=Math.round(ca*tx.cfp);
+  const tfcc=Math.round(ca*tx.tfcc);
+  return{urssaf,ir,cfp,tfcc,total:urssaf+ir+cfp+tfcc};
+}
+function setVFL(val){
+  S.vfl=val;
+  const btnOui=document.getElementById('s-vfl-oui');
+  const btnNon=document.getElementById('s-vfl-non');
+  if(btnOui)btnOui.style.cssText=_bs(val,'cy');
+  if(btnNon)btnNon.style.cssText=_bs(!val,'cy');
+  calcPro();
+}
+function updStart(){
+  const type=document.getElementById('s-type').value,ca=gv('s-ca');
+  S.type=type;S.ca=ca;S.tva_assujetti=(document.getElementById('s-tva')?.value==='oui');
+  S.ca2=gvCA2();S.type2=getType2();
+  sh('s-cma-row',type==='services'||type==='ventes'||type==='mixte');
+  if(!type||!ca){sh('conseil-box',false);sh('start-btn',false);return;}
+  let ico='💡',txt='',act='';
+  if(!S.cpro){ico='🏦';txt=`Sans compte pro séparé, impossible de construire le rempart. <strong>Un compte pro dédié est indispensable.</strong>`;act='Shine 7€/mois ou Blank 6€/mois';}
+  else if(!S.lep){ico='⭐';txt=`Le LEP (2,5% net) est le meilleur taux garanti — priorité pour la Réserve Perso.`;act='Caisse Épargne, Boursorama';}
+  else if(!S.pea){ico='📈';txt=`Ouvrir un PEA avec <strong>1€ maintenant</strong> démarre 5 ans d'antériorité fiscale.`;act='Fortuneo ou Boursorama';}
+  sh('conseil-box',!!txt);
+  if(txt){se('cb-ico',ico);document.getElementById('cb-txt').innerHTML=txt;const ac=document.getElementById('cb-act');ac.textContent=act;ac.style.display=act?'inline-block':'none';}
+  sh('start-btn',true);
+  buildAllCompteOptions();
+  calcPro();
+}
+function togCh(cb){cb.classList.toggle('on');cb.textContent=cb.classList.contains('on')?'✓':'';calcPro();}
+function calcVirResult(){
+  const dispo=S._dispo||0;
+  const virMin=S.r_fixes||0;
+  const espere=parseFloat(document.getElementById('vir-espere')?.value)||0;
+  const virChoisi=espere>0?Math.min(espere,dispo):virMin;
+  const surplus=Math.max(0,dispo-virChoisi);
+  S.surplusPro=surplus;
+  se('vir-montant',fmt(virChoisi)+'€');
+  let note='';
+  if(espere>0&&espere>dispo)note='Réduit au disponible ('+fmt(dispo)+'€)';
+  else if(espere>0)note='Montant souhaité';
+  else if(virMin>0)note='Minimum vital depuis tes fixes Perso';
+  else note='Saisis tes dépenses dans Perso pour le minimum vital';
+  se('vir-result-note',note);
+  sh('vir-result-box',true);
+  sh('surplus-pro-box',true);
+  se('surplus-pro-val',fmt(surplus)+'€');
+  const desc=surplus>0
+    ?'+'+fmt(surplus)+'€ restent sur le compte pro et construisent ton rempart.'
+    :'Rien ne reste sur le pro — réduis le virement pour constituer le rempart.';
+  se('surplus-pro-desc',desc);
+  // Lien bidirectionnel : le virement choisi alimente automatiquement "Montant reçu" dans Perso
+  const ppRecu=document.getElementById('pp-recu');
+  if(ppRecu&&!S._syncFromPerso){
+    ppRecu.value=virChoisi>0?Math.round(virChoisi):'';
+    S._syncFromPro=true;
+    calcPerso();
+    S._syncFromPro=false;
+  }
+  se('pp-autofill-lbl',virChoisi>0?'✓ synchronisé depuis Pro : '+fmt(virChoisi)+'€':'');
+  se('tp-surplus-lbl','+'+fmt(surplus)+'€');
+  se('tp-btn-surplus',fmt(surplus)+'€');
+  calcRempart();
+}
+function calcPro(){
+  const ca=gv('p-ca');
+  if(ca<=0){['p-prov-card','p-charges-card','p-dispo-box','vir-choice','surplus-pro-box','rempart-box'].forEach(id=>sh(id,false));return;}
+  const tvaAss=S.tva_assujetti,tva=tvaAss?ca*0.2:0,ttc=tvaAss?ca+tva:0;
+  sh('p-tva-bloc',tvaAss);
+  if(tvaAss){se('p-tva-ht',fmt(ca)+'€');se('p-tva-ttc',fmt(ttc)+'€');se('p-tva-v',fmt(tva)+'€');}
+  const t=getTX();
+  const ca2=S.ca2||0;
+  const t2=getTX2();
+  const o1=calcObligations(ca,t);
+  const o2=S.secondaire&&ca2>0&&t2?calcObligations(ca2,t2):{urssaf:0,ir:0,cfp:0,tfcc:0,total:0};
+  const caTotal=ca+ca2;
+  const urssaf=o1.urssaf+o2.urssaf;
+  const ir=o1.ir+o2.ir;
+  const cfp=o1.cfp+o2.cfp;
+  const tfcc=o1.tfcc+o2.tfcc;
+  const cfeCustom=gv('p-cfe-custom',0),caA=caTotal*12,cfeEstim=caA<10000?250:caA<32600?400:caA<100000?700:1200;
+  const cfe=Math.round((cfeCustom>0?cfeCustom:cfeEstim)/12);
+  const totalOblig=urssaf+ir+cfp+tfcc+cfe;
+  se('p-act1-lbl','Activité principale'+(ca>0?' — CA '+fmt(ca)+'€':''));
+  se('p-urssaf-lbl',t.label);se('p-urssaf-v',fmt(o1.urssaf)+'€');
+  se('p-ir-nom',S.vfl?'IR — Versement libératoire':'IR — Prélèvement source');
+  se('p-ir-lbl',S.vfl?`${(t.ir*100).toFixed(1)}% du CA HT`:'Non inclus — prélevé séparément');
+  se('p-ir-v',S.vfl?fmt(o1.ir)+'€':'0€');
+  document.getElementById('p-ir-row').style.opacity=S.vfl?'1':'.5';
+  se('p-cfp-v',fmt(o1.cfp)+'€');se('p-cfp-lbl',(t.cfp*100).toFixed(2)+'%');
+  se('p-tfcc-v',fmt(o1.tfcc)+'€');se('p-tfcc-chambre',t.tfcc_lbl?'— '+t.tfcc_lbl:'');
+  se('p-tfcc-lbl',o1.tfcc===0?'Non redevable':(t.tfcc*100).toFixed(3)+'% · '+t.tfcc_lbl);
+  const act2bloc=document.getElementById('p-act2-bloc');
+  if(act2bloc){
+    const showAct2=S.secondaire&&ca2>0&&t2;
+    act2bloc.style.display=showAct2?'block':'none';
+    if(showAct2){
+      se('p-act2-type-lbl',S.type2+(S.cma?' CMA':' CCI')+' — CA '+fmt(ca2)+'€');
+      se('p-urssaf2-lbl',(t2.urssaf*100).toFixed(1)+'%');se('p-urssaf2-v',fmt(o2.urssaf)+'€');
+      se('p-ir2-lbl',S.vfl?(t2.ir*100).toFixed(1)+'%':'Non inclus');se('p-ir2-v',S.vfl?fmt(o2.ir)+'€':'0€');
+      se('p-cfp2-v',fmt(o2.cfp)+'€');
+      se('p-tfcc2-lbl',o2.tfcc===0?'Non redevable':(t2.tfcc*100).toFixed(3)+'% · '+t2.tfcc_lbl);se('p-tfcc2-v',fmt(o2.tfcc)+'€');
+    }
+  }
+  se('p-cfe-v',fmt(cfe)+'€/mois');
+  se('p-cfe-lbl',(cfeCustom>0?`Saisi : ${fmt(cfeCustom)}€/an`:`Estimation : ~${fmt(cfeEstim)}€/an`)+' · mensualisation');
+  se('p-oblig-total',fmt(totalOblig)+'€');
+  const detailParts=['URSSAF '+fmt(urssaf)+'€'];
+  if(S.vfl)detailParts.push('IR '+fmt(ir)+'€');
+  detailParts.push('CFP '+fmt(cfp)+'€');
+  if(tfcc>0)detailParts.push('Taxe '+fmt(tfcc)+'€');
+  detailParts.push('CFE '+fmt(cfe)+'€');
+  se('p-oblig-detail',detailParts.join(' · '));
+  let chargesPro=0;
+  document.querySelectorAll('.ch-item').forEach(item=>{
+    if(item.querySelector('.ch-cb')?.classList.contains('on'))
+      chargesPro+=parseFloat(item.querySelector('.ch-inp')?.value)||0;
+  });
+  sh('p-prov-card',true);sh('p-charges-card',true);
+  const ca2Bloc=document.getElementById('p-ca2-bloc');
+  if(ca2Bloc){
+    ca2Bloc.style.display=S.secondaire&&S.ca2>0?'block':'none';
+    const ca2inp=document.getElementById('p-ca2-input');
+    if(ca2inp&&!ca2inp._edited)ca2inp.value=S.ca2>0?S.ca2:'';
+    se('p-ca2-type-lbl',S.type2?'Activité 2 : '+S.type2+(S.cma?' (CMA)':' (CCI)'):'');
+  }
+  const dispo=Math.max(0,(ca+(S.ca2||0))-totalOblig-chargesPro);
+  S._dispo=dispo;
+  sh('p-dispo-box',true);
+  se('p-dispo-val',fmt(dispo)+'€');
+  const caAff=(ca+(S.ca2||0));
+  se('p-dispo-detail','CA '+fmt(caAff)+'€'+(S.ca2>0?' ('+fmt(ca)+'€ + '+fmt(S.ca2)+'€)':'')+' − obligations '+fmt(totalOblig)+'€'+(chargesPro>0?' − charges '+fmt(chargesPro)+'€':''));
+  const virMin=(S.r_total||S.r_fixes||0);
+  se('vir-min-val',virMin>0?fmt(virMin)+'€':'—');
+  se('vir-min-detail',virMin>0?'Loyer + énergie + assurances + prêts + abonnements + transport':'Saisis tes dépenses dans Perso pour voir ce chiffre');
+  sh('vir-choice',true);
+  sh('rempart-box',true);
+  const treso=gv('p-treso');
+  const tpCpt=document.getElementById('tp-cpt')?.value||'pro';
+  if(tpCpt==='pro')S.tp_a=treso;
+  calcVirResult();
+  calcVueGlobale();
+}
+function calcRempart(){
+  const ca=gv('p-ca',S.ca||0);
+  const rempartSuggestion=ca>0?Math.max(500,Math.round(ca*2/100)*100):0;
+  // L'objectif éditable prime sur la suggestion automatique
+  const objInput=document.getElementById('rempart-obj-input');
+  if(objInput&&!objInput.value&&rempartSuggestion>0)objInput.value=rempartSuggestion;
+  se('rempart-obj-sugg-lbl',rempartSuggestion>0?`Suggestion : ${fmt(rempartSuggestion)}€ (2 mois de CA)`:'Saisis ton CA pour voir la suggestion');
+  const rempartObj=S.rempartObjManuel!=null?S.rempartObjManuel:rempartSuggestion;
+  const treso=S.tp_a||0;
+  const pct=rempartObj>0?Math.min(100,treso/rempartObj*100):0;
+  const manq=Math.max(0,rempartObj-treso);
+  const surpPro=S.surplusPro||0;
+  se('rempart-cur',fmt(treso)+'€');se('rempart-obj',rempartObj>0?fmt(rempartObj)+'€':'—');
+  document.getElementById('rempart-fill').style.width=pct+'%';
+  let phase,titre,desc;
+  if(rempartObj===0){phase='Définis ton objectif pour commencer';titre='Ton premier rempart';desc='Saisis ton CA ou un objectif manuel. Tant qu\'il n\'est pas constitué, verse-toi le minimum vital.';}
+  else if(pct<100){
+    phase='Phase 1 — Construction du rempart';
+    titre=`Objectif : ${fmt(rempartObj)}€ · ${Math.round(pct)}% constitué`;
+    desc=pct<50?'Verse-toi le minimum vital — chaque euro supplementaire accelere la constitution du rempart.':'Plus de la moitie ! Maintiens le minimum vital, tu y es bientot.';
+  }else{
+    phase='✅ Rempart constitué';
+    titre='Tu peux maintenant optimiser';
+    desc='Augmente ton virement, renforce les réserves, ou commence à investir. Le surplus pro continue de grossir automatiquement.';
+  }
+  se('rempart-phase',phase);se('rempart-titre',titre);se('rempart-desc',desc);
+  se('rempart-surplus-v',surpPro>0?'+'+fmt(surpPro)+'€/mois':'—');
+  if(surpPro>0&&manq>0){const mois=Math.ceil(manq/surpPro);const d=new Date();d.setMonth(d.getMonth()+mois);se('rempart-delai',mois+' mois (~'+d.toLocaleDateString('fr-FR',{month:'short',year:'numeric'})+')');se('rempart-eta',`Il manque ${fmt(manq)}€ · à ce rythme : ${mois} mois`);}
+  else if(pct>=100){se('rempart-delai','Atteint ✅');se('rempart-eta','Rempart constitué — optimise ta répartition');}
+  else{se('rempart-delai','—');se('rempart-eta','Saisis le solde de ton compte pro ci-dessus');}
+  const oTP=rempartObj;se('tp-cur',fmt(treso)+'€');se('tp-obj-lbl',oTP>0?fmt(oTP)+'€':'—');
+  if(document.getElementById('tp-bar'))document.getElementById('tp-bar').style.width=pct+'%';
+  se('tp-pct',Math.round(pct)+'%');
+  if(pct>=100)se('tp-eta','✅ Rempart constitué');
+  else if(surpPro>0&&manq>0)se('tp-eta',`${Math.ceil(manq/surpPro)} mois pour atteindre l'objectif`);
+  const augBox=document.getElementById('rempart-augmentation');
+  if(augBox){
+    if(surpPro>0){augBox.style.display='block';se('rempart-aug-txt',`+${fmt(surpPro)}€ ajoutés à ta trésorerie pro ce mois`);se('rempart-solde-estime',`Solde estimé après ce mois : ~${fmt(treso+surpPro)}€`);}
+    else{augBox.style.display='none';}
+  }
+}
+function setRempartObj(){
+  const v=gv('rempart-obj-input',0);
+  S.rempartObjManuel=v>0?v:null;
+  calcRempart();calcVueGlobale();
+}
+function resetRempartObj(){
+  const ca=gv('p-ca',S.ca||0);
+  const sugg=ca>0?Math.max(500,Math.round(ca*2/100)*100):0;
+  document.getElementById('rempart-obj-input').value=sugg||'';
+  S.rempartObjManuel=null;
+  calcRempart();calcVueGlobale();
+}
+function calcPerso(){
+  const loyer=gv('pp-loyer'),ener=gv('pp-ener'),ass=gv('pp-ass'),
+        pret=gv('pp-pret'),abo=gv('pp-abo'),transp=gv('pp-transp');
+  const fixes=loyer+ener+ass+pret+abo+transp;
+  const vari=gv('pp-var'),impot=gv('pp-impot');
+  const eparRes=gv('pp-epargne-res',0),eparInv=gv('pp-epargne-inv',0);
+  const eparTotal=eparRes+eparInv;
+  const total=fixes+vari+impot+eparTotal;
+  S.r_fixes=fixes;S.r_var=vari;S.r_total=fixes+vari;S.r_epar=eparTotal;
+  const hasDepenses=total>0;
+  const boxBesoins=document.getElementById('pp-besoins-box');
+  if(boxBesoins){
+    boxBesoins.style.display=hasDepenses?'block':'none';
+    if(hasDepenses){
+      se('pp-total-besoins','−'+fmt(total)+'€');
+      let detail='';
+      if(fixes>0)detail+='Fixes −'+fmt(fixes)+'€';
+      if(vari>0)detail+=(detail?'  ·  ':'')+'Variables −'+fmt(vari)+'€';
+      if(impot>0)detail+=(detail?'  ·  ':'')+'Impôts −'+fmt(impot)+'€';
+      if(eparTotal>0)detail+=(detail?'  ·  ':'')+'Épargne −'+fmt(eparTotal)+'€';
+      se('pp-total-besoins-d',detail||'—');
+    }
+  }
+  const totalBesoins=fixes+vari+impot;
+  if(totalBesoins>0){
+    se('vir-min-val',fmt(totalBesoins)+'€');
+    const parts=[];
+    if(fixes>0)parts.push('Fixes '+fmt(fixes)+'€');
+    if(vari>0)parts.push('Variables '+fmt(vari)+'€');
+    if(impot>0)parts.push('Impôts '+fmt(impot)+'€');
+    se('vir-min-detail',parts.join(' + '));
+  }
+  updSuggLabels();
+  updPalierLabels();
+  if(gv('p-ca')>0&&!S._syncFromPro)calcVirResult();
+  const recu=gv('pp-recu');
+  // Lien bidirectionnel : si la saisie vient de Perso (pas de Pro), propage vers vir-espere
+  if(!S._syncFromPro){
+    const virEspere=document.getElementById('vir-espere');
+    if(virEspere){
+      virEspere.value=recu>0?Math.round(recu):'';
+      if(gv('p-ca')>0){S._syncFromPerso=true;calcVirResult();S._syncFromPerso=false;}
+    }
+  }
+  if(recu<=0){sh('pp-result',false);return;}
+  const surplus=Math.max(0,recu-total);
+  S.surplusPerso=surplus;
+  se('pp-r-recu','+'+fmt(recu)+'€');
+  se('pp-r-fixes','−'+fmt(fixes)+'€');
+  se('pp-r-fixes-d',`Loyer ${fmt(loyer)}€ · Énergie ${fmt(ener)}€ · Ass. ${fmt(ass)}€ · Prêts ${fmt(pret)}€ · Abo. ${fmt(abo)}€ · Transp. ${fmt(transp)}€`);
+  se('pp-r-var','−'+fmt(vari+impot)+'€');
+  // Ligne épargne dans le détail
+  const ppEparRow = document.getElementById('pp-r-epar-row');
+  if(ppEparRow) ppEparRow.style.display = eparTotal>0 ? 'flex' : 'none';
+  const ppEparV = document.getElementById('pp-r-epar');
+  if(ppEparV) ppEparV.textContent = '−'+fmt(eparTotal)+'€';
+  se('pp-r-reste2',fmt(surplus)+'€');
+  se('pp-reste',fmt(surplus)+'€');
+  let desc='';
+  if(surplus<=0)desc='Le virement couvre juste les dépenses — rien à répartir ce mois.';
+  else if(surplus<100)desc=`${fmt(surplus)}€ disponibles — même une petite somme régulière construit quelque chose.`;
+  else desc=`${fmt(surplus)}€ à répartir vers les réserves et l'investissement.`;
+  se('pp-reste-desc',desc);
+  const c=document.getElementById('pp-conseil');
+  if(fixes>0&&recu<fixes){c.style.display='flex';document.getElementById('pp-conseil-txt').innerHTML=`Le virement reçu ne couvre pas tes fixes — vérifie le montant dans l'onglet Pro.`;}
+  else c.style.display='none';
+  sh('pp-result',true);
+  se('res-surplus-lbl',fmt(surplus)+'€');se('res-surplus-lbl2',fmt(surplus)+'€');
+  if(surplus>0){sh('res-rep-card',true);genRep(surplus);}
+}
+
+// ═══ RÉSERVES ═══
+function getObjExt(){const v=parseFloat((document.getElementById('ext-tar')?.textContent||'').replace(/[\s€]/g,''));return(!isNaN(v)&&v>0)?v:1500;}
+function getObjPer(){const v=parseFloat((document.getElementById('per-tar')?.textContent||'').replace(/[\s€]/g,''));return(!isNaN(v)&&v>0)?v:6000;}
+function updLivrets(){
+  const livs=[{id:'lep',plaf:PLAFONDS.lep,taux:TAUX_LIV.lep,sid:'lep-status'},{id:'la',plaf:PLAFONDS.la,taux:TAUX_LIV.la,sid:'la-status'},{id:'ldds',plaf:PLAFONDS.ldds,taux:TAUX_LIV.ldds,sid:'ldds-status'}];
+  let totS=0,totI=0;
+  livs.forEach(l=>{
+    const sol=gv('sol-'+l.id),vir=gv('v-'+l.id),cap=Math.max(0,l.plaf-sol),int=sol*l.taux;
+    totS+=sol;totI+=int;const full=sol>=l.plaf;
+    let tag='';
+    if(full){tag=`<div class="plafond-tag plafond-full">🔒 Plafond atteint · +${fmt(int)}€/an</div>`;if(vir>0){const nx=l.id==='lep'?'💧 Livret A':l.id==='la'?'🌿 LDDS':'Assurance Vie';tag+=`<div class="al a-am" style="margin-top:5px;margin-bottom:0"><span class="ai">→</span><div style="font-size:.69rem">Rediriger vers <strong>${nx}</strong></div></div>`;}}
+    else if(sol>l.plaf*.8)tag=`<div class="plafond-tag plafond-warn">⚡ Presque plein · ${fmt(cap)}€ restant</div>`;
+    else tag=`<div class="plafond-tag plafond-ok">✓ Capacité : ${fmt(cap)}€ · +${fmt(int)}€/an</div>`;
+    document.getElementById(l.sid).innerHTML=tag;
+  });
+  se('liv-total',fmt(totS)+'€');se('liv-interets','+'+fmt(totI)+'€/an');
+  const peaS=gv('inv-pea-sol'),peaEl=document.getElementById('pea-plafond-status');
+  if(peaEl){const pd=Math.max(0,PLAFONDS.pea-peaS);if(peaS>=PLAFONDS.pea)peaEl.innerHTML=`<div class="plafond-tag plafond-full">🔒 Plafond PEA atteint</div>`;else peaEl.innerHTML=`<div class="plafond-tag plafond-ok">✓ Capacité : ${fmt(pd)}€</div>`;}
+  // Rafraîchir les labels "piloté par le livret" si ext/per sont logés sur un livret
+  ['ext','per'].forEach(which=>{
+    const cpt=document.getElementById(which+'-cpt')?.value;
+    if(cpt&&isLivretCpt(cpt)){
+      const lbl={lep:'⭐ LEP',la:'💧 Livret A',ldds:'🌿 LDDS'}[cpt];
+      se(which+'-vr-livret-val',(lbl||cpt)+' : '+fmt(gv('v-'+cpt,0))+'€/mois');
+    }
+  });
+  updRes();
+}
+function updRes(){
+  const oE=getObjExt(),oP=getObjPer(),vE=getVirementReserve('ext'),vP=getVirementReserve('per');
+  const pE=oE>0?Math.min(100,S.ext_a/oE*100):100,pP=oP>0?Math.min(100,S.per_a/oP*100):100;
+  const urgEl=document.getElementById('res-urgent');
+  if(pE<100&&pE<=pP){urgEl.style.display='flex';const m=oE-S.ext_a,mo=vE>0?Math.ceil(m/vE):'?';document.getElementById('res-urgent-txt').innerHTML=`<strong>Priorité : Réserve Imprévus</strong> — Manque ${fmt(m)}€ · ${mo} mois`;}
+  else if(pP<100){urgEl.style.display='flex';const m=oP-S.per_a,mo=vP>0?Math.ceil(m/vP):'?';document.getElementById('res-urgent-txt').innerHTML=`<strong>Priorité : Réserve Perso</strong> — Manque ${fmt(m)}€ · ${mo} mois`;}
+  else urgEl.style.display='none';
+  updBar('ext',S.ext_a,oE,vE,'ext-full-msg');updBar('per',S.per_a,oP,vP,'per-full-msg');
+  if(pP>=100){const f=document.getElementById('per-full-txt');if(f){const ti=gv('sol-lep')*TAUX_LIV.lep+gv('sol-la')*TAUX_LIV.la+gv('sol-ldds')*TAUX_LIV.ldds;f.innerHTML=`Réserve constituée ✅ · Intérêts : <strong>+${fmt(ti)}€/an</strong>`;}}
+  if(S.surplusPerso>0)genRep(S.surplusPerso);
+  calcVueGlobale();
+  syncMensualitesPerso();
+}
+// Remplit automatiquement "Mensualités épargne & placement" dans Perso depuis les virements récurrents de Réserves
+function syncMensualitesPerso(){
+  const extCpt=document.getElementById('ext-cpt')?.value||'courant';
+  const perCpt=document.getElementById('per-cpt')?.value||'courant';
+  const vExt=getVirementReserve('ext'); // = v-ext, ou v-<livret> si ext logée sur un livret
+  const vPer=getVirementReserve('per'); // = v-per, ou v-<livret> si per logée sur un livret
+
+  // Virements des livrets — ne compter que ceux qui ne sont PAS déjà comptés via vExt/vPer ci-dessus
+  const livretsAffectes=new Set();
+  if(isLivretCpt(extCpt))livretsAffectes.add(extCpt);
+  if(isLivretCpt(perCpt))livretsAffectes.add(perCpt);
+  let vLivretsLibres=0;
+  ['lep','la','ldds'].forEach(id=>{
+    if(!livretsAffectes.has(id))vLivretsLibres+=gv('v-'+id,0);
+  });
+
+  const totalEpargne=vExt+vPer+vLivretsLibres; // réserves + livrets non affectés, sans double comptage
+  const vPea=gv('inv-pea-v',0),vAutre=gv('inv-autre-v',0);
+  const totalPlacement=vPea+vAutre; // virements vers investissement
+  const inpEpar=document.getElementById('pp-epargne-res');
+  const inpPlac=document.getElementById('pp-epargne-inv');
+  if(inpEpar)inpEpar.value=totalEpargne>0?Math.round(totalEpargne):'';
+  if(inpPlac)inpPlac.value=totalPlacement>0?Math.round(totalPlacement):'';
+  // Recalcule Perso si la page a déjà des données (sans relancer une boucle de sync Pro/Perso)
+  if(!S._syncFromPro&&!S._syncFromPerso)calcPerso();
+}
+function updBar(n,cur,obj,vir,fullId){
+  const pct=obj>0?Math.min(100,cur/obj*100):0,manq=Math.max(0,obj-cur),mo=vir>0&&pct<100?Math.ceil(manq/vir):null;
+  const eta=()=>{if(pct>=100)return'✅ Objectif atteint';if(!mo)return'—';const d=new Date();d.setMonth(d.getMonth()+mo);return`~${d.toLocaleDateString('fr-FR',{month:'short',year:'numeric'})} (${mo} mois)`;};
+  se(n+'-cur',fmt(cur)+'€');if(document.getElementById(n+'-bar'))document.getElementById(n+'-bar').style.width=Math.min(100,pct)+'%';se(n+'-pct',Math.min(100,Math.round(pct))+'%');if(document.getElementById(n+'-eta'))se(n+'-eta',eta());if(fullId)sh(fullId,pct>=100);
+}
+function roundNice(n,cap){
+  // Arrondit à un chiffre rond lisible, sans jamais dépasser le disponible (cap) ni la valeur exacte si elle l'est déjà
+  if(n<=0)return 0;
+  let r;
+  if(n>=200)r=Math.round(n/50)*50;
+  else if(n>=50)r=Math.round(n/20)*20;
+  else r=Math.round(n/5)*5;
+  if(cap!=null&&r>cap)r=Math.floor((cap)/(n>=200?50:n>=50?20:5))*(n>=200?50:n>=50?20:5);
+  if(cap!=null&&r>cap)r=Math.floor(cap); // sécurité ultime : ne jamais dépasser le cap, même non rond
+  return r;
+}
+function genRep(somme){
+  if(somme<=0){sh('res-rep-card',false);return;}
+  sh('res-rep-card',true);
+  // Le surplus reçu ici est déjà net des mensualités épargne/placement (déduites dans calcPerso) —
+  // pas de second retrait des virements récurrents, ce serait un double comptage.
+  const oE=getObjExt(),oP=getObjPer(),mE=Math.max(0,oE-S.ext_a),mP=Math.max(0,oP-S.per_a);
+  const lepD=Math.max(0,PLAFONDS.lep-gv('sol-lep')),laD=Math.max(0,PLAFONDS.la-gv('sol-la')),lddsD=Math.max(0,PLAFONDS.ldds-gv('sol-ldds'));
+  const totLivD=lepD+laD+lddsD,peaD=Math.max(0,PLAFONDS.pea-gv('inv-pea-sol'));
+  let r=somme,items=[];
+  if(mE>0){const brut=Math.min(r,mE);const v=roundNice(brut,r);items.push({n:'Réserve Imprévus',c:'var(--am)',m:v,w:'Priorité absolue — 2e rempart'});r-=v;}
+  if(r>0&&mP>0){const brut=Math.min(r,Math.round(r*.7));const v=roundNice(brut,r);const lbl=S.lep?'⭐ LEP (2,5%)':'💧 Livret A (1,5%)';items.push({n:'Réserve Perso',c:'var(--gr)',m:v,w:lbl});r-=v;}
+  if(r>0){
+    if(totLivD>0){const brut=Math.min(r,Math.round(r*.7));const v=roundNice(brut,r);const lbl=lepD>0?'⭐ LEP → 💧 Livret A → 🌿 LDDS':laD>0?'💧 Livret A → 🌿 LDDS':'🌿 LDDS';items.push({n:'Livrets réglementés',c:'var(--vi)',m:v,w:lbl});r-=v;}
+    if(r>0){
+      const vIbrut=Math.round(r*.7);const vI=roundNice(vIbrut,r);const vL=Math.max(0,r-vI);
+      if(vI>0)items.push({n:'Investissement',c:'var(--cy)',m:vI,w:peaD>0?'PEA — priorité':'CTO ou Assurance Vie'});
+      if(vL>0)items.push({n:'Disponible libre',c:'var(--tx2)',m:vL,w:'La rigueur doit rester supportable'}); // dernier poste : reste exact, jamais arrondi au-delà
+    }
+  }
+  document.getElementById('res-rep-items').innerHTML=items.map(it=>`<div class="ri"><div class="rd2" style="background:${it.c}"></div><div class="rin"><div class="rn">${it.n}</div><div class="rw">${it.w}</div></div><div class="rv" style="color:${it.c}">${fmt(it.m)}€<div class="rp">${Math.round(it.m/somme*100)}%</div></div></div>`).join('');
+}
+function calcSuggExt(){const f=S.r_fixes||0;return f>0?Math.max(500,Math.ceil(f*1.5/100)*100):1500;}
+function calcSuggPer(){const f=S.r_fixes||0;return Math.max(1000,Math.ceil(f*6/100)*100);}
+function updExtObj(){const v=gv('ext-obj');if(v>0){se('ext-tar',fmt(v)+'€');updRes();}}
+function updPerObj(){
+  const v=gv('per-obj');
+  if(v>0){
+    se('per-tar',fmt(v)+'€');
+    // Vérif dépassement plafond
+    const cpt=document.getElementById('per-cpt')?.value||'courant';
+    const plafMap={lep:10000,la:22950,ldds:12000};
+    const plaf=plafMap[cpt]||null;
+    const box=document.getElementById('per-depassement-lbl');
+    if(box&&plaf&&v>plaf){
+      const excedent=fmt(v-plaf);
+      const next=cpt==='lep'?'💧 Livret A (plafond 22 950€)':cpt==='la'?'🌿 LDDS (plafond 12 000€)':'un autre support (AV fonds euros, LDDS)';
+      box.style.display='block';
+      box.innerHTML=`⚠ Objectif ${fmt(v)}€ dépasse le plafond de ce livret (${fmt(plaf)}€). <br>Suggestion : placer les ${excedent}€ excédentaires sur ${next}.`;
+    } else if(box){box.style.display='none';}
+    updRes();
+  }
+}
+function resetObj(w){if(w==='ext'){const s=calcSuggExt();document.getElementById('ext-obj').value=s;se('ext-tar',fmt(s)+'€');}else{const s=calcSuggPer();document.getElementById('per-obj').value=s;se('per-tar',fmt(s)+'€');}updRes();}
+function updSuggLabels(){
+  const sE=calcSuggExt(),sP=calcSuggPer();
+  se('ext-sugg-lbl',`Suggéré : ${fmt(sE)}€`);se('per-sugg-lbl',`Suggéré : ${fmt(sP)}€`);
+  const eO=document.getElementById('ext-obj'),pO=document.getElementById('per-obj');
+  if(eO&&!eO.value){eO.value=sE;se('ext-tar',fmt(sE)+'€');}
+  if(pO&&!pO.value){pO.value=sP;se('per-tar',fmt(sP)+'€');}
+}
+
+// ═══ PROJECTIONS ═══
+let S_horizon=20;
+
+function setHorizon(n,btn){
+  S_horizon=Math.min(40,Math.max(1,n));
+  document.querySelectorAll('.hor-btn').forEach(b=>b.classList.remove('on'));
+  ['10','20','30','40'].forEach(v=>{
+    const b1=document.getElementById('hor-'+v);
+    if(b1)b1.classList.toggle('on',parseInt(v)===S_horizon);
+    const b2=document.getElementById('hor2-'+v);
+    if(b2)b2.classList.toggle('on',parseInt(v)===S_horizon);
+  });
+  se('invest-horizon-lbl',S_horizon);
+  se('patrim-horizon-lbl',S_horizon);
+  // Recalcul ciblé selon onglet visible
+  const projInvest=document.getElementById('proj-invest');
+  const projEp=document.getElementById('proj-epargne');
+  const projSim=document.getElementById('proj-simul');
+  if(projInvest&&projInvest.style.display!=='none')calcInvestProj();
+  else if(projEp&&projEp.style.display!=='none')calcEpargneProj();
+  else if(projSim&&projSim.style.display!=='none')calcSimul();
+  calcTotalProj();
+}
+
+function setHorizonCustom(srcInput){
+  const id=srcInput?srcInput.id:'hor-custom';
+  const v=Math.min(40,Math.max(1,parseInt(document.getElementById(id)?.value)||20));
+  const inp1=document.getElementById('hor-custom'),inp2=document.getElementById('hor2-custom');
+  if(inp1)inp1.value=v;
+  if(inp2)inp2.value=v;
+  document.querySelectorAll('.hor-btn').forEach(b=>b.classList.remove('on'));
+  S_horizon=v;
+  se('invest-horizon-lbl',v);
+  se('patrim-horizon-lbl',v);
+  calcAllProj();
+}
+
+function showProj(id,btn){
+  ['total','invest','epargne','simul'].forEach(t=>{
+    const el=document.getElementById('proj-'+t);
+    if(el)el.style.display='none';
+  });
+  const el=document.getElementById('proj-'+id);
+  if(el)el.style.display='block';
+  document.querySelectorAll('.ptab').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  setTimeout(()=>{
+    if(id==='total')calcTotalProj();
+    else if(id==='invest')calcInvestProj();
+    else if(id==='epargne')calcEpargneProj();
+    else if(id==='simul')calcSimul();
+  },30);
+}
+
+function getTauxEnv(id){
+  const v=parseFloat(document.getElementById(id)?.value);
+  const defaults={'taux-pea':7,'taux-cto':7,'taux-av-euros':2.5,'taux-av-uc':6};
+  return(!isNaN(v)?v:(defaults[id]||7))/100;
+}
+
+function projEnv(sol,vir,taux,annees){
+  const freq=parseInt(document.getElementById('sim-freq')?.value)||12;
+  const tm=taux/freq;
+  let s=sol;
+  for(let m=0;m<annees*12;m++)s=s*(1+tm)+vir;
+  return Math.round(s);
+}
+
+function calcAllProj(){
+  calcTotalProj();
+  if(document.getElementById('proj-invest')?.style.display!=='none')calcInvestProj();
+  if(document.getElementById('proj-epargne')?.style.display!=='none')calcEpargneProj();
+  if(document.getElementById('proj-simul')?.style.display!=='none')calcSimul();
+}
+
+// ── CORRECTION : calcInvestProj avec 4 taux par enveloppe + S_horizon + tableau 5 colonnes
+function calcInvestProj(){
+  const h=S_horizon||20;
+  se('invest-horizon-lbl',h);
+  const sP=gv('inv-pea-sol'),vP=gv('inv-pea-v');
+  const sA=gv('inv-autre-sol'),vA=gv('inv-autre-v');
+  // Répartition du poste "autre" : 50% CTO, 30% AV euros, 20% AV UC
+  const sCTO=sA*0.5,vCTO=vA*0.5;
+  const sAVe=sA*0.3,vAVe=vA*0.3;
+  const sAVu=sA*0.2,vAVu=vA*0.2;
+  const tPEA=getTauxEnv('taux-pea');
+  const tCTO=getTauxEnv('taux-cto');
+  const tAVe=getTauxEnv('taux-av-euros');
+  const tAVu=getTauxEnv('taux-av-uc');
+  // Courbes annuelles jusqu'à h
+  const labels=[],dPEA=[],dCTO=[],dAVe=[],dAVu=[],dTot=[];
+  for(let a=1;a<=h;a++){
+    const pea=projEnv(sP,vP,tPEA,a);
+    const cto=projEnv(sCTO,vCTO,tCTO,a);
+    const ave=projEnv(sAVe,vAVe,tAVe,a);
+    const avu=projEnv(sAVu,vAVu,tAVu,a);
+    labels.push(a+'a');
+    dPEA.push(pea);dCTO.push(cto);dAVe.push(ave);dAVu.push(avu);
+    dTot.push(pea+cto+ave+avu);
+  }
+  const tH=dTot[h-1];
+  se('pj-tot',fmtK(tH));
+  // Résumé enveloppes
+  const envBox=document.getElementById('pj-enveloppes');
+  if(envBox){
+    const items=[
+      {n:'PEA',c:'#8B5CF6',v:dPEA[h-1]},
+      {n:'CTO',c:'#F59E0B',v:dCTO[h-1]},
+      {n:'AV fonds €',c:'#06B6D4',v:dAVe[h-1]},
+      {n:'AV UC/PER',c:'#10B981',v:dAVu[h-1]},
+    ];
+    envBox.innerHTML=items.map(it=>`<div style="background:rgba(255,255,255,.05);border-radius:8px;padding:8px;text-align:center">
+      <div style="font-size:.58rem;color:${it.c};margin-bottom:3px;font-weight:700">${it.n}</div>
+      <div style="font-family:var(--mn);font-size:.88rem;font-weight:600;color:var(--tx)">${fmtK(it.v)}</div>
+    </div>`).join('');
+  }
+  // Règle des 72
+  const tauxPEApct=(getTauxEnv('taux-pea')*100).toFixed(1);
+  const r72=(72/getTauxEnv('taux-pea')/100).toFixed(1);
+  se('r72',r72);se('r72t',tauxPEApct);se('r72t2',tauxPEApct);se('r72r',r72+' ans');
+  // Chart multi-courbes
+  if(S.charts.invest)S.charts.invest.destroy();
+  const cvs=document.getElementById('chartInvest');
+  if(!cvs)return;
+  S.charts.invest=new Chart(cvs.getContext('2d'),{
+    type:'line',
+    data:{labels,datasets:[
+      {label:'Total',data:dTot,borderColor:'#10B981',backgroundColor:'rgba(16,185,129,0.07)',borderWidth:2.5,fill:true,tension:.4,pointRadius:0},
+      {label:'PEA',data:dPEA,borderColor:'#8B5CF6',backgroundColor:'transparent',borderWidth:1.5,tension:.4,pointRadius:0},
+      {label:'CTO',data:dCTO,borderColor:'#F59E0B',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],tension:.4,pointRadius:0},
+      {label:'AV €',data:dAVe,borderColor:'#06B6D4',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],tension:.4,pointRadius:0},
+      {label:'AV UC',data:dAVu,borderColor:'#EF4444',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],tension:.4,pointRadius:0},
+    ]},
+    options:{responsive:true,plugins:{legend:{display:true,labels:{color:'#94A3B8',font:{size:9},boxWidth:10}},tooltip:{backgroundColor:'#1C2640',titleColor:'#E2E8F0',bodyColor:'#94A3B8',callbacks:{label:c=>` ${c.dataset.label}: ${fmtK(c.raw)}`}}},
+    scales:{x:{ticks:{color:'#64748B',font:{size:9},maxTicksLimit:10},grid:{color:'rgba(255,255,255,0.03)'}},y:{ticks:{color:'#64748B',font:{size:9},callback:v=>fmtK(v)},grid:{color:'rgba(255,255,255,0.03)'}}}}
+  });
+  // Tableau jalons selon horizon (jusqu'à 40)
+  const jalons=[1,3,5,10,15,20,25,30,35,40].filter(a=>a<=h);
+  document.getElementById('tbody-invest').innerHTML=jalons.map(a=>{
+    const pea=projEnv(sP,vP,tPEA,a);
+    const cto=projEnv(sCTO,vCTO,tCTO,a);
+    const ave=projEnv(sAVe,vAVe,tAVe,a);
+    const avu=projEnv(sAVu,vAVu,tAVu,a);
+    const tot=pea+cto+ave+avu;
+    return`<tr><td class="${a===h?'hl':''}">${a}an${a>1?'s':''}</td><td style="color:var(--vi)">${fmtK(pea)}</td><td style="color:var(--am)">${fmtK(cto)}</td><td style="color:var(--cy)">${fmtK(ave)}</td><td style="color:var(--gr)">${fmtK(avu)}</td><td class="${a===h?'big':''}">${fmtK(tot)}</td></tr>`;
+  }).join('');
+}
+
+function calcSimul(){
+  const capital=gv('sim-capital',0);
+  const mensuel=gv('sim-mensuel',0);
+  const taux=(parseFloat(document.getElementById('sim-taux')?.value)||7)/100;
+  const duree=Math.min(40,Math.max(1,gv('sim-duree',20)));
+  if(capital<=0&&mensuel<=0){sh('sim-result',false);return;}
+  sh('sim-result',true);
+  const tm=taux/12;
+  const labels=[],data=[];
+  for(let a=1;a<=duree;a++){
+    let s=capital;
+    for(let m=0;m<a*12;m++)s=s*(1+tm)+mensuel;
+    labels.push(a+'a');data.push(Math.round(s));
+  }
+  const total=data[duree-1];
+  const verse=Math.round(capital+mensuel*duree*12);
+  se('sim-total',fmtK(total));
+  se('sim-verse',fmtK(verse));
+  se('sim-interets',fmtK(Math.max(0,total-verse)));
+  const cvsSimul=document.getElementById('chartSimul');
+  if(!cvsSimul){sh('sim-result',false);return;}
+  if(S.charts.simul){S.charts.simul.destroy();S.charts.simul=null;}
+  S.charts.simul=new Chart(cvsSimul.getContext('2d'),{
+    type:'line',
+    data:{labels,datasets:[
+      {label:'Avec intérêts composés',data,borderColor:'#06B6D4',backgroundColor:'rgba(6,182,212,0.08)',borderWidth:2,fill:true,tension:.4,pointRadius:0},
+      {label:'Sans intérêts (versements seuls)',data:labels.map((_,i)=>Math.round(capital+mensuel*(i+1)*12)),borderColor:'rgba(139,92,246,0.4)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[5,5],tension:.4,pointRadius:0}
+    ]},
+    options:{responsive:true,plugins:{legend:{display:true,labels:{color:'#94A3B8',font:{size:10},boxWidth:12}},tooltip:{backgroundColor:'#1C2640',titleColor:'#E2E8F0',bodyColor:'#94A3B8',callbacks:{label:c=>` ${c.dataset.label}: ${fmtK(c.raw)}`}}},
+    scales:{x:{ticks:{color:'#64748B',font:{size:9},maxTicksLimit:10},grid:{color:'rgba(255,255,255,0.03)'}},y:{ticks:{color:'#64748B',font:{size:9},callback:v=>fmtK(v)},grid:{color:'rgba(255,255,255,0.03)'}}}}
+  });
+  // ── CORRECTION : jalons jusqu'à 40 ans
+  const jalons=[1,2,3,5,10,15,20,25,30,35,40].filter(j=>j<=duree);
+  document.getElementById('tbody-simul').innerHTML=jalons.map(a=>{
+    let s=capital;for(let m=0;m<a*12;m++)s=s*(1+tm)+mensuel;s=Math.round(s);
+    const v=Math.round(capital+mensuel*a*12);
+    return`<tr><td class="${a===duree?'hl':''}">${a}an${a>1?'s':''}</td><td>${fmtK(v)}</td><td style="color:var(--gr)">${fmtK(Math.max(0,s-v))}</td><td class="${a===duree?'big':'hl'}">${fmtK(s)}</td></tr>`;
+  }).join('');
+}
+
+function calcEpargneProj(){
+  const livs=[{nom:'LEP',sol:gv('sol-lep'),vir:gv('v-lep'),plaf:PLAFONDS.lep,taux:TAUX_LIV.lep,c:'#F59E0B'},{nom:'Livret A',sol:gv('sol-la'),vir:gv('v-la'),plaf:PLAFONDS.la,taux:TAUX_LIV.la,c:'#06B6D4'},{nom:'LDDS',sol:gv('sol-ldds'),vir:gv('v-ldds'),plaf:PLAFONDS.ldds,taux:TAUX_LIV.ldds,c:'#10B981'}];
+  let dHtml='';livs.forEach(l=>{const int=l.sol*l.taux,cap=Math.max(0,l.plaf-l.sol);dHtml+=`<div class="rb"><div class="rb-l"><div class="rb-n">${l.nom}</div><div class="rb-d">${fmt(l.sol)}€ / ${fmt(l.plaf)}€ · ${l.sol>=l.plaf?'🔒':'Cap. '+fmt(cap)+'€'}</div></div><div style="text-align:right"><div style="font-family:var(--mn);font-size:.8rem;color:var(--gr)">+${fmt(int)}€/an</div></div></div>`;});
+  const tI=livs.reduce((s,l)=>s+l.sol*l.taux,0);dHtml+=`<div style="height:1px;background:var(--bo2);margin:7px 0"></div><div class="rb"><div class="rb-l"><div class="rb-n" style="color:var(--gr)">Intérêts totaux</div></div><div class="rb-v" style="color:var(--gr)">+${fmt(tI)}€/an</div></div>`;
+  document.getElementById('proj-liv-detail').innerHTML=dHtml;
+  // ── CORRECTION : 30 ans max pour l'épargne garantie
+  const epH=Math.min(S_horizon||20,30);
+  se('epargne-horizon-lbl',epH);
+  const labels=[],ds=[],colors=['#F59E0B','#06B6D4','#10B981'],totD=[];
+  for(let a=1;a<=epH;a++)labels.push(a+'a');
+  livs.forEach((l,i)=>{const d=[];for(let a=1;a<=epH;a++){let s=l.sol;for(let m=0;m<a*12;m++){if(s<l.plaf)s=Math.min(l.plaf,s+l.vir);s+=s*(l.taux/12);}d.push(Math.round(s));}ds.push({label:l.nom,data:d,borderColor:colors[i],backgroundColor:colors[i]+'15',borderWidth:2,fill:false,tension:.4,pointRadius:2});});
+  for(let a=1;a<=epH;a++){let tot=0;livs.forEach(l=>{let s=l.sol;for(let m=0;m<a*12;m++){if(s<l.plaf)s=Math.min(l.plaf,s+l.vir);s+=s*(l.taux/12);}tot+=s;});totD.push(Math.round(tot));}
+  ds.push({label:'Total',data:totD,borderColor:'#8B5CF6',backgroundColor:'#8B5CF615',borderWidth:2.5,fill:true,tension:.4,pointRadius:2,borderDash:[5,3]});
+  if(S.charts.epargne)S.charts.epargne.destroy();
+  S.charts.epargne=new Chart(document.getElementById('chartEpargne').getContext('2d'),{type:'line',data:{labels,datasets:ds},options:{responsive:true,plugins:{legend:{display:true,labels:{color:'#94A3B8',font:{size:10},boxWidth:12}},tooltip:{backgroundColor:'#1C2640',titleColor:'#E2E8F0',bodyColor:'#94A3B8',callbacks:{label:c=>` ${c.dataset.label}: ${fmtK(c.raw)}`}}},scales:{x:{ticks:{color:'#64748B',font:{size:9}},grid:{color:'rgba(255,255,255,0.03)'}},y:{ticks:{color:'#64748B',font:{size:9},callback:v=>fmtK(v)},grid:{color:'rgba(255,255,255,0.03)'}}}}});
+  const hors=[1,2,3,5,8,10,15,20,25,30].filter(a=>a<=epH);
+  document.getElementById('tbody-epargne').innerHTML=hors.map(a=>{let tot=0,verse=0;livs.forEach(l=>{let s=l.sol;for(let m=0;m<a*12;m++){if(s<l.plaf){s=Math.min(l.plaf,s+l.vir);verse+=l.vir;}s+=s*(l.taux/12);}tot+=s;});const int=tot-livs.reduce((s,l)=>s+l.sol,0)-verse;return`<tr><td class="${a===epH?'hl':''}">${a}an${a>1?'s':''}</td><td>${fmtK(verse)}</td><td style="color:var(--gr)">${fmtK(Math.max(0,int))}</td><td class="${a===epH?'big':'hl'}">${fmtK(tot)}</td></tr>`;}).join('');
+}
+
+let S_modeReserveProj='actuel'; // 'actuel' ou 'objectif'
+
+function setModeReserveProj(mode){
+  S_modeReserveProj=mode;
+  document.querySelectorAll('.scen-btn').forEach(b=>b.classList.remove('on'));
+  const btn=document.getElementById('mode-rsv-'+mode);
+  if(btn)btn.classList.add('on');
+  calcTotalProj();
+}
+
+function calcTotalProj(){
+  const h=S_horizon||20;
+  se('patrim-horizon-lbl',h);
+  const tPEA=getTauxEnv('taux-pea'),tCTO=getTauxEnv('taux-cto'),tAVe=getTauxEnv('taux-av-euros'),tAVu=getTauxEnv('taux-av-uc');
+
+  // Comptes déjà affectés à une réserve (Rempart/Imprévus/Perso) — exclus du calcul Livrets pour éviter le double comptage
+  const tpCpt=document.getElementById('tp-cpt')?.value||'pro';
+  const extCpt=document.getElementById('ext-cpt')?.value||'courant';
+  const perCpt=document.getElementById('per-cpt')?.value||'courant';
+  const comptesAffectes=new Set();
+  [tpCpt,extCpt,perCpt].forEach(c=>{if(c&&c!=='courant'&&c!=='pro')comptesAffectes.add(c);});
+
+  const livDefs=[{id:'lep',sol:gv('sol-lep'),vir:gv('v-lep'),plaf:PLAFONDS.lep,taux:TAUX_LIV.lep},{id:'la',sol:gv('sol-la'),vir:gv('v-la'),plaf:PLAFONDS.la,taux:TAUX_LIV.la},{id:'ldds',sol:gv('sol-ldds'),vir:gv('v-ldds'),plaf:PLAFONDS.ldds,taux:TAUX_LIV.ldds}];
+  const livsLibres=livDefs.filter(l=>!comptesAffectes.has(l.id));
+
+  const sP=gv('inv-pea-sol'),vP=gv('inv-pea-v'),sA=gv('inv-autre-sol'),vA=gv('inv-autre-v');
+
+  // Valeurs des 3 réserves selon le mode choisi
+  const objRempart=(()=>{if(S.rempartObjManuel!=null)return S.rempartObjManuel;const ca=gv('p-ca',S.ca||0);return ca>0?Math.max(500,Math.round(ca*2/100)*100):0;})();
+  const objExt=getObjExt(),objPer=getObjPer();
+  const rempartActuel=S.tp_a||0,extActuel=S.ext_a||0,perActuel=S.per_a||0;
+  const rempart=S_modeReserveProj==='objectif'?objRempart:rempartActuel;
+  const ext=S_modeReserveProj==='objectif'?objExt:extActuel;
+  const per=S_modeReserveProj==='objectif'?objPer:perActuel;
+
+  // Calcul Livrets — uniquement ceux non affectés à une réserve
+  const cL=(a)=>{let t=0;livsLibres.forEach(l=>{let s=l.sol;for(let m=0;m<a*12;m++){if(s<l.plaf)s=Math.min(l.plaf,s+l.vir);s+=s*(l.taux/12);}t+=s;});return Math.round(t);};
+  const cI=(a)=>projEnv(sP,vP,tPEA,a)+projEnv(sA*0.5,vA*0.5,tCTO,a)+projEnv(sA*0.3,vA*0.3,tAVe,a)+projEnv(sA*0.2,vA*0.2,tAVu,a);
+
+  // Cartes fixes 10/20/30 ans (toujours affichées, mêmes réserves constantes)
+  const t10=cL(Math.min(10,40))+cI(Math.min(10,40))+rempart+ext+per;
+  const t20=cL(Math.min(20,40))+cI(Math.min(20,40))+rempart+ext+per;
+  const t30=cL(Math.min(30,40))+cI(Math.min(30,40))+rempart+ext+per;
+  // Valeurs à l'horizon choisi (S_horizon)
+  const lH=cL(h),iH=cI(h),tH=lH+iH+rempart+ext+per;
+  se('patrim-10',fmtK(t10));se('patrim-20-sm',fmtK(t20));se('patrim-30',fmtK(t30));
+
+  // Mentions "dont X€ du LEP (plafond)" pour chaque réserve logée sur un livret
+  const noteCpt=(cpt)=>{
+    if(!isLivretCpt(cpt))return '';
+    const lbl={lep:'LEP',la:'Livret A',ldds:'LDDS'}[cpt];
+    const plaf=PLAFONDS[cpt];
+    const sol=getSoldeFromCpt(cpt);
+    const atteint=sol>=plaf;
+    return `<div class="rb-d">dont ${fmt(sol)}€ du ${lbl}${atteint?' — plafond atteint':' (plafond '+fmt(plaf)+'€)'}</div>`;
+  };
+
+  let det=`<div class="rb"><div class="rb-l"><div class="rb-n">🏦 Rempart — Trésorerie pro</div>${noteCpt(tpCpt)}</div><div class="rb-v" style="color:var(--cy)">${fmtK(rempart)}</div></div>`;
+  det+=`<div class="rb"><div class="rb-l"><div class="rb-n">🎯 Réserve Imprévus</div>${noteCpt(extCpt)}</div><div class="rb-v" style="color:var(--am)">${fmtK(ext)}</div></div>`;
+  det+=`<div class="rb"><div class="rb-l"><div class="rb-n">🏠 Réserve Perso</div>${noteCpt(perCpt)}</div><div class="rb-v" style="color:var(--gr)">${fmtK(per)}</div></div>`;
+  det+=`<div class="rb"><div class="rb-l"><div class="rb-n">📊 Livrets dans ${h} ans</div><div class="rb-d">hors comptes déjà affectés à une réserve</div></div><div class="rb-v" style="color:var(--vi)">${fmtK(lH)}</div></div>`;
+  det+=`<div class="rb"><div class="rb-l"><div class="rb-n">📈 Investissement dans ${h} ans</div><div class="rb-d">taux par enveloppe</div></div><div class="rb-v" style="color:var(--gr)">${fmtK(iH)}</div></div>`;
+  det+=`<div style="height:1px;background:var(--gr);opacity:.3;margin:7px 0"></div><div class="rb"><div class="rb-l"><div class="rb-n" style="color:var(--gr)">Patrimoine total dans ${h} ans</div></div><div class="rb-v" style="color:var(--gr);font-size:1.05rem">${fmtK(tH)}</div></div>`;
+  document.getElementById('patrim-detail').innerHTML=det;
+
+  const labels=[],dL=[],dI=[],dT=[];
+  for(let a=1;a<=h;a++){const l=cL(a),i=cI(a);labels.push(a+'a');dL.push(l);dI.push(i);dT.push(Math.round(l+i+rempart+ext+per));}
+  if(S.charts.total)S.charts.total.destroy();
+  S.charts.total=new Chart(document.getElementById('chartTotal').getContext('2d'),{type:'line',data:{labels,datasets:[{label:'Total',data:dT,borderColor:'#10B981',backgroundColor:'rgba(16,185,129,0.08)',borderWidth:2.5,fill:true,tension:.4,pointRadius:2},{label:'Investissement',data:dI,borderColor:'#06B6D4',backgroundColor:'transparent',borderWidth:1.5,tension:.4,pointRadius:1},{label:'Livrets',data:dL,borderColor:'#8B5CF6',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],tension:.4,pointRadius:1}]},options:{responsive:true,plugins:{legend:{display:true,labels:{color:'#94A3B8',font:{size:10},boxWidth:12}},tooltip:{backgroundColor:'#1C2640',titleColor:'#E2E8F0',bodyColor:'#94A3B8',callbacks:{label:c=>` ${c.dataset.label}: ${fmtK(c.raw)}`}}},scales:{x:{ticks:{color:'#64748B',font:{size:9}},grid:{color:'rgba(255,255,255,0.03)'}},y:{ticks:{color:'#64748B',font:{size:9},callback:v=>fmtK(v)},grid:{color:'rgba(255,255,255,0.03)'}}}}});
+}
+
+// ── COMPTES SUPPLÉMENTAIRES
+let extraComptes=[];
+let extraId=0;
+function addCompte(){const id='ec_'+(++extraId);extraComptes.push({id,nom:'',solde:0});renderExtraComptes();}
+function removeCompte(id){extraComptes=extraComptes.filter(c=>c.id!==id);renderExtraComptes();buildAllCompteOptions();updRes();}
+function renderExtraComptes(){
+  const box=document.getElementById('extra-comptes-list');if(!box)return;
+  box.innerHTML=extraComptes.map(c=>`<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><input type="text" placeholder="Nom du compte" value="${c.nom}" style="flex:1;background:var(--bg4);border:1px solid var(--bo2);border-radius:8px;padding:8px 10px;color:var(--tx);font-family:'Syne',sans-serif;font-size:.78rem;outline:none" oninput="extraComptes.find(x=>x.id==='${c.id}').nom=this.value"><input type="number" placeholder="Solde €" value="${c.solde||''}" style="width:90px;background:var(--bg4);border:1px solid var(--bo2);border-radius:8px;padding:8px 9px;color:var(--tx);font-family:var(--mn);font-size:.82rem;outline:none;text-align:right" oninput="extraComptes.find(x=>x.id==='${c.id}').solde=parseFloat(this.value)||0;dUpdRes()"><button onclick="removeCompte('${c.id}')" style="width:28px;height:28px;border-radius:7px;border:1px solid rgba(239,68,68,.3);background:var(--rdg);color:var(--rd);cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0">×</button></div>`).join('');
+}
+function totalExtraComptes(){return extraComptes.reduce((s,c)=>s+(parseFloat(c.solde)||0),0);}
+
+// ── PALIERS RÉSERVE PERSO
+function updPalierLabels(){
+  const fixes=S.r_fixes||0;
+  se('pal-fixes-lbl',fixes>0?`Tes fixes mensuelles : ${fmt(fixes)}€`:'Renseigne tes dépenses fixes dans Perso pour voir les montants');
+  [1,3,6].forEach(m=>{
+    const v=Math.max(500,Math.ceil(fixes*m/100)*100);
+    se('pal-'+m+'-v',fixes>0?fmt(v)+'€':'—');
+  });
+}
+function setPerPalier(mois){
+  const fixes=S.r_fixes||0;
+  const obj=Math.max(500,Math.ceil(fixes*mois/100)*100);
+  document.getElementById('per-obj').value=obj;
+  se('per-tar',fmt(obj)+'€');
+  [1,3,6].forEach(m=>{
+    const btn=document.getElementById('pal-'+m);if(!btn)return;
+    if(m===mois){btn.style.borderColor='rgba(16,185,129,.4)';btn.style.background='var(--grg)';btn.style.color='var(--gr)';}
+    else{btn.style.borderColor='var(--bo2)';btn.style.background='var(--bg4)';btn.style.color='var(--tx3)';}
+  });
+  updPalierLabels();
+  updRes();
+}
+
+// ── COMPTES DYNAMIQUES
+const LIVRET_IDS=['la','lep','ldds'];
+function getSoldeFromCpt(val){
+  if(val==='la')return gv('sol-la',0);
+  if(val==='lep')return gv('sol-lep',0);
+  if(val==='ldds')return gv('sol-ldds',0);
+  if(val==='pro')return gv('p-treso',0);
+  if(val&&val.startsWith('extra_')){const id=val.replace('extra_','');const ec=extraComptes.find(c=>c.id===id);return ec?parseFloat(ec.solde)||0:0;}
+  return 0;
+}
+function isLivretCpt(val){return LIVRET_IDS.includes(val);}
+function buildCompteOptions(selectId,preferred){
+  const sel=document.getElementById(selectId);if(!sel)return;
+  const prev=sel.value||preferred||'courant';
+  const opts=[];
+  if(selectId==='tp-cpt')opts.push({val:'pro',lbl:'💼 Compte pro (onglet Pro)'});
+  opts.push({val:'courant',lbl:'Compte courant'});
+  if(S.la)opts.push({val:'la',lbl:'💧 Livret A'});
+  if(S.lep)opts.push({val:'lep',lbl:'⭐ LEP'});
+  if(S.ldds)opts.push({val:'ldds',lbl:'🌿 LDDS'});
+  extraComptes.forEach(c=>{if(c.nom)opts.push({val:'extra_'+c.id,lbl:c.nom});});
+  sel.innerHTML=opts.map(o=>`<option value="${o.val}"${o.val===prev?' selected':''}>${o.lbl}</option>`).join('');
+  const which=selectId==='ext-cpt'?'ext':selectId==='per-cpt'?'per':'tp';
+  onChangeCpt(which);
+}
+function buildAllCompteOptions(){
+  buildCompteOptions('tp-cpt','pro');
+  buildCompteOptions('ext-cpt','courant');
+  buildCompteOptions('per-cpt',S.lep?'lep':S.la?'la':'courant');
+}
+function getVirementReserve(which){
+  // Retourne le virement mensuel effectif de la réserve, qu'il vienne du champ manuel
+  // ou du livret choisi comme compte (évite le double comptage)
+  const val=document.getElementById(which+'-cpt')?.value||'courant';
+  if(isLivretCpt(val))return gv('v-'+val,0);
+  return gv('v-'+which,which==='ext'?50:100);
+}
+function onChangeCpt(which){
+  const val=document.getElementById(which+'-cpt')?.value||(which==='tp'?'pro':'courant');
+  const isLiv=isLivretCpt(val);
+  const isExtra=val.startsWith('extra_');
+  const isPro=val==='pro';
+  if(which==='tp'){
+    // Le compte pro reprend automatiquement le solde saisi dans l'onglet Pro
+    sh('tp-solde-manual',!isPro&&!isLiv);
+    if(isPro){commitSolde('tp',gv('p-treso',0),true);}
+    else if(isLiv){const sol=getSoldeFromCpt(val);commitSolde('tp',sol,true);}
+    else{updRes();calcRempart();}
+    return;
+  }
+  sh(which+'-solde-manual',!isLiv);
+  sh(which+'-solde-auto',isLiv);
+  // Basculer le champ "virement récurrent" manuel vs piloté par le livret
+  const lbl={lep:'⭐ LEP',la:'💧 Livret A',ldds:'🌿 LDDS'}[val];
+  sh(which+'-vr-manuel',!isLiv);
+  sh(which+'-vr-livret',isLiv);
+  if(isLiv){
+    se(which+'-vr-livret-val',(lbl||val)+' : '+fmt(gv('v-'+val,0))+'€/mois');
+    const sol=getSoldeFromCpt(val);se(which+'-solde-auto-val',fmt(sol)+'€');commitSolde(which,sol,true);
+  }
+  else if(isExtra){const sol=getSoldeFromCpt(val);const inp=document.getElementById(which+'-solde');if(inp&&!inp.value)inp.value=sol||'';commitSolde(which,sol||parseFloat(inp?.value)||0,true);}
+  else{updRes();}
+}
+function commitSolde(which,val,silent){
+  const v=parseFloat(val)||0;
+  if(which==='ext'){S.ext_a=v;se('ext-cur',fmt(v)+'€');}
+  else if(which==='per'){S.per_a=v;se('per-cur',fmt(v)+'€');}
+  else if(which==='tp'){S.tp_a=v;se('tp-cur',fmt(v)+'€');}
+  if(!silent)updRes();
+  else if(which==='tp'){calcRempart();}
+  else updBar(which,which==='ext'?S.ext_a:S.per_a,which==='ext'?getObjExt():getObjPer(),getVirementReserve(which),which+'-full-msg');
+}
+
+let S_lastValidationSurplus=0; // mémorise le dernier montant validé pour permettre l'annulation
+
+function validerSurplusPro(){
+  const surplus=S.surplusPro||0;
+  if(surplus<=0){showToast('Aucun surplus pro à valider ce mois');return;}
+  S.tp_a=(S.tp_a||0)+surplus;
+  S_lastValidationSurplus=surplus;
+  const cpt=document.getElementById('tp-cpt')?.value||'pro';
+  if(cpt==='pro'){
+    const treso=document.getElementById('p-treso');
+    if(treso)treso.value=Math.round(S.tp_a);
+  } else if(cpt!=='courant'&&!isLivretCpt(cpt)&&!cpt.startsWith('extra_')){
+    // rien
+  } else {
+    const inp=document.getElementById('tp-solde');
+    if(inp)inp.value=Math.round(S.tp_a);
+  }
+  calcRempart();updRes();calcVueGlobale();
+  showToast('✅ +'+fmt(surplus)+'€ ajoutés au rempart — nouveau solde : '+fmt(S.tp_a)+'€');
+  // Basculer le bouton en mode "Annuler"
+  const btn=document.getElementById('tp-validation-btn');
+  const titre=document.getElementById('tp-validation-titre');
+  const desc=document.getElementById('tp-validation-desc');
+  if(btn){
+    btn.textContent='↺ Annuler — retirer '+fmt(surplus)+'€ du rempart';
+    btn.style.background='linear-gradient(135deg,var(--rd),#b91c1c)';
+    btn.setAttribute('onclick','annulerSurplusPro()');
+  }
+  if(titre)titre.textContent='✅ Ajouté — tu peux annuler';
+  if(desc)desc.textContent='Le surplus a été ajouté au rempart. Si tu t\'es trompé, tu peux annuler cette action.';
+}
+
+function annulerSurplusPro(){
+  const surplus=S_lastValidationSurplus||0;
+  if(surplus<=0){showToast('Rien à annuler');return;}
+  S.tp_a=Math.max(0,(S.tp_a||0)-surplus);
+  const cpt=document.getElementById('tp-cpt')?.value||'pro';
+  if(cpt==='pro'){
+    const treso=document.getElementById('p-treso');
+    if(treso)treso.value=Math.round(S.tp_a);
+  } else {
+    const inp=document.getElementById('tp-solde');
+    if(inp)inp.value=Math.round(S.tp_a);
+  }
+  calcRempart();updRes();calcVueGlobale();
+  showToast('↺ Annulé — −'+fmt(surplus)+'€ retirés du rempart');
+  S_lastValidationSurplus=0;
+  // Revenir au bouton "Ajouter"
+  const btn=document.getElementById('tp-validation-btn');
+  const titre=document.getElementById('tp-validation-titre');
+  const desc=document.getElementById('tp-validation-desc');
+  if(btn){
+    btn.style.background='linear-gradient(135deg,var(--gr),#059669)';
+    btn.setAttribute('onclick','validerSurplusPro()');
+    btn.innerHTML='+ Ajouter <span id="tp-btn-surplus">'+fmt(S.surplusPro||0)+'€</span> au rempart';
+  }
+  if(titre)titre.textContent='✅ Valider l\'ajout de ce mois';
+  if(desc)desc.textContent='Confirme que le surplus pro du mois a bien été conservé sur le compte choisi ci-dessus. Le rempart augmente d\'autant.';
+}
+
+// ── VUE GLOBALE — synthèse patrimoniale actuelle (non projetée, sans double comptage)
+function lblCpt(val){
+  const map={pro:'💼 Compte pro',courant:'Compte courant',la:'💧 Livret A',lep:'⭐ LEP',ldds:'🌿 LDDS'};
+  if(map[val])return map[val];
+  if(val&&val.startsWith('extra_')){const id=val.replace('extra_','');const ec=extraComptes.find(c=>c.id===id);return ec&&ec.nom?ec.nom:'Compte';}
+  return 'Compte courant';
+}
+function calcVueGlobale(){
+  const boxRes=document.getElementById('vue-globale-reserves');
+  const boxLibre=document.getElementById('vue-globale-libre');
+  if(!boxRes||!boxLibre)return;
+
+  const tpCpt=document.getElementById('tp-cpt')?.value||'pro';
+  const extCpt=document.getElementById('ext-cpt')?.value||'courant';
+  const perCpt=document.getElementById('per-cpt')?.value||'courant';
+
+  const rempart=S.tp_a||0,ext=S.ext_a||0,per=S.per_a||0;
+  const objRempart=(()=>{
+    if(S.rempartObjManuel!=null)return S.rempartObjManuel;
+    const ca=gv('p-ca',S.ca||0);return ca>0?Math.max(500,Math.round(ca*2/100)*100):0;
+  })();
+  const objExt=getObjExt(),objPer=getObjPer();
+
+  // Tableau des 3 réserves avec compte rattaché + objectif
+  const reserves=[
+    {n:'🏦 Rempart pro',v:rempart,o:objRempart,c:'var(--cy)',cpt:tpCpt},
+    {n:'🎯 Réserve Imprévus',v:ext,o:objExt,c:'var(--am)',cpt:extCpt},
+    {n:'🏠 Réserve Perso',v:per,o:objPer,c:'var(--gr)',cpt:perCpt},
+  ];
+  boxRes.innerHTML=reserves.map(r=>{
+    const pct=r.o>0?Math.min(100,Math.round(r.v/r.o*100)):0;
+    return `<div class="rb"><div class="rb-l"><div class="rb-n">${r.n}</div><div style="font-size:.79rem;font-weight:700;color:${r.c};margin-top:2px">${lblCpt(r.cpt)}</div><div class="rb-d">objectif ${fmt(r.o)}€ (${pct}%)</div></div><div class="rb-v" style="color:${r.c}">${fmt(r.v)}€</div></div>`;
+  }).join('');
+
+  // Comptes "consommés" par une réserve (pour éviter le double comptage)
+  const comptesAffectes=new Set();
+  [tpCpt,extCpt,perCpt].forEach(c=>{if(c&&c!=='courant'&&c!=='pro')comptesAffectes.add(c);});
+
+  // Livrets — exclure ceux déjà affectés à une réserve
+  const livDefs=[{id:'lep',lbl:'⭐ LEP',sol:gv('sol-lep',0)},{id:'la',lbl:'💧 Livret A',sol:gv('sol-la',0)},{id:'ldds',lbl:'🌿 LDDS',sol:gv('sol-ldds',0)}];
+  let totalLivLibre=0;
+  const livLibreItems=[];
+  livDefs.forEach(l=>{
+    if(comptesAffectes.has(l.id)){
+      // ce livret est déjà compté dans une réserve ci-dessus
+      return;
+    }
+    totalLivLibre+=l.sol;
+    if(l.sol>0)livLibreItems.push(`<div class="rb"><div class="rb-l"><div class="rb-n">${l.lbl}</div></div><div class="rb-v" style="color:var(--vi)">${fmt(l.sol)}€</div></div>`);
+  });
+
+  // Investissement (PEA + CTO/AV/PER) — jamais utilisé comme compte de réserve actuellement, donc toujours "libre"
+  const sPea=gv('inv-pea-sol',0),sAutre=gv('inv-autre-sol',0);
+  const totalInvest=sPea+sAutre;
+  if(sPea>0)livLibreItems.push(`<div class="rb"><div class="rb-l"><div class="rb-n">📈 PEA</div></div><div class="rb-v" style="color:var(--gr)">${fmt(sPea)}€</div></div>`);
+  if(sAutre>0)livLibreItems.push(`<div class="rb"><div class="rb-l"><div class="rb-n">📊 CTO / AV / PER</div></div><div class="rb-v" style="color:var(--gr)">${fmt(sAutre)}€</div></div>`);
+
+  // Comptes supplémentaires — exclure ceux affectés à une réserve
+  let totalExtraLibre=0;
+  extraComptes.forEach(c=>{
+    const val='extra_'+c.id;
+    if(comptesAffectes.has(val))return;
+    const s=parseFloat(c.solde)||0;
+    totalExtraLibre+=s;
+    if(s>0&&c.nom)livLibreItems.push(`<div class="rb"><div class="rb-l"><div class="rb-n">🏛️ ${c.nom}</div></div><div class="rb-v" style="color:var(--tx2)">${fmt(s)}€</div></div>`);
+  });
+
+  boxLibre.innerHTML=livLibreItems.length?livLibreItems.join(''):'<div style="font-size:.7rem;color:#8899AA;padding:6px 0">Tout ton épargne/investissement est déjà affecté à une réserve.</div>';
+
+  const totalLibre=totalLivLibre+totalInvest+totalExtraLibre;
+  const totalGlobal=rempart+ext+per+totalLibre;
+  se('vue-globale-total',fmt(totalGlobal)+'€');
+}
+
+window.addEventListener('load',()=>{updateProgress(0);buildAllCompteOptions();calcAllProj();calcVueGlobale();updPalierLabels();syncMensualitesPerso();});
+</script>
+</body>
+</html>
