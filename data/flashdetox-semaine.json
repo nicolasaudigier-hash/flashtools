@@ -1,35 +1,44 @@
 {
-  "generatedAt": null,
   "items": [
     {
-      "affirmation": "Le réchauffement climatique marque une pause depuis 10 ans",
-      "score": 7,
-      "contexte": "Affirmation appuyée sur des graphiques tronqués, largement partagée sur les réseaux sociaux.",
-      "historique": "Réapparaît depuis 2013 — souvent liée aux négociations climatiques",
-      "web": "Les données satellitaires et les relevés océaniques montrent une hausse continue. Les années 2014-2024 comptent parmi les plus chaudes jamais enregistrées.",
-      "analyse": "L'affirmation repose sur une sélection partielle des données. En choisissant une année exceptionnellement chaude comme point de départ, on crée l'illusion d'une stagnation.",
-      "conclusion": "Très probablement fausse. Le consensus scientifique et les données disponibles la contredisent clairement.",
-      "sources": ["NASA GISS Surface Temperature", "NOAA Global Climate Report", "WMO State of the Global Climate"]
+      "affirmation": "\"L'IA de Meta peut lire tous vos messages WhatsApp\" — message viral circulant en juin 2026",
+      "score": 4,
+      "contexte": "Un message alarmiste, très partagé sur WhatsApp et les réseaux sociaux en ce début juin, affirme que \"l'IA de Meta a désormais accès à toutes les discussions\", même privées, et qu'elle pourrait \"récupérer des informations personnelles\" sur les téléphones des utilisateurs. Il invite les administrateurs de groupes à modifier d'urgence leurs paramètres de confidentialité.",
+      "historique": "Ce type de message-chaîne paniquant autour de la vie privée numérique circule de manière récurrente depuis des années. Chaque évolution d'une plateforme majeure (Facebook, WhatsApp, Instagram) génère des vagues similaires d'alertes non vérifiées. Le lancement de Meta AI sur WhatsApp au printemps 2025 a fourni un nouveau prétexte à ces rumeurs.",
+      "web": "Vérifié par franceinfo (rubrique Vrai ou Faux, semaine du 9 juin 2026) et ICI.fr (Radio France). Les deux médias ont testé le fonctionnement réel de Meta AI sur l'application.",
+      "analyse": "Le message confond délibérément deux réalités distinctes. D'une part, WhatsApp a bien introduit en avril 2025 une fonctionnalité appelée \"Confidentialité avancée des discussions\", qui renforce la protection de certaines conversations. D'autre part, Meta AI est accessible sur WhatsApp depuis mars 2025 — ce n'est donc pas une nouveauté. Surtout, selon les vérifications de franceinfo et Radio France, Meta AI ne peut accéder aux messages que si l'utilisateur lui envoie explicitement un message ou la mentionne dans une conversation : il ne voit pas l'historique des échanges et n'a pas accès aux contacts.",
+      "conclusion": "FAUX. Le message exploite une peur légitime autour de la vie privée, mais son affirmation centrale — que l'IA lit automatiquement toutes vos conversations — est inexacte. L'IA n'intervient que lorsqu'elle est directement sollicitée par l'utilisateur.",
+      "sources": [
+        "franceinfo – Vrai ou Faux, « L'IA de Meta ne peut pas lire vos messages sur WhatsApp », juin 2026",
+        "ICI.fr (Radio France) – « Non, l'IA de WhatsApp n'a pas accès à toutes les conversations », juin 2026"
+      ]
     },
     {
-      "affirmation": "L'IA va supprimer 50% des emplois d'ici 2030",
-      "score": 18,
-      "contexte": "Chiffre repris dans les médias, issu d'études aux méthodologies très variables.",
-      "historique": "Variantes de cette affirmation circulent depuis 2013 — le chiffre change selon les sources",
-      "web": "L'OCDE évalue à 14% la part des emplois fortement automatisables. Les études sérieuses parlent de transformation plutôt que de suppression massive.",
-      "analyse": "La distinction entre transformation et suppression est essentielle. Historiquement, les révolutions technologiques créent autant d'emplois qu'elles en détruisent, avec des délais d'adaptation.",
-      "conclusion": "Très probablement exagérée. Une transformation significative est certaine, une suppression de 50% est peu probable à cette échéance.",
-      "sources": ["OCDE — Automatisation et emploi", "McKinsey Global Institute", "WEF Future of Jobs Report"]
+      "affirmation": "\"Il n'y a qu'en France où la victoire d'un club de foot provoque des émeutes\" — Marine Le Pen sur X, 30 mai 2026",
+      "score": 12,
+      "contexte": "Le soir du 30 mai 2026, quelques heures après la victoire du PSG en finale de la Ligue des champions contre Arsenal, des violences et dégradations ont éclaté à Paris et dans plusieurs villes françaises. Marine Le Pen a immédiatement publié sur X : \"Il n'y a qu'en France où la victoire d'un club de foot provoque des émeutes.\" Ce post a été aimé plus de 57 000 fois.",
+      "historique": "Les violences associées au football ne sont pas un phénomène nouveau ni exclusivement français. Des incidents liés au supportérisme et aux rassemblements festifs ont été documentés dans de nombreux pays européens, notamment autour de grandes compétitions. En novembre 2024, de graves violences avaient déjà éclaté à Amsterdam lors d'un match Ajax-Maccabi Tel-Aviv.",
+      "web": "Vérifié par franceinfo (Vrai ou Faux, 3 juin 2026) avec le concours de deux sociologues spécialistes : Williams Nuytens (université d'Artois) et Nicolas Hourcade (École centrale de Lyon). Couverture également assurée par Public Sénat avec Fabien Jobard (CNRS).",
+      "analyse": "Les violences après la victoire du PSG sont réelles et significatives : plus de 890 interpellations, 178 policiers blessés. Personne ne les nie. Mais l'affirmation selon laquelle seule la France connaîtrait ce phénomène est factuellement inexacte. Le sociologue Williams Nuytens confirme que des violences liées au football surviennent régulièrement en Turquie, en Belgique, en Pologne et aux Pays-Bas. Fabien Jobard (CNRS) nuance lui-même en parlant d'une \"spécificité parisienne plutôt que française\", liée à l'histoire particulière des banlieues parisiennes avec les forces de l'ordre. Les sociologues distinguent en outre ces violences urbaines opportunistes des violences de hooligans classiques.",
+      "conclusion": "TROMPEUR. Les violences post-PSG sont bien réelles et préoccupantes, mais l'affirmation d'une exclusivité française est inexacte : des incidents comparables se produisent régulièrement dans d'autres pays européens. La formulation de Marine Le Pen généralise excessivement et efface des réalités documentées à l'étranger.",
+      "sources": [
+        "franceinfo – Vrai ou Faux, « La France est-elle le seul pays où la victoire d'un club de foot provoque des émeutes ? », juin 2026",
+        "Public Sénat – « Violences après la victoire du PSG : plutôt une spécificité parisienne que française », Fabien Jobard (CNRS), juin 2026"
+      ]
     },
     {
-      "affirmation": "Les réseaux sociaux sont conçus intentionnellement pour rendre les enfants dépendants",
-      "score": 62,
-      "contexte": "Portée par d'anciens ingénieurs de Meta et des chercheurs en psychologie comportementale.",
-      "historique": "Débat relancé en 2021 après les révélations de Frances Haugen",
-      "web": "Des documents internes de Meta révèlent des mécanismes conçus pour maximiser le temps passé. Des études montrent des effets sur le système dopaminergique.",
-      "analyse": "Les plateformes optimisent l'engagement, ce qui produit des effets similaires à la dépendance. L'intentionnalité explicite reste difficile à prouver juridiquement.",
-      "conclusion": "Partiellement fondée. Les mécanismes existent, leur intentionnalité précise reste débattue.",
-      "sources": ["WSJ — The Facebook Files", "American Psychological Association", "Rapport Sénat français 2023"]
+      "affirmation": "\"1 500 entreprises françaises ont été rachetées par des capitaux américains en dix ans\" (affirmation présentée comme scandaleuse et à sens unique) — François Ruffin, franceinfo, 2 juin 2026",
+      "score": 58,
+      "contexte": "En marge du sommet Choose France (1er juin 2026), où Emmanuel Macron a annoncé 93 milliards d'euros d'investissements, le député François Ruffin a déclaré sur franceinfo : \"Il y a eu 1 500 entreprises françaises qui ont été rachetées par des capitaux américains ces dix dernières années\", pour appeler à \"se protéger\" des capitaux étrangers. Ce chiffre a été largement repris et amplifié sur les réseaux sociaux.",
+      "historique": "Le débat sur les rachats d'entreprises françaises par des capitaux étrangers est récurrent depuis l'affaire Alstom-GE (2014). Le chiffre de \"1 500\" circule depuis plusieurs mois dans les discours souverainistes de droite comme de gauche, parfois présenté comme une preuve d'un \"pillage\" unilatéral de l'économie française.",
+      "web": "Vérifié par franceinfo (Vrai ou Faux) et Les Vérificateurs de TF1, à partir des données du London Stock Exchange Group (LSEG), compilées à la demande des Échos (février 2025).",
+      "analyse": "Le chiffre brut est globalement exact : selon le LSEG, 1 608 entreprises françaises ont été rachetées par des capitaux américains depuis 2014. Cependant, l'affirmation est trompeuse par omission : elle ne mentionne pas que le flux est réciproque. Sur la même période, 1 177 entreprises américaines sont passées sous pavillon français (LVMH-Tiffany, Danone-WhiteWave, EDF-turbines Arabelle, etc.). Les Français ont d'ailleurs dépensé davantage en valeur pour ces rachats aux États-Unis que les Américains en France. Présenter ce chiffre seul, sans le flux inverse, donne une image déformée de la réalité des échanges économiques transatlantiques.",
+      "conclusion": "PARTIELLEMENT VRAI MAIS TROMPEUR. Le chiffre des 1 500 (en réalité 1 608) rachats est confirmé par les données du LSEG. Mais présenté sans le contexte des rachats français aux États-Unis (1 177 entreprises), il donne une image unilatérale et anxiogène de la réalité des flux d'investissements transatlantiques.",
+      "sources": [
+        "franceinfo – Vrai ou Faux, « 1 500 entreprises françaises ont-elles été rachetées par des capitaux américains en 10 ans ? », juin 2026",
+        "London Stock Exchange Group (LSEG) – données compilées pour Les Échos, février 2025, citées par TF1 Les Vérificateurs"
+      ]
     }
-  ]
+  ],
+  "generatedAt": "2026-06-18T11:58:01.791Z"
 }
