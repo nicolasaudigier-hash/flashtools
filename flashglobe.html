@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlashGlobe — Fuseaux horaires & Globe | FlashTools</title>
+<meta name="description" content="Convertisseur de fuseaux horaires avec globe terrestre temps réel. Ombre solaire, continents, tropiques. Gratuit, sans API.">
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0E27;--bg2:#111827;--surface:#1E293B;--surface2:#243447;
+  --text:#F1F5F9;--text2:#94A3B8;--cyan:#06B6D4;--violet:#8B5CF6;
+  --border:#334155;--success:#10B981;--warning:#F59E0B;--error:#EF4444;
+  --r:10px;--rs:6px;
+}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.5;overflow-x:hidden}
+
+.header{background:rgba(10,14,39,0.96);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.logo-name{font-weight:600;font-size:15px;color:var(--text)}
+.logo-name span{color:var(--cyan)}
+.header-badge{font-size:10px;color:var(--cyan);border:1px solid rgba(6,182,212,0.3);padding:2px 8px;border-radius:20px;letter-spacing:.5px}
+
+.tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;min-width:110px;padding:12px 8px;text-align:center;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
+.tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+.tab:hover:not(.active){color:var(--text);background:rgba(255,255,255,0.03)}
+
+.panel{display:none;padding:16px;max-width:560px;margin:0 auto}
+.panel.active{display:block}
+
+.map-outer{border-radius:var(--r);overflow:hidden;border:1px solid var(--border);background:#03050d;position:relative;max-width:560px;margin:0 auto}
+.map-outer canvas{display:block;width:100%;height:auto}
+.map-loading{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);color:rgba(6,182,212,0.55);font-size:10px;font-family:monospace;text-align:center;pointer-events:none;background:rgba(3,5,13,0.7);padding:2px 8px;border-radius:4px}
+
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+@media(max-width:480px){.stats-bar{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:7px 10px}
+.stat-l{font-size:9px;color:var(--text2);margin-bottom:2px;letter-spacing:.3px;text-transform:uppercase}
+.stat-v{font-size:11px;font-weight:600;color:var(--cyan);font-family:monospace}
+
+.legend{display:flex;flex-wrap:wrap;gap:9px;margin-top:8px;padding:9px 11px;background:var(--surface);border-radius:var(--rs);border:1px solid var(--border)}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2)}
+.leg-sw{width:18px;height:7px;border-radius:2px;flex-shrink:0}
+.leg-eq{width:18px;height:2px;background:var(--cyan);flex-shrink:0}
+.leg-tr{width:18px;height:0;border-top:2px dashed rgba(245,200,66,.8);flex-shrink:0}
+.leg-ca{width:18px;height:0;border-top:2px dashed rgba(245,160,50,.8);flex-shrink:0}
+.leg-po{width:18px;height:0;border-top:2px dotted rgba(180,210,230,.5);flex-shrink:0}
+.leg-note{margin-left:auto;font-size:9px;color:rgba(148,163,184,.4)}
+
+.geo-info{margin-top:8px;padding:11px;background:var(--surface);border-radius:var(--rs);border:1px solid var(--border);font-size:11px;color:var(--text2);line-height:1.9}
+.geo-info b{color:var(--text)}
+
+.stitle{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 10px;display:flex;align-items:center;gap:8px}
+.stitle::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.src-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px}
+.src-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+@media(max-width:480px){.src-grid{grid-template-columns:1fr 1fr}}
+.now-display{text-align:center;padding:8px 0 4px}
+.now-time{font-size:34px;font-weight:700;color:var(--cyan);font-family:monospace;letter-spacing:-1px;line-height:1}
+.now-date{font-size:12px;color:var(--text2);margin-top:4px;text-transform:capitalize}
+.overlay-toggle{margin-bottom:10px;max-width:560px;margin-left:auto;margin-right:auto}
+.mode-switch{display:flex;gap:6px;margin-bottom:10px;max-width:560px;margin-left:auto;margin-right:auto}
+.mode-btn{flex:1;padding:8px 10px;border-radius:var(--rs);border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
+.mode-btn.active{background:linear-gradient(135deg,var(--cyan),var(--violet));color:#fff;border-color:transparent}
+.mode-btn:hover:not(.active){border-color:var(--cyan);color:var(--text)}
+.tz-gradient-legend{display:flex;align-items:center;gap:8px;max-width:560px;margin:8px auto 0;font-size:10px;color:var(--text2)}
+.tz-gradient-bar{flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,rgb(139,92,246) 0%,rgb(99,130,246) 15%,rgb(45,170,235) 30%,rgb(6,182,212) 50%,rgb(16,185,129) 65%,rgb(234,179,8) 80%,rgb(249,115,22) 92%,rgb(244,114,182) 100%)}
+.map-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;max-width:560px;margin-left:auto;margin-right:auto;flex-wrap:wrap}
+.toggle-label{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer;user-select:none}
+.toggle-label input{width:15px;height:15px;accent-color:var(--cyan);cursor:pointer}
+.map-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#03050d;z-index:1000;flex-direction:column}
+.map-modal.open{display:flex}
+.map-modal-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--border)}
+.map-modal-canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:auto;padding:12px}
+.map-modal-canvas-wrap canvas{max-width:100%;max-height:100%;width:auto;height:auto;border-radius:var(--r)}
+.ilabel{display:block;font-size:11px;color:var(--text2);margin-bottom:4px}
+input[type=date],input[type=time],select,input[type=text]{
+  width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);
+  color:var(--text);padding:7px 10px;font-size:13px;outline:none;transition:border .2s;-webkit-appearance:none;
+}
+input:focus,select:focus{border-color:var(--cyan)}
+select option{background:var(--bg2)}
+.btn{padding:7px 14px;border-radius:var(--rs);cursor:pointer;font-size:12px;font-weight:500;border:1px solid var(--border);background:var(--surface);color:var(--text);transition:all .2s;white-space:nowrap}
+.btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.btn-primary{background:linear-gradient(135deg,var(--cyan),var(--violet));border:none;color:#fff}
+.btn-primary:hover{opacity:.88;color:#fff}
+.btn-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.search-wrap{position:relative;flex:1;min-width:160px}
+.search-results{position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);z-index:50;max-height:180px;overflow-y:auto;display:none;margin-top:2px}
+.search-results.open{display:block}
+.s-item{padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid rgba(51,65,85,.4)}
+.s-item:last-child{border-bottom:none}
+.s-item:hover{background:var(--surface2)}
+.s-item-tz{font-size:10px;color:var(--text2)}
+.city-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-top:10px}
+.city-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px;position:relative;transition:border-color .2s}
+.city-card:hover{border-color:rgba(6,182,212,.4)}
+.city-card.night-card{background:var(--bg2)}
+.city-flag{font-size:16px;margin-bottom:4px;display:block}
+.city-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:1px}
+.city-tz-off{font-size:10px;color:var(--text2);margin-bottom:6px}
+.city-time{font-size:23px;font-weight:700;color:var(--text);letter-spacing:-1px;font-family:monospace;line-height:1}
+.city-date{font-size:10px;color:var(--text2);margin-top:2px}
+.city-badge{position:absolute;top:8px;right:8px;font-size:9px;padding:2px 6px;border-radius:8px}
+.b-day{background:rgba(16,185,129,.12);color:#10B981}
+.b-night{background:rgba(148,163,184,.1);color:var(--text2)}
+.city-rm{position:absolute;bottom:6px;right:6px;background:none;border:none;cursor:pointer;color:var(--text2);opacity:0;transition:opacity .2s;font-size:14px;padding:2px 5px;line-height:1}
+.city-card:hover .city-rm{opacity:1}
+.city-rm:hover{color:var(--error)}
+.city-card-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;border-style:dashed;background:transparent;color:var(--text2);min-height:108px}
+.city-empty-icon{font-size:20px;color:rgba(148,163,184,.3);margin-bottom:4px;line-height:1}
+.city-empty-label{font-size:10px;color:rgba(148,163,184,.4)}
+.empty-state{text-align:center;padding:32px 16px;color:var(--text2);font-size:13px}
+.diff-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:9px 12px;font-size:11px;color:var(--text2);margin-top:8px;line-height:1.9}
+.tl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-top:10px;overflow-x:auto}
+.tl-row{display:flex;align-items:center;margin-bottom:3px}
+.tl-city{font-size:10px;color:var(--text2);width:70px;flex-shrink:0}
+.tl-cells{display:flex;flex:1;gap:1px;min-width:340px}
+.tl-cell{flex:1;height:17px;border-radius:2px;position:relative;cursor:default}
+.tl-work{background:rgba(6,182,212,.55)}
+.tl-off{background:rgba(51,65,85,.35)}
+.tl-now{outline:2px solid var(--cyan);outline-offset:-1px}
+.tl-cell:hover::after{content:attr(data-tip);position:absolute;top:-22px;left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:2px 6px;font-size:9px;color:var(--text);white-space:nowrap;z-index:20;pointer-events:none}
+.overlap-note{font-size:11px;color:var(--text2);margin-top:6px}
+.overlap-note b{color:var(--cyan)}
+.copy-bar{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding:9px 12px;background:var(--surface);border-radius:var(--rs);border:1px solid var(--border);gap:10px}
+.copy-text{font-size:10px;color:var(--text2);font-family:monospace;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.sph-outer{background:#03050d;border-radius:var(--r);border:1px solid var(--border);overflow:hidden;position:relative;max-width:560px;margin:0 auto}
+.sph-outer canvas{display:block;width:100%;height:auto}
+.sph-loading{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);color:rgba(6,182,212,.55);font-size:10px;font-family:monospace;text-align:center;pointer-events:none;background:rgba(3,5,13,0.7);padding:2px 8px;border-radius:4px}
+
+.sph-pick{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.sph-pick-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+@media(max-width:480px){.sph-pick-grid{grid-template-columns:1fr 1fr}}
+
+.day-indicator{display:flex;align-items:center;gap:10px;margin-top:10px;padding:10px 12px;background:var(--surface);border-radius:var(--rs);border:1px solid var(--border)}
+.day-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dot-day{background:#F5C842;box-shadow:0 0 8px rgba(245,200,66,.6)}
+.dot-night{background:#3a5a8a}
+.dot-twilight{background:linear-gradient(90deg,#F5C842,#3a5a8a)}
+.day-indicator-text{font-size:12px;color:var(--text2)}
+.day-indicator-text b{color:var(--text)}
+
+.footer{text-align:center;padding:16px;font-size:10px;color:rgba(148,163,184,.3);border-top:1px solid var(--border);margin-top:16px}
+.footer a{color:rgba(6,182,212,.3);text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo-name">Flash<span>Globe</span></div>
+  <div class="header-badge">FLASHTOOLS.FR</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('converter')">Fuseaux horaires</div>
+  <div class="tab" onclick="switchTab('flatglobe')">Globe plat</div>
+  <div class="tab" onclick="switchTab('sphere')">Vue sphérique</div>
+</div>
+
+<!-- ══════════════════════════════════════ TAB 1 — CONVERTISSEUR ══════════════════════════════════════ -->
+<div class="panel active" id="tab-converter">
+
+  <div class="stitle" style="margin-top:0">Heure actuelle (votre fuseau)</div>
+  <div class="src-card">
+    <div class="now-display">
+      <div class="now-time" id="now-time">--:--:--</div>
+      <div class="now-date" id="now-date">—</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="addPresets()">+ Capitales</button>
+      <button class="btn" onclick="clearCities()">Effacer tout</button>
+    </div>
+  </div>
+
+  <div class="stitle">Ajouter une ville</div>
+  <div class="btn-row" style="margin-bottom:0">
+    <select id="city-picker" style="flex:1;min-width:160px"></select>
+    <button class="btn btn-primary" onclick="addPickedCity()">Ajouter</button>
+  </div>
+
+  <div class="city-grid" id="city-grid"></div>
+  <div class="diff-bar" id="diff-bar" style="display:none"></div>
+
+  <div id="tl-section" style="display:none">
+    <div class="stitle">Heures de travail (9h–18h)</div>
+    <div class="tl-wrap">
+      <div id="tl-grid"></div>
+      <div class="overlap-note" id="tl-overlap"></div>
+    </div>
+  </div>
+
+  <div class="copy-bar" id="copy-bar" style="display:none">
+    <span class="copy-text" id="copy-text"></span>
+    <button class="btn" onclick="doCopy(this)">Copier</button>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════ TAB 2 — GLOBE PLAT ══════════════════════════════════════ -->
+<div class="panel" id="tab-flatglobe">
+
+  <div class="mode-switch">
+    <button class="mode-btn active" id="mode-btn-solar" onclick="switchMapMode('solar')">Carte solaire</button>
+    <button class="mode-btn" id="mode-btn-tz" onclick="switchMapMode('tz')">Fuseaux du monde</button>
+  </div>
+
+  <div class="map-toolbar">
+    <label class="toggle-label" id="tz-overlay-wrap">
+      <input type="checkbox" id="tz-overlay-toggle" onchange="onTzOverlayToggle()">
+      <span>Afficher les fuseaux horaires (UTC)</span>
+    </label>
+    <button class="btn" onclick="openMapModal()" title="Agrandir la carte">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+      Agrandir
+    </button>
+  </div>
+
+  <div class="map-outer">
+    <canvas id="cv-flat" width="560" height="280"></canvas>
+    <div class="map-loading" id="flat-loading">Chargement des continents…</div>
+  </div>
+
+  <div class="stats-bar" id="solar-stats">
+    <div class="stat-card"><div class="stat-l">UTC</div><div class="stat-v" id="f-utc">--:--:--</div></div>
+    <div class="stat-card"><div class="stat-l">Déclinaison</div><div class="stat-v" id="f-dec">--</div></div>
+    <div class="stat-card"><div class="stat-l">Lon. subsolare</div><div class="stat-v" id="f-lon">--</div></div>
+    <div class="stat-card"><div class="stat-l">Saison (N)</div><div class="stat-v" id="f-sea">--</div></div>
+  </div>
+
+  <div class="legend" id="solar-legend">
+    <div class="leg-item"><div class="leg-sw" style="background:#1a3a5c"></div>Océan jour</div>
+    <div class="leg-item"><div class="leg-sw" style="background:#07091a"></div>Océan nuit</div>
+    <div class="leg-item"><div class="leg-sw" style="background:#2a5c3a"></div>Terres jour</div>
+    <div class="leg-item"><div class="leg-sw" style="background:#08120c"></div>Terres nuit</div>
+    <div class="leg-item"><div class="leg-eq"></div>Équateur</div>
+    <div class="leg-item"><div class="leg-tr"></div>Tropique Cancer</div>
+    <div class="leg-item"><div class="leg-ca"></div>Tropique Capricorne</div>
+    <div class="leg-item"><div class="leg-po"></div>Cercles polaires</div>
+    <div class="leg-note">Natural Earth 110m</div>
+  </div>
+
+  <div class="geo-info" id="solar-geo-info">
+    <b>Équateur (0°)</b> — cercle équidistant des deux pôles ·
+    <b>Tropique du Cancer (23.4° N)</b> — latitude max du soleil au zénith ·
+    <b>Tropique du Capricorne (23.4° S)</b> — latitude min ·
+    <b>Cercles polaires (66.5°)</b> — au-delà : soleil de minuit ou nuit polaire possible ·
+    <b>Moscou (55.8° N)</b> est à ~11° du cercle arctique — géographiquement correct.
+  </div>
+
+  <div class="stats-bar" id="tz-stats" style="display:none">
+    <div class="stat-card" style="grid-column:1/-1">
+      <div class="stat-l" id="tz-hover-label">Survolez ou touchez un pays pour voir son fuseau</div>
+      <div class="stat-v" id="tz-hover-info">—</div>
+    </div>
+  </div>
+
+  <div class="tz-gradient-legend" id="tz-gradient-legend" style="display:none">
+    <span>UTC-12</span>
+    <div class="tz-gradient-bar"></div>
+    <span>UTC+12</span>
+  </div>
+
+  <div class="geo-info" id="tz-geo-info" style="display:none">
+    Carte des fuseaux horaires réellement utilisés par chaque pays (et non un simple découpage théorique tous les 15°).
+    Les grands pays à plusieurs fuseaux — <b>Russie</b>, <b>États-Unis</b>, <b>Canada</b>, <b>Brésil</b>, <b>Australie</b> —
+    sont subdivisés selon leurs zones administratives réelles. Couleurs distinctes par décalage UTC, du violet (ouest) au rose (est).
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════ TAB 3 — SPHÈRE ══════════════════════════════════════ -->
+<div class="panel" id="tab-sphere">
+
+  <div class="stitle" style="margin-top:0">Centrer la vue sur</div>
+  <div class="sph-pick">
+    <label class="ilabel">Ville / fuseau</label>
+    <select id="sph-tz" style="width:100%"></select>
+  </div>
+
+  <div class="map-toolbar" style="justify-content:flex-end">
+    <button class="btn" onclick="openSphModal()" title="Agrandir la sphère">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+      Agrandir
+    </button>
+  </div>
+
+  <div class="sph-outer">
+    <canvas id="cv-sphere" width="560" height="370"></canvas>
+    <div class="sph-loading" id="sph-loading">Chargement des continents…</div>
+  </div>
+
+  <div class="day-indicator">
+    <div class="day-dot" id="day-dot"></div>
+    <div class="day-indicator-text" id="day-text">—</div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-card"><div class="stat-l">Heure au point</div><div class="stat-v" id="s-localtime">--:--</div></div>
+    <div class="stat-card"><div class="stat-l">Déclinaison</div><div class="stat-v" id="s-dec">--</div></div>
+    <div class="stat-card"><div class="stat-l">Élévation soleil</div><div class="stat-v" id="s-elev">--</div></div>
+    <div class="stat-card"><div class="stat-l">Saison</div><div class="stat-v" id="s-sea">--</div></div>
+  </div>
+
+  <div class="legend">
+    <div class="leg-item"><div class="leg-sw" style="background:#1a3a5c;border-radius:50%"></div>Océan jour</div>
+    <div class="leg-item"><div class="leg-sw" style="background:#070d0a;border-radius:50%"></div>Nuit</div>
+    <div class="leg-item"><div class="leg-sw" style="background:#2a5c3a;border-radius:50%"></div>Terres</div>
+    <div class="leg-item"><div class="leg-eq"></div>Équateur</div>
+    <div class="leg-item"><div class="leg-tr"></div>Tropique Cancer</div>
+    <div class="leg-item"><div class="leg-ca"></div>Tropique Capricorne</div>
+    <div class="leg-note">Le point choisi est toujours au centre · temps réel</div>
+  </div>
+
+</div>
+
+<div class="map-modal" id="map-modal">
+  <div class="map-modal-bar">
+    <label class="toggle-label" id="tz-overlay-toggle-modal-wrap">
+      <input type="checkbox" id="tz-overlay-toggle-modal" onchange="onTzOverlayToggleModal()">
+      <span>Fuseaux horaires (UTC)</span>
+    </label>
+    <button class="btn" onclick="closeMapModal()">Fermer</button>
+  </div>
+  <div class="map-modal-canvas-wrap">
+    <canvas id="cv-flat-modal" width="1400" height="700"></canvas>
+  </div>
+</div>
+
+<div class="map-modal" id="sph-modal">
+  <div class="map-modal-bar">
+    <span class="toggle-label" id="sph-modal-label">—</span>
+    <button class="btn" onclick="closeSphModal()">Fermer</button>
+  </div>
+  <div class="map-modal-canvas-wrap">
+    <canvas id="cv-sphere-modal" width="1000" height="660"></canvas>
+  </div>
+</div>
+
+<div class="footer">FlashGlobe · <a href="https://flashtools.fr">FlashTools.fr</a> · Calculs astronomiques locaux · Aucune API · 0€</div>
+
+<script>
+'use strict';
+
+// ════════════════════════════════════════════════════════
+// ASTRONOMIE
+// ════════════════════════════════════════════════════════
+function getSunPos(date) {
+  const JD = date.getTime() / 86400000 + 2440587.5;
+  const n  = JD - 2451545.0;
+  const L  = (280.46 + 0.9856474 * n) % 360;
+  const g  = ((357.528 + 0.9856003 * n) % 360) * Math.PI / 180;
+  const lam = (L + 1.915 * Math.sin(g) + 0.02 * Math.sin(2 * g)) * Math.PI / 180;
+  const eps = 23.439 * Math.PI / 180;
+  const dec = Math.asin(Math.sin(eps) * Math.sin(lam)) * 180 / Math.PI;
+  const gmst = (280.46061837 + 360.98564736629 * n) % 360;
+  const ra   = Math.atan2(Math.cos(eps) * Math.sin(lam), Math.cos(lam)) * 180 / Math.PI;
+  const lon  = ((ra - gmst) % 360 + 540) % 360 - 180;
+  return { dec, lon };
+}
+function solarAngle(lat, lon, sdec, slon) {
+  const a = lat * Math.PI/180, b = lon * Math.PI/180;
+  const c = sdec* Math.PI/180, d = slon * Math.PI/180;
+  return Math.asin(Math.sin(a)*Math.sin(c) + Math.cos(a)*Math.cos(c)*Math.cos(b-d)) * 180 / Math.PI;
+}
+function season(date, lat) {
+  const d = Math.floor((date - new Date(date.getFullYear(),0,0)) / 86400000);
+  const northSeason = d<80?'Hiver':d<172?'Printemps':d<264?'Été':d<355?'Automne':'Hiver';
+  if (lat === undefined || lat >= 0) return northSeason;
+  // Hémisphère sud : saisons inversées
+  const invert = { 'Hiver':'Été', 'Été':'Hiver', 'Printemps':'Automne', 'Automne':'Printemps' };
+  return invert[northSeason];
+}
+function pad(n) { return String(n).padStart(2,'0'); }
+function utcStr(d) { return `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`; }
+
+// ════════════════════════════════════════════════════════
+// DONNÉES PARTAGÉES
+// ════════════════════════════════════════════════════════
+const STATE = { geoRings: null, sphReady: false };
+
+// ════════════════════════════════════════════════════════
+// GLOBE PLAT  440×220 (ratio 2:1 strict, taille réduite)
+// ════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
+// DONNÉES FUSEAUX HORAIRES PAR PAYS (carte "politique", pas théorique)
+// Table de correspondance basée sur les fuseaux IANA réellement appliqués.
+// Les grands pays multi-fuseaux ont des bornes de longitude internes (MULTI_TZ_BOUNDS).
+// ════════════════════════════════════════════════════════
+const COUNTRY_TZ = {"Portugal":[0],"United Kingdom":[0],"Ireland":[0],"Iceland":[0],"Spain":[1],"France":[1],"Germany":[1],"Belgium":[1],"Netherlands":[1],"Switzerland":[1],"Austria":[1],"Italy":[1],"Poland":[1],"Czechia":[1],"Czech Rep.":[1],"Slovakia":[1],"Hungary":[1],"Slovenia":[1],"Croatia":[1],"Denmark":[1],"Norway":[1],"Sweden":[1],"Luxembourg":[1],"Bosnia and Herz.":[1],"Bosnia and Herzegovina":[1],"Serbia":[1],"Montenegro":[1],"North Macedonia":[1],"Macedonia":[1],"Albania":[1],"Malta":[1],"Greece":[2],"Bulgaria":[2],"Romania":[2],"Finland":[2],"Estonia":[2],"Latvia":[2],"Lithuania":[2],"Ukraine":[2],"Moldova":[2],"Cyprus":[2],"Belarus":[3],"Turkey":[3],"Russia":[3,4,5,6,7,8,9,10,11,12],"Morocco":[1],"Western Sahara":[1],"W. Sahara":[1],"Algeria":[1],"Tunisia":[1],"Kosovo":[1],"Nigeria":[1],"Niger":[1],"Chad":[1],"Cameroon":[1],"Gabon":[1],"Congo":[1],"Eq. Guinea":[1],"Benin":[1],"Angola":[1],"Senegal":[0],"Mali":[0],"Mauritania":[0],"Guinea":[0],"Sierra Leone":[0],"Liberia":[0],"Côte d'Ivoire":[0],"Ivory Coast":[0],"Ghana":[0],"Burkina Faso":[0],"Togo":[0],"Gambia":[0],"Guinea-Bissau":[0],"Egypt":[2],"Libya":[2],"Sudan":[2],"South Sudan":[2],"S. Sudan":[2],"Dem. Rep. Congo":[1,2],"Democratic Republic of the Congo":[1,2],"Rwanda":[2],"Burundi":[2],"Zambia":[2],"Malawi":[2],"Botswana":[2],"Zimbabwe":[2],"Namibia":[2],"South Africa":[2],"Lesotho":[2],"eSwatini":[2],"Eswatini":[2],"Swaziland":[2],"Mozambique":[2],"Kenya":[3],"Tanzania":[3],"Uganda":[3],"Ethiopia":[3],"Somalia":[3],"Somaliland":[3],"Eritrea":[3],"Djibouti":[3],"Madagascar":[3],"Central African Rep.":[1],"Central African Republic":[1],"Israel":[2],"Lebanon":[2],"Jordan":[3],"Syria":[3],"Palestine":[2],"Iraq":[3],"Saudi Arabia":[3],"Kuwait":[3],"Bahrain":[3],"Qatar":[3],"Yemen":[3],"United Arab Emirates":[4],"Oman":[4],"Iran":[3.5],"Afghanistan":[4.5],"Pakistan":[5],"Uzbekistan":[5],"Turkmenistan":[5],"Tajikistan":[5],"Kazakhstan":[5,6],"Kyrgyzstan":[6],"India":[5.5],"Sri Lanka":[5.5],"Nepal":[5.75],"Bangladesh":[6],"Bhutan":[6],"Myanmar":[6.5],"Thailand":[7],"Vietnam":[7],"Cambodia":[7],"Laos":[7],"Indonesia":[7,8,9],"Malaysia":[8],"Singapore":[8],"Brunei":[8],"Philippines":[8],"China":[8],"Mongolia":[8],"Taiwan":[8],"Japan":[9],"South Korea":[9],"North Korea":[9],"Korea":[9],"Australia":[8,9.5,10],"Papua New Guinea":[10],"New Zealand":[12],"Fiji":[12],"New Caledonia":[11],"Solomon Is.":[11],"Solomon Islands":[11],"Vanuatu":[11],"United States of America":[-10,-9,-8,-7,-6,-5],"United States":[-10,-9,-8,-7,-6,-5],"Canada":[-8,-7,-6,-5,-4,-3.5],"Mexico":[-8,-7,-6],"Greenland":[-3],"Cuba":[-5],"Jamaica":[-5],"Haiti":[-5],"Dominican Rep.":[-4],"Dominican Republic":[-4],"Bahamas":[-5],"Puerto Rico":[-4],"Guatemala":[-6],"Belize":[-6],"Honduras":[-6],"El Salvador":[-6],"Nicaragua":[-6],"Costa Rica":[-6],"Panama":[-5],"Colombia":[-5],"Ecuador":[-5],"Peru":[-5],"Venezuela":[-4],"Bolivia":[-4],"Chile":[-4],"Paraguay":[-4],"Guyana":[-4],"Suriname":[-3],"Brazil":[-5,-4,-3],"Argentina":[-3],"Uruguay":[-3],"Falkland Is.":[-3],"Falkland Islands":[-3]};
+const MULTI_TZ_BOUNDS = {"United States of America":[{"lonMax":-141,"utc":-9},{"lonMax":-115,"utc":-8},{"lonMax":-102,"utc":-7},{"lonMax":-87,"utc":-6},{"lonMax":-66,"utc":-5}],"Canada":[{"lonMax":-139,"utc":-8},{"lonMax":-110,"utc":-7},{"lonMax":-95,"utc":-6},{"lonMax":-68,"utc":-5},{"lonMax":-57,"utc":-4},{"lonMax":-52,"utc":-3.5}],"Russia":[{"lonMax":40,"utc":3},{"lonMax":53,"utc":4},{"lonMax":64,"utc":5},{"lonMax":77,"utc":6},{"lonMax":91,"utc":7},{"lonMax":107,"utc":8},{"lonMax":122,"utc":9},{"lonMax":134,"utc":10},{"lonMax":154,"utc":11},{"lonMax":180,"utc":12}],"Brazil":[{"lonMax":-68,"utc":-5},{"lonMax":-52,"utc":-4},{"lonMax":-30,"utc":-3}],"Australia":[{"lonMax":129,"utc":8},{"lonMax":137.5,"utc":9.5},{"lonMax":154,"utc":10}]};
+
+function getCountryUtc(countryName, lon) {
+  if (MULTI_TZ_BOUNDS[countryName]) {
+    const bounds = MULTI_TZ_BOUNDS[countryName];
+    // Pays à bornes positives (ex. Russie, 40°→180°) : une longitude négative
+    // reçue ici vient forcément de l'extrême-est qui a "bouclé" après
+    // l'antiméridien (-179° au lieu de +181°) — on la ramène dans le même
+    // référentiel que les bornes avant de comparer.
+    let lonAdj = lon;
+    if (bounds[0].lonMax > 0 && lonAdj < 0) lonAdj += 360;
+    for (const b of bounds) { if (lonAdj <= b.lonMax) return b.utc; }
+    return bounds[bounds.length-1].utc;
+  }
+  const tz = COUNTRY_TZ[countryName];
+  if (!tz) return null;
+  if (tz.length === 1) return tz[0];
+  // Pays listé avec plusieurs fuseaux mais sans bornes précises : répartir par position relative de lon dans le pays
+  return tz[0]; // fallback simple
+}
+
+// Palette multi-stops : violet (ouest, UTC-12) -> bleu -> cyan (UTC0) -> émeraude -> jaune -> orange -> rose/magenta (est, UTC+12)
+// Plus de stops = plus de nuances distinctes entre fuseaux voisins.
+const TZ_COLOR_STOPS = [
+  [0.00, [139, 92, 246]],   // violet   UTC-12
+  [0.15, [99, 130, 246]],   // bleu-violet
+  [0.30, [45, 170, 235]],   // bleu ciel
+  [0.50, [6, 182, 212]],    // cyan     UTC0
+  [0.65, [16, 185, 129]],   // émeraude
+  [0.80, [234, 179, 8]],    // jaune
+  [0.92, [249, 115, 22]],   // orange
+  [1.00, [244, 114, 182]],  // rose/magenta UTC+12
+];
+function utcToColor(utc) {
+  const t = Math.max(0, Math.min(1, (utc + 12) / 24));
+  let i = 0;
+  while (i < TZ_COLOR_STOPS.length - 2 && t > TZ_COLOR_STOPS[i+1][0]) i++;
+  const [t0, c0] = TZ_COLOR_STOPS[i];
+  const [t1, c1] = TZ_COLOR_STOPS[i+1];
+  const k = t1 > t0 ? (t - t0) / (t1 - t0) : 0;
+  const r = Math.round(c0[0] + k*(c1[0]-c0[0]));
+  const g = Math.round(c0[1] + k*(c1[1]-c0[1]));
+  const b = Math.round(c0[2] + k*(c1[2]-c0[2]));
+  return `rgb(${r},${g},${b})`;
+}
+
+const FW=560, FH=280;
+const flatCv  = document.getElementById('cv-flat');
+const flatCtx = flatCv.getContext('2d');
+const fOcean  = document.createElement('canvas'); fOcean.width=FW; fOcean.height=FH;
+const fOCtx   = fOcean.getContext('2d');
+const fLand   = document.createElement('canvas'); fLand.width=FW; fLand.height=FH;
+const fLCtx   = fLand.getContext('2d');
+let fLastLon=null, fLastDec=null, fLastLandLon=null;
+
+// Buffers indépendants pour la modal (résolution propre, pas un simple agrandissement flou)
+const MW=1400, MH=700;
+const fOceanM = document.createElement('canvas'); fOceanM.width=MW; fOceanM.height=MH;
+const fOCtxM  = fOceanM.getContext('2d');
+const fLandM  = document.createElement('canvas'); fLandM.width=MW; fLandM.height=MH;
+const fLCtxM  = fLandM.getContext('2d');
+let mLastLon=null, mLastDec=null, mLastLandLon=null;
+let mapModalOpen = false;
+
+function smooth01(t) { t = t<0?0:(t>1?1:t); return t*t*(3-2*t); }
+function buildFlatOceanGeneric(ctxOut, W, H, sdec, slon) {
+  const img = ctxOut.createImageData(W, H);
+  const d = img.data;
+  // Transition continue (smoothstep) entre la couleur de nuit et celle de jour,
+  // sur une bande de ±9° autour de l'horizon — pas de palier ni de coude visible.
+  const dR=26,dG=58,dB=92, nR=7,nG=9,nB=26;
+  for (let py=0; py<H; py++) {
+    const lat = 90 - py/H*180;
+    for (let px=0; px<W; px++) {
+      const lon = px/W*360 - 180;
+      const a = solarAngle(lat, lon, sdec, slon);
+      const s = smooth01((a+9)/18);
+      const r = Math.round(nR + s*(dR-nR));
+      const g = Math.round(nG + s*(dG-nG));
+      const b = Math.round(nB + s*(dB-nB));
+      const i=(py*W+px)*4; d[i]=r; d[i+1]=g; d[i+2]=b; d[i+3]=255;
+    }
+  }
+  ctxOut.putImageData(img, 0, 0);
+}
+function buildFlatOcean(sdec, slon) { buildFlatOceanGeneric(fOCtx, FW, FH, sdec, slon); fLastLon=slon; fLastDec=sdec; }
+
+// Trace un anneau géographique sur un canvas plat, en gérant la traversée de
+// l'antiméridien (180°/-180°) : un pays comme la Russie ou les Fidji a des
+// sommets qui passent de +179° à -179°, ce qui sans traitement particulier
+// dessine un trait reliant les deux bords de la carte. On découpe l'anneau en
+// segments à chaque saut de longitude > 180°, puis on trace chaque segment à
+// sa position normale ET décalé de ±W (pour réafficher correctement la partie
+// qui "boucle" de l'autre côté de la carte).
+function forEachFlatRingPath(ring, W, H, draw) {
+  if (ring.length < 3) return;
+  const segments = [[ring[0]]];
+  for (let i=1; i<ring.length; i++) {
+    const [lo0,la0] = ring[i-1], [lo1,la1] = ring[i];
+    if (Math.abs(lo1-lo0) > 180) {
+      // Ferme chaque morceau contre le bord de la carte qu'il touche (180°/-180°)
+      // plutôt que par une ligne diagonale entre le dernier et le premier point.
+      const midLat = (la0+la1)/2;
+      const boundary0 = lo0 > 0 ? 180 : -180;
+      const boundary1 = lo1 > 0 ? 180 : -180;
+      segments[segments.length-1].push([boundary0, midLat]);
+      segments.push([[boundary1, midLat]]);
+    }
+    segments[segments.length-1].push(ring[i]);
+  }
+  segments.forEach(seg => {
+    if (seg.length < 2) return;
+    [-W,0,W].forEach(shift => {
+      const pts = seg.map(([lo,la]) => [(lo+180)/360*W+shift, (90-la)/180*H]);
+      if (pts.every(([x]) => x < -1 || x > W+1)) return; // entièrement hors-canvas, on saute
+      draw(pts);
+    });
+  });
+}
+function buildFlatLandGeneric(ctxOut, W, H, sdec, slon) {
+  if (!STATE.geoRings) return;
+  ctxOut.clearRect(0,0,W,H);
+  ctxOut.fillStyle = '#2a5c3a';
+  STATE.geoRings.forEach(ring => {
+    forEachFlatRingPath(ring, W, H, pts => {
+      ctxOut.beginPath();
+      pts.forEach(([x,y],i) => i===0 ? ctxOut.moveTo(x,y) : ctxOut.lineTo(x,y));
+      ctxOut.closePath();
+      ctxOut.fill();
+    });
+  });
+  // Contour des pays dessiné AVANT l'assombrissement jour/nuit, pour qu'il
+  // s'assombrisse lui aussi la nuit (sinon il reste à pleine intensité et
+  // ressort en liseré bleu vif par contraste avec un sol très sombre).
+  ctxOut.strokeStyle = 'rgba(6,182,212,0.1)'; ctxOut.lineWidth = W>800?0.7:0.4;
+  STATE.geoRings.forEach(ring => {
+    forEachFlatRingPath(ring, W, H, pts => {
+      ctxOut.beginPath();
+      pts.forEach(([x,y],i) => i===0 ? ctxOut.moveTo(x,y) : ctxOut.lineTo(x,y));
+      ctxOut.closePath();
+      ctxOut.stroke();
+    });
+  });
+  const shadeImg = ctxOut.getImageData(0,0,W,H);
+  const sd = shadeImg.data;
+  for (let py=0; py<H; py++) {
+    const lat = 90 - py/H*180;
+    for (let px=0; px<W; px++) {
+      const i = (py*W+px)*4;
+      if (sd[i+3] === 0) continue;
+      const lon = px/W*360 - 180;
+      const a = solarAngle(lat, lon, sdec, slon);
+      const factor = 0.20 + smooth01((a+9)/18)*0.80;
+      sd[i]   = Math.round(sd[i]   * factor);
+      sd[i+1] = Math.round(sd[i+1] * factor);
+      sd[i+2] = Math.round(sd[i+2] * factor);
+    }
+  }
+  ctxOut.putImageData(shadeImg, 0, 0);
+}
+function buildFlatLand(sdec, slon) { buildFlatLandGeneric(fLCtx, FW, FH, sdec, slon); fLastLandLon=slon; }
+
+// ── CARTE DES FUSEAUX "POLITIQUE" ────────────────────────────────────────────
+// Colorie chaque pays selon son fuseau horaire RÉEL (pas une bande théorique à 15°).
+// Pour les grands pays multi-fuseaux, le pixel est testé sur sa longitude exacte
+// dans MULTI_TZ_BOUNDS afin de retrouver la bonne sous-zone administrative.
+function meanLongitude(ring) {
+  let sx=0, sy=0;
+  ring.forEach(([lo]) => { const r=lo*Math.PI/180; sx+=Math.cos(r); sy+=Math.sin(r); });
+  return Math.atan2(sy,sx)*180/Math.PI;
+}
+function buildTzMapGeneric(ctxOut, W, H) {
+  if (!STATE.geoRingsWithCountry) return;
+  ctxOut.clearRect(0,0,W,H);
+  // Fond océan neutre
+  ctxOut.fillStyle = '#0a1428';
+  ctxOut.fillRect(0,0,W,H);
+
+  STATE.geoRingsWithCountry.forEach(({ring, country}) => {
+    if (ring.length < 3) return;
+    const mlo = meanLongitude(ring);
+    const utc = getCountryUtc(country, mlo);
+    const fillCol = utc === null ? '#2a3142' : utcToColor(utc); // pays non mappé : gris neutre plutôt qu'absent
+    forEachFlatRingPath(ring, W, H, pts => {
+      ctxOut.beginPath();
+      pts.forEach(([x,y],i) => i===0 ? ctxOut.moveTo(x,y) : ctxOut.lineTo(x,y));
+      ctxOut.closePath();
+      ctxOut.fillStyle = fillCol;
+      ctxOut.fill();
+      ctxOut.strokeStyle = 'rgba(5,8,18,0.6)'; ctxOut.lineWidth = W>800?0.8:0.4;
+      ctxOut.stroke();
+    });
+  });
+
+  // Pour les pays multi-fuseaux, tracer les frontières internes (limites de bornes)
+  // UNIQUEMENT là où le pays a réellement des terres à cette longitude précise —
+  // sinon la ligne traverse l'océan, l'Antarctique etc. sur toute la hauteur de
+  // la carte (c'est ce qui donnait l'impression de "terre" continue sous
+  // Russie UTC+11/+12 par exemple, en plein milieu de la mer d'Okhotsk).
+  ctxOut.strokeStyle = 'rgba(5,8,18,0.85)'; ctxOut.lineWidth = W>800?1.1:0.6;
+  const countryRingsCache = {};
+  Object.entries(MULTI_TZ_BOUNDS).forEach(([country, bounds]) => {
+    if (!STATE.geoRingsWithCountry) return;
+    if (!countryRingsCache[country]) {
+      countryRingsCache[country] = STATE.geoRingsWithCountry
+        .filter(r => r.country === country)
+        .map(r => r.unwrapped || r.ring);
+    }
+    const countryRings = countryRingsCache[country];
+    if (!countryRings.length) return;
+    bounds.slice(0,-1).forEach(b => {
+      const lon = b.lonMax;
+      const x = (lon+180)/360*W;
+      let segStartY = null;
+      const stepPx = W>800 ? 2 : 1;
+      for (let py=0; py<=H; py+=stepPx) {
+        const lat = 90 - py/H*180;
+        const inside = countryRings.some(r => pointInRing(lat,lon,r)||pointInRing(lat,lon-360,r)||pointInRing(lat,lon+360,r));
+        if (inside && segStartY===null) segStartY = py;
+        if ((!inside || py===H) && segStartY!==null) {
+          ctxOut.beginPath(); ctxOut.moveTo(x,segStartY); ctxOut.lineTo(x,py); ctxOut.stroke();
+          segStartY = null;
+        }
+      }
+    });
+  });
+}
+function buildTzMap() { buildTzMapGeneric(fLCtx, FW, FH); }
+
+// Tracé des lignes lat — DESSINÉ EN DERNIER, par-dessus tout, sans aucune
+// composition alpha qui pourrait inverser des couleurs sous-jacentes.
+function drawFlatLatLineGeneric(ctxOut, W, H, lat, color, dash, lw, label, fontSize) {
+  const y = (90-lat)/180*H;
+  ctxOut.save();
+  ctxOut.globalCompositeOperation = 'source-over';
+  ctxOut.strokeStyle=color; ctxOut.lineWidth=lw; ctxOut.setLineDash(dash);
+  ctxOut.beginPath(); ctxOut.moveTo(0,y); ctxOut.lineTo(W,y); ctxOut.stroke();
+  ctxOut.setLineDash([]);
+  if (label) {
+    ctxOut.font=`bold ${fontSize}px sans-serif`; ctxOut.fillStyle=color; ctxOut.globalAlpha=0.85;
+    ctxOut.fillText(label, 4, y-4);
+  }
+  ctxOut.restore();
+}
+function drawFlatLatLine(lat, color, dash, lw, label) {
+  drawFlatLatLineGeneric(flatCtx, FW, FH, lat, color, dash, lw, label, 8);
+}
+
+const FLAT_CITIES = [
+  {name:'Paris',lat:48.85,lon:2.35},{name:'New York',lat:40.71,lon:-74.0},
+  {name:'Tokyo',lat:35.68,lon:139.69},{name:'Sydney',lat:-33.87,lon:151.21},
+  {name:'Dubai',lat:25.2,lon:55.27},{name:'São Paulo',lat:-23.55,lon:-46.63},
+  {name:'Moscou',lat:55.75,lon:37.62},{name:'Lagos',lat:6.45,lon:3.4},
+];
+
+let showTzOverlay = false;
+function onTzOverlayToggle() {
+  showTzOverlay = document.getElementById('tz-overlay-toggle').checked;
+  const modalToggle = document.getElementById('tz-overlay-toggle-modal');
+  if (modalToggle) modalToggle.checked = showTzOverlay;
+  renderFlat();
+  if (mapModalOpen) renderFlatModal();
+}
+function onTzOverlayToggleModal() {
+  showTzOverlay = document.getElementById('tz-overlay-toggle-modal').checked;
+  document.getElementById('tz-overlay-toggle').checked = showTzOverlay;
+  renderFlat();
+  renderFlatModal();
+}
+
+// Bandes de fuseaux UTC -12 à +14 — lignes plus marquées qu'avant, labels mieux lisibles.
+function drawTzOverlayGeneric(ctxOut, W, H, lineAlpha, lineWidth, fontSize) {
+  ctxOut.save();
+  for (let h=-12; h<=14; h++) {
+    const lonStart = h*15 - 7.5;
+    const x1 = (lonStart+180)/360*W;
+    ctxOut.strokeStyle = `rgba(168,130,255,${lineAlpha})`;
+    ctxOut.lineWidth = lineWidth;
+    ctxOut.beginPath(); ctxOut.moveTo(x1,0); ctxOut.lineTo(x1,H); ctxOut.stroke();
+  }
+  ctxOut.font = `700 ${fontSize}px monospace`;
+  const step = W > 800 ? 1 : 2; // sur la modal (grande), un label par fuseau ; sur la mini carte, un sur deux
+  for (let h=-12; h<=14; h+=step) {
+    const xc = (h*15+180)/360*W;
+    if (xc < fontSize || xc > W-fontSize) continue;
+    const label = 'UTC' + (h>=0?'+':'') + h;
+    const tw = ctxOut.measureText(label).width;
+    ctxOut.fillStyle = 'rgba(196,170,255,0.85)';
+    ctxOut.fillText(label, xc - tw/2, fontSize+3);
+  }
+  ctxOut.restore();
+}
+function drawTzOverlay() { drawTzOverlayGeneric(flatCtx, FW, FH, 0.38, 0.9, 8); }
+
+function renderFlatGeneric(ctxOut, W, H, fOceanBuf, fLandBuf, lastLonRef, lastDecRef, lastLandLonRef, fontSize) {
+  const date = new Date();
+  const { dec:sdec, lon:slon } = getSunPos(date);
+
+  const needOcean = lastLonRef.v===null || Math.abs(slon-lastLonRef.v)>0.08 || Math.abs(sdec-lastDecRef.v)>0.05;
+  if (needOcean) { buildFlatOceanGeneric(fOceanBuf.ctx, W, H, sdec, slon); lastLonRef.v=slon; lastDecRef.v=sdec; }
+  const needLand = STATE.geoRings && (lastLandLonRef.v===null || Math.abs(slon-lastLandLonRef.v)>0.15);
+  if (needLand) { buildFlatLandGeneric(fLandBuf.ctx, W, H, sdec, slon); lastLandLonRef.v=slon; }
+
+  ctxOut.setTransform(1,0,0,1,0,0);
+  ctxOut.clearRect(0,0,W,H);
+  ctxOut.drawImage(fOceanBuf.canvas,0,0);
+  if (STATE.geoRings) ctxOut.drawImage(fLandBuf.canvas,0,0);
+
+  if (showTzOverlay) drawTzOverlayGeneric(ctxOut, W, H, W>800?0.48:0.45, W>800?1.4:1.1, W>800?13:8);
+
+  ctxOut.save();
+  ctxOut.strokeStyle='rgba(6,182,212,0.05)'; ctxOut.lineWidth=0.5;
+  for (let lo=-150; lo<=150; lo+=30) {
+    const x=(lo+180)/360*W;
+    ctxOut.beginPath(); ctxOut.moveTo(x,0); ctxOut.lineTo(x,H); ctxOut.stroke();
+  }
+  ctxOut.strokeStyle='rgba(6,182,212,0.15)';
+  const x0=(180)/360*W;
+  ctxOut.beginPath(); ctxOut.moveTo(x0,0); ctxOut.lineTo(x0,H); ctxOut.stroke();
+  ctxOut.restore();
+
+  drawFlatLatLineGeneric(ctxOut, W, H, 66.5,  'rgb(190,215,235)', [2,4], W>800?1.2:0.7, 'Cercle arctique', fontSize);
+  drawFlatLatLineGeneric(ctxOut, W, H, -66.5, 'rgb(190,215,235)', [2,4], W>800?1.2:0.7, 'Cercle antarctique', fontSize);
+  drawFlatLatLineGeneric(ctxOut, W, H, 23.44, 'rgb(245,200,66)',  [4,3], W>800?1.6:1.0, 'Tropique du Cancer', fontSize);
+  drawFlatLatLineGeneric(ctxOut, W, H, -23.44,'rgb(245,160,50)',  [4,3], W>800?1.6:1.0, 'Tropique du Capricorne', fontSize);
+  drawFlatLatLineGeneric(ctxOut, W, H, 0,     'rgb(6,182,212)',   [],    W>800?2.0:1.3, 'Équateur', fontSize);
+
+  FLAT_CITIES.forEach(c => {
+    const a = solarAngle(c.lat, c.lon, sdec, slon);
+    const px=(c.lon+180)/360*W, py=(90-c.lat)/180*H;
+    const r = W>800?5:2.5;
+    ctxOut.beginPath(); ctxOut.arc(px,py,r,0,Math.PI*2);
+    ctxOut.fillStyle = a>0 ? 'rgba(6,182,212,0.9)' : 'rgba(245,200,60,0.85)';
+    ctxOut.fill();
+    ctxOut.font=`bold ${fontSize}px sans-serif`;
+    ctxOut.fillStyle = a>0 ? 'rgba(255,255,255,0.78)' : 'rgba(245,200,60,0.78)';
+    ctxOut.fillText(c.name, px+r+2, py+fontSize/3);
+  });
+
+  const sx=(slon+180)/360*W, sy=(90-sdec)/180*H;
+  const sr = W>800?14:6;
+  ctxOut.beginPath(); ctxOut.arc(sx,sy,sr,0,Math.PI*2); ctxOut.fillStyle='#F5C842'; ctxOut.fill();
+  ctxOut.beginPath(); ctxOut.arc(sx,sy,sr*1.5,0,Math.PI*2);
+  ctxOut.strokeStyle='rgba(245,200,66,0.4)'; ctxOut.lineWidth=sr*0.4; ctxOut.stroke();
+
+  return { sdec, slon, date };
+}
+
+const fOceanRef = {canvas:fOcean, ctx:fOCtx}, fLandRef = {canvas:fLand, ctx:fLCtx};
+const fOceanRefM = {canvas:fOceanM, ctx:fOCtxM}, fLandRefM = {canvas:fLandM, ctx:fLCtxM};
+const fLastLonObj={v:null}, fLastDecObj={v:null}, fLastLandLonObj={v:null};
+const mLastLonObj={v:null}, mLastDecObj={v:null}, mLastLandLonObj={v:null};
+
+// ── MODE DE LA CARTE : 'solar' (ombre temps réel) ou 'tz' (fuseaux politiques) ──
+let mapMode = 'solar';
+
+function switchMapMode(mode) {
+  mapMode = mode;
+  document.getElementById('mode-btn-solar').classList.toggle('active', mode==='solar');
+  document.getElementById('mode-btn-tz').classList.toggle('active', mode==='tz');
+  document.getElementById('tz-overlay-wrap').style.display = mode==='solar' ? 'flex' : 'none';
+  document.getElementById('solar-stats').style.display = mode==='solar' ? 'grid' : 'none';
+  document.getElementById('solar-legend').style.display = mode==='solar' ? 'flex' : 'none';
+  document.getElementById('solar-geo-info').style.display = mode==='solar' ? 'block' : 'none';
+  document.getElementById('tz-stats').style.display = mode==='tz' ? 'grid' : 'none';
+  document.getElementById('tz-gradient-legend').style.display = mode==='tz' ? 'flex' : 'none';
+  document.getElementById('tz-geo-info').style.display = mode==='tz' ? 'block' : 'none';
+  if (mode==='tz') tzBuiltMainObj.v = false;
+  renderFlat();
+}
+
+// Test point-in-polygon (ray casting) pour détecter le pays sous un point lat/lon
+// Avant le ray-casting, on "déroule" les longitudes du contour pour qu'il n'y
+// ait jamais de saut > 180° entre deux sommets consécutifs (un pays comme la
+// Russie a une arête qui passe de +179° à -179°, ce qui fausse complètement
+// le test géométrique standard si on ne le corrige pas).
+function unwrapRingLons(ring) {
+  const out = [ring[0].slice()];
+  let prevLon = ring[0][0];
+  for (let i=1; i<ring.length; i++) {
+    let lo = ring[i][0];
+    while (lo - prevLon > 180) lo -= 360;
+    while (lo - prevLon < -180) lo += 360;
+    out.push([lo, ring[i][1]]);
+    prevLon = lo;
+  }
+  return out;
+}
+function pointInRing(lat, lon, ring) {
+  let inside = false;
+  for (let i=0, j=ring.length-1; i<ring.length; j=i++) {
+    const [xi,yi] = ring[i], [xj,yj] = ring[j];
+    if (((yi>lat) !== (yj>lat)) && (lon < (xj-xi)*(lat-yi)/(yj-yi)+xi)) inside = !inside;
+  }
+  return inside;
+}
+function findCountryAt(lat, lon) {
+  if (!STATE.geoRingsWithCountry) return null;
+  for (const { ring, unwrapped, country } of STATE.geoRingsWithCountry) {
+    const r = unwrapped || ring;
+    if (pointInRing(lat, lon, r) || pointInRing(lat, lon-360, r) || pointInRing(lat, lon+360, r)) return country;
+  }
+  return null;
+}
+function formatUtcLabel(utc) {
+  if (utc === null || utc === undefined) return 'inconnu';
+  const sign = utc >= 0 ? '+' : '-';
+  const abs = Math.abs(utc);
+  const h = Math.floor(abs);
+  const m = Math.round((abs - h) * 60);
+  return `UTC${sign}${h}${m>0?':'+pad(m):''}`;
+}
+
+function setupTzHover() {
+  const cv = document.getElementById('cv-flat');
+  function handlePoint(clientX, clientY) {
+    if (mapMode !== 'tz') return;
+    const rect = cv.getBoundingClientRect();
+    const px = (clientX - rect.left) / rect.width * FW;
+    const py = (clientY - rect.top) / rect.height * FH;
+    const lon = px/FW*360 - 180;
+    const lat = 90 - py/FH*180;
+    const country = findCountryAt(lat, lon);
+    const label = document.getElementById('tz-hover-info');
+    if (!label) return;
+    if (country) {
+      const utc = getCountryUtc(country, lon);
+      label.textContent = `${country} — ${formatUtcLabel(utc)}`;
+    } else {
+      label.textContent = 'Océan / zone non mappée';
+    }
+  }
+  cv.addEventListener('mousemove', e => handlePoint(e.clientX, e.clientY));
+  cv.addEventListener('click', e => handlePoint(e.clientX, e.clientY));
+  cv.addEventListener('touchstart', e => { if (e.touches[0]) handlePoint(e.touches[0].clientX, e.touches[0].clientY); }, {passive:true});
+}
+
+function renderTzMapGeneric(ctxOut, W, H, alreadyBuilt) {
+  if (!STATE.geoRingsWithCountry) {
+    // GeoJSON pas encore chargé : fond neutre + message, pour ne pas laisser
+    // l'ancien rendu (solaire) affiché par erreur derrière le bouton de mode.
+    ctxOut.setTransform(1,0,0,1,0,0);
+    ctxOut.fillStyle = '#0a1428';
+    ctxOut.fillRect(0,0,W,H);
+    return;
+  }
+  if (!alreadyBuilt.v) {
+    buildTzMapGeneric(ctxOut, W, H);
+    alreadyBuilt.v = true;
+  }
+}
+
+const tzBuiltMainObj = {v:false}, tzBuiltModalObj = {v:false};
+
+function renderFlat() {
+  if (mapMode === 'tz') {
+    renderTzMapGeneric(flatCtx, FW, FH, tzBuiltMainObj);
+    document.getElementById('f-utc') && (document.getElementById('f-utc').textContent = utcStr(new Date()));
+    return;
+  }
+  const { sdec, slon, date } = renderFlatGeneric(flatCtx, FW, FH, fOceanRef, fLandRef, fLastLonObj, fLastDecObj, fLastLandLonObj, 8);
+  document.getElementById('f-utc').textContent = utcStr(date);
+  document.getElementById('f-dec').textContent = `${sdec.toFixed(2)}°`;
+  document.getElementById('f-lon').textContent = `${slon.toFixed(1)}°`;
+  document.getElementById('f-sea').textContent = season(date);
+}
+
+function renderFlatModal() {
+  if (!mapModalOpen) return;
+  const cv = document.getElementById('cv-flat-modal');
+  const ctx = cv.getContext('2d');
+  if (mapMode === 'tz') {
+    renderTzMapGeneric(ctx, MW, MH, tzBuiltModalObj);
+    return;
+  }
+  renderFlatGeneric(ctx, MW, MH, fOceanRefM, fLandRefM, mLastLonObj, mLastDecObj, mLastLandLonObj, 16);
+}
+
+function openMapModal() {
+  mapModalOpen = true;
+  document.getElementById('map-modal').classList.add('open');
+  document.getElementById('tz-overlay-toggle-modal').checked = showTzOverlay;
+  document.getElementById('tz-overlay-toggle-modal-wrap').style.display = mapMode==='solar' ? 'flex' : 'none';
+  mLastLonObj.v=null; mLastDecObj.v=null; mLastLandLonObj.v=null;
+  tzBuiltModalObj.v = false; // forcer rebuild plein format
+  renderFlatModal();
+}
+function closeMapModal() {
+  mapModalOpen = false;
+  document.getElementById('map-modal').classList.remove('open');
+}
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (mapModalOpen) closeMapModal();
+  if (sphModalOpen) closeSphModal();
+});
+
+// ════════════════════════════════════════════════════════
+// GLOBE SPHÈRE  560×370 — recentré sur point choisi, temps réel continu
+// Architecture généralisée : chaque fonction reçoit un objet "cfg" décrivant
+// le canvas cible (ctx, dimensions, centre, rayon) pour pouvoir dessiner
+// indifféremment sur la mini-vue ou sur la modal plein écran.
+// ════════════════════════════════════════════════════════
+const TILT = 23.44 * Math.PI / 180;
+
+const SW=560, SH=370, SR=143, SCX=242, SCY=185;
+const sphCv  = document.getElementById('cv-sphere');
+const sphCtx = sphCv.getContext('2d');
+const sphOff = document.createElement('canvas'); sphOff.width=SW; sphOff.height=SH;
+const sphOCtx= sphOff.getContext('2d');
+
+const MSW=1000, MSH=660, MSR=270, MSCX=420, MSCY=330;
+const sphCvM  = document.getElementById('cv-sphere-modal');
+const sphCtxM = sphCvM.getContext('2d');
+const sphOffM = document.createElement('canvas'); sphOffM.width=MSW; sphOffM.height=MSH;
+const sphOCtxM= sphOffM.getContext('2d');
+
+const cfgMain  = { ctx: sphCtx,  off: sphOff,  offCtx: sphOCtx,  W: SW,  H: SH,  CX: SCX,  CY: SCY,  R: SR,  fontMul: 1 };
+const cfgModal = { ctx: sphCtxM, off: sphOffM, offCtx: sphOCtxM, W: MSW, H: MSH, CX: MSCX, CY: MSCY, R: MSR, fontMul: 1.9 };
+
+const sphRefsMain  = { viewLon: null, sunLon: null, sunDec: null };
+const sphRefsModal = { viewLon: null, sunLon: null, sunDec: null };
+let sphStars=null, sphStarsM=null;
+let sphModalOpen = false;
+
+const TW=512, TH=256;
+const texCv  = document.createElement('canvas'); texCv.width=TW; texCv.height=TH;
+const texCtx = texCv.getContext('2d');
+const texData= new Uint8Array(TW*TH*3);
+
+// Point centré choisi (lat/lon) — par défaut Paris
+let centerPoint = { lat: 48.85, lon: 2.35, label: 'Paris', tz: 'Europe/Paris' };
+
+function buildTexture() { texCtx.fillStyle='#1a3a5c'; texCtx.fillRect(0,0,TW,TH); }
+function paintTexLand(rings) {
+  texCtx.fillStyle='#2a5c3a'; texCtx.strokeStyle='rgba(6,182,212,0.14)'; texCtx.lineWidth=0.4;
+  rings.forEach(ring => {
+    forEachFlatRingPath(ring, TW, TH, pts => {
+      texCtx.beginPath();
+      pts.forEach(([x,y],i) => i===0 ? texCtx.moveTo(x,y) : texCtx.lineTo(x,y));
+      texCtx.closePath(); texCtx.fill(); texCtx.stroke();
+    });
+  });
+  const imgd = texCtx.getImageData(0,0,TW,TH);
+  for (let i=0; i<TW*TH; i++) { texData[i*3]=imgd.data[i*4]; texData[i*3+1]=imgd.data[i*4+1]; texData[i*3+2]=imgd.data[i*4+2]; }
+}
+function sampleTex(latDeg, lonDeg) {
+  const px = ((lonDeg+180)/360*TW+TW)%TW;
+  const py = (1-(latDeg+90)/180)*TH;
+  const x0=Math.floor(px)%TW, y0=Math.min(Math.floor(py),TH-1);
+  const x1=(x0+1)%TW, y1=Math.min(y0+1,TH-1);
+  const fx=px-Math.floor(px), fy=py-Math.floor(py);
+  const tx=fx*fx*(3-2*fx), ty=fy*fy*(3-2*fy);
+  const g=(x,y,c)=>texData[(y*TW+x)*3+c];
+  return [
+    Math.round(g(x0,y0,0)*(1-tx)*(1-ty)+g(x1,y0,0)*tx*(1-ty)+g(x0,y1,0)*(1-tx)*ty+g(x1,y1,0)*tx*ty),
+    Math.round(g(x0,y0,1)*(1-tx)*(1-ty)+g(x1,y0,1)*tx*(1-ty)+g(x0,y1,1)*(1-tx)*ty+g(x1,y1,1)*tx*ty),
+    Math.round(g(x0,y0,2)*(1-tx)*(1-ty)+g(x1,y0,2)*tx*(1-ty)+g(x0,y1,2)*(1-tx)*ty+g(x1,y1,2)*tx*ty),
+  ];
+}
+
+// Projection orthographique standard centrée sur (centerLat, centerLon).
+// Vérifiée par round-trip : project(centerLat,centerLon) === (0,0,1) exactement.
+function sphProject(cfg, latDeg, lonDeg, centerLat, centerLon) {
+  const lat=latDeg*Math.PI/180, lon=lonDeg*Math.PI/180;
+  const cLat=centerLat*Math.PI/180, cLon=centerLon*Math.PI/180;
+  const dLon = lon - cLon;
+  const x = Math.cos(lat) * Math.sin(dLon);
+  const y = Math.sin(lat)*Math.cos(cLat) - Math.cos(lat)*Math.sin(cLat)*Math.cos(dLon);
+  const z = Math.sin(lat)*Math.sin(cLat) + Math.cos(lat)*Math.cos(cLat)*Math.cos(dLon);
+  return { px: cfg.CX + x*cfg.R, py: cfg.CY - y*cfg.R, z };
+}
+
+function buildSphOff(cfg, centerLat, centerLon, sdec, slon) {
+  const { offCtx, W, H, CX, CY, R } = cfg;
+  const img = offCtx.createImageData(W,H);
+  const d = img.data;
+  const cLat = centerLat*Math.PI/180, cLon = centerLon*Math.PI/180;
+  const sdecR=sdec*Math.PI/180, slonR=slon*Math.PI/180;
+
+  for (let py=0; py<H; py++) {
+    for (let px=0; px<W; px++) {
+      const dx=px-CX, dy=CY-py, d2=dx*dx+dy*dy, idx=(py*W+px)*4;
+      if (d2 > R*R) { continue; }
+      const x = dx/R, y = dy/R;
+      const z = Math.sqrt(Math.max(0, 1 - x*x - y*y));
+      const sinLat = y*Math.cos(cLat) + z*Math.sin(cLat);
+      const latR = Math.asin(Math.max(-1,Math.min(1,sinLat)));
+      const cosLatCosDLon = z*Math.cos(cLat) - y*Math.sin(cLat);
+      const dLonR = Math.atan2(x, cosLatCosDLon);
+      const latDeg = latR*180/Math.PI;
+      const lonDeg = centerLon + dLonR*180/Math.PI;
+      const dot = Math.sin(latR)*Math.sin(sdecR) + Math.cos(latR)*Math.cos(sdecR)*Math.cos((lonDeg-slon)*Math.PI/180);
+      let [r0,g0,b0] = STATE.sphReady ? sampleTex(latDeg,lonDeg) : [10,35,78];
+
+      // Version "jour" (avec spéculaire océan) et version "nuit", puis fondu
+      // continu (smoothstep) entre les deux — aucun palier ni coude visible.
+      const t = Math.max(0, Math.min(dot/0.9, 1));
+      const boost = 0.55 + t*0.65;
+      let dr=Math.min(255,r0*boost), dg=Math.min(255,g0*boost), db=Math.min(255,b0*boost);
+      if (db>dg && db>dr) {
+        const sx=dx-R*0.28, sy=dy-R*0.20, spec=Math.exp(-(sx*sx+sy*sy)/(2*R*R*0.045))*0.14*t;
+        dr=Math.min(255,dr+spec*215); dg=Math.min(255,dg+spec*228); db=Math.min(255,db+spec*250);
+      }
+
+      const isLand = g0 > b0;
+      let nr,ng,nb;
+      if (isLand) { nr=Math.max(r0*0.13,4); ng=Math.max(g0*0.17,7); nb=Math.max(b0*0.13,5); }
+      else { nr=r0*0.04; ng=g0*0.05; nb=Math.max(b0*0.07,7); }
+
+      const wDay = smooth01((dot+0.15)/0.30);
+      const r = Math.round(nr + wDay*(dr-nr));
+      const g = Math.round(ng + wDay*(dg-ng));
+      const b = Math.round(nb + wDay*(db-nb));
+      d[idx]=r; d[idx+1]=g; d[idx+2]=b; d[idx+3]=255;
+    }
+  }
+  offCtx.putImageData(img,0,0);
+}
+
+function drawSphLine(cfg, latDeg, color, dash, lw, label, centerLat, centerLon) {
+  const ctx = cfg.ctx;
+  const segs = [];
+  let cur = [];
+  for (let lo=centerLon-180; lo<=centerLon+180; lo+=1) {
+    const p = sphProject(cfg, latDeg, lo, centerLat, centerLon);
+    if (p.z > 0.01) { cur.push(p); } else if (cur.length) { segs.push(cur); cur = []; }
+  }
+  if (cur.length) segs.push(cur);
+  if (segs.length === 0) return;
+
+  ctx.save();
+  ctx.strokeStyle=color; ctx.lineWidth=lw*cfg.fontMul; ctx.setLineDash(dash.map(v=>v*cfg.fontMul));
+  segs.forEach(s => {
+    if (s.length<2) return;
+    ctx.beginPath();
+    ctx.moveTo(s[0].px,s[0].py);
+    for (let i=1;i<s.length;i++) ctx.lineTo(s[i].px,s[i].py);
+    ctx.stroke();
+  });
+  ctx.setLineDash([]);
+  if (label) {
+    const longest = segs.reduce((a,b)=>b.length>a.length?b:a, segs[0]);
+    if (longest.length>4) {
+      const p = longest[Math.floor(longest.length*0.5)];
+      ctx.font=`500 ${Math.round(9*cfg.fontMul)}px sans-serif`; ctx.fillStyle=color; ctx.globalAlpha=0.85;
+      ctx.fillText(label, p.px+4*cfg.fontMul, p.py-4*cfg.fontMul);
+    }
+  }
+  ctx.restore();
+}
+
+function makeStarsFor(cfg) {
+  const arr=[];
+  for (let i=0; i<140; i++) {
+    let x,y,t=0;
+    do { x=Math.random()*cfg.W; y=Math.random()*cfg.H; t++; } while (Math.hypot(x-cfg.CX,y-cfg.CY)<cfg.R+34 && t<20);
+    arr.push({x,y,r:Math.random()*0.8+0.2,a:Math.random()*0.5+0.2});
+  }
+  return arr;
+}
+function makeSphStars() { sphStars = makeStarsFor(cfgMain); }
+function makeSphStarsModal() { sphStarsM = makeStarsFor(cfgModal); }
+
+// Calcule où placer la lueur solaire en projetant RÉELLEMENT le point subsolaire
+// dans le même repère écran que sphProject (cohérence garantie avec le reste du rendu).
+function getSunScreenInfo(cfg, centerLat, centerLon, sdec, slon) {
+  const p = sphProject(cfg, sdec, slon, centerLat, centerLon);
+  const elevation = solarAngle(centerLat, centerLon, sdec, slon);
+  return { px: (p.px - cfg.CX) / cfg.R, py: (p.py - cfg.CY) / cfg.R, visible: p.z > 0, elevation };
+}
+
+function renderSphereGeneric(cfg, stars, lastRefs) {
+  const { ctx, off, W, H, CX, CY, R } = cfg;
+  const now = new Date();
+  const { dec:sdec, lon:slon } = getSunPos(now);
+  const cLat = centerPoint.lat, cLon = centerPoint.lon;
+
+  const lonKey = cLon;
+  if (lastRefs.viewLon===null || lastRefs.viewLon!==lonKey || Math.abs(slon-lastRefs.sunLon)>0.08 || Math.abs(sdec-lastRefs.sunDec)>0.05) {
+    buildSphOff(cfg, cLat, cLon, sdec, slon);
+    lastRefs.viewLon=lonKey; lastRefs.sunLon=slon; lastRefs.sunDec=sdec;
+  }
+
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.fillStyle='#03050d'; ctx.fillRect(0,0,W,H);
+
+  const sunInfo = getSunScreenInfo(cfg, cLat, cLon, sdec, slon);
+  let sunScreenPos, sunInFront;
+  if (sunInfo.visible) {
+    sunScreenPos = { x: CX + sunInfo.px*R, y: CY + sunInfo.py*R };
+    sunInFront = true;
+  } else {
+    const angle = Math.atan2(sunInfo.py, sunInfo.px);
+    const halfW = W/2, halfH = H/2;
+    const cosA = Math.cos(angle), sinA = Math.sin(angle);
+    const tX = cosA !== 0 ? halfW/Math.abs(cosA) : Infinity;
+    const tY = sinA !== 0 ? halfH/Math.abs(sinA) : Infinity;
+    const t = Math.min(tX, tY) * 1.15;
+    sunScreenPos = { x: CX + cosA*t, y: CY + sinA*t };
+    sunInFront = false;
+  }
+
+  const glowR = Math.max(W,H)*0.85;
+  const grd = ctx.createRadialGradient(sunScreenPos.x, sunScreenPos.y, 0, sunScreenPos.x, sunScreenPos.y, glowR);
+  grd.addColorStop(0,    'rgba(255,225,90,0.20)');
+  grd.addColorStop(0.18, 'rgba(255,185,45,0.09)');
+  grd.addColorStop(0.42, 'rgba(120,150,230,0.03)');
+  grd.addColorStop(1,    'rgba(3,5,13,0)');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0,0,W,H);
+
+  stars.forEach(s => { ctx.globalAlpha=s.a; ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill(); });
+  ctx.globalAlpha=1;
+
+  ctx.drawImage(off,0,0);
+
+  const atmo = ctx.createRadialGradient(CX,CY,R,CX,CY,R+16*cfg.fontMul);
+  atmo.addColorStop(0,'rgba(70,130,210,0.18)');
+  atmo.addColorStop(1,'rgba(70,130,210,0)');
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(CX,CY,R+16*cfg.fontMul,0,Math.PI*2);
+  ctx.arc(CX,CY,R,0,Math.PI*2,true);
+  ctx.closePath();
+  ctx.fillStyle=atmo; ctx.fill('evenodd');
+  ctx.restore();
+
+  const distFromCenter = Math.hypot(sunScreenPos.x-CX, sunScreenPos.y-CY);
+  if (sunInFront && distFromCenter < R*0.35) {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,230,120,0.55)'; ctx.lineWidth = 2*cfg.fontMul;
+    ctx.beginPath(); ctx.arc(sunScreenPos.x, sunScreenPos.y, 16*cfg.fontMul, 0, Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(sunScreenPos.x, sunScreenPos.y, 22*cfg.fontMul, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(255,230,120,0.25)'; ctx.stroke();
+    ctx.restore();
+  }
+
+  drawSphLine(cfg, 66.5,   'rgb(190,215,235)', [2,4], 0.6, 'Cercle arctique',    cLat, cLon);
+  drawSphLine(cfg, -66.5,  'rgb(190,215,235)', [2,4], 0.6, 'Cercle antarctique', cLat, cLon);
+  drawSphLine(cfg, 23.44,  'rgb(245,195,58)',  [4,3], 0.9, 'Tropique du Cancer', cLat, cLon);
+  drawSphLine(cfg, -23.44, 'rgb(238,148,42)',  [4,3], 0.9, 'Tropique du Capricorne', cLat, cLon);
+  drawSphLine(cfg, 0,      'rgb(6,182,212)',   [],    1.2, 'Équateur',           cLat, cLon);
+
+  ctx.save();
+  ctx.beginPath(); ctx.arc(CX,CY,5*cfg.fontMul,0,Math.PI*2);
+  ctx.strokeStyle='#06B6D4'; ctx.lineWidth=2*cfg.fontMul; ctx.stroke();
+  ctx.beginPath(); ctx.arc(CX,CY,2*cfg.fontMul,0,Math.PI*2);
+  ctx.fillStyle='#06B6D4'; ctx.fill();
+  ctx.font=`600 ${Math.round(10*cfg.fontMul)}px sans-serif`; ctx.fillStyle='rgba(255,255,255,0.9)';
+  ctx.fillText(centerPoint.label, CX+9*cfg.fontMul, CY+4*cfg.fontMul);
+  ctx.restore();
+
+  return { sdec, slon, now, elevation: sunInfo.elevation };
+}
+
+function renderSphere() {
+  if (!sphStars) makeSphStars();
+  const { sdec, slon, now, elevation } = renderSphereGeneric(cfgMain, sphStars, sphRefsMain);
+
+  let stateLabel, dotClass;
+  if (elevation > 6)       { stateLabel='Plein jour';        dotClass='dot-day'; }
+  else if (elevation > -6) { stateLabel='Crépuscule / aube';  dotClass='dot-twilight'; }
+  else                      { stateLabel='Nuit';               dotClass='dot-night'; }
+
+  document.getElementById('day-dot').className = 'day-dot ' + dotClass;
+  document.getElementById('day-text').innerHTML = `<b>${stateLabel}</b> à ${centerPoint.label} (élévation du soleil : ${elevation.toFixed(1)}°)`;
+
+  let localTimeStr = '--:--';
+  try { localTimeStr = new Intl.DateTimeFormat('fr-FR',{timeZone:centerPoint.tz,hour:'2-digit',minute:'2-digit'}).format(now); } catch(e){}
+
+  document.getElementById('s-localtime').textContent = localTimeStr;
+  document.getElementById('s-dec').textContent = `${sdec.toFixed(2)}°`;
+  document.getElementById('s-elev').textContent = `${elevation.toFixed(1)}°`;
+  document.getElementById('s-sea').textContent = season(now, centerPoint.lat);
+}
+
+function renderSphereModal() {
+  if (!sphModalOpen) return;
+  if (!sphStarsM) makeSphStarsModal();
+  renderSphereGeneric(cfgModal, sphStarsM, sphRefsModal);
+  const label = document.getElementById('sph-modal-label');
+  if (label) label.textContent = centerPoint.label;
+}
+
+function openSphModal() {
+  sphModalOpen = true;
+  document.getElementById('sph-modal').classList.add('open');
+  sphRefsModal.viewLon = null; sphRefsModal.sunLon = null; sphRefsModal.sunDec = null;
+  renderSphereModal();
+}
+function closeSphModal() {
+  sphModalOpen = false;
+  document.getElementById('sph-modal').classList.remove('open');
+}
+
+// ════════════════════════════════════════════════════════
+// SÉLECTEUR POINT SPHÈRE (fuseau choisi → recentrage, toujours temps réel)
+// Liste groupée par continent et triée alphabétiquement (comme le picker du convertisseur)
+// ════════════════════════════════════════════════════════
+function populateSphTz() {
+  const sel = document.getElementById('sph-tz');
+  const regions = [...new Set(ZONES.map(z=>z.region))];
+  regions.forEach(region => {
+    const group = document.createElement('optgroup');
+    group.label = region;
+    ZONES.filter(z=>z.region===region).slice().sort((a,b)=>a.city.localeCompare(b.city)).forEach(z => {
+      const o = document.createElement('option');
+      o.value = ZONES.indexOf(z);
+      o.textContent = `${z.flag} ${z.city}`;
+      group.appendChild(o);
+    });
+    sel.appendChild(group);
+  });
+  const parisIdx = ZONES.findIndex(z=>z.tz==='Europe/Paris');
+  if (parisIdx>=0) sel.value = String(parisIdx);
+  sel.onchange = function() {
+    const z = ZONES[parseInt(this.value)];
+    if (z) centerPoint = { lat:z.lat, lon:z.lon, label:z.city, tz:z.tz };
+    sphRefsMain.viewLon = null; sphRefsModal.viewLon = null;
+    renderSphere();
+    if (sphModalOpen) renderSphereModal();
+  };
+}
+
+// ════════════════════════════════════════════════════════
+// CONVERTISSEUR (indépendant des globes désormais)
+// ════════════════════════════════════════════════════════
+const ZONES = [
+  // Europe
+  {city:'Amsterdam',tz:'Europe/Amsterdam',flag:'🇳🇱',lat:52.37,lon:4.9,region:'Europe'},
+  {city:'Athènes',tz:'Europe/Athens',flag:'🇬🇷',lat:37.98,lon:23.73,region:'Europe'},
+  {city:'Belgrade',tz:'Europe/Belgrade',flag:'🇷🇸',lat:44.79,lon:20.45,region:'Europe'},
+  {city:'Berlin',tz:'Europe/Berlin',flag:'🇩🇪',lat:52.52,lon:13.4,region:'Europe'},
+  {city:'Bruxelles',tz:'Europe/Brussels',flag:'🇧🇪',lat:50.85,lon:4.35,region:'Europe'},
+  {city:'Bucarest',tz:'Europe/Bucharest',flag:'🇷🇴',lat:44.43,lon:26.1,region:'Europe'},
+  {city:'Budapest',tz:'Europe/Budapest',flag:'🇭🇺',lat:47.5,lon:19.04,region:'Europe'},
+  {city:'Copenhague',tz:'Europe/Copenhagen',flag:'🇩🇰',lat:55.68,lon:12.57,region:'Europe'},
+  {city:'Dublin',tz:'Europe/Dublin',flag:'🇮🇪',lat:53.33,lon:-6.25,region:'Europe'},
+  {city:'Helsinki',tz:'Europe/Helsinki',flag:'🇫🇮',lat:60.17,lon:24.94,region:'Europe'},
+  {city:'Istanbul',tz:'Europe/Istanbul',flag:'🇹🇷',lat:41.01,lon:28.97,region:'Europe'},
+  {city:'Kiev',tz:'Europe/Kyiv',flag:'🇺🇦',lat:50.45,lon:30.52,region:'Europe'},
+  {city:'Lisbonne',tz:'Europe/Lisbon',flag:'🇵🇹',lat:38.72,lon:-9.14,region:'Europe'},
+  {city:'Londres',tz:'Europe/London',flag:'🇬🇧',lat:51.51,lon:-0.13,region:'Europe'},
+  {city:'Madrid',tz:'Europe/Madrid',flag:'🇪🇸',lat:40.42,lon:-3.7,region:'Europe'},
+  {city:'Oslo',tz:'Europe/Oslo',flag:'🇳🇴',lat:59.91,lon:10.75,region:'Europe'},
+  {city:'Paris',tz:'Europe/Paris',flag:'🇫🇷',lat:48.85,lon:2.35,region:'Europe'},
+  {city:'Prague',tz:'Europe/Prague',flag:'🇨🇿',lat:50.09,lon:14.42,region:'Europe'},
+  {city:'Reykjavik',tz:'Atlantic/Reykjavik',flag:'🇮🇸',lat:64.13,lon:-21.9,region:'Europe'},
+  {city:'Rome',tz:'Europe/Rome',flag:'🇮🇹',lat:41.9,lon:12.5,region:'Europe'},
+  {city:'Stockholm',tz:'Europe/Stockholm',flag:'🇸🇪',lat:59.33,lon:18.07,region:'Europe'},
+  {city:'Varsovie',tz:'Europe/Warsaw',flag:'🇵🇱',lat:52.23,lon:21.01,region:'Europe'},
+  {city:'Vienne',tz:'Europe/Vienna',flag:'🇦🇹',lat:48.21,lon:16.37,region:'Europe'},
+  {city:'Zurich',tz:'Europe/Zurich',flag:'🇨🇭',lat:47.37,lon:8.55,region:'Europe'},
+  // Russie
+  {city:'Irkoutsk',tz:'Asia/Irkutsk',flag:'🇷🇺',lat:52.29,lon:104.3,region:'Russie'},
+  {city:'Kaliningrad',tz:'Europe/Kaliningrad',flag:'🇷🇺',lat:54.71,lon:20.51,region:'Russie'},
+  {city:'Kamtchatka',tz:'Asia/Kamchatka',flag:'🇷🇺',lat:53.04,lon:158.65,region:'Russie'},
+  {city:'Moscou',tz:'Europe/Moscow',flag:'🇷🇺',lat:55.75,lon:37.62,region:'Russie'},
+  {city:'Omsk',tz:'Asia/Omsk',flag:'🇷🇺',lat:54.99,lon:73.37,region:'Russie'},
+  // Afrique
+  {city:'Abidjan',tz:'Africa/Abidjan',flag:'🇨🇮',lat:5.36,lon:-4.01,region:'Afrique'},
+  {city:'Accra',tz:'Africa/Accra',flag:'🇬🇭',lat:5.6,lon:-0.19,region:'Afrique'},
+  {city:'Addis-Abeba',tz:'Africa/Addis_Ababa',flag:'🇪🇹',lat:9.03,lon:38.74,region:'Afrique'},
+  {city:'Alger',tz:'Africa/Algiers',flag:'🇩🇿',lat:36.75,lon:3.06,region:'Afrique'},
+  {city:'Antananarivo',tz:'Indian/Antananarivo',flag:'🇲🇬',lat:-18.88,lon:47.51,region:'Afrique'},
+  {city:'Casablanca',tz:'Africa/Casablanca',flag:'🇲🇦',lat:33.59,lon:-7.62,region:'Afrique'},
+  {city:'Dakar',tz:'Africa/Dakar',flag:'🇸🇳',lat:14.69,lon:-17.45,region:'Afrique'},
+  {city:'Johannesburg',tz:'Africa/Johannesburg',flag:'🇿🇦',lat:-26.2,lon:28.04,region:'Afrique'},
+  {city:'Khartoum',tz:'Africa/Khartoum',flag:'🇸🇩',lat:15.5,lon:32.56,region:'Afrique'},
+  {city:'Kinshasa',tz:'Africa/Kinshasa',flag:'🇨🇩',lat:-4.32,lon:15.32,region:'Afrique'},
+  {city:'Lagos',tz:'Africa/Lagos',flag:'🇳🇬',lat:6.45,lon:3.4,region:'Afrique'},
+  {city:'Le Caire',tz:'Africa/Cairo',flag:'🇪🇬',lat:30.04,lon:31.24,region:'Afrique'},
+  {city:'Maurice',tz:'Indian/Mauritius',flag:'🇲🇺',lat:-20.35,lon:57.55,region:'Afrique'},
+  {city:'Nairobi',tz:'Africa/Nairobi',flag:'🇰🇪',lat:-1.29,lon:36.82,region:'Afrique'},
+  {city:'Tunis',tz:'Africa/Tunis',flag:'🇹🇳',lat:36.81,lon:10.18,region:'Afrique'},
+  {city:'Windhoek',tz:'Africa/Windhoek',flag:'🇳🇦',lat:-22.56,lon:17.08,region:'Afrique'},
+  // Amérique du Nord
+  {city:'Calgary',tz:'America/Edmonton',flag:'🇨🇦',lat:51.05,lon:-114.07,region:'Amérique du Nord'},
+  {city:'Denver',tz:'America/Denver',flag:'🇺🇸',lat:39.74,lon:-104.99,region:'Amérique du Nord'},
+  {city:'Honolulu',tz:'Pacific/Honolulu',flag:'🇺🇸',lat:21.31,lon:-157.86,region:'Amérique du Nord'},
+  {city:'La Havane',tz:'America/Havana',flag:'🇨🇺',lat:23.13,lon:-82.38,region:'Amérique du Nord'},
+  {city:'Los Angeles',tz:'America/Los_Angeles',flag:'🇺🇸',lat:34.05,lon:-118.24,region:'Amérique du Nord'},
+  {city:'Mexico',tz:'America/Mexico_City',flag:'🇲🇽',lat:19.43,lon:-99.13,region:'Amérique du Nord'},
+  {city:'Monterrey',tz:'America/Monterrey',flag:'🇲🇽',lat:25.69,lon:-100.32,region:'Amérique du Nord'},
+  {city:'Montréal',tz:'America/Toronto',flag:'🇨🇦',lat:45.5,lon:-73.57,region:'Amérique du Nord'},
+  {city:'New York',tz:'America/New_York',flag:'🇺🇸',lat:40.71,lon:-74,region:'Amérique du Nord'},
+  {city:'Toronto',tz:'America/Toronto',flag:'🇨🇦',lat:43.65,lon:-79.38,region:'Amérique du Nord'},
+  {city:'Vancouver',tz:'America/Vancouver',flag:'🇨🇦',lat:49.25,lon:-123.12,region:'Amérique du Nord'},
+  {city:'Winnipeg',tz:'America/Winnipeg',flag:'🇨🇦',lat:49.9,lon:-97.14,region:'Amérique du Nord'},
+  // Amérique du Sud & Centrale
+  {city:'Asuncion',tz:'America/Asuncion',flag:'🇵🇾',lat:-25.28,lon:-57.63,region:'Amérique du Sud & Centrale'},
+  {city:'Bogotá',tz:'America/Bogota',flag:'🇨🇴',lat:4.71,lon:-74.07,region:'Amérique du Sud & Centrale'},
+  {city:'Buenos Aires',tz:'America/Argentina/Buenos_Aires',flag:'🇦🇷',lat:-34.6,lon:-58.38,region:'Amérique du Sud & Centrale'},
+  {city:'Caracas',tz:'America/Caracas',flag:'🇻🇪',lat:10.48,lon:-66.9,region:'Amérique du Sud & Centrale'},
+  {city:'La Paz',tz:'America/La_Paz',flag:'🇧🇴',lat:-16.5,lon:-68.15,region:'Amérique du Sud & Centrale'},
+  {city:'Lima',tz:'America/Lima',flag:'🇵🇪',lat:-12.04,lon:-77.03,region:'Amérique du Sud & Centrale'},
+  {city:'Manaus',tz:'America/Manaus',flag:'🇧🇷',lat:-3.12,lon:-60.02,region:'Amérique du Sud & Centrale'},
+  {city:'Montevideo',tz:'America/Montevideo',flag:'🇺🇾',lat:-34.9,lon:-56.16,region:'Amérique du Sud & Centrale'},
+  {city:'Panama',tz:'America/Panama',flag:'🇵🇦',lat:8.98,lon:-79.52,region:'Amérique du Sud & Centrale'},
+  {city:'Quito',tz:'America/Guayaquil',flag:'🇪🇨',lat:-0.18,lon:-78.47,region:'Amérique du Sud & Centrale'},
+  {city:'San José',tz:'America/Costa_Rica',flag:'🇨🇷',lat:9.93,lon:-84.08,region:'Amérique du Sud & Centrale'},
+  {city:'Santiago',tz:'America/Santiago',flag:'🇨🇱',lat:-33.45,lon:-70.67,region:'Amérique du Sud & Centrale'},
+  {city:'São Paulo',tz:'America/Sao_Paulo',flag:'🇧🇷',lat:-23.55,lon:-46.63,region:'Amérique du Sud & Centrale'},
+  // Asie
+  {city:'Almaty',tz:'Asia/Almaty',flag:'🇰🇿',lat:43.24,lon:76.95,region:'Asie'},
+  {city:'Amman',tz:'Asia/Amman',flag:'🇯🇴',lat:31.95,lon:35.93,region:'Asie'},
+  {city:'Bagdad',tz:'Asia/Baghdad',flag:'🇮🇶',lat:33.31,lon:44.36,region:'Asie'},
+  {city:'Bali',tz:'Asia/Makassar',flag:'🇮🇩',lat:-8.65,lon:115.22,region:'Asie'},
+  {city:'Bangkok',tz:'Asia/Bangkok',flag:'🇹🇭',lat:13.75,lon:100.52,region:'Asie'},
+  {city:'Beyrouth',tz:'Asia/Beirut',flag:'🇱🇧',lat:33.89,lon:35.5,region:'Asie'},
+  {city:'Colombo',tz:'Asia/Colombo',flag:'🇱🇰',lat:6.93,lon:79.85,region:'Asie'},
+  {city:'Dacca',tz:'Asia/Dhaka',flag:'🇧🇩',lat:23.72,lon:90.41,region:'Asie'},
+  {city:'Doha',tz:'Asia/Qatar',flag:'🇶🇦',lat:25.29,lon:51.53,region:'Asie'},
+  {city:'Dubai',tz:'Asia/Dubai',flag:'🇦🇪',lat:25.2,lon:55.27,region:'Asie'},
+  {city:'Hanoï',tz:'Asia/Bangkok',flag:'🇻🇳',lat:21.03,lon:105.85,region:'Asie'},
+  {city:'Hô-Chi-Minh-Ville',tz:'Asia/Ho_Chi_Minh',flag:'🇻🇳',lat:10.82,lon:106.63,region:'Asie'},
+  {city:'Hong Kong',tz:'Asia/Hong_Kong',flag:'🇭🇰',lat:22.32,lon:114.17,region:'Asie'},
+  {city:'Jakarta',tz:'Asia/Jakarta',flag:'🇮🇩',lat:-6.21,lon:106.85,region:'Asie'},
+  {city:'Kaboul',tz:'Asia/Kabul',flag:'🇦🇫',lat:34.56,lon:69.21,region:'Asie'},
+  {city:'Karachi',tz:'Asia/Karachi',flag:'🇵🇰',lat:24.86,lon:67.01,region:'Asie'},
+  {city:'Katmandou',tz:'Asia/Kathmandu',flag:'🇳🇵',lat:27.72,lon:85.32,region:'Asie'},
+  {city:'Kuala Lumpur',tz:'Asia/Kuala_Lumpur',flag:'🇲🇾',lat:3.14,lon:101.69,region:'Asie'},
+  {city:'Manille',tz:'Asia/Manila',flag:'🇵🇭',lat:14.6,lon:120.98,region:'Asie'},
+  {city:'Mumbai',tz:'Asia/Kolkata',flag:'🇮🇳',lat:19.08,lon:72.88,region:'Asie'},
+  {city:'Oulan-Bator',tz:'Asia/Ulaanbaatar',flag:'🇲🇳',lat:47.92,lon:106.92,region:'Asie'},
+  {city:'Pékin',tz:'Asia/Shanghai',flag:'🇨🇳',lat:39.9,lon:116.4,region:'Asie'},
+  {city:'Phnom Penh',tz:'Asia/Phnom_Penh',flag:'🇰🇭',lat:11.56,lon:104.92,region:'Asie'},
+  {city:'Riyad',tz:'Asia/Riyadh',flag:'🇸🇦',lat:24.69,lon:46.72,region:'Asie'},
+  {city:'Séoul',tz:'Asia/Seoul',flag:'🇰🇷',lat:37.57,lon:126.98,region:'Asie'},
+  {city:'Singapour',tz:'Asia/Singapore',flag:'🇸🇬',lat:1.35,lon:103.82,region:'Asie'},
+  {city:'Tachkent',tz:'Asia/Tashkent',flag:'🇺🇿',lat:41.3,lon:69.24,region:'Asie'},
+  {city:'Taipei',tz:'Asia/Taipei',flag:'🇹🇼',lat:25.03,lon:121.57,region:'Asie'},
+  {city:'Téhéran',tz:'Asia/Tehran',flag:'🇮🇷',lat:35.69,lon:51.42,region:'Asie'},
+  {city:'Tel Aviv',tz:'Asia/Jerusalem',flag:'🇮🇱',lat:32.08,lon:34.78,region:'Asie'},
+  {city:'Tokyo',tz:'Asia/Tokyo',flag:'🇯🇵',lat:35.68,lon:139.69,region:'Asie'},
+  // Océanie
+  {city:'Adelaide',tz:'Australia/Adelaide',flag:'🇦🇺',lat:-34.93,lon:138.6,region:'Océanie'},
+  {city:'Auckland',tz:'Pacific/Auckland',flag:'🇳🇿',lat:-36.85,lon:174.76,region:'Océanie'},
+  {city:'Guam',tz:'Pacific/Guam',flag:'🇬🇺',lat:13.47,lon:144.75,region:'Océanie'},
+  {city:'Hobart',tz:'Australia/Hobart',flag:'🇦🇺',lat:-42.88,lon:147.33,region:'Océanie'},
+  {city:'Nouméa',tz:'Pacific/Noumea',flag:'🇳🇨',lat:-22.28,lon:166.46,region:'Océanie'},
+  {city:'Papeete',tz:'Pacific/Tahiti',flag:'🇵🇫',lat:-17.54,lon:-149.57,region:'Océanie'},
+  {city:'Perth',tz:'Australia/Perth',flag:'🇦🇺',lat:-31.95,lon:115.86,region:'Océanie'},
+  {city:'Port Moresby',tz:'Pacific/Port_Moresby',flag:'🇵🇬',lat:-9.48,lon:147.15,region:'Océanie'},
+  {city:'Suva',tz:'Pacific/Fiji',flag:'🇫🇯',lat:-18.14,lon:178.44,region:'Océanie'},
+  {city:'Sydney',tz:'Australia/Sydney',flag:'🇦🇺',lat:-33.87,lon:151.21,region:'Océanie'},
+];
+
+const MAX_CITIES = 9;
+let selectedCities = [];
+
+function getTzOffset(tz, date) {
+  try {
+    const p = new Intl.DateTimeFormat('en',{timeZone:tz,timeZoneName:'shortOffset'}).formatToParts(date);
+    return p.find(x=>x.type==='timeZoneName')?.value || 'UTC+0';
+  } catch(e) { return ''; }
+}
+function getOffsetMin(tz, date) {
+  const off = getTzOffset(tz, date);
+  const m = off.match(/([+-])(\d{1,2}):?(\d{2})?/);
+  if (m) { const s=m[1]==='+'?1:-1; return s*(parseInt(m[2]||0)*60+parseInt(m[3]||0)); }
+  return 0;
+}
+function fmtTime(date, tz) { return new Intl.DateTimeFormat('fr-FR',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false}).format(date); }
+function fmtDate(date, tz) { return new Intl.DateTimeFormat('fr-FR',{timeZone:tz,weekday:'short',day:'numeric',month:'short'}).format(date); }
+function getHour(date, tz) { return parseInt(new Intl.DateTimeFormat('en',{timeZone:tz,hour:'numeric',hour12:false}).format(date)); }
+
+// L'heure de référence est toujours l'heure réelle du navigateur — plus de fuseau "source" à choisir.
+function getSrcDate() { return new Date(); }
+function updateNowDisplay() {
+  const now = new Date();
+  document.getElementById('now-time').textContent = now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('now-date').textContent = now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+}
+
+function addPresets() {
+  ['Europe/Paris','Europe/London','America/New_York','America/Los_Angeles','Asia/Tokyo','Asia/Shanghai','Australia/Sydney'].forEach(tz => {
+    if (selectedCities.length >= MAX_CITIES) return;
+    const z=ZONES.find(x=>x.tz===tz); if(z&&!selectedCities.find(s=>s.tz===tz)) selectedCities.push(z);
+  });
+  renderConverter();
+}
+function clearCities() { selectedCities=[]; renderConverter(); }
+function removeCity(tz, city) { selectedCities=selectedCities.filter(s=>!(s.tz===tz && s.city===city)); renderConverter(); }
+function populateCityPicker() {
+  const sel = document.getElementById('city-picker');
+  sel.innerHTML = '';
+  const regions = [...new Set(ZONES.map(z=>z.region))];
+  regions.forEach(region => {
+    const group = document.createElement('optgroup');
+    group.label = region;
+    ZONES.filter(z=>z.region===region).forEach(z => {
+      const o = document.createElement('option');
+      o.value = z.tz;
+      // value seul ne suffit pas si même fuseau utilisé par 2 villes : on encode l'index
+      o.dataset.idx = ZONES.indexOf(z);
+      o.textContent = `${z.flag} ${z.city}`;
+      group.appendChild(o);
+    });
+    sel.appendChild(group);
+  });
+}
+function addPickedCity() {
+  if (selectedCities.length >= MAX_CITIES) return;
+  const sel = document.getElementById('city-picker');
+  const opt = sel.options[sel.selectedIndex];
+  if (!opt) return;
+  const idx = parseInt(opt.dataset.idx);
+  const z = ZONES[idx];
+  if (z && !selectedCities.find(s=>s.tz===z.tz && s.city===z.city)) selectedCities.push(z);
+  renderConverter();
+}
+
+function renderConverter() {
+  const date = getSrcDate();
+  const srcTz = Intl.DateTimeFormat().resolvedOptions().timeZone; // fuseau local du navigateur, automatique
+  const grid = document.getElementById('city-grid');
+
+  const cards = selectedCities.map(z => {
+    const time=fmtTime(date,z.tz), dt=fmtDate(date,z.tz), hour=getHour(date,z.tz);
+    const isDay=hour>=7&&hour<22, off=getTzOffset(z.tz,date);
+    return `<div class="city-card ${isDay?'':'night-card'}">
+      <span class="city-badge ${isDay?'b-day':'b-night'}">${isDay?'Jour':'Nuit'}</span>
+      <span class="city-flag">${z.flag}</span>
+      <div class="city-name">${z.city}</div>
+      <div class="city-tz-off">${off}</div>
+      <div class="city-time">${time}</div>
+      <div class="city-date">${dt}</div>
+      <button class="city-rm" onclick="removeCity('${z.tz}','${z.city}')" title="Retirer">✕</button>
+    </div>`;
+  });
+  const emptySlots = Math.max(0, MAX_CITIES - selectedCities.length);
+  for (let i=0; i<emptySlots; i++) {
+    cards.push(`<div class="city-card city-card-empty">
+      <div class="city-empty-icon">+</div>
+      <div class="city-empty-label">Emplacement libre</div>
+    </div>`);
+  }
+  grid.innerHTML = cards.join('');
+
+  if (selectedCities.length===0) {
+    ['diff-bar','copy-bar','tl-section'].forEach(id=>document.getElementById(id).style.display='none');
+    return;
+  }
+
+  if (selectedCities.length >= 2) {
+    const srcOff=getOffsetMin(srcTz,date);
+    const lines=selectedCities.map(z=>{
+      const diff=getOffsetMin(z.tz,date)-srcOff;
+      const h=Math.floor(Math.abs(diff)/60), m=Math.abs(diff)%60;
+      const s=(diff>=0?'+':'-')+h+'h'+(m>0?String(m).padStart(2,'0'):'');
+      return `<b>${z.flag} ${z.city}</b> : ${diff===0?'même heure':s}`;
+    }).join('&nbsp; · &nbsp;');
+    document.getElementById('diff-bar').innerHTML=lines;
+    document.getElementById('diff-bar').style.display='block';
+  } else {
+    document.getElementById('diff-bar').style.display='none';
+  }
+
+  if (selectedCities.length >= 2) {
+    const srcHour=getHour(date,srcTz);
+    let html='<div class="tl-row"><div class="tl-city" style="font-size:9px;color:var(--text2)"></div><div class="tl-cells">';
+    for(let h=0;h<24;h++) html+=`<div class="tl-cell" style="background:none;height:13px;display:flex;align-items:flex-end;justify-content:center"><span style="font-size:8px;color:var(--text2)">${h%6===0?h+'h':''}</span></div>`;
+    html+='</div></div>';
+    let bestCount=0, bestHour=-1;
+    for (let h=0;h<24;h++) {
+      let count=0;
+      selectedCities.forEach(z=>{ const zH=((h+(getHour(date,z.tz)-srcHour))%24+24)%24; if(zH>=9&&zH<18)count++; });
+      if(count>bestCount){bestCount=count;bestHour=h;}
+    }
+    selectedCities.forEach(z=>{
+      const diff=getHour(date,z.tz)-srcHour;
+      html+=`<div class="tl-row"><div class="tl-city">${z.flag} ${z.city.split(' ')[0]}</div><div class="tl-cells">`;
+      for(let h=0;h<24;h++){
+        const tzH=((h+diff)%24+24)%24;
+        html+=`<div class="tl-cell ${tzH>=9&&tzH<18?'tl-work':'tl-off'} ${h===srcHour?'tl-now':''}" data-tip="${z.city}: ${pad(tzH)}h"></div>`;
+      }
+      html+='</div></div>';
+    });
+    document.getElementById('tl-grid').innerHTML=html;
+    document.getElementById('tl-overlap').innerHTML = bestHour>=0
+      ? `Meilleur créneau commun : <b>${bestHour}h</b> — <b>${bestCount}/${selectedCities.length}</b> villes en heures de travail`
+      : 'Aucun créneau commun trouvé.';
+    document.getElementById('tl-section').style.display='block';
+  } else {
+    document.getElementById('tl-section').style.display='none';
+  }
+
+  const src=ZONES.find(x=>x.tz===srcTz);
+  const txt=(src?`${src.flag} ${src.city} ${fmtTime(date,srcTz)} → `:'')+selectedCities.map(z=>`${z.flag} ${z.city}: ${fmtTime(date,z.tz)} (${getTzOffset(z.tz,date)})`).join(' · ');
+  document.getElementById('copy-text').textContent=txt;
+  document.getElementById('copy-bar').style.display='flex';
+}
+
+function doCopy(btn) {
+  navigator.clipboard.writeText(document.getElementById('copy-text').textContent).then(()=>{
+    const orig=btn.textContent; btn.textContent='Copié !'; setTimeout(()=>btn.textContent=orig,1500);
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════════════════
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['converter','flatglobe','sphere'][i]===id));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+}
+
+// ════════════════════════════════════════════════════════
+// BOUCLE PRINCIPALE — tout en temps réel continu
+// ════════════════════════════════════════════════════════
+function mainLoop() {
+  renderFlat();
+  renderFlatModal();
+  renderSphere();
+  renderSphereModal();
+  updateNowDisplay();
+  renderConverter();
+}
+
+// ════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════
+populateSphTz();
+setupTzHover();
+populateCityPicker();
+buildTexture();
+makeSphStars();
+addPresets();
+
+const sun0 = getSunPos(new Date());
+buildFlatOcean(sun0.dec, sun0.lon);
+buildSphOff(cfgMain, centerPoint.lat, centerPoint.lon, sun0.dec, sun0.lon);
+mainLoop();
+setInterval(mainLoop, 1000);
+
+fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+  .then(r => r.json())
+  .then(topo => {
+    const geo = topojson.feature(topo, topo.objects.countries);
+    const rings = [];
+    const ringsWithCountry = [];
+    geo.features.forEach(f => {
+      const g=f.geometry; if(!g)return;
+      const countryName = (f.properties && f.properties.name) || '';
+      const polys=g.type==='Polygon'?[g.coordinates]:g.type==='MultiPolygon'?g.coordinates:[];
+      polys.forEach(poly=>poly.forEach(ring=>{
+        rings.push(ring);
+        ringsWithCountry.push({ ring, unwrapped: unwrapRingLons(ring), country: countryName });
+      }));
+    });
+    STATE.geoRings = rings;
+    STATE.geoRingsWithCountry = ringsWithCountry;
+    paintTexLand(rings);
+    STATE.sphReady = true;
+    document.getElementById('flat-loading').style.display='none';
+    document.getElementById('sph-loading').style.display='none';
+    fLastLon=null; fLastLandLon=null;
+    sphRefsMain.viewLon = null; sphRefsModal.viewLon = null;
+    mLastLonObj.v=null; mLastLandLonObj.v=null;
+    tzBuiltMainObj.v=false; tzBuiltModalObj.v=false;
+    mainLoop();
+  })
+  .catch(() => {
+    document.getElementById('flat-loading').textContent='Continents non disponibles';
+    document.getElementById('sph-loading').textContent='Continents non disponibles';
+  });
+</script>
+</body>
+</html>
