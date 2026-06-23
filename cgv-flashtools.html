@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de CGV - Conditions Générales de Vente</title>
+    <meta name="description" content="Créez vos CGV en 5 minutes. Conformes à la loi française, personnalisées selon votre activité.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #0A0E27;
+            color: #F1F5F9;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: #111827;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            color: #06B6D4;
+            margin-bottom: 15px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            color: #94A3B8;
+            margin-bottom: 20px;
+        }
+
+        .legal-sources {
+            background: #1E293B;
+            border-left: 4px solid #06B6D4;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+
+        .legal-sources h3 {
+            font-size: 1em;
+            margin-bottom: 10px;
+            color: #F1F5F9;
+        }
+
+        a, a:visited {
+            color: #06B6D4;
+        }
+
+        .legal-sources a, .legal-sources a:visited {
+            color: #06B6D4;
+            text-decoration: none;
+            display: block;
+            margin: 5px 0;
+        }
+
+        .legal-sources a:hover {
+            text-decoration: underline;
+        }
+
+        #cgvContent a, #cgvContent a:visited {
+            color: #0E7490;
+        }
+
+        .progress-card {
+            background: #141B2C;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+
+        .progress-text {
+            font-size: 0.85em;
+            color: #94A3B8;
+            margin-bottom: 8px;
+        }
+
+        .progress-track {
+            background: rgba(255,255,255,0.08);
+            border-radius: 6px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #06B6D4, #8B5CF6);
+            height: 100%;
+            width: 0%;
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+
+        .required-mark {
+            color: #FCA5A5;
+        }
+
+        .trio-banner {
+            background: #1E293B;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .trio-banner strong {
+            color: #06B6D4;
+        }
+
+        .trio-banner-text {
+            font-size: 0.9em;
+            color: #CBD5E1;
+            flex: 1;
+        }
+
+        .trio-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .trio-links a {
+            background: #141B2C;
+            color: #06B6D4;
+            text-decoration: none;
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .trio-links a:hover {
+            background: #06B6D4;
+            color: #04141A;
+            border-color: #06B6D4;
+        }
+
+        .form-legend {
+            font-size: 0.85em;
+            color: #94A3B8;
+            margin: -10px 0 20px 0;
+        }
+
+        .client-type-hint {
+            font-size: 0.85em;
+            color: #94A3B8;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        .info-disclosure {
+            background: #1E293B;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .info-disclosure summary {
+            cursor: pointer;
+            padding: 12px 16px;
+            font-weight: 600;
+            color: #06B6D4;
+            list-style: none;
+        }
+
+        .info-disclosure summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .info-disclosure summary::before {
+            content: "▸ ";
+        }
+
+        .info-disclosure[open] summary::before {
+            content: "▾ ";
+        }
+
+        .info-disclosure-body {
+            padding: 0 16px 16px 16px;
+            font-size: 0.9em;
+            color: #CBD5E1;
+            line-height: 1.6;
+        }
+
+        .info-disclosure-body p {
+            margin-bottom: 10px;
+        }
+
+        .info-disclosure-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-section {
+            background: #111827;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .form-section h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #F1F5F9;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255,255,255,0.08);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #F1F5F9;
+        }
+
+        .tooltip {
+            display: inline-block;
+            margin-left: 5px;
+            color: #06B6D4;
+            cursor: help;
+            font-weight: normal;
+            position: relative;
+        }
+
+        .tooltip:focus {
+            outline: 2px solid #06B6D4;
+            outline-offset: 2px;
+        }
+
+        .tooltip .tooltip-bubble {
+            display: none;
+            position: absolute;
+            bottom: 130%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1E293B;
+            color: #F1F5F9;
+            font-size: 0.85em;
+            font-weight: normal;
+            padding: 8px 12px;
+            border-radius: 6px;
+            white-space: normal;
+            width: 220px;
+            text-align: left;
+            line-height: 1.4;
+            z-index: 10;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tooltip.tooltip-open .tooltip-bubble {
+            display: block;
+        }
+
+        .address-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .address-row .form-group {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .address-row .form-group.city {
+            flex: 2;
+            min-width: 180px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            background: #1E293B;
+            border: 2px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            font-size: 1em;
+            color: #F1F5F9;
+            transition: border-color 0.3s;
+            accent-color: #06B6D4;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #64748B;
+        }
+
+        select option {
+            background: #1E293B;
+            color: #F1F5F9;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #06B6D4;
+        }
+
+        input:invalid:not(:placeholder-shown) {
+            border-color: #F87171;
+        }
+
+        .field-error {
+            color: #FCA5A5;
+            font-size: 0.85em;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .field-error.visible {
+            display: block;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #F1F5F9;
+        }
+
+        .radio-option input[type="radio"] {
+            width: auto;
+            accent-color: #06B6D4;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #F1F5F9;
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            width: auto;
+            accent-color: #06B6D4;
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, #06B6D4, #8B5CF6);
+            color: #04141A;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: opacity 0.3s;
+        }
+
+        .btn-generate:hover {
+            opacity: 0.9;
+        }
+
+        .warning {
+            background: rgba(239,68,68,0.1);
+            border-left: 4px solid #F87171;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            color: #F1F5F9;
+        }
+
+        .warning strong {
+            color: #FCA5A5;
+        }
+
+        #result {
+            display: none;
+            background: #111827;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        #cgvContent {
+            background: #F8FAFC;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 20px 0;
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid rgba(0,0,0,0.08);
+            color: #1E293B;
+        }
+
+        #cgvContent h2 {
+            font-size: 1.3em;
+            margin: 30px 0 15px 0;
+            color: #1E293B;
+        }
+
+        #cgvContent h3 {
+            font-size: 1.1em;
+            margin: 20px 0 10px 0;
+            color: #334155;
+        }
+
+        #cgvContent p {
+            margin-bottom: 15px;
+            text-align: justify;
+            color: #334155;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn-export {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 20px;
+            border: 2px solid #06B6D4;
+            background: transparent;
+            color: #06B6D4;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-export:hover {
+            background: #06B6D4;
+            color: #04141A;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media print {
+            body, .container {
+                background: white !important;
+            }
+            #cgvContent {
+                max-height: none;
+                overflow: visible;
+                border: none;
+            }
+            .form-section, .header, .progress-card, .export-buttons, .warning, .trio-banner {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.6em;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .form-section {
+                padding: 20px;
+            }
+
+            .address-row {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 Générateur de CGV</h1>
+            <p>Créez vos Conditions Générales de Vente en 5 minutes</p>
+            <p style="font-size: 0.95em; color: #94A3B8;">Conformes à la législation française</p>
+            
+            <div class="legal-sources">
+                <h3>📚 Sources légales officielles :</h3>
+                <a href="https://www.service-public.fr/professionnels-entreprises/vosdroits/F33527" target="_blank">→ Service-Public.fr : Guide complet des CGV</a>
+                <a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000032227429" target="_blank">→ Legifrance : Code de commerce (art. L441-10)</a>
+                <a href="https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006069565/LEGISCTA000032220967" target="_blank">→ Legifrance : Code de la consommation (garanties)</a>
+                <a href="https://www.economie.gouv.fr/dgccrf/Publications/Vie-pratique/Fiches-pratiques/conditions-generales-de-vente" target="_blank">→ DGCCRF : Fiches pratiques CGV</a>
+            </div>
+        </div>
+
+        <div class="trio-banner">
+            <div class="trio-banner-text"><strong>Le trio légal FlashTools</strong> — CGV, Mentions Légales et Politique de Confidentialité fonctionnent ensemble. Pensez aussi aux deux autres si vous ne les avez pas encore générées.</div>
+            <div class="trio-links">
+                <a href="https://nicolasaudigier-hash.github.io/flashtools/mentions-legales-flashtools.html" target="_blank">→ Mentions Légales</a>
+                <a href="https://nicolasaudigier-hash.github.io/flashtools/confidentialite-flashtools.html" target="_blank">→ Confidentialité</a>
+            </div>
+        </div>
+
+        <form id="cgvForm">
+            <div class="progress-card">
+                <p class="progress-text" id="progressText">0 / 0 champs obligatoires complétés</p>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressBarFill"></div>
+                </div>
+            </div>
+
+            <p class="form-legend">Les champs marqués d'un <span class="required-mark">*</span> correspondent à des mentions légalement obligatoires (LCEN, Code de la consommation, Code de commerce selon le cas).</p>
+
+            <!-- SECTION 1 : TYPE D'ACTIVITÉ -->
+            <div class="form-section">
+                <h2>1️⃣ Votre activité</h2>
+                
+                <div class="form-group">
+                    <label>Type d'activité :</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="activityType" value="produits" id="produits" checked>
+                            <label for="produits">Vente de produits physiques</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="activityType" value="numerique" id="numerique">
+                            <label for="numerique">Vente de produits numériques</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="activityType" value="services" id="services">
+                            <label for="services">Prestation de services</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="activityType" value="mixte" id="mixte">
+                            <label for="mixte">Mixte (produits + services)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Vous vendez principalement à :</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="clientType" value="b2c" id="b2c" checked>
+                            <label for="b2c">Particuliers (B2C)</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="clientType" value="b2b" id="b2b">
+                            <label for="b2b">Entreprises (B2B)</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="clientType" value="both" id="both">
+                            <label for="both">Les deux</label>
+                        </div>
+                    </div>
+                    <p class="client-type-hint">💡 Si une partie de vos clients sont des particuliers — même minoritaire — les règles de protection du consommateur (droit de rétractation, médiateur, garanties légales...) s'appliquent à ces ventes-là. Choisissez « Les deux » dans ce cas : vos CGV incluront alors automatiquement les clauses consommateur en plus des clauses professionnelles.</p>
+                </div>
+            </div>
+
+            <!-- SECTION 2 : INFORMATIONS LÉGALES -->
+            <div class="form-section">
+                <h2>2️⃣ Vos informations légales</h2>
+
+                <details class="info-disclosure">
+                    <summary>Pourquoi ces informations sont-elles obligatoires ?</summary>
+                    <div class="info-disclosure-body">
+                        <p>Le nom, l'adresse, le SIRET et le téléphone sont exigés par la loi sur deux fondements : les mentions légales de tout site web (article 1-1 de la LCEN, depuis la réforme de 2024 — l'ancien article 6-III n'existe plus) et l'information précontractuelle due à un consommateur avant toute vente à distance (Code de la consommation). Le numéro de téléphone ne fait pas exception : la loi ne prévoit pas de dispense même si vous n'en avez pas dédié à votre activité.</p>
+                        <p>Le médiateur de la consommation devient obligatoire dès que vous vendez à au moins un particulier — y compris si vous avez choisi « Les deux » plus haut.</p>
+                        <p>Concernant l'adresse : elle doit rester votre véritable adresse de domiciliation (celle déclarée au RCS/RNE, visible sur votre Kbis ou avis Sirene) — on ne peut pas la masquer ici. Pour la protéger si vous travaillez depuis votre domicile : une société de domiciliation (à partir de 10-20 €/mois), ou, pour les dirigeants de société uniquement (pas les auto-entrepreneurs ni les EI), la procédure d'occultation auprès de l'INPI. Voir le générateur de <strong>Mentions Légales</strong> pour le détail de cette démarche.</p>
+                        <p>Vous ne voulez pas afficher votre numéro personnel ? Vous pouvez souscrire un numéro professionnel virtuel auprès d'un hébergeur ou opérateur VoIP spécialisé (OVH Telecom, Keyyo...) à partir d'environ 1 €/mois en autonome, ou via le renvoi d'appel inclus dans une offre professionnelle existante chez un opérateur télécom classique (Orange Pro, SFR Business...) si vous en avez déjà une.</p>
+                        <p>Même chose pour l'email : pas besoin de donner votre adresse personnelle (gmail, etc.). La plupart des hébergeurs de domaine proposent une redirection d'email gratuite ou très peu chère : vous créez une adresse du type contact@votredomaine.fr qui redirige vers votre boîte habituelle, sans jamais révéler cette dernière à vos clients.</p>
+                        <p><strong>Ce générateur couvre uniquement vos CGV.</strong> Vos mentions légales (obligatoires pour tout site, sans exception) et votre politique de confidentialité (dès que vous collectez des données) sont deux documents distincts, à produire à part — liens en bas de page une fois vos CGV générées.</p>
+                    </div>
+                </details>
+                
+                <div class="form-group">
+                    <label for="legalForm">Forme juridique <span class="required-mark">*</span> <span class="tooltip" tabindex="0" role="button" aria-label="Aide: Ex auto-entrepreneur, SARL, SAS, EURL">ℹ️<span class="tooltip-bubble">Ex: Auto-entrepreneur, SARL, SAS, EURL...</span></span>:</label>
+                    <select id="legalForm" name="legalForm" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Auto-entrepreneur / Micro-entreprise">Auto-entrepreneur / Micro-entreprise</option>
+                        <option value="Entreprise Individuelle (EI)">Entreprise Individuelle (EI)</option>
+                        <option value="EURL">EURL</option>
+                        <option value="SARL">SARL</option>
+                        <option value="SAS">SAS</option>
+                        <option value="SASU">SASU</option>
+                        <option value="SA">SA</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="companyName">Nom commercial / Raison sociale <span class="required-mark">*</span> :</label>
+                    <input type="text" id="companyName" name="companyName" required placeholder="Ex: Ma Belle Entreprise">
+                </div>
+
+                <div class="form-group">
+                    <label for="addressStreet">Adresse du siège social (rue et numéro) <span class="required-mark">*</span> :</label>
+                    <input type="text" id="addressStreet" name="addressStreet" required placeholder="12 rue de la République">
+                </div>
+
+                <div class="address-row">
+                    <div class="form-group">
+                        <label for="addressZip">Code postal <span class="required-mark">*</span> :</label>
+                        <input type="text" id="addressZip" name="addressZip" required placeholder="75001" pattern="[0-9]{5}" maxlength="5" inputmode="numeric">
+                    </div>
+                    <div class="form-group city">
+                        <label for="addressCity">Ville <span class="required-mark">*</span> :</label>
+                        <input type="text" id="addressCity" name="addressCity" required placeholder="Paris">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="siret">Numéro SIRET <span class="required-mark">*</span> <span class="tooltip" tabindex="0" role="button" aria-label="Aide: 14 chiffres">ℹ️<span class="tooltip-bubble">14 chiffres</span></span>:</label>
+                    <input type="text" id="siret" name="siret" required placeholder="123 456 789 00012" pattern="[0-9 ]{14,17}" maxlength="17" inputmode="numeric">
+                    <p class="field-error" id="siretError">Le SIRET doit contenir exactement 14 chiffres.</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="rcs">RCS ou RM <span class="tooltip" tabindex="0" role="button" aria-label="Aide: RCS pour les commerçants et sociétés, RM pour les artisans, ni l'un ni l'autre pour une micro-entreprise de service">ℹ️<span class="tooltip-bubble">RCS : commerçants et sociétés commerciales. RM (Répertoire des Métiers, intégré au RNE depuis 2023) : artisans. Une micro-entreprise de service n'a généralement ni l'un ni l'autre — laissez vide.</span></span>:</label>
+                    <input type="text" id="rcs" name="rcs" placeholder="RCS Paris B 123 456 789">
+                </div>
+
+                <div class="form-group">
+                    <label for="capital">Capital social <span class="tooltip" tabindex="0" role="button" aria-label="Aide: laisser vide si auto-entrepreneur">ℹ️<span class="tooltip-bubble">Laisser vide si auto-entrepreneur</span></span>:</label>
+                    <input type="text" id="capital" name="capital" placeholder="Ex: 10 000 € (laisser vide si non applicable)">
+                </div>
+
+                <div class="form-group">
+                    <label for="tva">Numéro TVA intracommunautaire <span class="tooltip" tabindex="0" role="button" aria-label="Aide: laissez vide si en franchise de TVA">ℹ️<span class="tooltip-bubble">Laissez vide si vous êtes en franchise de TVA (cas courant en micro-entreprise) — la mention "TVA non applicable, art. 293 B du CGI" sera ajoutée automatiquement.</span></span>:</label>
+                    <input type="text" id="tva" name="tva" placeholder="FR 12 345678901 (si applicable)" pattern="[A-Za-z]{2}[A-Za-z0-9 ]{2,13}">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email de contact <span class="required-mark">*</span> <span class="tooltip" tabindex="0" role="button" aria-label="Aide: vous pouvez utiliser une adresse de redirection plutôt que votre email personnel">ℹ️<span class="tooltip-bubble">Pas besoin d'utiliser votre email personnel : une adresse @votredomaine.fr en redirection (souvent gratuite chez votre hébergeur) fonctionne tout aussi bien.</span></span>:</label>
+                    <input type="email" id="email" name="email" required placeholder="contact@monentreprise.fr">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Téléphone <span class="required-mark">*</span> :</label>
+                    <input type="tel" id="phone" name="phone" required placeholder="01 23 45 67 89">
+                </div>
+            </div>
+
+            <!-- SECTION 3 : CONDITIONS COMMERCIALES -->
+            <div class="form-section">
+                <h2>3️⃣ Conditions commerciales</h2>
+                
+                <div class="form-group" id="instantAccessGroup" style="display:none;">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="instantAccess" name="instantAccess" value="oui">
+                        <label for="instantAccess" style="margin:0;">Accès immédiat après paiement (pas de délai d'attente)</label>
+                    </div>
+                </div>
+
+                <div class="form-group" id="deliveryDelayGroup">
+                    <label for="deliveryDelay">Délai de livraison / exécution <span class="required-mark">*</span> :</label>
+                    <input type="text" id="deliveryDelay" name="deliveryDelay" placeholder="Ex: 5 à 7 jours ouvrés" required>
+                </div>
+
+                <div class="form-group" id="zoneGroup">
+                    <label>Zone géographique :</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="zoneFrance" name="zone" value="France métropolitaine" checked>
+                            <label for="zoneFrance">France métropolitaine</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="zoneDOM" name="zone" value="DOM-TOM">
+                            <label for="zoneDOM">DOM-TOM</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="zoneEU" name="zone" value="Union Européenne">
+                            <label for="zoneEU">Union Européenne</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="zoneInter" name="zone" value="International">
+                            <label for="zoneInter">International</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Modes de paiement acceptés :</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="payCB" name="payment" value="Carte bancaire" checked>
+                            <label for="payCB">Carte bancaire</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="payVirement" name="payment" value="Virement bancaire">
+                            <label for="payVirement">Virement bancaire</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="payPaypal" name="payment" value="PayPal">
+                            <label for="payPaypal">PayPal</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="payCheque" name="payment" value="Chèque">
+                            <label for="payCheque">Chèque</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="paySepa" name="payment" value="Prélèvement SEPA">
+                            <label for="paySepa" style="margin:0;">Prélèvement SEPA <span class="tooltip" tabindex="0" role="button" aria-label="Aide: pertinent pour un abonnement ou paiement récurrent">ℹ️<span class="tooltip-bubble">Pertinent si vous facturez un abonnement ou un paiement récurrent.</span></span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="mediatorGroup">
+                    <label for="mediator">Médiateur de la consommation <span id="mediatorRequiredMark" class="required-mark" style="display:none;">*</span> <span class="tooltip" tabindex="0" role="button" aria-label="Aide: obligatoire pour vente B2C">ℹ️<span class="tooltip-bubble">Obligatoire pour vente B2C</span></span>:</label>
+                    <input type="text" id="mediator" name="mediator" placeholder="Ex: CM2C - www.cm2c.net">
+                    <p class="field-error" id="mediatorError">Ce champ est obligatoire pour la vente aux particuliers (article L611-1 du Code de la consommation).</p>
+                    <p style="font-size: 0.85em; color: #94A3B8; margin-top: 5px;">Liste des médiateurs : <a href="https://www.economie.gouv.fr/mediation-conso/mediateurs-references" target="_blank">www.economie.gouv.fr</a></p>
+                </div>
+            </div>
+
+            <!-- WARNING -->
+            <div class="warning">
+                <strong>⚠️ AVERTISSEMENT IMPORTANT</strong><br>
+                Ce générateur produit un document standard adapté aux informations que vous avez fournies. Il ne remplace pas les conseils personnalisés d'un avocat. Nous vous recommandons fortement de faire relire vos CGV par un professionnel du droit pour valider leur conformité avec votre situation spécifique et les évolutions légales récentes.
+            </div>
+
+            <button type="submit" class="btn-generate">✨ Générer mes CGV</button>
+        </form>
+
+        <!-- RÉSULTAT -->
+        <div id="result">
+            <h2 style="text-align: center; margin-bottom: 20px;">✅ Vos CGV sont prêtes !</h2>
+            
+            <div class="export-buttons">
+                <button class="btn-export" onclick="exportPDF()">📄 Télécharger PDF</button>
+                <button class="btn-export" onclick="copyText()">📋 Copier le texte</button>
+            </div>
+
+            <div id="cgvContent"></div>
+
+            <div class="legal-sources" style="margin-top: 20px;">
+                <h3>📚 Ce document s'appuie sur les textes légaux en vigueur :</h3>
+                <a href="https://www.service-public.fr/professionnels-entreprises/vosdroits/F33527" target="_blank">→ Guide officiel Service-Public.fr</a>
+                <a href="https://www.legifrance.gouv.fr" target="_blank">→ Code de commerce et Code de la consommation (Legifrance)</a>
+                <a href="https://www.economie.gouv.fr/dgccrf" target="_blank">→ Fiches pratiques DGCCRF</a>
+            </div>
+
+            <div class="trio-banner">
+                <div class="trio-banner-text">Pensez aussi à vos <strong>Mentions Légales</strong> (obligatoires pour tout site, sans exception) et à votre <strong>Politique de Confidentialité</strong> (dès que vous collectez des données).</div>
+                <div class="trio-links">
+                    <a href="https://nicolasaudigier-hash.github.io/flashtools/mentions-legales-flashtools.html" target="_blank">→ Mentions Légales</a>
+                    <a href="https://nicolasaudigier-hash.github.io/flashtools/confidentialite-flashtools.html" target="_blank">→ Confidentialité</a>
+                </div>
+            </div>
+
+            <div class="warning" style="margin-top: 20px;">
+                <strong>⚠️ Document généré automatiquement</strong><br>
+                FlashTools.fr décline toute responsabilité quant à l'utilisation de ce document. Vous restez seul responsable de sa conformité légale. Une relecture par un professionnel du droit est vivement recommandée.
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" onerror="window.jsPDFLoadFailed = true;"></script>
+    <script>
+        // Tooltips accessibles au tactile (clic/tap pour ouvrir/fermer)
+        document.querySelectorAll('.tooltip').forEach(function(tip) {
+            tip.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var wasOpen = tip.classList.contains('tooltip-open');
+                document.querySelectorAll('.tooltip.tooltip-open').forEach(function(t) {
+                    t.classList.remove('tooltip-open');
+                });
+                if (!wasOpen) tip.classList.add('tooltip-open');
+            });
+            tip.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    tip.click();
+                }
+            });
+        });
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.tooltip.tooltip-open').forEach(function(t) {
+                t.classList.remove('tooltip-open');
+            });
+        });
+
+        // Affiche/masque la zone géographique, le médiateur et l'accès immédiat selon les choix faits,
+        // et rend le médiateur obligatoire si la vente touche des particuliers (B2C)
+        function updateConditionalFields() {
+            var activity = document.querySelector('input[name="activityType"]:checked').value;
+            var clientType = document.querySelector('input[name="clientType"]:checked').value;
+            var isB2C = clientType === 'b2c' || clientType === 'both';
+            var needsZone = activity === 'produits' || activity === 'mixte';
+
+            document.getElementById('zoneGroup').style.display = needsZone ? '' : 'none';
+
+            // Médiateur : on ne touche jamais à l'innerHTML du label (ça détruirait le tooltip
+            // et son écouteur de clic) — on bascule juste la visibilité d'un astérisque dédié.
+            var mediatorInput = document.getElementById('mediator');
+            var mediatorRequiredMark = document.getElementById('mediatorRequiredMark');
+            mediatorInput.required = isB2C;
+            if (mediatorRequiredMark) mediatorRequiredMark.style.display = isB2C ? '' : 'none';
+
+            // Accès immédiat après paiement : pertinent seulement pour le numérique et les services
+            var instantAccessGroup = document.getElementById('instantAccessGroup');
+            var instantAccessInput = document.getElementById('instantAccess');
+            var showInstantOption = activity === 'numerique' || activity === 'services';
+            instantAccessGroup.style.display = showInstantOption ? '' : 'none';
+            if (!showInstantOption) {
+                instantAccessInput.checked = false;
+            }
+
+            var deliveryDelayGroup = document.getElementById('deliveryDelayGroup');
+            var deliveryDelayInput = document.getElementById('deliveryDelay');
+            var isInstant = showInstantOption && instantAccessInput.checked;
+            deliveryDelayGroup.style.display = isInstant ? 'none' : '';
+            deliveryDelayInput.required = !isInstant;
+
+            updateProgress();
+        }
+
+        document.getElementById('instantAccess').addEventListener('change', updateConditionalFields);
+
+        // Barre de progression : compte les champs obligatoires (y compris le médiateur,
+        // requis dynamiquement en B2C) et le nombre déjà remplis
+        function updateProgress() {
+            var fields = Array.prototype.slice.call(document.querySelectorAll('#cgvForm [required]'));
+            var total = fields.length;
+            var filled = fields.filter(function(f) {
+                return f.value && f.value.trim().length > 0;
+            }).length;
+            var pct = total > 0 ? Math.round((filled / total) * 100) : 0;
+
+            var bar = document.getElementById('progressBarFill');
+            var text = document.getElementById('progressText');
+            if (bar) bar.style.width = pct + '%';
+            if (text) text.textContent = filled + ' / ' + total + ' champs obligatoires complétés';
+        }
+
+        document.getElementById('cgvForm').addEventListener('input', updateProgress);
+        document.getElementById('cgvForm').addEventListener('change', updateProgress);
+
+        // Avertit avant de fermer/recharger l'onglet si le formulaire a été rempli
+        // (remplace une persistance par localStorage, peu fiable en navigation privée)
+        var formTouched = false;
+        document.getElementById('cgvForm').addEventListener('input', function() {
+            formTouched = true;
+        });
+        window.addEventListener('beforeunload', function(e) {
+            if (formTouched) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        document.querySelectorAll('input[name="activityType"], input[name="clientType"]').forEach(function(el) {
+            el.addEventListener('change', updateConditionalFields);
+        });
+        updateConditionalFields();
+
+        document.getElementById('cgvForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Validation SIRET (14 chiffres, espaces tolérés)
+            var siretInput = document.getElementById('siret');
+            var siretDigits = siretInput.value.replace(/\s/g, '');
+            var siretError = document.getElementById('siretError');
+            var siretValid = /^[0-9]{14}$/.test(siretDigits);
+            siretError.classList.toggle('visible', !siretValid);
+            siretInput.style.borderColor = siretValid ? '' : '#fc8181';
+
+            // Validation médiateur obligatoire en B2C
+            var clientType = document.querySelector('input[name="clientType"]:checked').value;
+            var isB2C = clientType === 'b2c' || clientType === 'both';
+            var mediatorInput = document.getElementById('mediator');
+            var mediatorError = document.getElementById('mediatorError');
+            var mediatorValid = !isB2C || mediatorInput.value.trim().length > 0;
+            mediatorError.classList.toggle('visible', !mediatorValid);
+            mediatorInput.style.borderColor = mediatorValid ? '' : '#fc8181';
+
+            if (!siretValid) {
+                siretInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                siretInput.focus();
+                return;
+            }
+            if (!mediatorValid) {
+                mediatorInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                mediatorInput.focus();
+                return;
+            }
+
+            generateCGV();
+        });
+
+        // Échappement HTML pour toute donnée saisie par l'utilisateur avant insertion dans le document
+        function escapeHTML(str) {
+            if (str === undefined || str === null) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function generateCGV() {
+            // Récupération des données du formulaire
+            const formData = new FormData(document.getElementById('cgvForm'));
+            const data = {};
+            
+            formData.forEach((value, key) => {
+                if (key === 'zone' || key === 'payment') {
+                    if (!data[key]) data[key] = [];
+                    data[key].push(value);
+                } else {
+                    data[key] = value;
+                }
+            });
+
+            // Échappement systématique de toutes les valeurs texte issues du formulaire
+            Object.keys(data).forEach(function(key) {
+                if (Array.isArray(data[key])) {
+                    data[key] = data[key].map(escapeHTML);
+                } else {
+                    data[key] = escapeHTML(data[key]);
+                }
+            });
+
+            // Recomposition de l'adresse complète à partir des 3 champs séparés
+            data.address = data.addressStreet + ', ' + data.addressZip + ' ' + data.addressCity;
+
+            // Génération du contenu CGV
+            let cgvHTML = generateCGVContent(data);
+            
+            // Affichage du résultat
+            document.getElementById('cgvContent').innerHTML = cgvHTML;
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function generateCGVContent(data) {
+            const isB2C = data.clientType === 'b2c' || data.clientType === 'both';
+            const isB2B = data.clientType === 'b2b' || data.clientType === 'both';
+            const isB2BOnly = data.clientType === 'b2b';
+            const zones = data.zone ? data.zone.join(', ') : 'France métropolitaine';
+            const payments = data.payment ? data.payment.join(', ') : 'Carte bancaire';
+            const priceBasis = isB2BOnly ? 'HT' : 'TTC';
+            const priceBasisLabel = isB2BOnly ? 'hors taxes (HT)' : 'toutes taxes comprises (TTC)';
+
+            let content = `
+                <h2 style="text-align: center; font-size: 1.8em; margin-bottom: 30px;">CONDITIONS GÉNÉRALES DE VENTE</h2>
+                
+                <p style="text-align: center; margin-bottom: 30px;"><em>En vigueur au ${new Date().toLocaleDateString('fr-FR')}</em></p>
+
+                <h3>ARTICLE 1 - IDENTIFICATION DU VENDEUR</h3>
+                <p>
+                    <strong>${data.companyName}</strong><br>
+                    Forme juridique : ${data.legalForm}<br>
+                    Siège social : ${data.address}<br>
+                    SIRET : ${data.siret}<br>
+                    ${data.rcs ? `${data.rcs}<br>` : ''}
+                    ${data.capital ? `Capital social : ${data.capital}<br>` : ''}
+                    ${data.tva ? `N° TVA intracommunautaire : ${data.tva}<br>` : `N° TVA intracommunautaire : TVA non applicable, article 293 B du Code général des impôts<br>`}
+                    Email : ${data.email}<br>
+                    Téléphone : ${data.phone}
+                </p>
+
+                <h3>ARTICLE 2 - OBJET ET CHAMP D'APPLICATION</h3>
+                <p>
+                    Les présentes Conditions Générales de Vente (CGV) régissent les relations contractuelles entre ${data.companyName} (ci-après "le Vendeur") et toute personne physique ou morale (ci-après "le Client") souhaitant procéder à un achat via les services du Vendeur.
+                </p>
+                <p>
+                    Le Vendeur exerce une activité de ${getActivityDescription(data.activityType)}.
+                </p>
+                <p>
+                    Ces CGV s'appliquent à l'exclusion de toutes autres conditions, notamment celles du Client. Toute commande implique l'acceptation sans réserve des présentes CGV.
+                </p>
+
+                <h3>ARTICLE 3 - PRIX</h3>
+                <p>
+                    Les prix sont indiqués en euros, ${priceBasisLabel}${!isB2BOnly ? ', incluant la TVA applicable au jour de la commande' : ''}. Le Vendeur se réserve le droit de modifier ses prix à tout moment, étant entendu que le prix figurant sur la commande sera le seul applicable au Client.
+                </p>
+                <p>
+                    Les frais de livraison sont ${data.activityType === 'services' || data.activityType === 'numerique' ? 'non applicables' : 'indiqués avant validation de la commande'}.
+                </p>
+
+                <h3>ARTICLE 4 - COMMANDE</h3>
+                <p>
+                    Le Client passe commande ${data.activityType === 'numerique' ? 'en ligne' : 'selon les modalités définies par le Vendeur'}. La validation de la commande vaut acceptation des présentes CGV et engagement de payer les sommes dues.
+                </p>
+                <p>
+                    Le Vendeur confirmera la commande par email à l'adresse indiquée par le Client. Cette confirmation fera foi entre les parties.
+                </p>
+
+                <h3>ARTICLE 5 - PAIEMENT</h3>
+                <p>
+                    Le règlement des commandes s'effectue par : ${payments}.
+                </p>
+                ${isB2B ? `
+                <p>
+                    <strong>Pour les ventes entre professionnels :</strong> En cas de retard de paiement, des pénalités égales à trois fois le taux d'intérêt légal seront appliquées automatiquement, sans mise en demeure préalable, conformément à l'article L441-10 du Code de commerce. Une indemnité forfaitaire de 40€ pour frais de recouvrement sera également due (article D441-5 du Code de commerce).
+                </p>` : ''}
+                <p>
+                    Le Vendeur se réserve le droit de suspendre toute commande en cas de défaut de paiement.
+                </p>
+
+                <h3>ARTICLE 6 - ${getDeliveryTitle(data.activityType)}</h3>
+                ${getDeliveryContent(data)}
+                ${data.activityType === 'produits' || data.activityType === 'mixte' ? `
+                <p>
+                    Zone de livraison (pour la partie produits physiques) : ${zones}.
+                </p>
+                <p>
+                    Le transfert de propriété et des risques intervient à la livraison effective des produits. Une clause de réserve de propriété est applicable : les produits demeurent la propriété du Vendeur jusqu'au paiement intégral du prix.
+                </p>` : ''}
+
+                ${isB2C ? `
+                <h3>ARTICLE 7 - DROIT DE RÉTRACTATION</h3>
+                ${data.activityType === 'numerique' ? `
+                <p>
+                    Conformément à l'article L221-28 du Code de la consommation, le droit de rétractation ne peut être exercé pour les contenus numériques fournis sur un support immatériel dont l'exécution a commencé avec l'accord préalable exprès du consommateur et son renoncement exprès à son droit de rétractation.
+                </p>` : `
+                <p>
+                    Conformément aux articles L221-18 et suivants du Code de la consommation, le Client dispose d'un délai de 14 jours à compter de la ${data.activityType === 'services' ? 'conclusion du contrat' : 'réception du produit'} pour exercer son droit de rétractation sans avoir à justifier de motifs ni à payer de pénalités.
+                </p>
+                <p>
+                    Le Client notifie sa décision de rétractation par courrier postal ou email à l'adresse du Vendeur. ${data.activityType === 'produits' || data.activityType === 'mixte' ? "Le produit doit être retourné dans son état d'origine, dans son emballage d'origine, dans un délai de 14 jours suivant la notification." : ''}
+                </p>
+                <p>
+                    Le remboursement sera effectué dans un délai de 14 jours à compter de la réception de la notification de rétractation.
+                </p>`}
+                ` : ''}
+
+                <h3>ARTICLE ${isB2C ? '8' : '7'} - GARANTIES LÉGALES</h3>
+                ${isB2C ? `
+                <p>
+                    <strong>Garantie légale de conformité (articles L217-4 à L217-14 du Code de la consommation) :</strong><br>
+                    Le Client bénéficie d'une garantie légale de conformité de 2 ans à compter de la délivrance du bien. Durant ce délai, le Client peut obtenir la réparation ou le remplacement du bien sans frais. Le Client peut également obtenir une réduction du prix ou la résolution du contrat dans les conditions prévues par la loi.
+                </p>
+                <p>
+                    <strong>Garantie légale des vices cachés (articles 1641 à 1649 du Code civil) :</strong><br>
+                    Le Client peut également faire valoir la garantie contre les vices cachés de la chose vendue au sens de l'article 1641 du Code civil. Dans ce cas, il peut choisir entre la résolution de la vente ou une réduction du prix conformément à l'article 1644 du Code civil. Cette action doit être intentée dans un délai de 2 ans à compter de la découverte du vice.
+                </p>` : `
+                <p>
+                    Les garanties applicables sont celles prévues par le droit commun (Code civil).
+                </p>`}
+
+                <h3>ARTICLE ${isB2C ? '9' : '8'} - RESPONSABILITÉ</h3>
+                <p>
+                    Le Vendeur ne saurait être tenu responsable d'un dommage résultant d'un usage anormal ou d'une utilisation non conforme des ${data.activityType === 'services' ? 'services' : 'produits'}. Sa responsabilité est limitée au montant de la commande, sauf en cas de faute lourde ou de dommage corporel.
+                </p>
+                <p>
+                    Le Vendeur ne saurait être tenu pour responsable en cas de force majeure ou de fait imprévisible et insurmontable d'un tiers.
+                </p>
+
+                <h3>ARTICLE ${isB2C ? '10' : '9'} - PROPRIÉTÉ INTELLECTUELLE</h3>
+                <p>
+                    Tous les contenus présents (textes, images, graphismes, logos, etc.) sont la propriété exclusive du Vendeur ou font l'objet d'une autorisation d'utilisation. Toute reproduction, distribution, modification, adaptation, retransmission ou publication de ces différents éléments est strictement interdite sans l'accord exprès du Vendeur.
+                </p>
+
+                <h3>ARTICLE ${isB2C ? '11' : '10'} - DONNÉES PERSONNELLES</h3>
+                <p>
+                    Le Vendeur s'engage à respecter la réglementation en vigueur relative à la protection des données personnelles (RGPD - Règlement UE 2016/679). Les données collectées sont nécessaires au traitement et à l'exécution de la commande ainsi qu'à l'établissement des factures.
+                </p>
+                <p>
+                    Conformément au RGPD, le Client dispose d'un droit d'accès, de rectification, d'effacement, de limitation du traitement, d'opposition et de portabilité de ses données. Ces droits peuvent être exercés en contactant le Vendeur à l'adresse : ${data.email}.
+                </p>
+
+                ${isB2C ? `
+                <h3>ARTICLE 12 - MÉDIATION DE LA CONSOMMATION</h3>
+                <p>
+                    Conformément aux articles L611-1 et suivants du Code de la consommation, le Client a le droit de recourir gratuitement à un médiateur de la consommation en vue de la résolution amiable d'un litige l'opposant au Vendeur.
+                </p>
+                <p>
+                    Médiateur compétent : ${data.mediator}
+                </p>
+                <p>
+                    Le Client peut également utiliser la plateforme européenne de règlement en ligne des litiges : <a href="https://ec.europa.eu/consumers/odr" target="_blank">https://ec.europa.eu/consumers/odr</a>
+                </p>` : ''}
+
+                <h3>ARTICLE ${isB2C ? '13' : '11'} - DROIT APPLICABLE ET JURIDICTION COMPÉTENTE</h3>
+                <p>
+                    Les présentes CGV sont soumises au droit français. En cas de litige, et à défaut d'accord amiable, le différend sera porté devant les tribunaux compétents conformément aux règles de droit commun.
+                </p>
+                ${isB2C ? `<p>Pour les consommateurs, le tribunal compétent est celui du lieu de résidence du consommateur ou celui du lieu de livraison effective.</p>` : ''}
+
+                <p style="text-align: center; margin-top: 40px; font-style: italic; color: #718096;">
+                    --- Fin des Conditions Générales de Vente ---
+                </p>
+            `;
+
+            return content;
+        }
+
+        function getDeliveryTitle(activityType) {
+            if (activityType === 'services') return 'EXÉCUTION DE LA PRESTATION';
+            if (activityType === 'numerique') return 'MISE À DISPOSITION DU PRODUIT NUMÉRIQUE';
+            if (activityType === 'mixte') return 'LIVRAISON ET EXÉCUTION DE LA PRESTATION';
+            return 'LIVRAISON';
+        }
+
+        function getDeliveryContent(data) {
+            if (data.instantAccess && data.activityType === 'services') {
+                return `<p>Le Client bénéficie d'un accès immédiat à la prestation dès validation du paiement, sans délai d'attente.</p>`;
+            }
+            if (data.instantAccess && data.activityType === 'numerique') {
+                return `<p>Le Client bénéficie d'un accès immédiat au produit numérique dès validation du paiement (lien de téléchargement, accès en ligne ou envoi par email selon le cas), sans délai d'attente. Aucune livraison physique n'est effectuée, le produit étant fourni sous forme dématérialisée.</p>`;
+            }
+            if (data.activityType === 'services') {
+                return `<p>Les prestations sont exécutées dans un délai de ${data.deliveryDelay} à compter de la validation de la commande.</p>`;
+            }
+            if (data.activityType === 'numerique') {
+                return `<p>Le produit numérique est mis à disposition du Client (lien de téléchargement, accès en ligne ou envoi par email selon le cas) dans un délai de ${data.deliveryDelay} à compter de la validation de la commande et du paiement intégral. Aucune livraison physique n'est effectuée, le produit étant fourni sous forme dématérialisée.</p>`;
+            }
+            if (data.activityType === 'mixte') {
+                return `<p>Les produits physiques sont livrés à l'adresse indiquée par le Client, et les prestations de services sont exécutées, dans un délai de ${data.deliveryDelay} à compter de la validation de la commande et, le cas échéant, du paiement intégral. Pour la part du produit numérique éventuellement incluse, l'accès est fourni de façon dématérialisée (lien de téléchargement, accès en ligne ou email).</p>`;
+            }
+            return `<p>Les produits sont livrés à l'adresse indiquée par le Client dans un délai de ${data.deliveryDelay} à compter de la validation de la commande et du paiement intégral.</p>`;
+        }
+
+        function getActivityDescription(type) {
+            const descriptions = {
+                'produits': 'vente de produits physiques',
+                'numerique': 'vente de produits numériques',
+                'services': 'prestation de services',
+                'mixte': 'vente de produits et prestation de services'
+            };
+            return descriptions[type] || 'commerce';
+        }
+
+        function copyText() {
+            const content = document.getElementById('cgvContent').innerText;
+            navigator.clipboard.writeText(content).then(() => {
+                alert('✅ CGV copiées dans le presse-papier !');
+            }).catch(() => {
+                alert('La copie automatique a échoué sur ce navigateur. Vous pouvez sélectionner le texte manuellement puis utiliser Ctrl+C / Cmd+C.');
+            });
+        }
+
+        function sanitizeFilename(name) {
+            return (name || 'CGV').replace(/[\\\/:*?"<>|]/g, '_').replace(/\s+/g, '_');
+        }
+
+        function exportPDF() {
+            if (window.jsPDFLoadFailed || !window.jspdf) {
+                alert("Le module de génération PDF n'a pas pu se charger (connexion internet ou bloqueur de script). Vous pouvez utiliser \"Copier le texte\" en attendant, ou réessayer après avoir rechargé la page.");
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+
+            const content = document.getElementById('cgvContent').innerText;
+            const marginLeft = 15;
+            const marginTop = 15;
+            const marginBottom = 15;
+            const lineHeight = 7;
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const maxLinesPerPage = Math.floor((pageHeight - marginTop - marginBottom) / lineHeight);
+
+            const splitText = doc.splitTextToSize(content, 180);
+
+            doc.setFontSize(11);
+
+            let line = 0;
+            let y = marginTop;
+            for (let i = 0; i < splitText.length; i++) {
+                if (line >= maxLinesPerPage) {
+                    doc.addPage();
+                    y = marginTop;
+                    line = 0;
+                }
+                doc.text(splitText[i], marginLeft, y);
+                y += lineHeight;
+                line++;
+            }
+
+            const companyNameValue = document.getElementById('companyName').value;
+            doc.save('CGV_' + sanitizeFilename(companyNameValue) + '.pdf');
+        }
+    </script>
+</body>
+</html>

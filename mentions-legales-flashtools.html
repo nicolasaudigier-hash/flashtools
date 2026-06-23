@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Mentions Légales | FlashTools</title>
+    <meta name="description" content="Créez vos mentions légales à jour de la réforme LCEN (loi SREN 2024) en 5 minutes. Pour tous types de sites web.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #06B6D4;
+            --secondary: #8B5CF6;
+            --dark: #F1F5F9;
+            --light: #1E293B;
+            --border: rgba(255,255,255,0.08);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #0A0E27;
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        .header {
+            text-align: center;
+            background: #111827;
+            padding: 40px 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            font-weight: 800;
+            color: #06B6D4;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle { font-size: 1.2em; color: #94A3B8; margin-bottom: 8px; }
+
+        .tags { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 15px; }
+
+        .tag {
+            background: #1E293B;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #94A3B8;
+            border: 1px solid var(--border);
+        }
+
+        .trio-banner {
+            background: #111827;
+            border-radius: 20px;
+            padding: 20px 26px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .trio-banner strong { color: var(--primary); }
+
+        .trio-links { display: flex; gap: 10px; flex-wrap: wrap; margin-left: auto; }
+
+        .trio-links a {
+            background: #1E293B;
+            color: var(--primary);
+            text-decoration: none;
+            padding: 9px 16px;
+            border-radius: 10px;
+            font-size: 0.88em;
+            font-weight: 600;
+            border: 2px solid var(--border);
+        }
+
+        .trio-links a:hover { background: var(--primary); color: #04141A; border-color: var(--primary); }
+
+        .main-grid { display: grid; grid-template-columns: 400px 1fr; gap: 25px; margin-bottom: 30px; }
+
+        .panel { background: #111827; padding: 30px; border-radius: 20px; border: 1px solid var(--border); }
+
+        .sticky-panel { position: sticky; top: 20px; height: fit-content; max-height: calc(100vh - 40px); overflow-y: auto; }
+
+        .section-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .form-group { margin-bottom: 18px; }
+
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--dark); font-size: 0.9em; }
+
+        .label-optional { color: #64748B; font-weight: 400; font-size: 0.85em; }
+
+        .help-text { font-size: 0.78em; color: #94A3B8; margin-top: 5px; font-style: italic; }
+
+        input[type="text"], input[type="email"], input[type="tel"], input[type="url"], textarea, select {
+            width: 100%;
+            padding: 11px 13px;
+            background: #1E293B;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.95em;
+            color: var(--dark);
+            transition: all 0.3s;
+            font-family: inherit;
+            accent-color: var(--primary);
+        }
+
+        input::placeholder, textarea::placeholder { color: #64748B; }
+        select option { background: #1E293B; color: var(--dark); }
+
+        textarea { resize: vertical; min-height: 70px; }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+        }
+
+        .radio-group { display: flex; flex-direction: column; gap: 10px; }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--dark);
+        }
+
+        .radio-option:hover { border-color: var(--primary); background: rgba(6, 182, 212, 0.08); }
+        .radio-option input[type="radio"] { width: auto; margin: 0; accent-color: var(--primary); }
+        .radio-option.selected { border-color: var(--primary); background: rgba(6, 182, 212, 0.12); }
+
+        .hidden { display: none !important; }
+
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
+            width: 100%;
+        }
+
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #04141A; }
+        .btn-primary:hover { opacity: 0.9; }
+
+        .btn-secondary { background: transparent; color: var(--primary); border: 2px solid var(--primary); margin-top: 10px; }
+        .btn-secondary:hover { background: var(--primary); color: #04141A; }
+
+        .info-box {
+            background: rgba(6, 182, 212, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.88em;
+            color: var(--dark);
+            margin-top: 15px;
+        }
+        .info-box a { color: var(--primary); font-weight: 700; }
+
+        .warning-box {
+            background: rgba(239,68,68,0.1);
+            border-left: 4px solid #F87171;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.88em;
+            color: var(--dark);
+            margin: 20px 0;
+        }
+        .warning-box strong { color: #FCA5A5; }
+
+        .legal-sources {
+            background: #1E293B;
+            border-left: 4px solid var(--secondary);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.88em;
+            color: var(--dark);
+            margin-top: 20px;
+        }
+        .legal-sources a { color: #8B5CF6; text-decoration: none; display: block; margin: 5px 0; }
+        .legal-sources a:hover { text-decoration: underline; }
+
+        .result-container {
+            background: #F8FAFC;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+            color: #1E293B;
+        }
+        .result-container h2 { font-size: 1.5em; margin-bottom: 20px; color: #1E293B; }
+        .result-container h3 { font-size: 1.2em; margin: 25px 0 15px 0; color: #334155; }
+        .result-container p { margin-bottom: 15px; text-align: justify; color: #334155; }
+        .result-container ul { margin-left: 20px; margin-bottom: 15px; }
+        .result-container li { margin-bottom: 8px; color: #334155; }
+        .result-container a { color: #0E7490; }
+
+        .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+
+        .guide-section { margin-bottom: 25px; }
+        .guide-section h3 { font-size: 1.1em; color: var(--dark); margin-bottom: 10px; }
+        .guide-section p { font-size: 0.9em; color: #CBD5E1; margin-bottom: 8px; line-height: 1.6; }
+        .guide-section ul { margin-left: 20px; font-size: 0.88em; color: #CBD5E1; }
+        .guide-section li { margin-bottom: 6px; }
+
+        .fresh-badge {
+            display: inline-block;
+            background: rgba(16,185,129,0.15);
+            color: #6EE7B7;
+            font-size: 0.7em;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 6px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        .collapsible {
+            background: #1E293B;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            cursor: pointer;
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+            color: var(--dark);
+        }
+        .collapsible:hover { border-color: var(--primary); }
+        .collapsible.active { border-color: var(--primary); background: rgba(6, 182, 212, 0.08); }
+        .collapsible-content { display: none; padding-top: 15px; border-top: 1px solid var(--border); margin-top: 15px; color: #CBD5E1; }
+        .collapsible-content p { margin-bottom: 10px; }
+        .collapsible-content a { color: #8B5CF6; }
+        .collapsible.active .collapsible-content { display: block; }
+
+        @media print {
+            body, .container { background: white !important; }
+            .form-section, .trio-banner, .btn-group, .warning-box, #guide, .header, .panel.sticky-panel { display: none !important; }
+            .result-container { max-height: none; overflow: visible; border: none; }
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .sticky-panel { position: static; max-height: none; }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2em; }
+            .trio-banner { flex-direction: column; align-items: flex-start; }
+            .trio-links { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <div class="header">
+            <h1>⚖️ Générateur de Mentions Légales</h1>
+            <p class="subtitle">À jour de la réforme LCEN — loi SREN 2024 • Pour tous types de sites</p>
+            <div class="tags">
+                <span class="tag">✅ Conforme LCEN art. 1-1</span>
+                <span class="tag">📄 Export HTML</span>
+                <span class="tag">⚡ 5 minutes</span>
+            </div>
+        </div>
+
+        <div class="trio-banner">
+            <div><strong>Le trio légal FlashTools</strong> — Mentions Légales, CGV et Politique de Confidentialité fonctionnent ensemble. Remplissez ce formulaire d'abord : les deux autres reprennent votre identité.</div>
+            <div class="trio-links">
+                <a href="https://nicolasaudigier-hash.github.io/flashtools/cgv-flashtools.html" target="_blank">→ CGV</a>
+                <a href="https://nicolasaudigier-hash.github.io/flashtools/confidentialite-flashtools.html" target="_blank">→ Politique de Confidentialité</a>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <!-- FORMULAIRE -->
+            <div class="panel sticky-panel">
+                <h2 class="section-title">📝 Informations</h2>
+
+                <div class="form-group">
+                    <label>Type de site</label>
+                    <div class="radio-group">
+                        <label class="radio-option selected">
+                            <input type="radio" name="siteType" value="vitrine" checked>
+                            <span>Site vitrine / Portfolio</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="siteType" value="commerce">
+                            <span>Site e-commerce / Vente en ligne</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="siteType" value="blog">
+                            <span>Blog / Site d'information</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="siteType" value="association">
+                            <span>Association / Organisation</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Statut juridique *</label>
+                    <select id="legalStatus" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="auto-entrepreneur">Auto-entrepreneur / Micro-entreprise</option>
+                        <option value="ei">Entreprise Individuelle (EI)</option>
+                        <option value="eurl">EURL</option>
+                        <option value="sarl">SARL</option>
+                        <option value="sas">SAS</option>
+                        <option value="sasu">SASU</option>
+                        <option value="sa">SA</option>
+                        <option value="association">Association loi 1901</option>
+                        <option value="particulier">Particulier</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label id="nameLabel">Nom / Raison sociale *</label>
+                    <input type="text" id="companyName" required placeholder="Ex: Ma Belle Entreprise">
+                </div>
+
+                <div class="form-group">
+                    <label>Adresse complète du siège social *</label>
+                    <textarea id="address" required placeholder="12 rue de la République&#10;75001 Paris, France"></textarea>
+                    <span class="help-text" id="addressToggle" style="cursor:pointer; text-decoration:underline; font-weight:600;" onclick="toggleCollapsibleById('infoAdresse')">Je ne veux pas afficher mon adresse personnelle</span>
+                </div>
+
+                <div class="collapsible" id="infoAdresse" onclick="toggleCollapsible(this)" style="display:none;">
+                    <strong>🛡️ Protéger mon adresse personnelle</strong>
+                    <div class="collapsible-content">
+                        <p>Ce champ doit rester votre adresse de domiciliation réelle (celle déclarée à l'INPI / RNE, visible sur votre Kbis ou avis SIRENE). On ne peut pas la masquer ici sans changer la domiciliation en amont.</p>
+                        <p><strong>Pour un auto-entrepreneur ou une EI domicilié chez soi</strong>, deux solutions concrètes :</p>
+                        <ul>
+                            <li>Société de domiciliation agréée ou coworking avec domiciliation — à partir d'environ 10-20€/mois</li>
+                            <li>Demande de modification du statut de diffusion auprès de l'Insee (répertoire Sirene), à vérifier selon votre situation</li>
+                        </ul>
+                        <p><strong>Attention :</strong> le décret n°2025-840 du 22/08/2025 sur l'occultation d'adresse au RCS/RNE ne concerne que les dirigeants et associés <em>de sociétés</em> (gérant SARL/EURL, président SAS/SASU...) — pas les auto-entrepreneurs ni les EI, dont l'adresse personnelle est par définition celle du siège.</p>
+                        <p><a href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000052130299" target="_blank">→ Décret n°2025-840 (Légifrance)</a><br>
+                        <a href="https://www.inpi.fr/ressources/formalites-dentreprises/anonymisation-actes-et-donnees-personnelles" target="_blank">→ Démarche d'occultation (INPI)</a></p>
+                    </div>
+                </div>
+
+                <div class="form-group" id="siretGroup">
+                    <label>Numéro SIRET *</label>
+                    <input type="text" id="siret" placeholder="123 456 789 00012">
+                </div>
+
+                <div class="form-group" id="rcsGroup">
+                    <label>RCS ou RM <span class="label-optional">(optionnel)</span></label>
+                    <input type="text" id="rcs" placeholder="RCS Paris B 123 456 789">
+                </div>
+
+                <div class="form-group" id="capitalGroup">
+                    <label>Capital social <span class="label-optional">(optionnel)</span></label>
+                    <input type="text" id="capital" placeholder="10 000 €">
+                </div>
+
+                <div class="form-group" id="tvaGroup">
+                    <label>N° TVA intracommunautaire <span class="label-optional">(si applicable)</span></label>
+                    <input type="text" id="tva" placeholder="FR 12 345678901">
+                    <span class="help-text">Laissez vide si vous êtes en franchise de TVA (cas courant en micro-entreprise) — la mention légale "TVA non applicable, art. 293 B du CGI" sera ajoutée automatiquement.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Responsable de la publication *</label>
+                    <input type="text" id="director" required placeholder="Prénom Nom">
+                </div>
+
+                <div class="form-group">
+                    <label>Email de contact *</label>
+                    <input type="email" id="email" required placeholder="contact@exemple.fr">
+                    <span class="help-text" style="cursor:pointer; text-decoration:underline; font-weight:600;" onclick="toggleCollapsibleById('infoEmail')">Protéger mon email personnel</span>
+                </div>
+
+                <div class="collapsible" id="infoEmail" onclick="toggleCollapsible(this)" style="display:none;">
+                    <strong>📧 Protéger mon email</strong>
+                    <div class="collapsible-content">
+                        <p>Rien n'oblige à utiliser votre adresse mail personnelle. Une adresse pro dédiée (contact@votresite.fr) ou un alias qui redirige vers votre boîte habituelle fait l'affaire — et c'est plus pro.</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Téléphone *</label>
+                    <input type="tel" id="phone" required placeholder="+33 1 23 45 67 89">
+                    <span class="help-text" style="cursor:pointer; text-decoration:underline; font-weight:600;" onclick="toggleCollapsibleById('infoPhone')">Protéger mon numéro personnel</span>
+                </div>
+
+                <div class="collapsible" id="infoPhone" onclick="toggleCollapsible(this)" style="display:none;">
+                    <strong>📞 Protéger mon numéro</strong>
+                    <div class="collapsible-content">
+                        <p>Un numéro virtuel (standard en ligne, renvoi d'appel, secrétariat externalisé) évite d'exposer votre ligne perso, à partir de quelques euros par mois.</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>URL de votre site *</label>
+                    <input type="url" id="website" required placeholder="https://www.monsite.fr">
+                </div>
+
+                <div class="form-group">
+                    <label>Hébergeur du site *</label>
+                    <select id="host" onchange="onHostChange()">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="ovh">OVHcloud</option>
+                        <option value="o2switch">o2switch</option>
+                        <option value="ionos">IONOS (1&1)</option>
+                        <option value="hostinger">Hostinger</option>
+                        <option value="infomaniak">Infomaniak</option>
+                        <option value="custom">Autre (à préciser)</option>
+                    </select>
+                    <span class="help-text">Les coordonnées se pré-remplissent pour les hébergeurs courants — vérifiez-les sur la page mentions légales de l'hébergeur avant publication, ces informations peuvent changer.</span>
+                </div>
+
+                <div class="form-group hidden" id="customHostGroup">
+                    <label>Nom de l'hébergeur *</label>
+                    <input type="text" id="customHost" placeholder="Nom de l'hébergeur">
+                    <label style="margin-top: 10px;">Adresse de l'hébergeur</label>
+                    <textarea id="customHostAddress" placeholder="Adresse complète de l'hébergeur"></textarea>
+                </div>
+
+                <button class="btn btn-primary" onclick="generateMentions()" style="margin-top: 20px;">
+                    ✨ Générer les Mentions Légales
+                </button>
+
+                <div class="warning-box">
+                    <strong>⚠️ IMPORTANT</strong><br>
+                    Ce générateur produit un document standard. Pour des besoins spécifiques, consultez un avocat. Vous restez responsable de la conformité légale.
+                </div>
+            </div>
+
+            <!-- RÉSULTAT ET GUIDE -->
+            <div class="panel">
+                <h2 class="section-title">📄 Résultat</h2>
+
+                <div id="result" style="display: none;">
+                    <div class="result-container" id="mentionsContent"></div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="copyHTML()">📋 Copier le code HTML</button>
+                        <button class="btn btn-secondary" onclick="copyText()">📝 Copier le texte brut</button>
+                        <button class="btn btn-secondary" onclick="downloadHTML()">💾 Télécharger HTML</button>
+                        <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimer / PDF</button>
+                    </div>
+
+                    <div class="trio-banner" style="margin-top: 18px; box-shadow:none; border:2px solid var(--border);">
+                        <div>Pensez aussi à vos <strong>CGV</strong> (si vous vendez en ligne) et à votre <strong>Politique de Confidentialité</strong> (dès que vous collectez des données).</div>
+                        <div class="trio-links">
+                            <a href="https://nicolasaudigier-hash.github.io/flashtools/cgv-flashtools.html" target="_blank">→ CGV</a>
+                            <a href="https://nicolasaudigier-hash.github.io/flashtools/confidentialite-flashtools.html" target="_blank">→ Confidentialité</a>
+                        </div>
+                    </div>
+
+                    <div class="legal-sources">
+                        <h3 style="font-size: 1em; margin-bottom: 10px;">📚 Bases légales :</h3>
+                        <a href="https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000049568614" target="_blank">→ LCEN, article 1-1 — obligation d'identification (Légifrance)</a>
+                        <a href="https://www.legifrance.gouv.fr/affichTexte.do?cidTexte=JORFTEXT000000801164" target="_blank">→ Loi n°2004-575 du 21 juin 2004 (LCEN, texte d'origine)</a>
+                        <a href="https://www.service-public.fr/professionnels-entreprises/vosdroits/F31228" target="_blank">→ Service-Public.fr : obligations mentions légales</a>
+                        <a href="https://www.cnil.fr/fr/cnil-direct/question/quelles-mentions-legales-doit-comporter-un-site-internet" target="_blank">→ CNIL — mentions légales et données personnelles</a>
+                    </div>
+                </div>
+
+                <!-- GUIDE D'UTILISATION -->
+                <div id="guide">
+                    <h2 class="section-title">📚 Guide d'utilisation</h2>
+
+                    <div class="guide-section">
+                        <h3>⚖️ Pourquoi des mentions légales ?<span class="fresh-badge">à jour 2024</span></h3>
+                        <p><strong>C'est obligatoire</strong>, en application de l'article 1-1 de la LCEN.</p>
+                        <p>Attention : la base légale a changé en 2024. La loi SREN du 21 mai 2024 a restructuré la LCEN — l'obligation d'identification, autrefois à l'article 6-III (citée par presque tous les générateurs gratuits), est désormais à <strong>l'article 1-1</strong>. La sanction, elle, est passée de l'article 6-VI-2 à <strong>l'article 1-2</strong>.</p>
+                        <p><strong>Peines (inchangées) :</strong> jusqu'à 1 an d'emprisonnement et 75 000 € d'amende pour une personne physique, 375 000 € pour une société.</p>
+                    </div>
+
+                    <div class="guide-section">
+                        <h3>📝 Que doivent contenir les mentions légales ?</h3>
+                        <ul>
+                            <li><strong>Identité :</strong> nom/raison sociale, adresse, SIRET</li>
+                            <li><strong>Contact :</strong> email, téléphone</li>
+                            <li><strong>Hébergeur :</strong> nom et coordonnées</li>
+                            <li><strong>Responsable :</strong> directeur de publication</li>
+                            <li><strong>RGPD :</strong> renvoi vers la Politique de Confidentialité</li>
+                        </ul>
+                    </div>
+
+                    <div class="collapsible" onclick="toggleCollapsible(this)">
+                        <strong>🌐 Comment intégrer sur mon site ?</strong>
+                        <div class="collapsible-content">
+                            <p><strong>1. Créer la page :</strong></p>
+                            <ul>
+                                <li>WordPress : nouvelle page "Mentions Légales"</li>
+                                <li>Wix/Squarespace : ajouter une page</li>
+                                <li>Site custom : créer mentions-legales-flashtools.html</li>
+                            </ul>
+                            <p><strong>2. Copier le contenu généré</strong></p>
+                            <p><strong>3. Ajouter un lien dans le footer</strong>, visible sur toutes les pages.</p>
+                        </div>
+                    </div>
+
+                    <div class="collapsible" onclick="toggleCollapsible(this)">
+                        <strong>🔒 Différence avec la Politique de Confidentialité et les CGV ?</strong>
+                        <div class="collapsible-content">
+                            <p><strong>Mentions Légales :</strong> qui est derrière le site — obligatoire pour tous, sans exception.</p>
+                            <p><strong>CGV :</strong> encadre la relation commerciale — obligatoire dès que vous vendez en ligne à des particuliers.</p>
+                            <p><strong>Politique de Confidentialité :</strong> traitement des données personnelles (RGPD) — obligatoire dès qu'il y a un formulaire, des cookies ou une newsletter.</p>
+                            <p><strong>→ Un site e-commerce a presque toujours besoin des trois.</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="collapsible" onclick="toggleCollapsible(this)">
+                        <strong>💡 Cas particuliers</strong>
+                        <div class="collapsible-content">
+                            <p><strong>Auto-entrepreneur :</strong></p>
+                            <ul>
+                                <li>Pas de capital social</li>
+                                <li>SIRET obligatoire</li>
+                                <li>Mention "TVA non applicable, art. 293 B du CGI" si en franchise de base</li>
+                            </ul>
+                            <p><strong>Blog personnel / particulier :</strong></p>
+                            <ul>
+                                <li>Régime d'anonymat possible (article 1-1, II de la LCEN) : vous pouvez n'afficher publiquement que le nom et l'adresse de votre hébergeur à la place des vôtres, à condition d'avoir transmis votre véritable identité à cet hébergeur au préalable — il est tenu au secret professionnel, sauf réquisition judiciaire</li>
+                                <li>Ce régime ne vaut que pour une édition <em>non professionnelle</em> au sens de la jurisprudence : contenu à portée personnelle limitée, destiné à un cercle privé (famille, amis)</li>
+                                <li>Il se perd dès qu'apparaît une contrepartie économique, même modeste (publicité, affiliation rémunérée, newsletter payante, vente) — et parfois même sans aucune monétisation : un blog politique publiant 17 à 20 fois par mois a déjà été qualifié de "professionnel" par un tribunal malgré l'absence de revenus</li>
+                                <li>En cas de doute (blog actif, régulier, à audience large), le plus sûr est d'afficher vos propres mentions complètes plutôt que de s'appuyer sur ce régime</li>
+                            </ul>
+                            <p><strong>Association :</strong></p>
+                            <ul>
+                                <li>Nom de l'association, siège social</li>
+                                <li>N° RNA si déclarée en préfecture</li>
+                            </ul>
+                            <p><strong>E-commerce :</strong></p>
+                            <ul>
+                                <li>Médiateur de la consommation obligatoire, base légale actuellement à l'article 19 de la LCEN (transfert prévu vers le Code de la consommation au 1er septembre 2026)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="info-box" style="margin-top: 20px;">
+                        💡 <strong>Conseil :</strong> mettez à jour vos mentions légales à chaque changement (adresse, statut, hébergeur, etc.) — et vérifiez l'adresse de votre hébergeur avant publication, ces coordonnées évoluent.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('input[name="siteType"]').forEach(input => {
+            input.addEventListener('change', function() {
+                document.querySelectorAll('input[name="siteType"]').forEach(i => {
+                    i.closest('.radio-option').classList.remove('selected');
+                });
+                this.closest('.radio-option').classList.add('selected');
+            });
+        });
+
+        document.getElementById('legalStatus').addEventListener('change', updateFieldsVisibility);
+
+        function updateFieldsVisibility() {
+            const status = document.getElementById('legalStatus').value;
+            const siretGroup = document.getElementById('siretGroup');
+            const rcsGroup = document.getElementById('rcsGroup');
+            const capitalGroup = document.getElementById('capitalGroup');
+            const tvaGroup = document.getElementById('tvaGroup');
+            const nameLabel = document.getElementById('nameLabel');
+
+            siretGroup.style.display = 'block';
+            rcsGroup.style.display = 'block';
+            capitalGroup.style.display = 'block';
+            tvaGroup.style.display = 'block';
+            siretGroup.querySelector('label').innerHTML = 'Numéro SIRET *';
+
+            if (status === 'particulier') {
+                siretGroup.style.display = 'none';
+                rcsGroup.style.display = 'none';
+                capitalGroup.style.display = 'none';
+                tvaGroup.style.display = 'none';
+                nameLabel.textContent = 'Nom et Prénom *';
+            } else if (status === 'association') {
+                siretGroup.querySelector('label').innerHTML = 'Numéro RNA <span class="label-optional">(optionnel)</span>';
+                capitalGroup.style.display = 'none';
+                tvaGroup.style.display = 'none';
+                nameLabel.textContent = "Nom de l'association *";
+            } else if (status === 'auto-entrepreneur' || status === 'ei') {
+                capitalGroup.style.display = 'none';
+                nameLabel.textContent = 'Nom et Prénom *';
+            } else {
+                nameLabel.textContent = 'Raison sociale *';
+            }
+        }
+
+        function toggleCollapsible(element) {
+            element.classList.toggle('active');
+        }
+
+        function toggleCollapsibleById(id) {
+            const el = document.getElementById(id);
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+            if (el.style.display === 'block') el.classList.add('active');
+        }
+
+        function onHostChange() {
+            const customGroup = document.getElementById('customHostGroup');
+            customGroup.style.display = document.getElementById('host').value === 'custom' ? 'block' : 'none';
+        }
+
+        function generateMentions() {
+            const data = {
+                siteType: document.querySelector('input[name="siteType"]:checked').value,
+                legalStatus: document.getElementById('legalStatus').value,
+                companyName: document.getElementById('companyName').value.trim(),
+                address: document.getElementById('address').value.trim(),
+                siret: document.getElementById('siret').value.trim(),
+                rcs: document.getElementById('rcs').value.trim(),
+                capital: document.getElementById('capital').value.trim(),
+                tva: document.getElementById('tva').value.trim(),
+                director: document.getElementById('director').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                website: document.getElementById('website').value.trim(),
+                host: document.getElementById('host').value
+            };
+
+            if (!data.companyName || !data.address || !data.director || !data.email || !data.website || !data.host) {
+                alert('⚠️ Veuillez remplir tous les champs obligatoires (*)');
+                return;
+            }
+            if (data.legalStatus !== 'particulier' && data.legalStatus !== 'association' && !data.siret) {
+                alert('⚠️ Le numéro SIRET est obligatoire pour ce statut juridique');
+                return;
+            }
+
+            document.getElementById('mentionsContent').innerHTML = generateMentionsContent(data);
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('guide').style.display = 'none';
+            document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function generateMentionsContent(data) {
+            const hostInfo = getHostInfo(data.host);
+            const statusLabel = getStatusLabel(data.legalStatus);
+            const isEcommerce = data.siteType === 'commerce';
+
+            let content = `
+                <h2>MENTIONS LÉGALES</h2>
+                <p style="text-align: center; margin-bottom: 30px;"><em>Dernière mise à jour : ${new Date().toLocaleDateString('fr-FR')}</em></p>
+
+                <h3>1. ÉDITEUR DU SITE</h3>
+                <p>
+                    Le site <strong>${data.website}</strong> est édité par :<br><br>
+                    <strong>${data.companyName}</strong><br>
+                    ${statusLabel}<br>
+                    ${data.address.replace(/\n/g, '<br>')}<br>
+                    ${data.siret ? `${data.legalStatus === 'association' ? 'RNA' : 'SIRET'} : ${data.siret}<br>` : ''}
+                    ${data.rcs ? `${data.rcs}<br>` : ''}
+                    ${data.capital ? `Capital social : ${data.capital}<br>` : ''}
+                    N° TVA intracommunautaire : ${data.tva || 'TVA non applicable, article 293 B du Code général des impôts'}<br>
+                    <br>
+                    Email : <a href="mailto:${data.email}">${data.email}</a><br>
+                    Téléphone : ${data.phone}<br>
+                </p>
+
+                <h3>2. DIRECTEUR DE LA PUBLICATION</h3>
+                <p>Le directeur de la publication du site est <strong>${data.director}</strong>.</p>
+
+                <h3>3. HÉBERGEMENT</h3>
+                <p>
+                    Le site est hébergé par :<br><br>
+                    <strong>${hostInfo.name}</strong><br>
+                    ${hostInfo.address}
+                </p>
+                <p style="font-size:0.85em; color:#a0aec0;">
+                    Conformément à l'article 1-1, I, 5° de la LCEN, si les données traitées par le site sont stockées par un prestataire distinct de l'hébergeur ci-dessus, ses coordonnées doivent également être ajoutées ici.
+                </p>
+
+                <h3>4. PROPRIÉTÉ INTELLECTUELLE</h3>
+                <p>
+                    L'ensemble de ce site (structure, textes, logos, images, etc.) relève de la législation française et internationale sur le droit d'auteur et la propriété intellectuelle. Tous les droits de reproduction sont réservés, y compris pour les documents téléchargeables et les représentations iconographiques et photographiques.
+                </p>
+                <p>
+                    La reproduction de tout ou partie de ce site sur un support électronique quel qu'il soit est formellement interdite sauf autorisation expresse du directeur de la publication.
+                </p>
+
+                <h3>5. PROTECTION DES DONNÉES PERSONNELLES</h3>
+                <p>
+                    Conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés, vous disposez d'un droit d'accès, de rectification, de suppression et d'opposition aux données personnelles vous concernant.
+                </p>
+                <p>
+                    Pour exercer ces droits, vous pouvez nous contacter à l'adresse suivante : <a href="mailto:${data.email}">${data.email}</a>. Le détail des traitements (finalités, durée de conservation, destinataires) figure dans notre <strong>Politique de Confidentialité</strong>, document distinct disponible sur le site.
+                </p>
+            `;
+
+            if (isEcommerce) {
+                content += `
+                <h3>6. CONDITIONS GÉNÉRALES DE VENTE</h3>
+                <p>
+                    Les ventes réalisées sur ce site sont régies par des <strong>Conditions Générales de Vente distinctes</strong>, accessibles avant toute commande. Tout client peut recourir gratuitement à un médiateur de la consommation en cas de litige non résolu directement avec le vendeur (obligation actuellement fixée par l'article 19 de la LCEN, dont le transfert vers le Code de la consommation est prévu au 1er septembre 2026).
+                </p>
+                `;
+            }
+
+            const n1 = isEcommerce ? 7 : 6;
+            content += `
+                <h3>${n1}. COOKIES</h3>
+                <p>
+                    Le site peut être amené à vous demander l'acceptation de cookies. Le détail des cookies utilisés et les modalités pour les accepter ou les refuser figurent dans la Politique de Confidentialité du site.
+                </p>
+
+                <h3>${n1 + 1}. RESPONSABILITÉ</h3>
+                <p>
+                    Les informations contenues sur ce site sont aussi précises que possible et le site est périodiquement remis à jour, mais peut toutefois contenir des inexactitudes, des omissions ou des lacunes. Si vous constatez une lacune, erreur ou dysfonctionnement, merci de le signaler à <a href="mailto:${data.email}">${data.email}</a>.
+                </p>
+
+                <h3>${n1 + 2}. DROIT APPLICABLE</h3>
+                <p>
+                    Les présentes mentions légales sont régies par le droit français. En cas de litige et à défaut d'accord amiable, les tribunaux français seront seuls compétents.
+                </p>
+
+                <p style="text-align: center; margin-top: 40px; font-style: italic; color: #718096;">
+                    Mentions légales établies sur la base de l'article 1-1 de la LCEN (loi n°2004-575 du 21 juin 2004, modifiée par la loi n°2024-449 du 21 mai 2024).
+                </p>
+            `;
+
+            return content;
+        }
+
+        function getHostInfo(host) {
+            const hosts = {
+                'ovh': { name: 'OVH SAS (OVHcloud)', address: '2 rue Kellermann<br>59100 Roubaix<br>France' },
+                'o2switch': { name: 'o2switch SAS', address: '222-224 Boulevard Gustave Flaubert<br>63000 Clermont-Ferrand<br>France' },
+                'ionos': { name: 'IONOS SARL', address: '7 place de la Gare<br>57200 Sarreguemines<br>France' },
+                'hostinger': { name: 'Hostinger International Ltd', address: '61 Lordou Vironos Street<br>6023 Larnaca<br>Chypre' },
+                'infomaniak': { name: 'Infomaniak Network SA', address: 'Rue Eugène-Marziano 25<br>1227 Les Acacias (Genève)<br>Suisse' },
+                'custom': {
+                    name: document.getElementById('customHost').value || 'À compléter',
+                    address: (document.getElementById('customHostAddress').value || 'Adresse à compléter').replace(/\n/g, '<br>')
+                }
+            };
+            return hosts[host] || hosts['custom'];
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'auto-entrepreneur': 'Auto-entrepreneur / Micro-entreprise',
+                'ei': 'Entreprise Individuelle',
+                'eurl': 'EURL', 'sarl': 'SARL', 'sas': 'SAS', 'sasu': 'SASU', 'sa': 'SA',
+                'association': 'Association loi 1901',
+                'particulier': 'Particulier'
+            };
+            return labels[status] || '';
+        }
+
+        function copyHTML() {
+            navigator.clipboard.writeText(document.getElementById('mentionsContent').innerHTML)
+                .then(() => alert('✅ Code HTML copié dans le presse-papier !'))
+                .catch(() => alert('La copie a échoué — vérifiez les autorisations du presse-papier.'));
+        }
+
+        function copyText() {
+            navigator.clipboard.writeText(document.getElementById('mentionsContent').innerText)
+                .then(() => alert('✅ Texte copié dans le presse-papier !'))
+                .catch(() => alert('La copie a échoué — vérifiez les autorisations du presse-papier.'));
+        }
+
+        function downloadHTML() {
+            const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentions Légales</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 40px auto; padding: 20px; color: #333; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        h3 { color: #34495e; margin-top: 30px; }
+        a { color: #667eea; }
+    </style>
+</head>
+<body>
+${document.getElementById('mentionsContent').innerHTML}
+</body>
+</html>`;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mentions-legales-flashtools.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        updateFieldsVisibility();
+    </script>
+</body>
+</html>

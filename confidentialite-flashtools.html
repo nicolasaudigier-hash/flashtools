@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur Politique de Confidentialité RGPD | FlashTools</title>
+    <meta name="description" content="Créez votre politique de confidentialité basée sur le RGPD en 10 minutes. Simple, conforme à la législation française.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #06B6D4;
+            --secondary: #8B5CF6;
+            --dark: #F1F5F9;
+            --light: #1E293B;
+            --border: rgba(255,255,255,0.08);
+            --success: #10b981;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #0A0E27;
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            background: #111827;
+            padding: 40px 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            font-weight: 800;
+            color: #06B6D4;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            font-size: 1.2em;
+            color: #94A3B8;
+            margin-bottom: 8px;
+        }
+
+        .tags {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .tag {
+            background: #1E293B;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #94A3B8;
+            border: 1px solid var(--border);
+        }
+
+        .trio-banner {
+            background: #111827;
+            border-radius: 20px;
+            padding: 20px 26px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .trio-banner strong { color: var(--primary); }
+
+        .trio-links { display: flex; gap: 10px; flex-wrap: wrap; margin-left: auto; }
+
+        .trio-links a {
+            background: #1E293B;
+            color: var(--primary);
+            text-decoration: none;
+            padding: 9px 16px;
+            border-radius: 10px;
+            font-size: 0.88em;
+            font-weight: 600;
+            border: 2px solid var(--border);
+        }
+
+        .trio-links a:hover { background: var(--primary); color: #04141A; border-color: var(--primary); }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: #111827;
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .sticky-panel {
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step-indicator {
+            background: #1E293B;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .step-indicator strong {
+            color: var(--primary);
+            font-size: 1.1em;
+        }
+
+        .form-section {
+            background: #141B2C;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 2px solid var(--border);
+        }
+
+        .form-section h3 {
+            font-size: 1.1em;
+            color: var(--dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.9em;
+        }
+
+        .help-text {
+            font-size: 0.8em;
+            color: #94A3B8;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="url"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 11px 13px;
+            background: #1E293B;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.95em;
+            color: var(--dark);
+            transition: all 0.3s;
+            font-family: inherit;
+            accent-color: var(--primary);
+        }
+
+        input::placeholder, textarea::placeholder { color: #64748B; }
+        select option { background: #1E293B; color: var(--dark); }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px;
+            background: #1E293B;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .checkbox-item:hover {
+            border-color: var(--primary);
+            background: rgba(6, 182, 212, 0.08);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin-top: 3px;
+            accent-color: var(--primary);
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+            color: var(--dark);
+        }
+
+        .checkbox-item small { color: #94A3B8; }
+
+        .checkbox-item.checked {
+            border-color: var(--primary);
+            background: rgba(6, 182, 212, 0.12);
+        }
+
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #04141A;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: #04141A;
+        }
+
+        .info-box {
+            background: rgba(6, 182, 212, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.88em;
+            color: var(--dark);
+            margin: 15px 0;
+        }
+
+        .warning-box {
+            background: rgba(239,68,68,0.1);
+            border-left: 4px solid #F87171;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.88em;
+            color: var(--dark);
+            margin: 15px 0;
+        }
+        .warning-box strong { color: #FCA5A5; }
+
+        .success-box {
+            background: rgba(16,185,129,0.12);
+            border-left: 4px solid var(--success);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.88em;
+            color: var(--dark);
+            margin: 15px 0;
+        }
+        .success-box strong { color: #6EE7B7; }
+
+        .legal-sources {
+            background: #1E293B;
+            border-left: 4px solid var(--success);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.88em;
+            color: var(--dark);
+            margin-top: 20px;
+        }
+
+        .legal-sources a {
+            color: #6EE7B7;
+            text-decoration: none;
+            display: block;
+            margin: 5px 0;
+        }
+
+        .legal-sources a:hover {
+            text-decoration: underline;
+        }
+
+        .result-container {
+            background: #F8FAFC;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+            color: #1E293B;
+        }
+
+        .result-container h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #1E293B;
+        }
+
+        .result-container h3 {
+            font-size: 1.2em;
+            margin: 25px 0 15px 0;
+            color: #334155;
+        }
+
+        .result-container p {
+            margin-bottom: 15px;
+            text-align: justify;
+            color: #334155;
+        }
+
+        .result-container ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .result-container li {
+            margin-bottom: 8px;
+            color: #334155;
+        }
+
+        .result-container a { color: #0E7490; }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .guide-card {
+            background: #1E293B;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .guide-card h3 {
+            font-size: 1.1em;
+            color: var(--dark);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .guide-card p {
+            font-size: 0.9em;
+            color: #CBD5E1;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .guide-card ul {
+            margin-left: 20px;
+            font-size: 0.88em;
+            color: #CBD5E1;
+        }
+
+        .guide-card li {
+            margin-bottom: 6px;
+        }
+
+        .guide-card a { color: #06B6D4; }
+
+        @media print {
+            body, .container { background: white !important; }
+            .result-container { max-height: none; overflow: visible; border: none; }
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sticky-panel {
+                position: static;
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .trio-banner { flex-direction: column; align-items: flex-start; }
+            .trio-links { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>🔒 Politique de Confidentialité RGPD</h1>
+            <p class="subtitle">Basée sur le RGPD • Simple et Complet</p>
+            <div class="tags">
+                <span class="tag">✅ Structure RGPD</span>
+                <span class="tag">🇫🇷 Droit français</span>
+                <span class="tag">📄 Export HTML</span>
+                <span class="tag">⚡ 10 minutes</span>
+            </div>
+        </div>
+
+        <!-- TRIO LÉGAL -->
+        <div class="trio-banner">
+            <div><strong>Le trio légal FlashTools</strong> — Politique de Confidentialité, CGV et Mentions Légales fonctionnent ensemble. Commencez par les Mentions Légales : les deux autres reprennent votre identité.</div>
+            <div class="trio-links">
+                <a href="https://nicolasaudigier-hash.github.io/flashtools/mentions-legales-flashtools.html" target="_blank">→ Mentions Légales</a>
+                <a href="https://nicolasaudigier-hash.github.io/flashtools/cgv-flashtools.html" target="_blank">→ CGV</a>
+            </div>
+        </div>
+
+        <!-- MAIN GRID -->
+        <div class="main-grid">
+            <!-- FORMULAIRE -->
+            <div class="panel sticky-panel">
+                <h2 class="section-title">📝 Configuration</h2>
+
+                <!-- SECTION 1: INFOS DE BASE -->
+                <div class="form-section">
+                    <h3>📋 Votre site</h3>
+
+                    <div class="form-group">
+                        <label>Nom de votre site / entreprise *</label>
+                        <input type="text" id="siteName" required placeholder="Ex: Ma Belle Boutique">
+                    </div>
+
+                    <div class="form-group">
+                        <label>URL du site *</label>
+                        <input type="url" id="siteUrl" required placeholder="https://www.monsite.fr">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email de contact *</label>
+                        <input type="email" id="contactEmail" required placeholder="contact@exemple.fr">
+                        <p class="help-text">Les utilisateurs peuvent vous contacter ici pour exercer leurs droits RGPD</p>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: DONNÉES COLLECTÉES -->
+                <div class="form-section">
+                    <h3>🗂️ Quelles données collectez-vous ?</h3>
+                    <p class="help-text" style="margin-bottom: 15px;">Cochez tout ce qui s'applique à votre site</p>
+
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="data-contact" value="contact">
+                            <label for="data-contact">
+                                <strong>Formulaire de contact</strong><br>
+                                <small>Nom, email, message</small>
+                            </label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="data-newsletter" value="newsletter">
+                            <label for="data-newsletter">
+                                <strong>Newsletter</strong><br>
+                                <small>Email pour envoi de newsletters</small>
+                            </label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="data-account" value="account">
+                            <label for="data-account">
+                                <strong>Comptes utilisateurs</strong><br>
+                                <small>Inscription, connexion, profil</small>
+                            </label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="data-ecommerce" value="ecommerce">
+                            <label for="data-ecommerce">
+                                <strong>E-commerce</strong><br>
+                                <small>Adresse, paiement, historique commandes</small>
+                            </label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="data-comments" value="comments">
+                            <label for="data-comments">
+                                <strong>Commentaires / Avis</strong><br>
+                                <small>Nom, email, contenu des commentaires</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: COOKIES & TRACKERS -->
+                <div class="form-section">
+                    <h3>🍪 Cookies & Trackers</h3>
+
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cookie-analytics" value="analytics">
+                            <label for="cookie-analytics">
+                                <strong>Google Analytics</strong><br>
+                                <small>Statistiques de visite</small>
+                            </label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cookie-ads" value="ads">
+                            <label for="cookie-ads">
+                                <strong>Publicités</strong><br>
+                                <small>Google Ads, Facebook Pixel, etc.</small>
+                            </label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cookie-functional" value="functional">
+                            <label for="cookie-functional">
+                                <strong>Cookies fonctionnels</strong><br>
+                                <small>Panier, préférences, session</small>
+                            </label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cookie-social" value="social">
+                            <label for="cookie-social">
+                                <strong>Réseaux sociaux</strong><br>
+                                <small>Boutons partage Facebook, Twitter, etc.</small>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        💡 <strong>Comment savoir lesquels cocher ?</strong> Si tu as toi-même ajouté un outil (Analytics, pixel publicitaire, bouton de partage), tu le sais déjà. Sinon : ouvre ton site, appuie sur F12 (outils de développement) → onglet Application/Stockage → Cookies, pour voir ce qui est réellement posé. Un programme d'affiliation ou certains outils marketing intégrés à ta plateforme peuvent aussi poser leurs propres cookies sans que tu aies rien codé — vérifie la documentation de ton outil si tu en utilises un. Des services de bandeau cookie (gratuits ou payants) peuvent aussi scanner ton site automatiquement.
+                    </div>
+                </div>
+
+                <!-- SECTION 4: SOUS-TRAITANTS -->
+                <div class="form-section">
+                    <h3>🔗 Services tiers utilisés</h3>
+                    <p class="help-text" style="margin-bottom: 15px;">Quels outils externes utilisez-vous ?</p>
+
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="service-stripe" value="stripe">
+                            <label for="service-stripe">
+                                <strong>Stripe</strong> - Paiement en ligne
+                            </label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="service-paypal" value="paypal">
+                            <label for="service-paypal">
+                                <strong>PayPal</strong> - Paiement en ligne
+                            </label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="service-mailchimp" value="mailchimp">
+                            <label for="service-mailchimp">
+                                <strong>Mailchimp</strong> - Email marketing
+                            </label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="service-sendinblue" value="sendinblue">
+                            <label for="service-sendinblue">
+                                <strong>Brevo (Sendinblue)</strong> - Email marketing
+                            </label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="service-cloudflare" value="cloudflare">
+                            <label for="service-cloudflare">
+                                <strong>Cloudflare</strong> - CDN & Sécurité
+                            </label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="service-googlefonts" value="googlefonts">
+                            <label for="service-googlefonts">
+                                <strong>Google Fonts</strong> - Polices web
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>Autres services <small>(optionnel)</small></label>
+                        <textarea id="otherServices" placeholder="Ex: Zapier, Intercom, HubSpot..."></textarea>
+                    </div>
+                </div>
+
+                <!-- SECTION 5: DURÉE CONSERVATION -->
+                <div class="form-section">
+                    <h3>⏱️ Durée de conservation</h3>
+
+                    <div class="form-group">
+                        <label>Combien de temps gardez-vous les données ?</label>
+                        <select id="retention">
+                            <option value="1">1 an après dernier contact</option>
+                            <option value="2">2 ans après dernier contact</option>
+                            <option value="3" selected>3 ans après dernier contact</option>
+                            <option value="5">5 ans après dernier contact</option>
+                            <option value="legal">Durée légale obligatoire</option>
+                        </select>
+                        <p class="help-text">Recommandé : 3 ans pour la prospection commerciale</p>
+                    </div>
+
+                    <div class="info-box">
+                        💡 <strong>Cette durée ne s'applique pas toute seule.</strong> Aucun outil ne supprime automatiquement tes contacts au bout de ce délai — c'est à toi de le faire, ou de configurer une automatisation si ton CRM/outil d'emailing le permet (beaucoup ont une fonction de nettoyage de liste). Repères CNIL : clients, pendant la relation commerciale puis 3 ans après la fin de celle-ci ; prospects n'ayant jamais acheté, 3 ans depuis la collecte ou le dernier contact actif (une simple ouverture de mail ne compte pas) ; factures, 10 ans quoi qu'il arrive (obligation comptable, indépendante du RGPD). <strong>Attention :</strong> cette durée concerne tes données de contact (prospects, clients, comptes) — les cookies suivent une règle différente, à 13 mois maximum, précisée plus bas dans le document généré.
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="generatePolicy()" style="margin-top: 20px;">
+                    ✨ Générer la Politique de Confidentialité
+                </button>
+
+                <div class="info-box" style="margin-top: 15px;">
+                    💡 <strong>Astuce :</strong> Soyez transparent ! Plus vous êtes clair sur l'utilisation des données, plus vos utilisateurs vous feront confiance.
+                </div>
+
+                <div class="warning-box">
+                    <strong>⚠️ IMPORTANT</strong><br>
+                    Ce générateur produit un document standard basé sur le RGPD. Pour des besoins très spécifiques, consultez un avocat spécialisé.
+                </div>
+            </div>
+
+            <!-- RÉSULTAT ET GUIDE -->
+            <div class="panel">
+                <div id="result" style="display: none;">
+                    <h2 class="section-title">✅ Votre Politique de Confidentialité</h2>
+
+                    <div class="result-container" id="policyContent">
+                        <!-- Le contenu sera généré ici -->
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="copyHTML()">
+                            📋 Copier le code HTML
+                        </button>
+                        <button class="btn btn-secondary" onclick="copyText()">
+                            📝 Copier le texte brut
+                        </button>
+                        <button class="btn btn-secondary" onclick="downloadHTML()">
+                            💾 Télécharger HTML
+                        </button>
+                    </div>
+
+                    <div class="trio-banner" style="margin-top: 18px; box-shadow:none; border:2px solid var(--border);">
+                        <div>Pensez aussi à vos <strong>Mentions Légales</strong> (obligatoires pour tous) et à vos <strong>CGV</strong> (si vous vendez en ligne).</div>
+                        <div class="trio-links">
+                            <a href="https://nicolasaudigier-hash.github.io/flashtools/mentions-legales-flashtools.html" target="_blank">→ Mentions Légales</a>
+                            <a href="https://nicolasaudigier-hash.github.io/flashtools/cgv-flashtools.html" target="_blank">→ CGV</a>
+                        </div>
+                    </div>
+
+                    <div class="legal-sources">
+                        <h3 style="font-size: 1em; margin-bottom: 10px;">📚 Bases légales :</h3>
+                        <a href="https://www.cnil.fr/fr/reglement-europeen-protection-donnees" target="_blank">→ RGPD - Règlement Européen (CNIL)</a>
+                        <a href="https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000886460" target="_blank">→ Loi Informatique et Libertés (Legifrance)</a>
+                        <a href="https://www.cnil.fr/fr/modeles/mentions-dinformation" target="_blank">→ Modèles CNIL</a>
+                        <a href="https://www.cnil.fr/fr/cookies-et-autres-traceurs" target="_blank">→ Guide Cookies CNIL</a>
+                        <a href="https://www.dataprivacyframework.gov/list" target="_blank">→ Liste des entreprises certifiées Data Privacy Framework</a>
+                    </div>
+                </div>
+
+                <!-- GUIDE D'UTILISATION -->
+                <div id="guide">
+                    <h2 class="section-title">📚 Guide RGPD Simplifié</h2>
+
+                    <div class="guide-card">
+                        <h3>🔒 C'est quoi le RGPD ?</h3>
+                        <p><strong>RGPD = Règlement Général sur la Protection des Données</strong></p>
+                        <p>C'est la loi européenne qui protège les données personnelles de vos utilisateurs.</p>
+                        <p><strong>Entrée en vigueur :</strong> 25 mai 2018</p>
+                        <p><strong>S'applique à :</strong> Tous les sites qui collectent des données d'Européens</p>
+                    </div>
+
+                    <div class="guide-card">
+                        <h3>❓ Ai-je besoin d'une politique de confidentialité ?</h3>
+                        <p><strong>OUI si vous avez :</strong></p>
+                        <ul>
+                            <li>Un formulaire de contact</li>
+                            <li>Google Analytics (ou autre outil stats)</li>
+                            <li>Des cookies (même techniques)</li>
+                            <li>Une newsletter</li>
+                            <li>Un e-commerce</li>
+                            <li>Des comptes utilisateurs</li>
+                            <li>Des commentaires</li>
+                        </ul>
+                        <p><strong>En gros :</strong> 90% des sites web ont besoin d'une politique de confidentialité !</p>
+                    </div>
+
+                    <div class="guide-card">
+                        <h3>📋 Que doit contenir ma politique ?</h3>
+                        <ul>
+                            <li><strong>Données collectées :</strong> Quoi exactement (nom, email, IP...)</li>
+                            <li><strong>Finalité :</strong> Pourquoi vous collectez ces données</li>
+                            <li><strong>Base légale :</strong> Consentement, contrat, intérêt légitime...</li>
+                            <li><strong>Destinataires :</strong> Qui a accès (vous, sous-traitants...)</li>
+                            <li><strong>Durée :</strong> Combien de temps vous gardez les données</li>
+                            <li><strong>Droits :</strong> Accès, rectification, suppression...</li>
+                            <li><strong>Cookies :</strong> Quels cookies, pourquoi, comment les refuser</li>
+                        </ul>
+                    </div>
+
+                    <div class="guide-card">
+                        <h3>👥 Les droits de vos utilisateurs</h3>
+                        <p><strong>Le RGPD donne 8 droits aux utilisateurs :</strong></p>
+                        <ul>
+                            <li><strong>Droit d'accès :</strong> Savoir quelles données vous avez sur eux</li>
+                            <li><strong>Droit de rectification :</strong> Corriger leurs données</li>
+                            <li><strong>Droit à l'effacement :</strong> "Droit à l'oubli"</li>
+                            <li><strong>Droit d'opposition :</strong> Refuser certains traitements</li>
+                            <li><strong>Droit à la limitation :</strong> Geler temporairement le traitement</li>
+                            <li><strong>Droit à la portabilité :</strong> Récupérer leurs données (CSV, JSON...)</li>
+                            <li><strong>Droit de retrait :</strong> Retirer leur consentement</li>
+                            <li><strong>Droit de réclamation :</strong> Se plaindre à la CNIL</li>
+                        </ul>
+                        <div class="info-box" style="margin-top: 10px;">
+                            <strong>Important :</strong> Vous devez répondre sous 1 mois maximum à toute demande d'exercice de droits
+                        </div>
+                    </div>
+
+                    <div class="guide-card">
+                        <h3>🍪 Les cookies, comment ça marche ?</h3>
+                        <p><strong>3 types de cookies :</strong></p>
+                        <ul>
+                            <li><strong>Essentiels :</strong> Panier, connexion → PAS besoin de consentement</li>
+                            <li><strong>Analytics :</strong> Google Analytics → Consentement OBLIGATOIRE</li>
+                            <li><strong>Publicitaires :</strong> Tracking pub → Consentement OBLIGATOIRE</li>
+                        </ul>
+                        <div class="warning-box" style="margin-top: 10px;">
+                            <strong>⚠️ Règle CNIL 2024 :</strong> Les cookies non-essentiels nécessitent un consentement ACTIF (clic). Les bannières "tout accepter" seules ne suffisent plus !
+                        </div>
+                    </div>
+
+                    <div class="guide-card">
+                        <h3>💰 Sanctions en cas de non-conformité</h3>
+                        <p><strong>La CNIL peut sanctionner :</strong></p>
+                        <ul>
+                            <li>Avertissement (public ou privé)</li>
+                            <li>Mise en demeure de se conformer</li>
+                            <li>Limitation temporaire du traitement</li>
+                            <li><strong>Amende jusqu'à 20 millions €</strong> ou 4% du CA mondial</li>
+                        </ul>
+                        <div class="info-box" style="margin-top: 10px;">
+                            La CNIL sanctionne aussi les PME ! En 2023, amendes de 5 000€ à 90 000€ pour des petites entreprises.
+                        </div>
+                    </div>
+
+                    <div class="guide-card">
+                        <h3>✅ Comment intégrer ma politique ?</h3>
+                        <p><strong>Étape 1 :</strong> Créer une page sur votre site</p>
+                        <ul>
+                            <li>WordPress : Nouvelle page "Politique de confidentialité"</li>
+                            <li>Wix/Squarespace : Ajouter une page</li>
+                            <li>Site custom : Créer confidentialite-flashtools.html</li>
+                        </ul>
+                        <p><strong>Étape 2 :</strong> Copier le contenu généré et le coller</p>
+                        <p><strong>Étape 3 :</strong> Ajouter des liens</p>
+                        <ul>
+                            <li>Dans le footer (visible partout)</li>
+                            <li>Sur les formulaires</li>
+                            <li>Lors de l'inscription</li>
+                            <li>Dans la bannière cookies</li>
+                        </ul>
+                    </div>
+
+                    <div class="guide-card">
+                        <h3>🔗 Complémentarité des documents</h3>
+                        <p><strong>Vous devez avoir :</strong></p>
+                        <ul>
+                            <li><strong>Mentions Légales :</strong> Qui vous êtes (identité, contact, hébergeur)</li>
+                            <li><strong>Politique de Confidentialité :</strong> Comment vous traitez les données</li>
+                            <li><strong>CGV :</strong> Conditions de vente (si e-commerce)</li>
+                        </ul>
+                        <div class="success-box" style="margin-top: 10px;">
+                            <strong>✅ Trio gagnant :</strong> Mentions Légales + Politique Confidentialité + CGV = Site 100% conforme
+                        </div>
+                    </div>
+
+                    <div class="guide-card">
+                        <h3>📞 Contact CNIL</h3>
+                        <p>En cas de doute ou pour déclarer un traitement complexe :</p>
+                        <ul>
+                            <li><strong>Site :</strong> <a href="https://www.cnil.fr" target="_blank">www.cnil.fr</a></li>
+                            <li><strong>Téléphone :</strong> 01 53 73 22 22</li>
+                            <li><strong>Adresse :</strong> 3 Place de Fontenoy, 75007 Paris</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Gestion des checkbox avec style
+        document.querySelectorAll('.checkbox-item').forEach(item => {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            
+            item.addEventListener('click', function(e) {
+                if (e.target !== checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                }
+                
+                if (checkbox.checked) {
+                    this.classList.add('checked');
+                } else {
+                    this.classList.remove('checked');
+                }
+            });
+        });
+
+        function generatePolicy() {
+            const data = collectFormData();
+            
+            // Validation
+            if (!data.siteName || !data.siteUrl || !data.contactEmail) {
+                alert('⚠️ Veuillez remplir tous les champs obligatoires (*)');
+                return;
+            }
+
+            // Générer le contenu
+            const content = generatePolicyContent(data);
+            document.getElementById('policyContent').innerHTML = content;
+            
+            // Afficher le résultat
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('guide').style.display = 'none';
+            
+            // Scroll vers le résultat
+            document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function collectFormData() {
+            return {
+                siteName: document.getElementById('siteName').value.trim(),
+                siteUrl: document.getElementById('siteUrl').value.trim(),
+                contactEmail: document.getElementById('contactEmail').value.trim(),
+                
+                // Données collectées
+                hasContact: document.getElementById('data-contact').checked,
+                hasNewsletter: document.getElementById('data-newsletter').checked,
+                hasAccount: document.getElementById('data-account').checked,
+                hasEcommerce: document.getElementById('data-ecommerce').checked,
+                hasComments: document.getElementById('data-comments').checked,
+                
+                // Cookies
+                hasAnalytics: document.getElementById('cookie-analytics').checked,
+                hasAds: document.getElementById('cookie-ads').checked,
+                hasFunctional: document.getElementById('cookie-functional').checked,
+                hasSocial: document.getElementById('cookie-social').checked,
+                
+                // Services
+                hasStripe: document.getElementById('service-stripe').checked,
+                hasPaypal: document.getElementById('service-paypal').checked,
+                hasMailchimp: document.getElementById('service-mailchimp').checked,
+                hasSendinblue: document.getElementById('service-sendinblue').checked,
+                hasCloudflare: document.getElementById('service-cloudflare').checked,
+                hasGoogleFonts: document.getElementById('service-googlefonts').checked,
+                otherServices: document.getElementById('otherServices').value.trim(),
+                
+                retention: document.getElementById('retention').value
+            };
+        }
+
+        function generatePolicyContent(data) {
+            const retentionText = getRetentionText(data.retention);
+            
+            let content = `
+                <h2>POLITIQUE DE CONFIDENTIALITÉ</h2>
+                
+                <p style="text-align: center; margin-bottom: 30px;"><em>Dernière mise à jour : ${new Date().toLocaleDateString('fr-FR')}</em></p>
+
+                <p>
+                    <strong>${data.siteName}</strong> accorde une grande importance à la protection de vos données personnelles. 
+                    Cette politique de confidentialité explique quelles données nous collectons, pourquoi nous les collectons, 
+                    et comment nous les protégeons, conformément au Règlement Général sur la Protection des Données (RGPD).
+                </p>
+
+                <h3>1. RESPONSABLE DU TRAITEMENT</h3>
+                <p>
+                    Le responsable du traitement de vos données personnelles est :<br>
+                    <strong>${data.siteName}</strong><br>
+                    Site web : <a href="${data.siteUrl}">${data.siteUrl}</a><br>
+                    Email : <a href="mailto:${data.contactEmail}">${data.contactEmail}</a>
+                </p>
+
+                <h3>2. DONNÉES PERSONNELLES COLLECTÉES</h3>
+                <p>Nous collectons et traitons les données personnelles suivantes :</p>
+                <ul>
+            `;
+
+            // Liste des données selon les cases cochées
+            if (data.hasContact) {
+                content += `<li><strong>Formulaire de contact :</strong> Nom, prénom, adresse email, message</li>`;
+            }
+            if (data.hasNewsletter) {
+                content += `<li><strong>Newsletter :</strong> Adresse email</li>`;
+            }
+            if (data.hasAccount) {
+                content += `<li><strong>Compte utilisateur :</strong> Nom, prénom, email, mot de passe (chiffré), date de création</li>`;
+            }
+            if (data.hasEcommerce) {
+                content += `<li><strong>Commandes :</strong> Nom, prénom, adresse de livraison, adresse de facturation, téléphone, email, historique des achats</li>`;
+            }
+            if (data.hasComments) {
+                content += `<li><strong>Commentaires :</strong> Nom, email, contenu du commentaire, date de publication</li>`;
+            }
+
+            content += `
+                    <li><strong>Données de navigation :</strong> Adresse IP, type de navigateur, pages visitées, durée de visite</li>
+                </ul>
+
+                <h3>3. FINALITÉS ET BASES LÉGALES</h3>
+                <p>Vos données sont traitées pour les finalités suivantes :</p>
+                <ul>
+            `;
+
+            if (data.hasContact) {
+                content += `<li><strong>Traiter vos demandes de contact</strong> - Base légale : Consentement</li>`;
+            }
+            if (data.hasNewsletter) {
+                content += `<li><strong>Envoi de newsletters</strong> - Base légale : Consentement (vous pouvez vous désabonner à tout moment)</li>`;
+            }
+            if (data.hasAccount) {
+                content += `<li><strong>Gestion de votre compte</strong> - Base légale : Exécution du contrat</li>`;
+            }
+            if (data.hasEcommerce) {
+                content += `<li><strong>Traitement des commandes</strong> - Base légale : Exécution du contrat</li>`;
+                content += `<li><strong>Facturation et comptabilité</strong> - Base légale : Obligation légale</li>`;
+            }
+            if (data.hasAnalytics) {
+                content += `<li><strong>Amélioration du site (analytics)</strong> - Base légale : Consentement</li>`;
+            }
+            if (data.hasAds) {
+                content += `<li><strong>Publicité ciblée</strong> - Base légale : Consentement</li>`;
+            }
+
+            content += `
+                    <li><strong>Sécurité et prévention de la fraude</strong> - Base légale : Intérêt légitime</li>
+                    <li><strong>Respect des obligations légales</strong> - Base légale : Obligation légale</li>
+                </ul>
+
+                <h3>4. DESTINATAIRES DES DONNÉES</h3>
+                <p>Vos données personnelles sont destinées à :</p>
+                <ul>
+                    <li><strong>${data.siteName}</strong> et ses équipes habilitées</li>
+            `;
+
+            // Services tiers
+            if (data.hasStripe) {
+                content += `<li><strong>Stripe</strong> - Traitement des paiements (conforme PCI-DSS)</li>`;
+            }
+            if (data.hasPaypal) {
+                content += `<li><strong>PayPal</strong> - Traitement des paiements</li>`;
+            }
+            if (data.hasMailchimp) {
+                content += `<li><strong>Mailchimp</strong> - Envoi d'emails marketing (USA, certifié Data Privacy Framework)</li>`;
+            }
+            if (data.hasSendinblue) {
+                content += `<li><strong>Brevo (Sendinblue)</strong> - Envoi d'emails marketing (UE)</li>`;
+            }
+            if (data.hasAnalytics) {
+                content += `<li><strong>Google Analytics</strong> - Analyse d'audience (USA, Google LLC certifié Data Privacy Framework)</li>`;
+            }
+            if (data.hasCloudflare) {
+                content += `<li><strong>Cloudflare</strong> - CDN et sécurité (USA/UE)</li>`;
+            }
+            if (data.hasGoogleFonts) {
+                content += `<li><strong>Google Fonts</strong> - Polices web (USA)</li>`;
+            }
+
+            if (data.otherServices) {
+                content += `<li><strong>Autres services :</strong> ${data.otherServices}</li>`;
+            }
+
+            content += `
+                </ul>
+                <p>
+                    Ces sous-traitants sont contractuellement tenus de respecter la confidentialité et la sécurité de vos données 
+                    conformément au RGPD.
+                </p>
+
+                <h3>5. TRANSFERTS DE DONNÉES HORS UE</h3>
+            `;
+
+            if (data.hasStripe || data.hasPaypal || data.hasMailchimp || data.hasAnalytics || data.hasCloudflare || data.hasGoogleFonts) {
+                content += `
+                <p>
+                    Certains de nos prestataires sont situés en dehors de l'Union Européenne (notamment aux États-Unis). 
+                    Ces transferts sont encadrés par :
+                </p>
+                <ul>
+                    <li>Le <strong>Data Privacy Framework</strong> (DPF) UE-États-Unis, lorsque le prestataire y est certifié — ce cadre, entré en vigueur le 10 juillet 2023, a remplacé le Privacy Shield invalidé en 2020</li>
+                    <li>Les clauses contractuelles types de la Commission Européenne, pour les prestataires non certifiés DPF</li>
+                    <li>Des garanties appropriées assurant un niveau de protection adéquat</li>
+                </ul>
+                <p class="help-text">La certification Data Privacy Framework d'un prestataire peut être vérifiée sur dataprivacyframework.gov/list.</p>
+                `;
+            } else {
+                content += `
+                <p>
+                    Vos données personnelles sont hébergées et traitées au sein de l'Union Européenne. 
+                    Aucun transfert hors UE n'est effectué.
+                </p>
+                `;
+            }
+
+            content += `
+                <h3>6. DURÉE DE CONSERVATION</h3>
+                <p>
+                    Vos données de contact (formulaire, compte, commande, selon les cas applicables) sont conservées pendant <strong>${retentionText}</strong>.
+                </p>
+            `;
+
+            if (data.hasEcommerce) {
+                content += `
+                <p>
+                    <strong>Données de facturation :</strong> Conservées 10 ans conformément aux obligations comptables et fiscales.
+                </p>
+                `;
+            }
+
+            content += `
+                <p>
+                    Au-delà de cette durée, vos données sont supprimées ou anonymisées, sauf obligation légale de conservation plus longue. Cette durée ne s'applique pas aux cookies et traceurs éventuellement utilisés sur le site, qui suivent une règle de validité distincte précisée à l'article 8.
+                </p>
+
+                <h3>7. VOS DROITS</h3>
+                <p>Conformément au RGPD, vous disposez des droits suivants :</p>
+                <ul>
+                    <li><strong>Droit d'accès :</strong> Obtenir la confirmation que vos données sont traitées et y accéder</li>
+                    <li><strong>Droit de rectification :</strong> Corriger vos données inexactes ou incomplètes</li>
+                    <li><strong>Droit à l'effacement :</strong> Demander la suppression de vos données ("droit à l'oubli")</li>
+                    <li><strong>Droit à la limitation :</strong> Demander la limitation du traitement de vos données</li>
+                    <li><strong>Droit d'opposition :</strong> Vous opposer au traitement de vos données</li>
+                    <li><strong>Droit à la portabilité :</strong> Récupérer vos données dans un format structuré</li>
+                    <li><strong>Droit de retirer votre consentement :</strong> À tout moment, sans affecter la licéité du traitement antérieur</li>
+                    <li><strong>Droit de définir des directives post-mortem :</strong> Concernant le sort de vos données après votre décès</li>
+                </ul>
+                <p>
+                    <strong>Pour exercer vos droits :</strong> Contactez-nous à <a href="mailto:${data.contactEmail}">${data.contactEmail}</a><br>
+                    Nous vous répondrons dans un délai maximum d'1 mois.
+                </p>
+                <p>
+                    <strong>Réclamation :</strong> Vous pouvez introduire une réclamation auprès de la CNIL 
+                    (<a href="https://www.cnil.fr" target="_blank">www.cnil.fr</a>) si vous estimez que vos droits ne sont pas respectés.
+                </p>
+
+                <h3>8. COOKIES</h3>
+                <p>Notre site utilise des cookies pour améliorer votre expérience de navigation.</p>
+            `;
+
+            // Types de cookies
+            content += `<p><strong>Types de cookies utilisés :</strong></p><ul>`;
+            
+            if (data.hasFunctional) {
+                content += `
+                <li><strong>Cookies essentiels :</strong> Nécessaires au fonctionnement du site (panier, connexion). 
+                Ces cookies ne nécessitent pas votre consentement.</li>
+                `;
+            }
+            
+            if (data.hasAnalytics) {
+                content += `
+                <li><strong>Cookies analytiques (Google Analytics) :</strong> Nous permettent de comprendre comment les visiteurs utilisent notre site. 
+                Ces cookies nécessitent votre consentement préalable.</li>
+                `;
+            }
+            
+            if (data.hasAds) {
+                content += `
+                <li><strong>Cookies publicitaires :</strong> Utilisés pour afficher des publicités pertinentes. 
+                Ces cookies nécessitent votre consentement préalable.</li>
+                `;
+            }
+            
+            if (data.hasSocial) {
+                content += `
+                <li><strong>Cookies de réseaux sociaux :</strong> Permettent le partage de contenu sur les réseaux sociaux. 
+                Ces cookies nécessitent votre consentement préalable.</li>
+                `;
+            }
+
+            content += `
+                </ul>
+                <p><strong>Gestion des cookies :</strong></p>
+                <ul>
+                    <li>Vous pouvez accepter ou refuser les cookies via notre bandeau de consentement</li>
+                    <li>Vous pouvez modifier vos préférences à tout moment</li>
+                    <li>Vous pouvez configurer votre navigateur pour refuser les cookies</li>
+                </ul>
+                <p>
+                    <strong>Note :</strong> Le refus des cookies peut limiter certaines fonctionnalités du site.
+                </p>
+            `;
+
+            if (data.hasAnalytics || data.hasAds || data.hasSocial) {
+                content += `
+                <p>
+                    <strong>Durée de validité du consentement :</strong> conformément aux recommandations de la CNIL, votre consentement aux cookies non essentiels (analytiques, publicitaires, réseaux sociaux) est valable pour une durée maximale de 13 mois. Au terme de ce délai, votre consentement vous sera à nouveau demandé. Cette durée est indépendante de celle indiquée à l'article 6 pour vos données de contact.
+                </p>
+                `;
+            }
+
+            content += `
+                <h3>9. SÉCURITÉ DES DONNÉES</h3>
+                <p>
+                    Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données contre 
+                    la perte, l'utilisation abusive, l'accès non autorisé, la divulgation, l'altération ou la destruction :
+                </p>
+                <ul>
+                    <li>Chiffrement SSL/TLS pour les transmissions de données</li>
+                    <li>Mots de passe chiffrés (hachage sécurisé)</li>
+                    <li>Accès limité aux données aux seules personnes habilitées</li>
+                    <li>Sauvegardes régulières</li>
+                    <li>Mise à jour régulière des systèmes de sécurité</li>
+                </ul>
+
+                <h3>10. MINEURS</h3>
+                <p>
+                    Notre site n'est pas destiné aux personnes de moins de 16 ans. Nous ne collectons pas sciemment de données 
+                    personnelles auprès de mineurs. Si vous êtes parent et pensez que votre enfant nous a fourni des données, 
+                    contactez-nous pour que nous puissions les supprimer.
+                </p>
+
+                <h3>11. MODIFICATIONS</h3>
+                <p>
+                    Nous pouvons modifier cette politique de confidentialité à tout moment. La version mise à jour sera publiée 
+                    sur cette page avec une nouvelle date de "dernière mise à jour". Nous vous encourageons à consulter 
+                    régulièrement cette page.
+                </p>
+
+                <h3>12. CONTACT</h3>
+                <p>
+                    Pour toute question concernant cette politique de confidentialité ou vos données personnelles :<br><br>
+                    <strong>Email :</strong> <a href="mailto:${data.contactEmail}">${data.contactEmail}</a><br>
+                    <strong>Site web :</strong> <a href="${data.siteUrl}">${data.siteUrl}</a>
+                </p>
+
+                <p style="text-align: center; margin-top: 40px; font-style: italic; color: #718096;">
+                    Cette politique de confidentialité est conforme au RGPD (Règlement UE 2016/679)
+                </p>
+            `;
+
+            return content;
+        }
+
+        function getRetentionText(retention) {
+            const texts = {
+                '1': '1 an après votre dernier contact avec nous',
+                '2': '2 ans après votre dernier contact avec nous',
+                '3': '3 ans après votre dernier contact avec nous',
+                '5': '5 ans après votre dernier contact avec nous',
+                'legal': 'la durée légale applicable selon la nature des données'
+            };
+            return texts[retention] || texts['3'];
+        }
+
+        function copyHTML() {
+            const html = document.getElementById('policyContent').innerHTML;
+            navigator.clipboard.writeText(html).then(() => {
+                alert('✅ Code HTML copié dans le presse-papier !');
+            }).catch(() => {
+                alert('La copie a échoué — vérifiez les autorisations du presse-papier.');
+            });
+        }
+
+        function copyText() {
+            const text = document.getElementById('policyContent').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Texte copié dans le presse-papier !');
+            }).catch(() => {
+                alert('La copie a échoué — vérifiez les autorisations du presse-papier.');
+            });
+        }
+
+        function downloadHTML() {
+            const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Politique de Confidentialité</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: #34495e;
+            margin-top: 30px;
+        }
+        a {
+            color: #3498db;
+        }
+        ul {
+            margin-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+${document.getElementById('policyContent').innerHTML}
+</body>
+</html>`;
+
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'confidentialite-flashtools.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
