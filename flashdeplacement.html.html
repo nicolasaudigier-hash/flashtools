@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>FlashDéplacement — Coût réel & facturation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cyan:#06B6D4; --cyan-dim:#0891B2;
+    --violet:#8B5CF6; --violet-dim:#7C3AED;
+    --bg:#0A0E1A; --bg2:#0F1525; --surface:#151D30; --surface2:#1C2640;
+    --text:#E2E8F0; --text2:#94A3B8; --text3:#64748B;
+    --border:rgba(6,182,212,0.15); --border-v:rgba(139,92,246,0.18);
+    --success:#10B981; --warning:#F59E0B; --danger:#EF4444;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'DM Sans',sans-serif;
+    background:var(--bg); color:var(--text);
+    min-height:100vh; overflow-x:hidden; line-height:1.5;
+  }
+  body::before{
+    content:''; position:fixed; top:-200px; left:-200px; width:600px; height:600px;
+    background:radial-gradient(circle, rgba(6,182,212,0.07) 0%, transparent 70%);
+    pointer-events:none; z-index:0;
+  }
+  body::after{
+    content:''; position:fixed; bottom:-200px; right:-200px; width:500px; height:500px;
+    background:radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%);
+    pointer-events:none; z-index:0;
+  }
+  a{color:var(--cyan);}
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible{
+    outline:2px solid var(--cyan); outline-offset:2px; border-radius:4px;
+  }
+
+  header{
+    position:sticky; top:0; z-index:100;
+    background:rgba(10,14,26,0.92); backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--border);
+    padding:0 20px; height:56px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .logo-text{font-family:'Syne',sans-serif; font-weight:800; font-size:1.05rem; letter-spacing:-0.3px;}
+  .logo-flash{color:var(--cyan);}
+  .header-sub{font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--text3); display:none;}
+  @media(min-width:520px){.header-sub{display:block;}}
+
+  main{position:relative; z-index:1; max-width:760px; margin:0 auto; padding:28px 18px 60px;}
+
+  .hero{margin-bottom:24px;}
+  .hero-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(6,182,212,0.1); border:1px solid var(--border);
+    color:var(--cyan); font-family:'JetBrains Mono',monospace; font-size:0.68rem;
+    padding:4px 10px; border-radius:20px; margin-bottom:14px;
+  }
+  .hero-badge .dot{width:5px; height:5px; border-radius:50%; background:var(--cyan);}
+  h1{font-family:'Syne',sans-serif; font-weight:800; font-size:1.55rem; letter-spacing:-0.5px; margin-bottom:8px;}
+  .hero p{color:var(--text2); font-size:0.94rem; max-width:580px;}
+
+  /* EXPLICATIONS INITIALES */
+  .explain-block{
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:18px 20px; margin-bottom:12px;
+  }
+  .explain-block .ex-num{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:22px; height:22px; border-radius:50%; background:rgba(6,182,212,0.15);
+    color:var(--cyan); font-family:'JetBrains Mono',monospace; font-weight:600; font-size:0.72rem;
+    margin-right:8px; flex-shrink:0;
+  }
+  .explain-block h3{
+    font-family:'Syne',sans-serif; font-size:0.95rem; font-weight:700;
+    display:flex; align-items:center; margin-bottom:8px;
+  }
+  .explain-block p{font-size:0.86rem; color:var(--text2); line-height:1.6;}
+  .explain-block p + p{margin-top:8px;}
+  .explain-block strong{color:var(--text);}
+  .checklist{margin-top:10px; padding-left:0; list-style:none;}
+  .checklist li{
+    font-size:0.84rem; color:var(--text2); padding:6px 0 6px 22px; position:relative; line-height:1.5;
+  }
+  .checklist li::before{
+    content:'—'; position:absolute; left:0; color:var(--violet); font-weight:700;
+  }
+
+  .step-tag{
+    display:flex; align-items:center; gap:8px; margin-bottom:12px;
+    font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--cyan);
+  }
+  .step-tag .num{
+    width:20px; height:20px; border-radius:50%; background:rgba(6,182,212,0.15);
+    display:flex; align-items:center; justify-content:center; font-weight:600; flex-shrink:0;
+  }
+
+  .card{
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:22px; margin-bottom:18px;
+  }
+  .card h2{font-family:'Syne',sans-serif; font-size:1.05rem; font-weight:700; margin-bottom:4px;}
+  .card .card-sub{font-size:0.82rem; color:var(--text3); margin-bottom:18px;}
+
+  .subsection{border-top:1px solid var(--border); padding-top:16px; margin-top:16px;}
+  .subsection:first-of-type{border-top:none; padding-top:0; margin-top:0;}
+  .subsection-title{display:flex; align-items:center; gap:8px; font-weight:600; font-size:0.88rem; margin-bottom:12px;}
+  .subsection-amount{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:0.85rem; color:var(--cyan);}
+
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:0.8rem; color:var(--text2); margin-bottom:7px; font-weight:500;}
+  .pill-group{display:flex; gap:8px; flex-wrap:wrap;}
+  .pill{
+    flex:1; min-width:88px; background:var(--surface2); border:1px solid var(--border);
+    color:var(--text2); padding:11px 8px; border-radius:10px; cursor:pointer; text-align:center;
+    font-size:0.81rem; font-weight:500; transition:.15s; min-height:44px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .pill.active{background:rgba(6,182,212,0.12); border-color:var(--cyan); color:var(--text);}
+  .pill.small{flex:0 1 auto; min-width:0; padding:9px 16px;}
+  input[type=number], select{
+    width:100%; background:var(--surface2); border:1px solid var(--border);
+    color:var(--text); padding:12px 14px; border-radius:10px; font-size:1rem;
+    font-family:'DM Sans',sans-serif; min-height:46px;
+  }
+  input[type=number]:focus, select:focus{border-color:var(--cyan);}
+  .field-hint{font-size:0.72rem; color:var(--text3); margin-top:6px;}
+  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  @media(max-width:420px){.field-row{grid-template-columns:1fr;}}
+  .checkbox-row{
+    display:flex; align-items:center; gap:10px; padding:12px 14px;
+    background:var(--surface2); border:1px solid var(--border); border-radius:10px; cursor:pointer;
+  }
+  .checkbox-row input{width:18px; height:18px; accent-color:var(--cyan); flex-shrink:0;}
+  .checkbox-row span{font-size:0.85rem; color:var(--text2);}
+
+  .method-toggle{display:flex; gap:8px; margin-bottom:14px;}
+
+  .total-bar{
+    display:flex; align-items:baseline; justify-content:space-between;
+    background:var(--surface2); border:1px solid var(--border-v);
+    border-radius:12px; padding:16px 18px; margin-top:8px;
+  }
+  .total-bar .label{font-size:0.82rem; color:var(--text2);}
+  .total-bar .amount{
+    font-family:'Syne',sans-serif; font-weight:800; font-size:1.5rem;
+    background:linear-gradient(135deg, var(--cyan), var(--violet));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  }
+
+  .regime-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;}
+  @media(max-width:420px){.regime-grid{grid-template-columns:1fr;}}
+  .regime-pill{
+    background:var(--surface2); border:1px solid var(--border); border-radius:10px;
+    padding:11px 12px; cursor:pointer; text-align:left;
+  }
+  .regime-pill.active{border-color:var(--cyan); background:rgba(6,182,212,0.1);}
+  .regime-pill .rp-name{font-size:0.82rem; font-weight:600; color:var(--text);}
+  .regime-pill .rp-rate{font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--cyan); margin-top:2px;}
+
+  .btn-calc{
+    width:100%; padding:15px; border:none; border-radius:12px; cursor:pointer;
+    background:linear-gradient(135deg, var(--cyan), var(--violet)); color:#fff;
+    font-family:'Syne',sans-serif; font-weight:700; font-size:0.95rem; letter-spacing:.2px;
+    min-height:48px; margin-top:6px;
+  }
+  .btn-calc:active{transform:scale(0.99);}
+
+  .result{display:none; margin-top:18px;}
+  .result.show{display:block; animation:fadeIn .35s ease;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  .compare-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;}
+  @media(max-width:480px){.compare-grid{grid-template-columns:1fr;}}
+  .compare-card{border-radius:12px; padding:16px; border:1px solid var(--border);}
+  .compare-card.bad{background:rgba(239,68,68,0.06); border-color:rgba(239,68,68,0.25);}
+  .compare-card.good{background:rgba(16,185,129,0.06); border-color:rgba(16,185,129,0.3);}
+  .compare-label{font-size:0.74rem; color:var(--text3); margin-bottom:4px; text-transform:uppercase; letter-spacing:.04em;}
+  .compare-amount{font-family:'Syne',sans-serif; font-weight:800; font-size:1.4rem;}
+  .compare-card.bad .compare-amount{color:var(--danger);}
+  .compare-card.good .compare-amount{color:var(--success);}
+  .compare-detail{font-size:0.78rem; color:var(--text2); margin-top:6px; line-height:1.5;}
+
+  .result-actions{display:flex; gap:8px; flex-wrap:wrap;}
+  .btn-secondary{
+    flex:1; min-width:140px; padding:11px 14px; border-radius:10px; cursor:pointer;
+    background:transparent; border:1px solid var(--border); color:var(--text2);
+    font-size:0.82rem; font-weight:500; min-height:44px;
+  }
+  .btn-secondary:hover{border-color:var(--cyan); color:var(--text);}
+
+  /* PROJECTION ANNUELLE */
+  .proj-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:16px;}
+  @media(max-width:520px){.proj-grid{grid-template-columns:1fr;}}
+  .proj-card{border-radius:12px; padding:14px 14px 16px; border:1px solid var(--border); background:var(--surface2);}
+  .proj-card.bad{border-color:rgba(239,68,68,0.25);}
+  .proj-card.good{border-color:rgba(16,185,129,0.3);}
+  .proj-tag{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:0.66rem;
+    padding:2px 8px; border-radius:10px; margin-bottom:10px;
+  }
+  .proj-card.bad .proj-tag{background:rgba(239,68,68,0.12); color:var(--danger);}
+  .proj-card.good .proj-tag{background:rgba(16,185,129,0.12); color:var(--success);}
+  .proj-title{font-size:0.82rem; font-weight:600; color:var(--text); margin-bottom:10px; min-height:34px;}
+  .proj-row{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px;}
+  .proj-row .pl{font-size:0.72rem; color:var(--text3);}
+  .proj-row .pv{font-family:'JetBrains Mono',monospace; font-size:0.84rem; color:var(--text);}
+  .proj-card.bad .proj-row:last-child .pv{color:var(--danger);}
+  .proj-card.good .proj-row:last-child .pv{color:var(--success);}
+
+  details{
+    background:var(--surface); border:1px solid var(--border-v); border-radius:var(--radius);
+    margin-bottom:12px; overflow:hidden;
+  }
+  summary{
+    padding:16px 18px; cursor:pointer; font-family:'Syne',sans-serif; font-weight:700;
+    font-size:0.92rem; display:flex; align-items:center; gap:10px; list-style:none; color:var(--text);
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary .chev{margin-left:auto; color:var(--violet); transition:transform .2s; font-size:0.8rem;}
+  details[open] summary .chev{transform:rotate(180deg);}
+  .details-body{padding:0 18px 18px; font-size:0.86rem; color:var(--text2); line-height:1.65;}
+  .details-body h3{font-size:0.84rem; color:var(--text); margin:14px 0 6px; font-family:'DM Sans',sans-serif; font-weight:600;}
+  .details-body h3:first-child{margin-top:0;}
+  .details-body ul{padding-left:18px; margin:6px 0;}
+  .details-body li{margin-bottom:4px;}
+
+  .invoice-template{
+    font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--text2);
+    background:var(--surface2); border:1px solid var(--border); border-radius:10px;
+    padding:14px; margin:10px 0; white-space:pre-wrap; line-height:1.7;
+  }
+  .invoice-template .hl{color:var(--cyan); font-weight:600;}
+
+  .source-links{display:flex; flex-direction:column; gap:6px; margin-top:12px;}
+  .source-link{
+    display:flex; align-items:center; gap:8px; font-size:0.8rem; padding:8px 10px;
+    background:var(--surface2); border-radius:8px; text-decoration:none; color:var(--cyan);
+    border:1px solid var(--border);
+  }
+  .source-link:hover{border-color:var(--cyan);}
+  .source-link .ext{margin-left:auto; color:var(--text3); font-size:0.7rem;}
+
+  .crosslink{
+    background:var(--surface); border:1px solid var(--border-v); border-radius:var(--radius);
+    padding:18px 20px; margin-bottom:18px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  }
+  .crosslink p{font-size:0.85rem; color:var(--text2); flex:1; min-width:200px;}
+  .crosslink a.btn-secondary{text-decoration:none; display:inline-flex; align-items:center; justify-content:center;}
+
+  footer{max-width:760px; margin:0 auto; padding:0 18px 40px; text-align:center;}
+  .disclaimer{font-size:0.74rem; color:var(--text3); line-height:1.6; padding-top:18px; border-top:1px solid var(--border);}
+  .disclaimer a{color:var(--text2);}
+
+  @media(max-width:480px){
+    h1{font-size:1.3rem;}
+    .card{padding:18px;}
+    .compare-amount{font-size:1.2rem;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-text"><span class="logo-flash">Flash</span>Déplacement</div>
+  <div class="header-sub">COÛT RÉEL · FACTURATION 2026</div>
+</header>
+
+<main>
+
+  <div class="hero">
+    <div class="hero-badge"><span class="dot"></span> Barème officiel + taux URSSAF 2026</div>
+    <h1>Coût réel de ton déplacement</h1>
+    <p>La plupart des micro-entrepreneurs refacturent leurs frais de déplacement, d'hébergement et de matériaux à prix coûtant — sans réaliser qu'ils perdent de l'argent une fois les cotisations payées, ni qu'une partie peut sortir entièrement du chiffre d'affaires. Cette page explique comment, puis calcule les montants pour ton cas.</p>
+  </div>
+
+  <div class="explain-block">
+    <h3><span class="ex-num">1</span> Barème officiel ou frais réels : deux façons de chiffrer un trajet en véhicule</h3>
+    <p>Pour une voiture, une moto ou un cyclomoteur, tu as le choix. Le <strong>barème officiel</strong> est un forfait au kilomètre qui couvre l'usure du véhicule, l'entretien, les pneumatiques, le carburant et l'assurance — il est presque toujours plus avantageux que le seul coût du carburant. Les <strong>frais réels</strong> (essence et péages réellement payés) donnent un montant plus conservateur, parfois préférable si tu veux rester strictement sur des dépenses justifiables au centime. Pour le train, l'avion et le bateau, il n'existe aucun barème : on facture toujours le prix réel du billet.</p>
+  </div>
+
+  <div class="explain-block">
+    <h3><span class="ex-num">2</span> Pourquoi le mode de facturation change tout pour tes cotisations</h3>
+    <p>En micro-entreprise, toute somme encaissée d'un client — y compris une ligne "frais de déplacement" sur ta facture — entre dans ton chiffre d'affaires. Si tu factures exactement ton coût réel, les cotisations sociales (12,3 % à 25,6 % selon ton régime) s'appliquent dessus comme sur le reste : tu es mécaniquement en perte. La solution la plus simple est d'augmenter le montant facturé pour compenser.</p>
+    <p style="font-size:0.78rem;color:var(--text3)">Ces frais refacturés s'ajoutent aussi à ton chiffre d'affaires total pour le <strong style="color:var(--text2)">seuil de franchise TVA</strong> (37 500 € en prestations de services, 85 000 € en vente — seuils majorés 41 250 € et 93 500 €). Pris isolément ils y suffisent rarement, mais ils comptent dans le total avec le reste de ton activité.</p>
+    <p style="font-size:0.78rem;color:var(--text3)">Si tu deviens assujetti : la TVA sur l'hébergement et les billets (train, avion, bateau) n'est presque jamais récupérable, même assujetti — indique le montant TTC, ton coût réel. Sur les matériaux et le matériel, en revanche, la TVA se récupère normalement — indique alors le montant HT. En franchise (le cas par défaut), tu indiques toujours le TTC partout, sans te poser la question.</p>
+  </div>
+
+  <div class="explain-block">
+    <h3><span class="ex-num">3</span> Le débours : sortir une dépense de ton chiffre d'affaires</h3>
+    <p>Il existe un second mécanisme, plus puissant mais plus exigeant : le <strong>débours</strong>. Si certaines conditions sont réunies, la dépense ne passe jamais par ton chiffre d'affaires — tu économises les cotisations dessus <strong>et</strong> elle ne consomme pas ton plafond annuel.</p>
+    <ul class="checklist">
+      <li>Ton client doit accepter ce montage (il devient le destinataire juridique de la dépense — argument à lui présenter : s'il récupère la TVA, c'est lui qui en profite, pas toi)</li>
+      <li>Le fournisseur ou l'hébergeur doit accepter d'établir la facture à son nom — possible quasi systématiquement pour des matériaux, rare et incertain pour un hôtel ou un billet de train/avion</li>
+      <li>Cette facture nominative doit lui être transmise</li>
+      <li>Le remboursement se fait au centime exact, sans aucune marge</li>
+    </ul>
+    <p>Les indemnités kilométriques ne peuvent jamais être traitées en débours. Pour le train, l'avion, le bateau et l'hôtel, la solution la plus simple reste souvent de faire payer le client directement plutôt que d'essayer de transformer ton achat après coup.</p>
+  </div>
+
+  <div class="step-tag" id="step1"><span class="num">1</span> COÛT RÉEL DU DÉPLACEMENT</div>
+
+  <div class="card">
+    <h2>Détail des frais engagés</h2>
+    <div class="card-sub">Renseigne ce qui s'applique à ta mission — laisse à 0 ce qui ne concerne pas ton déplacement.</div>
+
+    <!-- TRAJET -->
+    <div class="subsection">
+      <div class="subsection-title">Trajet <span class="subsection-amount" id="amount-trajet">0,00 €</span></div>
+
+      <div class="field">
+        <label>Mode de transport</label>
+        <div class="pill-group" id="vehicule-group">
+          <div class="pill active" data-val="voiture" onclick="setVehicule('voiture')">Voiture</div>
+          <div class="pill" data-val="moto" onclick="setVehicule('moto')">Moto</div>
+          <div class="pill" data-val="cyclo" onclick="setVehicule('cyclo')">Cyclo</div>
+          <div class="pill" data-val="train" onclick="setVehicule('train')">Train</div>
+          <div class="pill" data-val="avion" onclick="setVehicule('avion')">Avion</div>
+          <div class="pill" data-val="bateau" onclick="setVehicule('bateau')">Bateau</div>
+        </div>
+      </div>
+
+      <!-- bloc vehicule personnel -->
+      <div id="vehicule-perso-fields">
+        <div class="field">
+          <label>Méthode de calcul</label>
+          <div class="method-toggle" id="methode-group">
+            <div class="pill active" data-val="bareme" onclick="setMethode('bareme')">Barème officiel</div>
+            <div class="pill" data-val="reel" onclick="setMethode('reel')">Frais réels</div>
+          </div>
+        </div>
+
+        <div id="bareme-fields">
+          <div class="field-row">
+            <div class="field" id="cv-field">
+              <label for="cv-input">Puissance fiscale (CV)</label>
+              <input type="number" id="cv-input" min="1" max="20" value="5" inputmode="numeric" onchange="updateAll()">
+            </div>
+            <div class="field">
+              <label for="km-input">Distance (km)</label>
+              <input type="number" id="km-input" min="0" step="1" placeholder="Ex : 120" inputmode="numeric" onchange="updateAll()">
+            </div>
+          </div>
+          <div class="field" id="electric-field">
+            <label class="checkbox-row">
+              <input type="checkbox" id="electric-check" onchange="updateAll()">
+              <span>Véhicule 100 % électrique (+20 % sur le barème)</span>
+            </label>
+          </div>
+          <div class="field-hint">Barème fiscal officiel (arrêté du 27 mars 2023, inchangé en 2026) — inclut déjà l'usure du véhicule.</div>
+        </div>
+
+        <div id="reel-fields" style="display:none;">
+          <div class="field">
+            <label for="reel-input">Carburant + péages réellement payés (€)</label>
+            <input type="number" id="reel-input" min="0" step="0.01" placeholder="Ex : 45" inputmode="decimal" onchange="updateAll()">
+          </div>
+          <div class="field-hint">Montant réel constaté sur tickets — ne couvre pas l'usure du véhicule, contrairement au barème.</div>
+        </div>
+      </div>
+
+      <!-- bloc billet -->
+      <div id="billet-field" style="display:none;">
+        <div class="field">
+          <label for="billet-input">Montant du billet (€)</label>
+          <input type="number" id="billet-input" min="0" step="0.01" placeholder="Ex : 89" inputmode="decimal" onchange="updateAll()">
+        </div>
+        <div class="field-hint">Aucun barème ne s'applique — toujours le prix réel du billet TTC, sur justificatif. La TVA sur le transport de personnes n'est quasiment jamais récupérable, même assujetti.</div>
+      </div>
+    </div>
+
+    <!-- HEBERGEMENT -->
+    <div class="subsection">
+      <div class="subsection-title">Hébergement <span class="subsection-amount" id="amount-hebergement">0,00 €</span></div>
+      <div class="field-row">
+        <div class="field">
+          <label for="nuits-input">Nombre de nuits</label>
+          <input type="number" id="nuits-input" min="0" step="1" placeholder="Ex : 2" inputmode="numeric" onchange="updateAll()">
+        </div>
+        <div class="field">
+          <label for="prixnuit-input">Prix par nuit (€)</label>
+          <input type="number" id="prixnuit-input" min="0" step="0.01" placeholder="Ex : 85" inputmode="decimal" onchange="updateAll()">
+        </div>
+      </div>
+      <div class="field-hint">Montant réel constaté sur facture, TTC — il n'existe pas de barème officiel pour l'hébergement d'un indépendant. La TVA dessus n'est presque jamais récupérable, même assujetti.</div>
+    </div>
+
+    <!-- REPAS -->
+    <div class="subsection">
+      <div class="subsection-title">Repas <span class="subsection-amount" id="amount-repas">0,00 €</span></div>
+      <div class="field-row">
+        <div class="field">
+          <label for="repas-input">Nombre de repas</label>
+          <input type="number" id="repas-input" min="0" step="1" placeholder="Ex : 3" inputmode="numeric" onchange="updateAll()">
+        </div>
+        <div class="field">
+          <label for="prixrepas-input">Prix par repas (€)</label>
+          <input type="number" id="prixrepas-input" min="0" step="0.01" placeholder="Ex : 18" inputmode="decimal" onchange="updateAll()">
+        </div>
+      </div>
+      <div class="field-hint">Montant réel constaté sur addition/ticket.</div>
+    </div>
+
+    <!-- MATERIAUX -->
+    <div class="subsection">
+      <div class="subsection-title">Matériaux <span class="subsection-amount" id="amount-materiaux">0,00 €</span></div>
+      <div class="field">
+        <label for="materiaux-input">Montant des matériaux achetés pour la mission (€)</label>
+        <input type="number" id="materiaux-input" min="0" step="0.01" placeholder="Ex : 240" inputmode="decimal" onchange="updateAll()">
+      </div>
+      <div class="field-hint">C'est la catégorie où le débours est le plus facile à obtenir : il suffit souvent de demander une facture au nom du client à l'achat. Si tu es assujetti à la TVA et la récupères sur ce type d'achat, indique le montant HT — sinon, le TTC.</div>
+    </div>
+
+    <div class="total-bar">
+      <div class="label">Coût réel total</div>
+      <div class="amount" id="total-cout-reel">0,00 €</div>
+    </div>
+  </div>
+
+  <div class="step-tag"><span class="num">2</span> MONTANT À FACTURER</div>
+
+  <div class="card">
+    <h2>Pour ne pas perdre d'argent</h2>
+    <div class="card-sub">Si tu factures exactement ton coût réel, les cotisations sociales s'appliquent dessus comme sur le reste de ton chiffre d'affaires — tu es mécaniquement en perte.</div>
+
+    <div class="field">
+      <label>Ton régime de cotisation</label>
+      <div class="regime-grid" id="regime-group">
+        <div class="regime-pill active" data-rate="0.123" data-seuil="203100" onclick="setRegime(this)">
+          <div class="rp-name">Vente (BIC)</div>
+          <div class="rp-rate">12,3 %</div>
+        </div>
+        <div class="regime-pill" data-rate="0.212" data-seuil="83600" onclick="setRegime(this)">
+          <div class="rp-name">Services BIC</div>
+          <div class="rp-rate">21,2 %</div>
+        </div>
+        <div class="regime-pill" data-rate="0.256" data-seuil="83600" onclick="setRegime(this)">
+          <div class="rp-name">BNC (hors Cipav)</div>
+          <div class="rp-rate">25,6 %</div>
+        </div>
+        <div class="regime-pill" data-rate="0.232" data-seuil="83600" onclick="setRegime(this)">
+          <div class="rp-name">BNC Cipav</div>
+          <div class="rp-rate">23,2 %</div>
+        </div>
+      </div>
+      <div class="field-hint">Cotisations sociales seules, hors versement libératoire — voir pourquoi ci-dessous. Pour un tarif de base incluant le VFL, utilise FlashTarif.</div>
+      <button type="button" class="btn-secondary" style="width:100%;margin-top:8px" onclick="toggleCategorieHelper()">Pas sûr de ta catégorie ? Réponds à 2 questions</button>
+      <div id="categorie-helper" style="display:none;margin-top:12px;padding:14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px">
+        <div class="field">
+          <label>Que vends-tu principalement ?</label>
+          <div class="pill-group" id="ch-q1-group">
+            <div class="pill" data-val="produit" onclick="setChQ1('produit')">Des produits</div>
+            <div class="pill" data-val="manuel" onclick="setChQ1('manuel')">Une prestation manuelle ou commerciale</div>
+            <div class="pill" data-val="conseil" onclick="setChQ1('conseil')">Du conseil, une expertise</div>
+          </div>
+          <div class="field-hint">Ex. produit = artisanat vendu, e-commerce · manuel = travaux, réparation, coiffure · conseil = consulting, digital, création</div>
+        </div>
+        <div class="field" id="ch-q2-field" style="display:none;">
+          <label>Ta profession est-elle réglementée et rattachée à la Cipav ?</label>
+          <div class="pill-group" id="ch-q2-group">
+            <div class="pill" data-val="oui" onclick="setChQ2('oui')">Oui</div>
+            <div class="pill" data-val="non" onclick="setChQ2('non')">Non / je ne sais pas</div>
+          </div>
+          <div class="field-hint">Concerne surtout l'architecture et certaines professions réglementées. La plupart des activités de conseil ou du digital n'en relèvent pas.</div>
+        </div>
+        <div id="ch-result" style="font-size:0.84rem;color:var(--text2);margin-top:10px;line-height:1.6;"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="checkbox-row">
+        <input type="checkbox" id="acre-check" onchange="toggleAcre()">
+        <span>Je bénéficie de l'ACRE (taux réduit, 4 premiers trimestres)</span>
+      </label>
+    </div>
+    <div class="field" id="acre-detail" style="display:none;">
+      <label>Taux d'exonération ACRE</label>
+      <select id="acre-select" onchange="updateAll()">
+        <option value="0.5">50 % — micro-entreprise créée avant le 1er juillet 2026</option>
+        <option value="0.25">25 % — micro-entreprise créée à partir du 1er juillet 2026</option>
+      </select>
+    </div>
+
+    <button class="btn-calc" onclick="calculer()">Calculer le montant à facturer</button>
+
+    <div class="result" id="result">
+      <div class="compare-grid">
+        <div class="compare-card bad">
+          <div class="compare-label">Si tu factures le coût réel</div>
+          <div class="compare-amount" id="result-perte">0,00 €</div>
+          <div class="compare-detail" id="result-perte-detail"></div>
+        </div>
+        <div class="compare-card good">
+          <div class="compare-label">Montant à facturer</div>
+          <div class="compare-amount" id="result-facturer">0,00 €</div>
+          <div class="compare-detail" id="result-facturer-detail"></div>
+        </div>
+      </div>
+      <div class="result-actions">
+        <button class="btn-secondary" onclick="copierResultat()">Copier le résultat</button>
+        <button class="btn-secondary" onclick="document.getElementById('comprendre').open=true; document.getElementById('comprendre').scrollIntoView({behavior:'smooth'});">Voir le détail des droits</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-tag"><span class="num">3</span> PROJECTION ANNUELLE</div>
+
+  <div class="card">
+    <h2>L'effet du débours sur une année</h2>
+    <div class="card-sub">Si tes déplacements sont réguliers sur plusieurs mois, voici ce que représente le choix entre facturation classique et débours bien formalisé.</div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="proj-mensuel">Frais mensuels concernés (€)</label>
+        <input type="number" id="proj-mensuel" min="0" step="1" placeholder="Ex : 900" inputmode="numeric" onchange="calculerProjection()">
+      </div>
+      <div class="field">
+        <label for="proj-mois">Nombre de mois de déplacement par an</label>
+        <input type="number" id="proj-mois" min="0" max="12" step="1" placeholder="Ex : 7" inputmode="numeric" onchange="calculerProjection()">
+      </div>
+    </div>
+
+    <div class="result show" id="proj-result" style="margin-top:4px;">
+      <div class="proj-grid">
+        <div class="proj-card bad">
+          <span class="proj-tag">Classique</span>
+          <div class="proj-title">Le montant entre dans ton chiffre d'affaires</div>
+          <div class="proj-row"><span class="pl">Cotisations payées</span><span class="pv" id="proj-bad-cot">0,00 €</span></div>
+          <div class="proj-row"><span class="pl">Plafond consommé</span><span class="pv" id="proj-bad-plafond">0,00 €</span></div>
+        </div>
+        <div class="proj-card good">
+          <span class="proj-tag">Débours</span>
+          <div class="proj-title">Le montant ne passe jamais par ton CA</div>
+          <div class="proj-row"><span class="pl">Cotisations payées</span><span class="pv">0,00 €</span></div>
+          <div class="proj-row"><span class="pl">Plafond consommé</span><span class="pv">0,00 €</span></div>
+        </div>
+      </div>
+      <div class="compare-detail" id="proj-summary" style="margin-top:14px;"></div>
+    </div>
+  </div>
+
+  <details id="comprendre">
+    <summary>Comprendre tes droits en détail <span class="chev">▾</span></summary>
+    <div class="details-body">
+      <h3>Pourquoi tu perds de l'argent en facturant à prix coûtant</h3>
+      <p>L'abattement forfaitaire (34 % à 71 % selon ton activité) est censé couvrir tes charges, mais en pratique il ne compense presque jamais le coût réel d'un déplacement spécifique. Le seul moyen fiable de ne pas en pâtir, si tu restes en facturation classique, est d'ajuster le montant facturé en conséquence — c'est le calcul de l'étape 2.</p>
+
+      <h3>Train, avion, bateau : pas de barème, et un débours difficile</h3>
+      <p>Contrairement à un véhicule personnel, il n'existe aucun forfait pour ces modes de transport : on facture toujours le prix réel du billet. Pour le débours, ces billets posent le même problème que l'hôtel — il est rare d'obtenir une facture au nom d'un tiers, le justificatif étant généralement lié au compte qui a payé. La solution la plus réaliste reste de convenir avec le client qu'il réserve et paie lui-même le billet.</p>
+
+      <h3>Matériaux : la forme de débours la plus accessible</h3>
+      <p>La plupart des fournisseurs et négoces acceptent d'établir la facture directement au nom de ton client si tu le demandes à l'achat — une simple précision à la commande, pas une démarche lourde. C'est la forme de débours la plus utilisée en pratique dans le bâtiment et l'artisanat.</p>
+
+      <h3>Les 4 conditions cumulatives du débours</h3>
+      <ul>
+        <li>Le client accepte le montage (mandat, même par simple échange écrit)</li>
+        <li>Le fournisseur accepte d'établir la facture au nom du client</li>
+        <li>Cette facture lui est transmise</li>
+        <li>Le remboursement se fait au centime exact, sans marge</li>
+      </ul>
+
+      <h3>L'écriture à faire figurer sur la facture</h3>
+      <p>Le débours doit apparaître sur une ligne séparée de ta prestation, avec le mot "Débours" explicitement mentionné, une référence au justificatif joint, et sans application de ta propre TVA sur cette ligne :</p>
+      <div class="invoice-template">FACTURE N° 2026-014
+
+Ligne 1 — Prestation
+<span class="hl">Travaux effectués (description)................450,00 €</span>
+TVA si applicable
+
+Ligne 2 — Débours
+<span class="hl">DÉBOURS — pour le compte de [Nom du client],
+voir facture [Fournisseur] n° XXX du XX/XX
+jointe en annexe...............................95,00 €</span>
+(montant identique à la facture jointe,
+non soumis à TVA, hors chiffre d'affaires)
+
+TOTAL À PAYER........................545,00 €</div>
+      <p>Conserve la facture fournisseur originale (celle au nom du client), la preuve de sa transmission, et une trace de l'accord préalable — même un simple échange d'e-mail suffit en cas de contrôle.</p>
+
+      <h3>Les bons réflexes</h3>
+      <ul>
+        <li>Intègre systématiquement tes frais prévisibles dans ton tarif global plutôt que de les isoler, sauf si le débours est réellement applicable.</li>
+        <li>Si tes déplacements sont fréquents et coûteux, compare régulièrement ton abattement forfaitaire à tes charges réelles — au-delà d'un certain seuil, le régime réel peut devenir plus avantageux.</li>
+        <li>Conserve tous les justificatifs (carnet de bord, factures, additions) au moins 3 ans.</li>
+      </ul>
+
+      <h3>Sources officielles</h3>
+      <div class="source-links">
+        <a class="source-link" href="https://www.service-public.gouv.fr/particuliers/actualites/A14686" target="_blank" rel="noopener">Service-Public.fr — barème kilométrique 2026 <span class="ext">↗</span></a>
+        <a class="source-link" href="https://entreprendre.service-public.gouv.fr/vosdroits/F21746" target="_blank" rel="noopener">Service-Public.fr — seuils de franchise TVA 2026 <span class="ext">↗</span></a>
+        <a class="source-link" href="https://www.autoentrepreneur.urssaf.fr/portail/accueil/sinformer-sur-le-statut/lessentiel-du-statut.html" target="_blank" rel="noopener">Autoentrepreneur.urssaf.fr — taux de cotisations 2026 <span class="ext">↗</span></a>
+        <a class="source-link" href="https://www.autoentrepreneur.urssaf.fr/portail/accueil/une-question/toutes-les-fiches-pratiques/determiner-mon-chiffre-daffaires.html" target="_blank" rel="noopener">Autoentrepreneur.urssaf.fr — chiffre d'affaires et débours <span class="ext">↗</span></a>
+        <a class="source-link" href="https://www.economie.gouv.fr/entreprises/gerer-sa-micro-entreprise/micro-entreprises-quel-est-le-montant-de-vos-cotisations-sociales" target="_blank" rel="noopener">Economie.gouv.fr — cotisations sociales micro-entreprise <span class="ext">↗</span></a>
+      </div>
+    </div>
+  </details>
+
+  <div class="crosslink">
+    <p>Cette page calcule les frais liés à une mission. Pour fixer ton tarif de base (jour ou heure), utilise FlashTarif.</p>
+    <a class="btn-secondary" href="flashtarif.html">Ouvrir FlashTarif</a>
+  </div>
+
+</main>
+
+<footer>
+  <div class="disclaimer">
+    Barème kilométrique : arrêté du 27 mars 2023, inchangé en 2026 (<a href="https://www.service-public.gouv.fr/particuliers/actualites/A14686" target="_blank" rel="noopener">Service-Public.fr</a>). Taux de cotisations : <a href="https://www.autoentrepreneur.urssaf.fr/portail/accueil/sinformer-sur-le-statut/lessentiel-du-statut.html" target="_blank" rel="noopener">Autoentrepreneur.urssaf.fr</a>, hors CFP et versement libératoire — ce dernier explique l'écart avec les taux combinés affichés sur FlashTarif. Cet outil donne une estimation à but informatif — vérifie ton cas précis auprès de l'URSSAF.
+  </div>
+</footer>
+
+<script>
+  const BAREME_VOITURE = [
+    {cvMax:3, t1:0.529, t2c:0.316, t2f:1065, t3:0.370},
+    {cvMax:4, t1:0.606, t2c:0.340, t2f:1330, t3:0.407},
+    {cvMax:5, t1:0.636, t2c:0.357, t2f:1395, t3:0.427},
+    {cvMax:6, t1:0.665, t2c:0.374, t2f:1457, t3:0.447},
+    {cvMax:999, t1:0.697, t2c:0.394, t2f:1515, t3:0.470}
+  ];
+  const BAREME_MOTO = [
+    {cvMax:2, t1:0.395, t2c:0.099, t2f:891, t3:0.248},
+    {cvMax:5, t1:0.468, t2c:0.082, t2f:1158, t3:0.275},
+    {cvMax:999, t1:0.606, t2c:0.079, t2f:1583, t3:0.343}
+  ];
+  const BAREME_CYCLO = {t1:0.315, t2c:0.079, t2f:711, t3:0.198};
+
+  let vehicule = 'voiture';
+  let methode = 'bareme';
+  let regimeRate = 0.123;
+  let regimeSeuil = 203100;
+
+  const VEHICULES_PERSO = ['voiture', 'moto', 'cyclo'];
+  const BILLETS = ['train', 'avion', 'bateau'];
+
+  function setVehicule(v){
+    vehicule = v;
+    document.querySelectorAll('#vehicule-group .pill').forEach(p=>{
+      p.classList.toggle('active', p.dataset.val === v);
+    });
+
+    const isPerso = VEHICULES_PERSO.includes(v);
+    document.getElementById('vehicule-perso-fields').style.display = isPerso ? 'block' : 'none';
+    document.getElementById('billet-field').style.display = isPerso ? 'none' : 'block';
+
+    if (isPerso){
+      document.getElementById('cv-field').style.display = (v === 'cyclo') ? 'none' : 'block';
+      document.getElementById('electric-field').style.display = (v === 'voiture') ? 'block' : 'none';
+    }
+    updateAll();
+  }
+
+  function setMethode(m){
+    methode = m;
+    document.querySelectorAll('#methode-group .pill').forEach(p=>{
+      p.classList.toggle('active', p.dataset.val === m);
+    });
+    document.getElementById('bareme-fields').style.display = (m === 'bareme') ? 'block' : 'none';
+    document.getElementById('reel-fields').style.display = (m === 'reel') ? 'block' : 'none';
+    updateAll();
+  }
+
+  function setRegime(el){
+    document.querySelectorAll('#regime-group .regime-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    regimeRate = parseFloat(el.dataset.rate);
+    regimeSeuil = parseFloat(el.dataset.seuil);
+    calculerProjection();
+  }
+
+  function toggleAcre(){
+    document.getElementById('acre-detail').style.display = document.getElementById('acre-check').checked ? 'block' : 'none';
+    updateAll();
+  }
+
+  // ── Assistant de catégorie ──────────────────────────────────────────────
+  let chQ1 = null, chQ2 = null;
+  const CATEGORIE_MAP = {
+    produit: { rate: 0.123, label: 'Vente (BIC)' },
+    manuel:  { rate: 0.212, label: 'Services BIC' }
+  };
+
+  function toggleCategorieHelper(){
+    const el = document.getElementById('categorie-helper');
+    el.style.display = (el.style.display === 'none' || !el.style.display) ? 'block' : 'none';
+  }
+
+  function setChQ1(v){
+    chQ1 = v;
+    document.querySelectorAll('#ch-q1-group .pill').forEach(p => p.classList.toggle('active', p.dataset.val === v));
+    document.getElementById('ch-q2-field').style.display = (v === 'conseil') ? 'block' : 'none';
+    if (v !== 'conseil'){ chQ2 = null; }
+    evalCategorieHelper();
+  }
+
+  function setChQ2(v){
+    chQ2 = v;
+    document.querySelectorAll('#ch-q2-group .pill').forEach(p => p.classList.toggle('active', p.dataset.val === v));
+    evalCategorieHelper();
+  }
+
+  function evalCategorieHelper(){
+    const out = document.getElementById('ch-result');
+    let rate = null, label = '';
+    if (chQ1 === 'produit' || chQ1 === 'manuel'){
+      rate = CATEGORIE_MAP[chQ1].rate;
+      label = CATEGORIE_MAP[chQ1].label;
+    } else if (chQ1 === 'conseil' && chQ2 === 'oui'){
+      rate = 0.232; label = 'BNC Cipav';
+    } else if (chQ1 === 'conseil' && chQ2 === 'non'){
+      rate = 0.256; label = 'BNC (hors Cipav)';
+    }
+    if (rate === null){ out.innerHTML = ''; return; }
+    out.innerHTML = 'Catégorie probable : <strong style="color:var(--cyan)">' + label + '</strong>. À confirmer sur ton certificat d\'inscription ou sur <a href="https://www.autoentrepreneur.urssaf.fr" target="_blank" rel="noopener">autoentrepreneur.urssaf.fr</a> — ceci est une orientation, pas une qualification officielle.' +
+      '<button type="button" class="btn-secondary" style="width:100%;margin-top:8px" onclick="appliquerCategorieHelper(' + rate + ')">Utiliser cette catégorie</button>';
+  }
+
+  function appliquerCategorieHelper(rate){
+    const pill = document.querySelector('#regime-group .regime-pill[data-rate="' + rate + '"]');
+    if (pill) setRegime(pill);
+    document.getElementById('categorie-helper').style.display = 'none';
+  }
+
+  function tauxEffectif(){
+    let taux = regimeRate;
+    if (document.getElementById('acre-check').checked){
+      const exo = parseFloat(document.getElementById('acre-select').value);
+      taux = taux * (1 - exo);
+    }
+    return taux;
+  }
+
+  function calcTrajet(){
+    if (BILLETS.includes(vehicule)){
+      return parseFloat(document.getElementById('billet-input').value) || 0;
+    }
+
+    if (methode === 'reel'){
+      return parseFloat(document.getElementById('reel-input').value) || 0;
+    }
+
+    const km = parseFloat(document.getElementById('km-input').value) || 0;
+    if (km <= 0) return 0;
+    let row, seuil1, seuil2;
+    const electric = vehicule === 'voiture' && document.getElementById('electric-check').checked;
+
+    if (vehicule === 'voiture'){
+      const cv = parseInt(document.getElementById('cv-input').value) || 5;
+      row = BAREME_VOITURE.find(r => cv <= r.cvMax);
+      seuil1 = 5000; seuil2 = 20000;
+    } else if (vehicule === 'moto'){
+      const cv = parseInt(document.getElementById('cv-input').value) || 3;
+      row = BAREME_MOTO.find(r => cv <= r.cvMax);
+      seuil1 = 3000; seuil2 = 6000;
+    } else {
+      row = BAREME_CYCLO;
+      seuil1 = 3000; seuil2 = 6000;
+    }
+
+    let amount;
+    if (km <= seuil1) amount = km * row.t1;
+    else if (km <= seuil2) amount = km * row.t2c + row.t2f;
+    else amount = km * row.t3;
+
+    if (electric) amount *= 1.20;
+    return amount;
+  }
+
+  function calcHebergement(){
+    const nuits = parseFloat(document.getElementById('nuits-input').value) || 0;
+    const prix = parseFloat(document.getElementById('prixnuit-input').value) || 0;
+    return nuits * prix;
+  }
+
+  function calcRepas(){
+    const repas = parseFloat(document.getElementById('repas-input').value) || 0;
+    const prix = parseFloat(document.getElementById('prixrepas-input').value) || 0;
+    return repas * prix;
+  }
+
+  function calcMateriaux(){
+    return parseFloat(document.getElementById('materiaux-input').value) || 0;
+  }
+
+  function fmt(n){
+    return n.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €';
+  }
+
+  function updateAll(){
+    const trajet = calcTrajet();
+    const heberg = calcHebergement();
+    const repas = calcRepas();
+    const materiaux = calcMateriaux();
+    document.getElementById('amount-trajet').textContent = fmt(trajet);
+    document.getElementById('amount-hebergement').textContent = fmt(heberg);
+    document.getElementById('amount-repas').textContent = fmt(repas);
+    document.getElementById('amount-materiaux').textContent = fmt(materiaux);
+    document.getElementById('total-cout-reel').textContent = fmt(trajet + heberg + repas + materiaux);
+    document.getElementById('result').classList.remove('show');
+    return trajet + heberg + repas + materiaux;
+  }
+
+  function calculer(){
+    const coutReel = updateAll();
+    if (coutReel <= 0){
+      return;
+    }
+
+    const taux = tauxEffectif();
+    const netSiCoutant = coutReel * (1 - taux);
+    const perte = coutReel - netSiCoutant;
+    const montantAFacturer = coutReel / (1 - taux);
+    const supplement = montantAFacturer - coutReel;
+
+    document.getElementById('result-perte').textContent = fmt(coutReel);
+    document.getElementById('result-perte-detail').textContent =
+      'Après cotisations (' + (taux*100).toFixed(1).replace('.', ',') + ' %), il te reste ' + fmt(netSiCoutant) + ' — perte de ' + fmt(perte) + '.';
+
+    document.getElementById('result-facturer').textContent = fmt(montantAFacturer);
+    document.getElementById('result-facturer-detail').textContent =
+      '+ ' + fmt(supplement) + ' par rapport au coût réel, pour que les cotisations n\'entament pas ce que tu as avancé.';
+
+    document.getElementById('result').classList.add('show');
+    document.getElementById('result').scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+
+  function calculerProjection(){
+    const mensuel = parseFloat(document.getElementById('proj-mensuel').value) || 0;
+    const mois = parseFloat(document.getElementById('proj-mois').value) || 0;
+    const total = mensuel * mois;
+    const taux = tauxEffectif();
+
+    const cotClassique = total * taux;
+
+    document.getElementById('proj-bad-cot').textContent = fmt(cotClassique);
+    document.getElementById('proj-bad-plafond').textContent = fmt(total);
+
+    if (total > 0){
+      const pct = (total / regimeSeuil * 100).toFixed(1).replace('.', ',');
+      const tvaSeuil = (regimeRate === 0.123) ? 85000 : 37500;
+      document.getElementById('proj-summary').textContent =
+        'Sur ' + fmt(total).replace(' €','') + ' € de frais annuels concernés : la facturation classique consomme ' + pct + ' % de ton plafond et te coûte ' + fmt(cotClassique) + ' de cotisations ; le débours bien formalisé ne consomme rien de ton plafond et ne coûte aucune cotisation sur ce montant. Ces frais s\'ajoutent aussi à ton chiffre d\'affaires total pour le seuil de franchise TVA (' + tvaSeuil.toLocaleString('fr-FR') + ' €) — à surveiller avec le reste de ton activité, pas isolément.';
+    } else {
+      document.getElementById('proj-summary').textContent = '';
+    }
+  }
+
+  function copierResultat(){
+    const txt = 'Coût réel : ' + document.getElementById('total-cout-reel').textContent
+      + ' — Montant à facturer : ' + document.getElementById('result-facturer').textContent;
+    navigator.clipboard.writeText(txt).then(()=>{
+      const btn = event.target;
+      const old = btn.textContent;
+      btn.textContent = 'Copié';
+      setTimeout(()=>{ btn.textContent = old; }, 1500);
+    });
+  }
+
+  updateAll();
+  calculerProjection();
+</script>
+</body>
+</html>
