@@ -102,13 +102,13 @@
         .logo-upload{border:2px dashed var(--border);padding:18px;border-radius:10px;text-align:center;cursor:pointer;transition:all .2s;color:var(--text2);font-size:.88em;background:var(--bg2);}
         .logo-upload:hover{border-color:var(--cyan);color:var(--text);}
         .logo-controls-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:12px 0;}
-        .logo-preview-zone{grid-column:1/-1;text-align:center;padding:16px;background:var(--bg2);border-radius:8px;min-height:80px;display:none;border:1px solid var(--border);}
+        .logo-preview-zone{grid-column:1/-1;text-align:center;padding:16px;background:var(--bg2);border-radius:8px;min-height:80px;display:none;border:1px solid var(--border);overflow:hidden;}
         .logo-preview-zone img{max-width:180px;max-height:70px;object-fit:contain;}
 
         /* PREVIEW DOCUMENT */
         .preview-wrap{background:var(--bg2);padding:24px;border-radius:10px;margin:20px 0;border:1px solid var(--border);}
         .preview-page{background:white;padding:44px;border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.25);max-width:860px;margin:0 auto;position:relative;color:var(--gray-900);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
-        .preview-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:26px;padding-bottom:18px;border-bottom:1px solid var(--gray-200);position:relative;}
+        .preview-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:26px;padding-bottom:18px;border-bottom:1px solid var(--gray-200);position:relative;z-index:1;}
         .preview-left{display:flex;align-items:center;gap:14px;}
         .preview-logo-img{max-width:75px;max-height:38px;object-fit:contain;}
         .preview-company-name{font-size:1.05em;font-weight:700;color:var(--gray-900);margin-bottom:5px;}
@@ -119,22 +119,22 @@
         .preview-doc-number{font-size:.95em;color:var(--gray-600);font-weight:500;}
         .preview-doc-dates{margin-top:10px;font-size:.82em;color:var(--gray-700);}
         .preview-doc-dates div{margin:3px 0;}
-        .preview-parties{display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--gray-200);}
+        .preview-parties{display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--gray-200);position:relative;z-index:1;}
         .preview-party h4{font-size:.72em;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-600);margin-bottom:8px;font-weight:700;}
         .preview-party p{margin:2px 0;font-size:.88em;color:var(--gray-800);}
         .preview-party strong{font-weight:600;color:var(--gray-900);}
-        .preview-note{font-size:.73em;color:var(--gray-600);font-style:italic;margin-bottom:18px;padding:7px 0;border-top:1px dashed var(--gray-300);}
-        .preview-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.88em;}
+        .preview-note{font-size:.73em;color:var(--gray-600);font-style:italic;margin-bottom:18px;padding:7px 0;border-top:1px dashed var(--gray-300);position:relative;z-index:1;}
+        .preview-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.88em;position:relative;z-index:1;}
         .preview-table thead{background:var(--theme-light);}
         .preview-table th{padding:10px 9px;text-align:left;font-weight:600;border-bottom:2px solid var(--theme-primary);color:var(--theme-secondary);font-size:.82em;text-transform:uppercase;letter-spacing:.3px;}
         .preview-table td{padding:9px;border-bottom:1px solid var(--gray-200);color:var(--gray-800);vertical-align:top;}
         .preview-table td:nth-child(n+2),.preview-table th:nth-child(n+2){text-align:right;}
-        .preview-totals{margin-left:auto;width:300px;margin-top:18px;}
+        .preview-totals{margin-left:auto;width:300px;margin-top:18px;position:relative;z-index:1;}
         .preview-total-line{display:flex;justify-content:space-between;padding:7px 0;font-size:.92em;}
         .preview-total-line.grand{font-size:1.25em;font-weight:700;color:var(--theme-primary);border-top:2px solid var(--gray-300);margin-top:10px;padding-top:13px;}
-        .preview-footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--gray-200);font-size:.73em;color:var(--gray-600);line-height:1.6;}
+        .preview-footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--gray-200);font-size:.73em;color:var(--gray-600);line-height:1.6;position:relative;z-index:1;}
         .preview-footer div{margin:5px 0;}
-        .stamp-paid{position:absolute;bottom:130px;right:70px;border:3px solid #dc2626;color:#dc2626;padding:8px 18px;font-size:1.4em;font-weight:700;transform:rotate(-8deg);opacity:.5;border-radius:4px;letter-spacing:2px;}
+        .stamp-paid{position:absolute;bottom:130px;right:70px;border:3px solid #dc2626;color:#dc2626;padding:8px 18px;font-size:1.4em;font-weight:700;transform:rotate(-8deg);opacity:.5;border-radius:4px;letter-spacing:2px;z-index:2;}
 
         /* RESPONSIVE */
         @media(max-width:768px){
@@ -196,11 +196,16 @@
                     <div class="logo-controls-grid">
                         <div class="form-group">
                             <label>Position</label>
-                            <select id="logoPosition" onchange="updatePreview()">
-                                <option value="position1">Position 1 : Marge</option>
-                                <option value="position2">Position 2 : Dessus</option>
-                                <option value="position3">Position 3 : Centre</option>
+                            <select id="logoPosition" onchange="onPositionChange()">
+                                <option value="watermark">Transparence</option>
+                                <option value="topleft">Haut gauche</option>
+                                <option value="center">Centre</option>
                             </select>
+                        </div>
+                        <div class="form-group" id="watermarkModeGroup" style="display:none;grid-column:1/-1;margin-bottom:0">
+                            <div class="info-box">
+                                <strong>Filigrane pleine page :</strong> à privilégier sur une imprimante laser plutôt que jet d'encre. Une grande zone teintée, même claire, peut faire gondoler ou légèrement baver le papier sur un jet d'encre — une laser dépose le toner à sec, sans ce risque.
+                            </div>
                         </div>
                         <div class="form-group">
                             <label>Taille (%)</label>
@@ -402,11 +407,11 @@
                 <div class="preview-wrap">
                     <div class="preview-page" id="previewPage">
                         <div id="stampPaid" class="stamp-paid" style="display:none">PAYÉ</div>
-                        <div id="previewLogoCenterTop" style="text-align:center;margin-bottom:18px;display:none">
-                            <img id="previewLogoCenterImg" class="preview-logo-img" style="display:none" src="" alt="Logo">
+                        <div id="previewWatermark" style="display:none;position:absolute;left:0;right:0;align-items:center;justify-content:center;overflow:hidden;pointer-events:none;z-index:0;">
+                            <img id="previewWatermarkImg" style="object-fit:contain;max-width:80%;max-height:80%;" src="" alt="Filigrane">
                         </div>
                         <div class="preview-header">
-                            <div class="preview-left">
+                            <div class="preview-left" id="previewLeftBox">
                                 <img id="previewLogoMain" class="preview-logo-img" style="display:none" src="" alt="Logo">
                                 <div>
                                     <div class="preview-company-name" id="previewCompanyName">---</div>
@@ -478,7 +483,7 @@
 </div>
 
 <script>
-var lines=[];var logoData=null;
+var lines=[];var logoData=null;var logoRatio=1;
 var themes={
     black:{primary:'#000000',secondary:'#1f1f1f',light:'#f5f5f5'},
     indigo:{primary:'#4f46e5',secondary:'#4338ca',light:'#e0e7ff'},
@@ -539,14 +544,24 @@ function toggleIBAN(){
 }
 
 // ── LOGO ─────────────────────────────────────────────────
+// logoRatio mémorise le VRAI ratio largeur/hauteur du logo, capturé dès le chargement
+// du fichier (onload de l'Image probe ci-dessous), pour que le logo ne soit jamais
+// déformé dans le PDF, quelle que soit la position choisie.
 function handleLogo(e){
     var file=e.target.files[0];if(!file)return;
     var reader=new FileReader();
     reader.onload=function(ev){
         logoData=ev.target.result;
+        logoRatio=1;
+        var probe=new Image();
+        probe.onload=function(){
+            logoRatio=(probe.naturalWidth/probe.naturalHeight)||1;
+        };
+        probe.src=logoData;
         document.getElementById('logoPreviewImg').src=logoData;
         document.getElementById('logoControls').style.display='block';
         document.getElementById('logoPreviewZone').style.display='block';
+        onPositionChange();
         updateLogoPreview();updatePreview();
     };
     reader.readAsDataURL(file);
@@ -561,10 +576,30 @@ function updateLogoPreview(){
     updatePreview();
 }
 function removeLogo(){
-    logoData=null;
+    logoData=null;logoRatio=1;
     document.getElementById('logoControls').style.display='none';
     document.getElementById('logoPreviewZone').style.display='none';
     document.getElementById('logoInput').value='';
+    updatePreview();
+}
+
+// Appelé quand on change la position du logo : affiche/cache le sous-réglage
+// "Étendue du filigrane" (uniquement pertinent en mode Transparence), et plafonne
+// l'opacité à une valeur raisonnable pour un filigrane (un filigrane à 100% d'opacité
+// gênerait la lecture du tableau/des totaux qui s'affichent par-dessus).
+function onPositionChange(){
+    var pos=document.getElementById('logoPosition').value;
+    document.getElementById('watermarkModeGroup').style.display = pos==='watermark' ? 'block' : 'none';
+    var opSlider=document.getElementById('logoOpacity');
+    if(pos==='watermark'){
+        opSlider.max=30;
+        if(parseInt(opSlider.value)>30){
+            opSlider.value=15;
+            document.getElementById('logoOpacityValue').textContent='15%';
+        }
+    }else{
+        opSlider.max=100;
+    }
     updatePreview();
 }
 
@@ -630,34 +665,42 @@ function calculateTotals(){
 // ── PREVIEW ──────────────────────────────────────────────
 function updatePreview(){
     var isInv=document.querySelector('input[name="docType"]:checked').value==='invoice';
-    // Logo
+
+    // Logo : on repart de zéro à chaque appel (tout cacher), puis on n'affiche que
+    // l'élément correspondant à la position choisie. Cela évite tout résidu visuel
+    // d'un mode précédent quand on change de position.
+    var leftBox=document.getElementById('previewLeftBox');
+    leftBox.style.flexDirection='';leftBox.style.alignItems='';
+    document.getElementById('previewLogoMain').style.display='none';
+    document.getElementById('previewLogoCenterMiddle').style.display='none';
+    document.getElementById('previewWatermark').style.display='none';
+
     if(logoData){
         var pos=document.getElementById('logoPosition').value;
         var sz=document.getElementById('logoSize').value;
         var op=document.getElementById('logoOpacity').value;
-        ['previewLogoCenterTop','previewLogoCenterImg','previewLogoMain','previewLogoCenterMiddle','previewLogoCenterMiddleImg'].forEach(function(id){
-            document.getElementById(id).style.display='none';
-        });
-        if(pos==='position2'){
-            document.getElementById('previewLogoCenterTop').style.display='block';
-            var img=document.getElementById('previewLogoCenterImg');
+        if(pos==='topleft'){
+            leftBox.style.flexDirection='column';
+            leftBox.style.alignItems='flex-start';
+            var img=document.getElementById('previewLogoMain');
             img.style.display='block';img.src=logoData;
+            img.style.transformOrigin='top left';
             img.style.transform='scale('+(sz/100)+')';img.style.opacity=op/100;
-        }else if(pos==='position3'){
+        }else if(pos==='center'){
             document.getElementById('previewLogoCenterMiddle').style.display='block';
             var img=document.getElementById('previewLogoCenterMiddleImg');
             img.style.display='block';img.src=logoData;
             img.style.transform='scale('+(sz/100)+')';img.style.opacity=op/100;
-        }else{
-            var img=document.getElementById('previewLogoMain');
-            img.style.display='block';img.src=logoData;
-            img.style.transform='scale('+(sz/100)+')';img.style.opacity=op/100;
+        }else if(pos==='watermark'){
+            var wm=document.getElementById('previewWatermark');
+            var wimg=document.getElementById('previewWatermarkImg');
+            wm.style.display='flex';
+            wm.style.top='0';wm.style.bottom='0';wm.style.height='auto';
+            wimg.src=logoData;
+            wimg.style.opacity=op/100;
         }
-    }else{
-        ['previewLogoCenterTop','previewLogoCenterImg','previewLogoMain','previewLogoCenterMiddle','previewLogoCenterMiddleImg'].forEach(function(id){
-            document.getElementById(id).style.display='none';
-        });
     }
+
     document.getElementById('previewDocType').textContent=isInv?'FACTURE':'DEVIS';
     document.getElementById('previewNumber').textContent='N° '+(document.getElementById('docNumber').value||'---');
     document.getElementById('previewCompanyName').textContent=document.getElementById('companyName').value||'---';
@@ -726,6 +769,25 @@ function updatePreview(){
 }
 
 // ── GÉNÉRATION PDF ────────────────────────────────────────
+//
+// Note sur les 3 positions de logo, pensées pour rester FIABLES (pas de coordination
+// fragile entre plusieurs blocs) :
+//   - "topleft"   : logo fixe en haut à gauche (x=14, y=14). Seul le texte société qui
+//                   est juste en dessous en tient compte (démarre après logo+espace).
+//                   Le bloc titre (FACTURE/N°/dates) à droite NE BOUGE JAMAIS.
+//   - "center"    : logo en surimpression centrée, ne déplace ni le texte ni le titre
+//                   (comme un calque par-dessus, cf. opacité réduite si besoin).
+//   - "watermark" : logo en arrière-plan (dessiné EN PREMIER, avant tout texte), sur la
+//                   bande du premier tiers de page ou sur la page entière. N'affecte la
+//                   position d'aucun autre élément.
+// Dans les 3 cas, le bloc titre reste à une position FIXE (y=20,27,33,38) — c'est ce qui
+// rend ces positions robustes : il n'y a plus besoin de synchroniser plusieurs éléments.
+//
+// Calibration de la taille du logo (positions "topleft"/"center") : boîte de référence
+// 17.7mm × 8.96mm, équivalent du CSS max-width:75px/max-height:38px de l'aperçu (facteur
+// 0.2358mm/px, déduit du rapport largeur de contenu PDF (182mm) / largeur de contenu de
+// l'aperçu (772px)). Le logo est mis à l'échelle en respectant son vrai ratio (logoRatio)
+// dans cette boîte, exactement comme le ferait object-fit:contain en CSS.
 function generatePDF(){
     var cn=document.getElementById('companyName').value.trim();
     var cl=document.getElementById('clientName').value.trim();
@@ -743,37 +805,73 @@ function generatePDF(){
         var lr=hexToRgb(theme.light);
         var y=20;
 
-        // Logo
-        if(logoData){
-            var lpos=document.getElementById('logoPosition').value;
-            var lsz=parseInt(document.getElementById('logoSize').value);
-            var lop=parseInt(document.getElementById('logoOpacity').value)/100;
-            var ti=new Image();ti.src=logoData;
-            var ar=ti.width/ti.height||1;
-            var lw=10*(lsz/100),lh=lw/ar;
-            var lx,ly;
-            if(lpos==='position2'){lx=14;ly=y;y=ly+lh+5;}
-            else if(lpos==='position3'){lx=(210-lw)/2;ly=12;}
-            else{lx=14;ly=y;}
+        // Infos entreprise
+        var ca=document.getElementById('companyAddress').value;
+        var ce=document.getElementById('companyEmail').value;
+        var cp=document.getElementById('companyPhone').value;
+        var cs=document.getElementById('companySiret').value;
+        var cv=document.getElementById('companyVAT').value;
+
+        // Dessine le logo avec opacité, sans toucher au reste de la mise en page
+        function drawLogo(lx,ly,lw,lh,op){
             doc.saveGraphicsState();
-            doc.setGState(new doc.GState({opacity:lop}));
+            doc.setGState(new doc.GState({opacity:op}));
             doc.addImage(logoData,'PNG',lx,ly,lw,lh);
             doc.restoreGraphicsState();
         }
+        // Calcule lw/lh pour faire entrer un logo de ratio "ar" dans une boîte
+        // containerW × containerH, comme le ferait object-fit:contain.
+        function fitContain(containerW,containerH,ar){
+            if(ar >= containerW/containerH) return {w:containerW, h:containerW/ar};
+            return {w:containerH*ar, h:containerH};
+        }
 
-        var cx=14;
-        if(logoData&&document.getElementById('logoPosition').value==='position1')cx=14+lw+5;
+        var lpos = logoData ? document.getElementById('logoPosition').value : null;
+        var lsz = logoData ? parseInt(document.getElementById('logoSize').value) : 100;
+        var lop = logoData ? parseInt(document.getElementById('logoOpacity').value)/100 : 1;
+        var ar = logoRatio || 1;
+        var BOX_W=17.7, BOX_H=8.96;  // équivalent mm de la boîte CSS 75×38px (voir commentaire au-dessus)
+        var GAP=3.3;                 // équivalent mm du gap:14px
 
-        doc.setFontSize(11);doc.setFont(undefined,'bold');doc.text(cn,cx,y);y+=5;
+        var textStartY=y;       // par défaut, le texte société démarre à y=20 (inchangé)
+        var logoBottomGuard=0;  // sécurité pour la position "center" si le logo est grand
+
+        if(logoData && lpos==='watermark'){
+            // Filigrane pleine page : dessiné EN PREMIER (avant tout texte), donc il
+            // apparaît en arrière-plan. N'affecte la position d'aucun autre élément.
+            var wx=14, wy=14, ww=182, wh=269; // zone de contenu complète (marges 14mm)
+            var fit=fitContain(ww,wh,ar);
+            var wlx=wx+(ww-fit.w)/2, wly=wy+(wh-fit.h)/2;
+            drawLogo(wlx,wly,fit.w,fit.h,lop);
+        }
+
+        if(logoData && lpos==='topleft'){
+            var containerW=BOX_W*(lsz/100), containerH=BOX_H*(lsz/100);
+            var fit=fitContain(containerW,containerH,ar);
+            var logoX=14, logoY=14;
+            drawLogo(logoX,logoY,fit.w,fit.h,lop);
+            textStartY = logoY+fit.h+GAP; // le texte démarre juste sous le logo, le titre à droite ne bouge pas
+        }
+
+        if(logoData && lpos==='center'){
+            var containerW=BOX_W*(lsz/100), containerH=BOX_H*(lsz/100);
+            var fit=fitContain(containerW,containerH,ar);
+            var logoX=(210-fit.w)/2, logoY=y+4.25; // surimpression, ne déplace ni texte ni titre
+            drawLogo(logoX,logoY,fit.w,fit.h,lop);
+            logoBottomGuard = logoY+fit.h;
+        }
+
+        var cx=14, ty=textStartY;
+        doc.setFontSize(11);doc.setFont(undefined,'bold');doc.text(cn,cx,ty);ty+=5;
         doc.setFontSize(7);doc.setFont(undefined,'normal');
-        var ca=document.getElementById('companyAddress').value;
-        if(ca)doc.splitTextToSize(ca,80).forEach(function(l){doc.text(l,cx,y);y+=3.5;});
-        var ce=document.getElementById('companyEmail').value;if(ce){doc.text(ce,cx,y);y+=3.5;}
-        var cp=document.getElementById('companyPhone').value;if(cp){doc.text('Tél: '+cp,cx,y);y+=3.5;}
-        var cs=document.getElementById('companySiret').value;if(cs){doc.text('SIRET: '+cs,cx,y);y+=3.5;}
-        var cv=document.getElementById('companyVAT').value;if(cv){doc.text('TVA: '+cv,cx,y);}
+        var addrLines = ca ? doc.splitTextToSize(ca,80) : [];
+        if(addrLines.length)addrLines.forEach(function(l){doc.text(l,cx,ty);ty+=3.5;});
+        if(ce){doc.text(ce,cx,ty);ty+=3.5;}
+        if(cp){doc.text('Tél: '+cp,cx,ty);ty+=3.5;}
+        if(cs){doc.text('SIRET: '+cs,cx,ty);ty+=3.5;}
+        if(cv){doc.text('TVA: '+cv,cx,ty);}
 
-        // Titre
+        // Titre — TOUJOURS à position fixe, quelle que soit la position du logo
         doc.setFontSize(22);doc.setFont(undefined,'bold');
         doc.setTextColor(pr.r,pr.g,pr.b);
         doc.text(isInv?'FACTURE':'DEVIS',196,20,{align:'right'});
@@ -785,7 +883,7 @@ function generatePDF(){
         doc.text(dlbl+': '+new Date(document.getElementById('dueDate').value+'T12:00').toLocaleDateString('fr-FR'),196,38,{align:'right'});
 
         // Séparateur
-        var sy=Math.max(y,43)+3;
+        var sy=Math.max(ty,logoBottomGuard,43)+3;
         doc.setDrawColor(220);doc.setLineWidth(0.3);doc.line(14,sy,196,sy);sy+=5;
 
         // Client
