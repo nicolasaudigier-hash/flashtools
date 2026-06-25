@@ -9,7 +9,7 @@ export default async function handler(req, res) {
       fetch('https://api.systeme.io/api/tags', {
         headers: { 'X-API-Key': apiKey }
       }),
-      fetch('https://api.systeme.io/api/contacts?limit=5', {
+      fetch('https://api.systeme.io/api/contacts?limit=10', {
         headers: { 'X-API-Key': apiKey }
       })
     ]);
