@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>FlashContrat — Générateur de contrat de prestation et de vente | FlashTools</title>
+<meta name="description" content="Créez votre contrat de prestation de services ou de vente en quelques minutes. Clauses expliquées, sources légales officielles, export immédiat.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0E27; --bg2:#0F1525; --surface:#111827; --card:#1E293B; --card2:#243044;
+  --border:rgba(255,255,255,.08); --border2:rgba(6,182,212,.28);
+  --cyan:#06B6D4; --violet:#8B5CF6;
+  --text:#F1F5F9; --muted:#94A3B8; --muted2:#64748B;
+  --success:#10B981; --warning:#F59E0B; --danger:#EF4444;
+  --gradient:linear-gradient(135deg,var(--cyan),var(--violet));
+  --paper:#F7F2E6; --paper-edge:#E8DCC0; --ink:#2B2620; --ink-soft:#5C5347; --seal:#9B2C2C;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; line-height:1.5;}
+body::before{
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:
+    radial-gradient(ellipse 700px 500px at 12% 0%, rgba(6,182,212,.06) 0%, transparent 60%),
+    radial-gradient(ellipse 700px 500px at 88% 18%, rgba(139,92,246,.06) 0%, transparent 60%);
+}
+a{color:var(--cyan); text-decoration:none;}
+:focus-visible{outline:2px solid var(--cyan); outline-offset:2px; border-radius:4px;}
+
+.topbar{position:sticky; top:0; z-index:200; background:rgba(10,14,39,.92); backdrop-filter:blur(14px); border-bottom:1px solid var(--border);}
+.topbar-inner{max-width:1080px; margin:0 auto; padding:14px 16px; display:flex; align-items:baseline; gap:10px;}
+.brand{font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; color:var(--text);}
+.brand .accent{background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent;}
+.topbar-sub{font-size:.78rem; color:var(--muted2); font-family:'JetBrains Mono',monospace;}
+
+.tabs{position:sticky; top:57px; z-index:190; display:flex; gap:4px; max-width:1080px; margin:0 auto; padding:8px 16px 0; background:var(--bg); overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab-btn{flex:0 0 auto; padding:10px 16px; border-radius:10px 10px 0 0; border:1px solid var(--border); border-bottom:none; background:var(--surface); color:var(--muted); font-family:'Inter',sans-serif; font-weight:600; font-size:.85rem; cursor:pointer; transition:all .2s; white-space:nowrap;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{background:var(--card); color:var(--cyan); border-color:var(--border2);}
+
+.wrap{position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:18px 16px 70px;}
+.panel{display:none;}
+.panel.active{display:block; animation:fade .25s ease;}
+@keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+.hero{padding:6px 0 22px;}
+.hero h1{font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(1.4rem,4vw,2.1rem); line-height:1.2; margin-bottom:10px;}
+.hero h1 span{background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent;}
+.hero p{color:var(--muted); font-size:.95rem; max-width:640px;}
+
+.card{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:16px;}
+.card h2{font-family:'Syne',sans-serif; font-size:1.02rem; font-weight:700; margin-bottom:10px;}
+.card h3{font-size:.92rem; font-weight:600; margin:14px 0 6px;}
+.card p, .card li{color:var(--muted); font-size:.88rem; line-height:1.6;}
+.card ul{padding-left:18px; margin:6px 0;}
+.card strong{color:var(--text);}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+@media(max-width:720px){.grid-2{grid-template-columns:1fr;}}
+
+.note{border-left:3px solid var(--cyan); background:rgba(6,182,212,.06); border-radius:0 8px 8px 0; padding:10px 14px; font-size:.82rem; color:var(--muted); margin-top:8px; line-height:1.55;}
+.note.warn{border-left-color:var(--warning); background:rgba(245,158,11,.07);}
+.src-list{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;}
+.src-chip{font-family:'JetBrains Mono',monospace; font-size:.74rem; background:var(--surface); border:1px solid var(--border); color:var(--cyan); padding:6px 11px; border-radius:8px; transition:all .2s;}
+.src-chip:hover{border-color:var(--cyan); background:var(--card2);}
+.steps{display:grid; gap:10px; margin-top:6px;}
+.step{display:flex; gap:12px; align-items:flex-start;}
+.step-n{flex-shrink:0; width:24px; height:24px; border-radius:50%; background:var(--surface); border:1px solid var(--border2); color:var(--cyan); font-weight:700; font-size:.78rem; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace;}
+.step p{color:var(--muted); font-size:.87rem; margin:0;}
+.step strong{color:var(--text);}
+
+.form-section{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:14px;}
+.form-section-head{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
+.form-section-num{width:26px; height:26px; border-radius:8px; background:var(--surface); border:1px solid var(--border2); color:var(--cyan); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:.8rem; flex-shrink:0;}
+.form-section-head h3{font-family:'Syne',sans-serif; font-size:.98rem; font-weight:700;}
+.form-section-head small{display:block; color:var(--muted2); font-size:.75rem; font-weight:400; margin-top:1px;}
+
+.field{margin-bottom:13px;}
+.field label{display:block; font-size:.82rem; font-weight:600; color:var(--text); margin-bottom:5px;}
+.field label .req{color:var(--cyan); margin-left:2px;}
+.field label .opt{color:var(--muted2); font-weight:400; font-size:.76rem;}
+.field .hint{display:block; font-size:.74rem; color:var(--muted2); margin-top:4px; line-height:1.4;}
+input[type=text], input[type=email], input[type=tel], input[type=date], input[type=number], textarea, select{
+  width:100%; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:9px; padding:11px 12px; font-family:'Inter',sans-serif; font-size:.92rem; transition:border-color .2s;
+}
+input:focus, textarea:focus, select:focus{border-color:var(--cyan); outline:none;}
+textarea{resize:vertical; min-height:78px; line-height:1.5;}
+select{appearance:none; cursor:pointer; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:34px;}
+.row-2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+@media(max-width:560px){.row-2{grid-template-columns:1fr;}}
+
+.radio-grid{display:flex; flex-wrap:wrap; gap:8px;}
+.radio-opt{flex:1 1 170px; border:1px solid var(--border); border-radius:10px; padding:11px 12px; cursor:pointer; display:flex; align-items:flex-start; gap:9px; transition:all .2s; background:var(--surface);}
+.radio-opt:hover{border-color:var(--border2);}
+.radio-opt.selected{border-color:var(--cyan); background:rgba(6,182,212,.08);}
+.radio-opt input{margin-top:2px; accent-color:var(--cyan); flex-shrink:0;}
+.radio-opt .ro-label{font-size:.85rem; font-weight:600; color:var(--text); display:block;}
+.radio-opt .ro-sub{font-size:.73rem; color:var(--muted2); display:block; margin-top:1px;}
+
+.check-row{display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-top:1px solid var(--border);}
+.check-row:first-of-type{border-top:none;}
+.check-row input{margin-top:3px; width:17px; height:17px; accent-color:var(--cyan); flex-shrink:0; cursor:pointer;}
+.check-row .cr-label{font-size:.85rem; font-weight:600; color:var(--text); cursor:pointer;}
+.check-row .cr-sub{font-size:.75rem; color:var(--muted2); margin-top:2px; line-height:1.45;}
+
+.conditional{display:none; margin-top:10px; padding:12px; background:var(--surface); border:1px solid var(--border); border-radius:10px;}
+.conditional.show{display:block;}
+
+#livrablesList{display:flex; flex-direction:column; gap:8px; margin-bottom:8px;}
+.livrable-row{display:flex; gap:8px;}
+.livrable-row input{flex:1;}
+.icon-btn{flex-shrink:0; width:40px; height:40px; border-radius:9px; border:1px solid var(--border); background:var(--surface); color:var(--muted); font-size:1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s;}
+.icon-btn:hover{border-color:var(--danger); color:var(--danger);}
+.btn-add{border:1px dashed var(--border2); background:transparent; color:var(--cyan); padding:9px 14px; border-radius:9px; font-size:.83rem; font-weight:600; cursor:pointer; width:100%; transition:all .2s;}
+.btn-add:hover{background:rgba(6,182,212,.08);}
+
+.calc-box{display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:10px; margin-top:10px; padding:12px; background:var(--surface); border-radius:10px;}
+.calc-item{text-align:center;}
+.calc-item .cv{font-family:'JetBrains Mono',monospace; font-size:1.05rem; font-weight:700; color:var(--cyan);}
+.calc-item .cl{font-size:.68rem; color:var(--muted2); text-transform:uppercase; letter-spacing:.04em;}
+
+.cta-row{display:flex; justify-content:flex-end; margin-top:6px;}
+.btn-primary{background:var(--gradient); color:#fff; border:none; padding:13px 22px; border-radius:10px; font-weight:700; font-size:.9rem; cursor:pointer; transition:opacity .2s; font-family:'Inter',sans-serif;}
+.btn-primary:hover{opacity:.88;}
+
+.preview-actions{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px;}
+.btn-action{background:var(--card); border:1px solid var(--border); color:var(--text); padding:11px 16px; border-radius:10px; font-size:.84rem; font-weight:600; cursor:pointer; transition:all .2s; font-family:'Inter',sans-serif;}
+.btn-action:hover{border-color:var(--cyan); color:var(--cyan);}
+.btn-action.primary{background:var(--gradient); border:none; color:#fff;}
+.btn-action.primary:hover{opacity:.9; color:#fff;}
+
+.completion-box{background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:18px;}
+.completion-label{font-size:.82rem; font-weight:600; color:var(--text); margin-bottom:8px;}
+.completion-track{height:7px; border-radius:6px; background:var(--surface); overflow:hidden;}
+.completion-fill{height:100%; background:var(--gradient); transition:width .3s;}
+.completion-missing{font-size:.76rem; color:var(--muted2); margin-top:8px; line-height:1.5;}
+
+.paper-wrap{display:flex; justify-content:center;}
+.paper{background:var(--paper); color:var(--ink); border:1px solid var(--paper-edge); border-radius:3px; width:100%; max-width:720px; padding:42px 38px 50px; box-shadow:0 18px 50px rgba(0,0,0,.35); font-family:'Newsreader',serif;}
+@media(max-width:560px){.paper{padding:26px 18px 36px;}}
+.paper h2.doc-title{text-align:center; font-size:1.35rem; font-weight:600; letter-spacing:.03em; text-transform:uppercase; margin-bottom:6px;}
+.paper .doc-ref{text-align:center; font-size:.8rem; color:var(--ink-soft); font-family:'Inter',sans-serif; margin-bottom:26px;}
+.paper p{margin-bottom:12px; font-size:1rem; line-height:1.65;}
+.paper .party-block{margin-bottom:10px;}
+.paper .party-label{font-weight:600; text-transform:uppercase; font-size:.76rem; letter-spacing:.05em; color:var(--seal); font-family:'Inter',sans-serif;}
+.paper h4.art{font-weight:600; font-size:1.0rem; margin:22px 0 8px; padding-bottom:4px; border-bottom:1px solid var(--paper-edge);}
+.paper ul{margin:6px 0 12px 22px;}
+.paper li{margin-bottom:4px;}
+.paper .missing{color:var(--seal); font-style:italic; border-bottom:1px dotted var(--seal);}
+.paper .sign-block{display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:30px;}
+@media(max-width:560px){.paper .sign-block{grid-template-columns:1fr;}}
+.paper .sign-col{text-align:center;}
+.paper .sign-line{border-top:1px solid var(--ink); margin-top:50px; padding-top:6px; font-size:.82rem; font-style:italic;}
+.paper .seal-note{text-align:center; margin-top:6px; font-size:.85rem; font-style:italic; color:var(--ink-soft);}
+
+footer{text-align:center; padding:26px 16px 10px; color:var(--muted2); font-size:.78rem; line-height:1.6;}
+
+.print-helper-overlay{position:fixed; inset:0; background:rgba(0,0,0,.62); z-index:500; display:none; align-items:center; justify-content:center; padding:20px;}
+.print-helper-box{background:var(--card); border:1px solid var(--border2); border-radius:14px; padding:22px; max-width:420px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.print-helper-box h3{font-family:'Syne',sans-serif; font-size:1.05rem; font-weight:700; margin-bottom:4px;}
+.print-helper-box .ph-sub{font-size:.78rem; color:var(--muted2); margin-bottom:14px;}
+.print-helper-box ol{padding-left:20px; margin-bottom:18px; display:flex; flex-direction:column; gap:9px;}
+.print-helper-box li{font-size:.85rem; color:var(--muted); line-height:1.55;}
+.print-helper-box li strong{color:var(--text);}
+.print-helper-actions{display:flex; justify-content:flex-end; gap:10px;}
+
+@media print{
+  body{background:#fff !important;}
+  body::before{display:none;}
+  .topbar, .tabs, .preview-actions, .completion-box, footer, .hero, .print-helper-overlay, .panel:not(#panel-preview){display:none !important;}
+  .wrap{padding:0; max-width:none;}
+  .paper{box-shadow:none; border:none; max-width:none; width:100%;}
+  .closing-block{break-inside:avoid; page-break-inside:avoid;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <span class="brand">Flash<span class="accent">Contrat</span></span>
+    <span class="topbar-sub">Générateur de contrat</span>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" id="tabbtn-guide" onclick="switchTab('guide')">Guide</button>
+  <button class="tab-btn" id="tabbtn-form" onclick="switchTab('form')">Créer mon contrat</button>
+  <button class="tab-btn" id="tabbtn-preview" onclick="switchTab('preview')">Aperçu &amp; export</button>
+</nav>
+
+<div class="wrap">
+
+  <section class="panel active" id="panel-guide">
+    <div class="hero">
+      <h1>Un contrat <span>clair, complet et conforme</span></h1>
+      <p>Chaque clause s'accompagne d'une explication et de sa base légale, pour que vous sachiez précisément ce que vous signez — sans jargon inutile, sans rien laisser de côté non plus.</p>
+    </div>
+
+    <div class="card">
+      <h2>Devis, facture, contrat : quelle différence ?</h2>
+      <p>Le <strong>devis</strong> est une proposition de prix. La <strong>facture</strong> constate une vente ou une prestation réalisée. Le <strong>contrat</strong> est le seul des trois à fixer les obligations réciproques : qui fait quoi, quand, pour combien, et ce qui se passe en cas de désaccord. C'est votre meilleure protection en cas de litige, bien plus qu'un échange d'e-mails ou un devis signé seul.</p>
+      <div class="note">En droit français, la liberté contractuelle (article 1103 du Code civil) permet de rédiger un contrat sans avocat. Un écrit signé par les deux parties suffit à lui donner une valeur juridique forte, même sans formalisme particulier.</div>
+    </div>
+
+    <div class="card">
+      <h2>Prestation sur mesure ou vente d'un bien déjà réalisé ?</h2>
+      <p>Le critère retenu en droit n'est pas « est-ce qu'un objet physique est livré », mais : <strong>l'objet existait-il déjà avant la commande, ou a-t-il été fabriqué spécifiquement pour ce client</strong> ?</p>
+      <ul>
+        <li>Une pièce <strong>fabriquée sur commande</strong>, où le savoir-faire de l'auteur est l'élément central, relève du <strong>contrat d'entreprise</strong> (article 1710 et suivants du Code civil) — même si le résultat est un objet livré physiquement.</li>
+        <li>Une pièce <strong>déjà réalisée</strong> (en atelier, en stock, en galerie), achetée telle qu'elle sans personnalisation, relève de la <strong>vente</strong> (article 1582 et suivants du Code civil), avec ses propres garanties.</li>
+      </ul>
+      <p>Exemple : un sculpteur qui réalise une pièce sur mesure pour un client signe une prestation ; le même sculpteur qui vend une pièce déjà exposée en atelier signe une vente. FlashContrat couvre les deux cas et adapte les clauses automatiquement selon ce que vous sélectionnez.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h2>Les clauses qui protègent vraiment</h2>
+        <ul>
+          <li><strong>Objet précis</strong> — décrire la prestation ou le bien évite les désaccords sur ce qui était prévu.</li>
+          <li><strong>Prix et échéances de paiement</strong> — un acompte clair limite le risque d'impayé.</li>
+          <li><strong>Délai d'exécution ou de livraison</strong> — sans date, aucun retard n'est juridiquement constatable.</li>
+          <li><strong>Pénalités de retard de paiement</strong> — prévues par la loi entre professionnels, à rappeler pour qu'elles s'appliquent.</li>
+          <li><strong>Propriété intellectuelle</strong> — sans cession écrite, le client n'acquiert pas automatiquement le droit d'exploiter votre travail, même après paiement.</li>
+          <li><strong>Garanties</strong> — en cas de vente, vices cachés et conformité protègent l'acheteur, et donc vous, en cadrant clairement ce qui est couvert.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>Ce que la loi impose selon le client</h2>
+        <p><strong>Client professionnel</strong> — pas de droit de rétractation, mais les pénalités de retard de paiement sont encadrées par l'article L441-10 du Code de commerce.</p>
+        <p><strong>Client particulier</strong> — un délai de rétractation de 14 jours s'applique en principe (article L221-18), sauf exceptions légales : bien nettement personnalisé (article L221-28, 3°), ou service pleinement exécuté avec l'accord exprès du client (article L221-28, 1°). Le tribunal compétent est alors obligatoirement celui du domicile du client (article R631-3), sans possibilité d'y déroger.</p>
+        <div class="note warn">FlashContrat adapte ces clauses automatiquement selon la nature du client et de la mission.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Vous êtes créatif·ve (design, dev, photo, rédaction, art) ?</h2>
+      <p>Sans clause de cession de droits, votre client n'acquiert <strong>pas automatiquement</strong> le droit d'exploiter ce que vous créez, même après paiement. L'article <strong>L131-3 du Code de la propriété intellectuelle</strong> exige que toute cession soit écrite et précise.</p>
+      <p>Votre <strong>droit moral</strong> (être reconnu·e comme auteur·e, vous opposer à une dénaturation de l'œuvre) est <strong>incessible</strong> — vous le gardez toujours, quoi qu'il arrive (article L121-1 du même code).</p>
+      <p>Cas particulier de la <strong>vente d'une œuvre déjà réalisée</strong> : vendre l'objet physique ne transfère pas les droits d'auteur attachés à l'œuvre (article L111-3 du CPI). FlashContrat ajoute cette précision automatiquement si vous l'indiquez.</p>
+    </div>
+
+    <div class="card">
+      <h2>Vente et prestation sous la même micro-entreprise : c'est autorisé</h2>
+      <p>Rien n'empêche de cumuler les deux. L'administration appelle ça une <strong>activité mixte</strong>, et la donne en exemple elle-même : un coiffeur qui vend aussi des produits, un menuisier qui fournit le matériel qu'il pose ensuite.</p>
+      <p>Deux points de vigilance : chaque facture doit être classée dans la bonne catégorie (vente ou prestation), car le taux de cotisation diffère ; et le plafond de chiffre d'affaires global suit la catégorie « vente », avec un sous-plafond propre à la part « prestation ».</p>
+      <div class="src-list">
+        <a class="src-chip" href="https://www.economie.gouv.fr/entreprises/gerer-sa-micro-entreprise/micro-entreprise-peut-exercer-plusieurs-activites" target="_blank" rel="noopener">economie.gouv.fr — Activités mixtes</a>
+        <a class="src-chip" href="https://www.autoentrepreneur.urssaf.fr/portail/accueil/sinformer-sur-le-statut/lessentiel-du-statut.html" target="_blank" rel="noopener">autoentrepreneur.urssaf.fr</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Comment ça marche</h2>
+      <div class="steps">
+        <div class="step"><span class="step-n">1</span><p><strong>Remplissez le formulaire</strong> — chaque champ explique pourquoi il compte et ce qui se passe si vous le laissez vide.</p></div>
+        <div class="step"><span class="step-n">2</span><p><strong>Le contrat se génère en direct</strong>, avec un indicateur de complétude dans l'onglet Aperçu.</p></div>
+        <div class="step"><span class="step-n">3</span><p><strong>Copiez, téléchargez ou imprimez / enregistrez en PDF</strong> — prêt à faire signer, sur papier ou électroniquement.</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Faut-il parapher chaque page ?</h2>
+      <p>Ce n'est <strong>pas une obligation légale</strong> : la signature seule suffit à donner sa valeur juridique au contrat (articles 1366 et 1367 du Code civil, déjà cités plus bas dans le document). Le paraphe est une pratique recommandée, pas une condition de validité — son seul rôle est de prouver qu'aucune page n'a été substituée après coup en cas de litige sur un exemplaire papier.</p>
+      <ul>
+        <li><strong>Signature papier</strong> — parapher chaque page sauf la dernière (celle des signatures, déjà plus engageante qu'un simple paraphe) reste la pratique la plus sûre pour un contrat de plusieurs pages.</li>
+        <li><strong>Signature électronique</strong> — l'intégrité de l'ensemble du document est en principe garantie cryptographiquement par la solution de signature utilisée ; parapher page par page n'a alors plus vraiment d'utilité pratique.</li>
+      </ul>
+      <div class="note">Un article coupé par un saut de page n'a aucune incidence juridique. Seul le bloc des signatures fait l'objet d'une vigilance particulière dans cet outil : il reste toujours regroupé avec la mention « Fait à... » sur la même page, pour qu'aucune page imprimée ne se termine par une signature isolée sans contexte.</div>
+    </div>
+
+    <div class="card">
+      <h2>Sources officielles citées dans cet outil</h2>
+      <div class="src-list">
+        <a class="src-chip" href="https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006070721" target="_blank" rel="noopener">Légifrance — Code civil</a>
+        <a class="src-chip" href="https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006069565" target="_blank" rel="noopener">Légifrance — Code de la consommation</a>
+        <a class="src-chip" href="https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006069578" target="_blank" rel="noopener">Légifrance — Code de commerce</a>
+        <a class="src-chip" href="https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006069414" target="_blank" rel="noopener">Légifrance — Propriété intellectuelle</a>
+        <a class="src-chip" href="https://www.service-public.fr/particuliers/vosdroits/F31228" target="_blank" rel="noopener">Service-public.fr — Rétractation</a>
+      </div>
+      <div class="note">Besoin d'un avis sur un cas particulier ? Les CCI, chambres de métiers et certains barreaux d'avocats proposent des permanences juridiques gratuites pour les indépendants.</div>
+    </div>
+
+    <div class="cta-row"><button class="btn-primary" onclick="switchTab('form')">Commencer mon contrat</button></div>
+  </section>
+
+  <section class="panel" id="panel-form">
+    <div class="hero">
+      <h1>Remplissez les <span>informations</span></h1>
+      <p>Tout se met à jour en direct dans l'onglet Aperçu. Les champs vides apparaissent en rouge dans le document pour repérer immédiatement ce qui manque.</p>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-head"><span class="form-section-num">1</span><div><h3>Nature de la mission</h3><small>Adapte automatiquement les clauses du contrat</small></div></div>
+      <div class="field">
+        <div class="radio-grid">
+          <label class="radio-opt selected" id="opt-service">
+            <input type="radio" name="typeMission" value="service" checked onchange="setTypeMission('service')">
+            <span><span class="ro-label">Prestation classique</span><span class="ro-sub">Conseil, artisanat sur mesure, services à la personne</span></span>
+          </label>
+          <label class="radio-opt" id="opt-creatif">
+            <input type="radio" name="typeMission" value="creatif" onchange="setTypeMission('creatif')">
+            <span><span class="ro-label">Mission créative / digitale</span><span class="ro-sub">Design, dev, photo, rédaction — cession de droits incluse</span></span>
+          </label>
+          <label class="radio-opt" id="opt-vente">
+            <input type="radio" name="typeMission" value="vente" onchange="setTypeMission('vente')">
+            <span><span class="ro-label">Vente d'un bien déjà réalisé</span><span class="ro-sub">Pièce en stock, achetée telle qu'elle, sans personnalisation</span></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-head"><span class="form-section-num">2</span><div><h3>Vous</h3><small>Prestataire ou Vendeur selon la mission choisie ci-dessus</small></div></div>
+      <div class="row-2">
+        <div class="field"><label>Nom ou raison sociale <span class="req">*</span></label><input type="text" id="p_nom" placeholder="Ex. Camille Dubois" oninput="update()"></div>
+        <div class="field"><label>Statut</label><input type="text" id="p_statut" placeholder="Ex. Entrepreneur individuel (micro-entreprise)" oninput="update()"></div>
+      </div>
+      <div class="row-2">
+        <div class="field"><label>SIRET <span class="req">*</span></label><input type="text" id="p_siret" placeholder="14 chiffres" oninput="update()"></div>
+        <div class="field"><label>Adresse / siège</label><input type="text" id="p_adresse" placeholder="N°, rue, code postal, ville" oninput="update()"></div>
+      </div>
+      <div class="row-2">
+        <div class="field"><label>Email</label><input type="email" id="p_email" oninput="update()"></div>
+        <div class="field"><label>Téléphone</label><input type="tel" id="p_tel" oninput="update()"></div>
+      </div>
+      <div class="field">
+        <label>TVA</label>
+        <select id="p_tva" onchange="update()">
+          <option value="0">Franchise en base — non assujetti (art. 293 B du CGI)</option>
+          <option value="5.5">Assujetti — taux de 5,5 %</option>
+          <option value="10">Assujetti — taux de 10 %</option>
+          <option value="20">Assujetti — taux de 20 %</option>
+        </select>
+        <span class="hint">La franchise en base est la situation la plus fréquente en micro-entreprise.</span>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-head"><span class="form-section-num">3</span><div><h3>Le Client</h3><small>Client ou Acheteur selon la mission — détermine le droit de rétractation et le tribunal compétent</small></div></div>
+      <div class="field">
+        <div class="radio-grid">
+          <label class="radio-opt selected" id="opt-pro">
+            <input type="radio" name="natureClient" value="pro" checked onchange="setNatureClient('pro')">
+            <span><span class="ro-label">Professionnel</span><span class="ro-sub">Entreprise, association, autre indépendant</span></span>
+          </label>
+          <label class="radio-opt" id="opt-particulier">
+            <input type="radio" name="natureClient" value="particulier" onchange="setNatureClient('particulier')">
+            <span><span class="ro-label">Particulier</span><span class="ro-sub">Droit de rétractation légal de 14 jours</span></span>
+          </label>
+        </div>
+      </div>
+      <div class="row-2">
+        <div class="field"><label>Nom <span class="opt" id="lbl-c-nom-sub">(ou raison sociale)</span> <span class="req">*</span></label><input type="text" id="c_nom" oninput="update()"></div>
+        <div class="field" id="field-c-siret"><label>SIRET</label><input type="text" id="c_siret" oninput="update()"></div>
+      </div>
+      <div class="row-2">
+        <div class="field"><label>Adresse</label><input type="text" id="c_adresse" oninput="update()"></div>
+        <div class="field"><label>Email</label><input type="email" id="c_email" oninput="update()"></div>
+      </div>
+      <div class="conditional" id="cond-retractation">
+        <div class="field" style="margin-bottom:6px;">
+          <label>Situation au regard du droit de rétractation</label>
+          <select id="retract_case" onchange="update()"></select>
+          <span class="hint">L'exemption pour bien personnalisé est interprétée strictement par les tribunaux : informez clairement le client de l'absence de rétractation avant la signature.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-head"><span class="form-section-num">4</span><div><h3 id="lbl-objet-titre">Objet de la prestation</h3><small>Plus c'est précis, mieux vous êtes protégé·e</small></div></div>
+      <div class="field"><label id="lbl-o-titre">Titre de la prestation <span class="req">*</span></label><input type="text" id="o_titre" placeholder="Ex. Création d'un site web vitrine" oninput="update()"></div>
+      <div class="field"><label id="lbl-o-description">Description détaillée <span class="req">*</span></label><textarea id="o_description" placeholder="Décrivez précisément ce qui est inclus." oninput="update()"></textarea></div>
+      <div class="conditional" id="cond-bien">
+        <div class="row-2">
+          <div class="field"><label>État du bien <span class="opt">(facultatif)</span></label>
+            <select id="bien_etat" onchange="update()">
+              <option value="">—</option>
+              <option value="Pièce unique de fabrication artisanale">Pièce unique de fabrication artisanale</option>
+              <option value="Neuf">Neuf</option>
+              <option value="Occasion">Occasion / seconde main</option>
+            </select>
+          </div>
+          <div class="field" style="display:flex;align-items:flex-end;">
+            <div class="check-row" style="border-top:none;padding-top:0;">
+              <input type="checkbox" id="bien_oeuvre" onchange="update()">
+              <div><span class="cr-label" onclick="document.getElementById('bien_oeuvre').click()">Œuvre originale (art, photo, design)</span>
+                <div class="cr-sub">Ajoute la clause de séparation entre propriété de l'objet et droits d'auteur.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="conditional" id="cond-creatif">
+        <div class="check-row" style="border-top:none;padding-top:0;">
+          <input type="checkbox" id="cl_cession_limitee" onchange="toggleCessionLimitee()">
+          <div><span class="cr-label" onclick="document.getElementById('cl_cession_limitee').click()">Limiter la cession de droits</span>
+            <div class="cr-sub">Par défaut, la cession est totale (monde entier, durée légale). Cochez pour préciser une étendue plus restreinte.</div>
+          </div>
+        </div>
+        <div class="conditional" id="cond-cession-detail">
+          <div class="field"><label>Étendue précise de la cession</label><textarea id="cession_detail" placeholder="Ex. droits de reproduction et de diffusion sur le site web et les réseaux sociaux du client, France, 3 ans" oninput="update()"></textarea></div>
+        </div>
+      </div>
+      <div class="field"><label>Livrables ou accessoires fournis <span class="opt">(facultatif)</span></label>
+        <div id="livrablesList"></div>
+        <button class="btn-add" onclick="addLivrable()">Ajouter une ligne</button>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-head"><span class="form-section-num">5</span><div><h3 id="lbl-duree-titre">Durée et délai d'exécution</h3><small>Sans date, aucun retard n'est juridiquement constatable</small></div></div>
+      <div id="block-duree-service">
+        <div class="row-2">
+          <div class="field"><label>Date de début</label><input type="date" id="d_debut" oninput="update()"></div>
+          <div class="field"><label>Mode</label>
+            <select id="d_mode" onchange="onModeChange()">
+              <option value="date">Date de fin précise</option>
+              <option value="delai">Délai en jours/semaines</option>
+            </select>
+          </div>
+        </div>
+        <div class="field" id="field-date-fin"><label>Date de fin</label><input type="date" id="d_fin" oninput="update()"></div>
+        <div class="field conditional" id="field-delai"><label>Délai d'exécution</label><input type="text" id="d_delai" placeholder="Ex. 15 jours ouvrés à compter de la signature" oninput="update()"></div>
+      </div>
+      <div id="block-livraison-vente" style="display:none;">
+        <div class="row-2">
+          <div class="field"><label>Date de livraison</label><input type="date" id="livr_date" oninput="update()"></div>
+          <div class="field"><label>Mode de remise</label>
+            <select id="livr_mode" onchange="onLivrModeChange()">
+              <option value="Remise en main propre">Remise en main propre</option>
+              <option value="Expédition par transporteur">Expédition par transporteur</option>
+            </select>
+          </div>
+        </div>
+        <div class="conditional" id="cond-expedition">
+          <div class="row-2">
+            <div class="field"><label>Adresse de livraison <span class="opt">(facultatif — si différente de l'adresse de l'Acheteur)</span></label><input type="text" id="livr_adresse" oninput="update()"></div>
+            <div class="field"><label>Frais de port à la charge de</label>
+              <select id="livr_frais_port" onchange="update()">
+                <option value="vendeur">Le Vendeur</option>
+                <option value="acheteur">L'Acheteur</option>
+              </select>
+            </div>
+          </div>
+          <span class="hint">Le moment du transfert des risques est précisé automatiquement dans le contrat selon ce mode de remise.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-head"><span class="form-section-num">6</span><div><h3>Prix et paiement</h3><small>Le point le plus surveillé en cas de litige</small></div></div>
+      <div class="row-2">
+        <div class="field"><label id="lbl-montant">Montant <span class="req">*</span></label><input type="number" id="pr_montant" placeholder="0.00" oninput="update()"></div>
+        <div class="field"><label>Délai de paiement après facture</label><input type="text" id="pr_delai_paiement" placeholder="Ex. 30 jours" value="30 jours" oninput="update()"></div>
+      </div>
+      <div class="field">
+        <label>Modalités</label>
+        <div class="radio-grid">
+          <label class="radio-opt selected" id="opt-paiement-total">
+            <input type="radio" name="modePaiement" value="total" checked onchange="setModePaiement('total')">
+            <span><span class="ro-label">Paiement intégral</span><span class="ro-sub">À réception de facture</span></span>
+          </label>
+          <label class="radio-opt" id="opt-paiement-acompte">
+            <input type="radio" name="modePaiement" value="acompte" onchange="setModePaiement('acompte')">
+            <span><span class="ro-label">Acompte + solde</span><span class="ro-sub">Recommandé pour limiter le risque d'impayé</span></span>
+          </label>
+        </div>
+      </div>
+      <div class="conditional" id="cond-acompte">
+        <div class="field"><label>Pourcentage d'acompte</label><input type="number" id="pr_acompte_pct" value="30" min="0" max="100" oninput="update()"></div>
+      </div>
+      <div class="conditional" id="row-reserve-propriete">
+        <div class="check-row" style="border-top:none;padding-top:0;">
+          <input type="checkbox" id="cl_reserve_propriete" onchange="update()">
+          <div><span class="cr-label" onclick="document.getElementById('cl_reserve_propriete').click()">Réserve de propriété jusqu'au paiement intégral</span>
+            <div class="cr-sub">Art. 2367 du Code civil — le bien reste votre propriété jusqu'au complet paiement, même après livraison.</div>
+          </div>
+        </div>
+      </div>
+      <div class="calc-box" id="calcBox"></div>
+      <div class="note">En cas de retard de paiement, l'article L441-10 du Code de commerce prévoit, entre professionnels, des intérêts de retard et une indemnité forfaitaire de 40 € pour frais de recouvrement. La clause correspondante est ajoutée automatiquement.</div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-head"><span class="form-section-num">7</span><div><h3>Clauses complémentaires</h3><small>Cochez celles qui s'appliquent à votre situation</small></div></div>
+      <div class="check-row">
+        <input type="checkbox" id="cl_confidentialite" onchange="update()">
+        <div><span class="cr-label" onclick="document.getElementById('cl_confidentialite').click()">Clause de confidentialité</span>
+          <div class="cr-sub">Fondée sur la liberté contractuelle (art. 1103 du Code civil) et le secret des affaires (art. L151-1 et s. du Code de commerce).</div>
+        </div>
+      </div>
+      <div class="check-row">
+        <input type="checkbox" id="cl_nonconcurrence" onchange="toggleNonConcurrence()">
+        <div><span class="cr-label" onclick="document.getElementById('cl_nonconcurrence').click()">Clause de non-concurrence</span>
+          <div class="cr-sub">Fondée sur la liberté du commerce et de l'industrie. À manier avec prudence : une clause disproportionnée peut être annulée par un juge.</div>
+        </div>
+      </div>
+      <div class="conditional" id="cond-nonconcurrence">
+        <div class="row-2">
+          <div class="field"><label>Durée</label><input type="text" id="nc_duree" placeholder="Ex. 12 mois" oninput="update()"></div>
+          <div class="field"><label>Zone géographique</label><input type="text" id="nc_zone" placeholder="Ex. France métropolitaine" oninput="update()"></div>
+        </div>
+      </div>
+      <div id="row-perimetre">
+        <div class="check-row">
+          <input type="checkbox" id="cl_perimetre" onchange="update()">
+          <div><span class="cr-label" onclick="document.getElementById('cl_perimetre').click()">Clause de gestion du périmètre</span>
+            <div class="cr-sub">Recommandé pour les missions par étapes — encadre les demandes additionnelles non prévues initialement.</div>
+          </div>
+        </div>
+      </div>
+      <div id="row-responsabilite">
+        <div class="check-row">
+          <input type="checkbox" id="cl_responsabilite" onchange="toggleResponsabilite()">
+          <div><span class="cr-label" onclick="document.getElementById('cl_responsabilite').click()">Limitation de responsabilité</span>
+            <div class="cr-sub">Plafonne les dommages indemnisables, hors faute lourde ou intentionnelle.</div>
+          </div>
+        </div>
+        <div class="conditional" id="cond-responsabilite">
+          <div class="field"><label>Plafond <span class="opt">(facultatif — par défaut : montant total du contrat)</span></label><input type="number" id="plafond_montant" placeholder="0.00" oninput="update()"></div>
+        </div>
+      </div>
+      <div class="check-row">
+        <input type="checkbox" id="cl_assurance" onchange="update()">
+        <div><span class="cr-label" onclick="document.getElementById('cl_assurance').click()">Assurance responsabilité civile professionnelle</span>
+          <div class="cr-sub">Obligatoire dans certaines professions réglementées, recommandée pour les autres.</div>
+        </div>
+      </div>
+      <div id="row-soustraitance" class="field">
+        <label>Sous-traitance <span class="opt">(facultatif)</span></label>
+        <select id="cl_soustraitance" onchange="update()">
+          <option value="">Non précisée</option>
+          <option value="autorisee">Autorisée</option>
+          <option value="interdite">Interdite sans accord écrit</option>
+        </select>
+      </div>
+      <div class="check-row">
+        <input type="checkbox" id="cl_rgpd" onchange="toggleRgpd()">
+        <div><span class="cr-label" onclick="document.getElementById('cl_rgpd').click()">Traitement de données personnelles (RGPD)</span>
+          <div class="cr-sub">À cocher si vous traitez des données du client pour son compte (ex. agence web, gestion de base de données clients).</div>
+        </div>
+      </div>
+      <div class="conditional" id="cond-rgpd">
+        <div class="row-2">
+          <div class="field"><label>Finalité du traitement</label><input type="text" id="rgpd_finalite" placeholder="Ex. gestion de la newsletter client" oninput="update()"></div>
+          <div class="field"><label>Durée de conservation</label><input type="text" id="rgpd_duree" placeholder="Ex. 3 ans après la fin du contrat" oninput="update()"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-head"><span class="form-section-num">8</span><div><h3>Litiges et juridiction</h3><small>Prévoir le cadre pour ne jamais en avoir besoin</small></div></div>
+      <div class="conditional show" id="cond-tribunal-pro">
+        <div class="field"><label>Tribunal compétent en cas de désaccord</label>
+          <select id="lit_tribunal" onchange="update()">
+            <option value="siege">Tribunal du siège du Prestataire / Vendeur</option>
+            <option value="defendeur">Tribunal du domicile du défendeur</option>
+          </select>
+        </div>
+      </div>
+      <div class="note" id="note-tribunal-particulier" style="display:none;">Face à un particulier, la compétence territoriale est fixée par la loi (art. R631-3 du Code de la consommation) : c'est toujours le tribunal du domicile du client, sans possibilité d'y déroger par contrat. Ce champ est donc masqué.</div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-head"><span class="form-section-num">9</span><div><h3>Référence et signature</h3></div></div>
+      <div class="row-2">
+        <div class="field"><label>Numéro de contrat</label><input type="text" id="s_numero" oninput="update()"></div>
+        <div class="field"><label>Lieu de signature</label><input type="text" id="s_lieu" placeholder="Ex. Lyon" oninput="update()"></div>
+      </div>
+      <div class="field"><label>Date de signature</label><input type="date" id="s_date" oninput="update()"></div>
+    </div>
+
+    <div class="cta-row"><button class="btn-primary" onclick="switchTab('preview')">Voir mon contrat</button></div>
+  </section>
+
+  <section class="panel" id="panel-preview">
+    <div class="hero">
+      <h1>Votre <span>contrat</span></h1>
+      <p>Les passages en rouge italique indiquent une information manquante — complétez-les dans l'onglet précédent avant de faire signer.</p>
+    </div>
+    <div class="completion-box" id="completionBox"></div>
+    <div class="preview-actions">
+      <button class="btn-action" onclick="copyContract()">Copier le texte</button>
+      <button class="btn-action" onclick="downloadContract()">Télécharger (.doc)</button>
+      <button class="btn-action primary" onclick="openPrintHelper()">Imprimer / Enregistrer en PDF</button>
+    </div>
+    <div class="paper-wrap"><div class="paper" id="paper"></div></div>
+  </section>
+
+</div>
+
+<div class="print-helper-overlay" id="printHelperOverlay">
+  <div class="print-helper-box">
+    <h3>Avant d'imprimer</h3>
+    <div class="ph-sub">Pour obtenir un PDF propre, prêt à envoyer :</div>
+    <ol>
+      <li>Dans <strong>Destination</strong>, choisissez <strong>Enregistrer au format PDF</strong> (ou votre imprimante si vous imprimez sur papier).</li>
+      <li>Dans les options avancées (souvent « Plus de paramètres »), <strong>décochez « En-têtes et pieds de page »</strong> — sinon l'URL et la date s'ajoutent en haut et en bas de chaque page.</li>
+      <li>Laissez les <strong>marges sur « Par défaut »</strong> — elles sont déjà adaptées à ce document.</li>
+    </ol>
+    <div class="print-helper-actions">
+      <button class="btn-action" onclick="closePrintHelper()">Annuler</button>
+      <button class="btn-action primary" onclick="confirmPrint()">Continuer</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  FlashContrat applique les clauses prévues par le Code civil, le Code de la consommation et le Code de commerce.<br>
+  En cas de doute, ou pour une situation inhabituelle, faites relire votre contrat par un professionnel du droit ou par les permanences gratuites de votre CCI ou chambre de métiers.
+</footer>
+
+<script>
+let livrables = [""];
+let typeMission = "service";
+let natureClient = "pro";
+let modePaiement = "total";
+let artNum = 0;
+
+function switchTab(name){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById("panel-"+name).classList.add("active");
+  document.getElementById("tabbtn-"+name).classList.add("active");
+  if(name === "preview"){ update(); }
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function openPrintHelper(){
+  document.getElementById("printHelperOverlay").style.display = "flex";
+}
+function closePrintHelper(){
+  document.getElementById("printHelperOverlay").style.display = "none";
+}
+function confirmPrint(){
+  closePrintHelper();
+  // petit délai pour laisser la fenêtre se fermer visuellement avant l'ouverture du dialogue d'impression
+  setTimeout(function(){ window.print(); }, 120);
+}
+
+function updateRetractOptions(){
+  const sel = document.getElementById("retract_case");
+  const isVente = typeMission === "vente";
+  const current = sel.value || "standard";
+  let opts = '<option value="standard">Standard \u2014 d\u00e9lai de r\u00e9tractation de 14 jours</option>' +
+             '<option value="personnalise">Bien/prestation nettement personnalis\u00e9(e) (exemption l\u00e9gale)</option>';
+  if(!isVente){ opts += '<option value="renonce">Le client demande l\u2019ex\u00e9cution imm\u00e9diate et renonce au d\u00e9lai</option>'; }
+  sel.innerHTML = opts;
+  sel.value = (current === "renonce" && isVente) ? "standard" : current;
+}
+
+function setTypeMission(v){
+  typeMission = v;
+  document.getElementById("opt-service").classList.toggle("selected", v==="service");
+  document.getElementById("opt-creatif").classList.toggle("selected", v==="creatif");
+  document.getElementById("opt-vente").classList.toggle("selected", v==="vente");
+
+  const isVente = v === "vente";
+  const isCreatif = v === "creatif";
+  document.getElementById("cond-bien").classList.toggle("show", isVente);
+  document.getElementById("cond-creatif").classList.toggle("show", isCreatif);
+  document.getElementById("block-duree-service").style.display = isVente ? "none" : "block";
+  document.getElementById("block-livraison-vente").style.display = isVente ? "block" : "none";
+  document.getElementById("row-reserve-propriete").classList.toggle("show", isVente);
+  document.getElementById("row-perimetre").style.display = isVente ? "none" : "block";
+  document.getElementById("row-responsabilite").style.display = isVente ? "none" : "block";
+  document.getElementById("row-soustraitance").style.display = isVente ? "none" : "block";
+
+  document.getElementById("lbl-objet-titre").textContent = isVente ? "D\u00e9signation du bien vendu" : "Objet de la prestation";
+  document.getElementById("lbl-o-titre").innerHTML = (isVente ? "Titre / nom du bien" : "Titre de la prestation") + ' <span class="req">*</span>';
+  document.getElementById("lbl-o-description").innerHTML = "Description d\u00e9taill\u00e9e " + '<span class="req">*</span>';
+  document.getElementById("lbl-duree-titre").textContent = isVente ? "Livraison" : "Dur\u00e9e et d\u00e9lai d\u2019ex\u00e9cution";
+  document.getElementById("lbl-montant").innerHTML = (isVente ? "Prix du bien" : "Montant") + ' <span class="req">*</span>';
+
+  updateRetractOptions();
+  update();
+}
+
+function setNatureClient(v){
+  natureClient = v;
+  document.getElementById("opt-pro").classList.toggle("selected", v==="pro");
+  document.getElementById("opt-particulier").classList.toggle("selected", v==="particulier");
+  document.getElementById("field-c-siret").style.display = v==="pro" ? "block" : "none";
+  document.getElementById("cond-retractation").classList.toggle("show", v==="particulier");
+  document.getElementById("lbl-c-nom-sub").style.display = v==="pro" ? "inline" : "none";
+  document.getElementById("cond-tribunal-pro").classList.toggle("show", v==="pro");
+  document.getElementById("note-tribunal-particulier").style.display = v==="particulier" ? "block" : "none";
+  update();
+}
+
+function setModePaiement(v){
+  modePaiement = v;
+  document.getElementById("opt-paiement-total").classList.toggle("selected", v==="total");
+  document.getElementById("opt-paiement-acompte").classList.toggle("selected", v==="acompte");
+  document.getElementById("cond-acompte").classList.toggle("show", v==="acompte");
+  update();
+}
+
+function onModeChange(){
+  const isDelai = document.getElementById("d_mode").value === "delai";
+  document.getElementById("field-date-fin").style.display = isDelai ? "none" : "block";
+  document.getElementById("field-delai").classList.toggle("show", isDelai);
+  update();
+}
+
+function onLivrModeChange(){
+  const isExpedition = document.getElementById("livr_mode").value === "Exp\u00e9dition par transporteur";
+  document.getElementById("cond-expedition").classList.toggle("show", isExpedition);
+  update();
+}
+
+function toggleNonConcurrence(){ document.getElementById("cond-nonconcurrence").classList.toggle("show", document.getElementById("cl_nonconcurrence").checked); update(); }
+function toggleResponsabilite(){ document.getElementById("cond-responsabilite").classList.toggle("show", document.getElementById("cl_responsabilite").checked); update(); }
+function toggleRgpd(){ document.getElementById("cond-rgpd").classList.toggle("show", document.getElementById("cl_rgpd").checked); update(); }
+function toggleCessionLimitee(){ document.getElementById("cond-cession-detail").classList.toggle("show", document.getElementById("cl_cession_limitee").checked); update(); }
+
+function renderLivrables(){
+  const c = document.getElementById("livrablesList");
+  c.innerHTML = "";
+  livrables.forEach((val, i)=>{
+    const row = document.createElement("div");
+    row.className = "livrable-row";
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "Ex. Certificat d'authenticité";
+    input.value = val;
+    input.oninput = function(){ livrables[i] = this.value; update(); };
+    row.appendChild(input);
+    if(livrables.length > 1){
+      const btn = document.createElement("button");
+      btn.className = "icon-btn"; btn.type = "button"; btn.textContent = "x";
+      btn.onclick = function(){ livrables.splice(i,1); renderLivrables(); update(); };
+      row.appendChild(btn);
+    }
+    c.appendChild(row);
+  });
+}
+function addLivrable(){ livrables.push(""); renderLivrables(); update(); }
+
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+function f(v, placeholder){
+  v = (v||"").toString().trim();
+  return v ? esc(v) : '<span class="missing">[' + placeholder + ']</span>';
+}
+function fmtDate(d){
+  if(!d) return "";
+  const parts = d.split("-");
+  if(parts.length!==3) return d;
+  const mois = ["janvier","f\u00e9vrier","mars","avril","mai","juin","juillet","ao\u00fbt","septembre","octobre","novembre","d\u00e9cembre"];
+  return parseInt(parts[2],10) + " " + mois[parseInt(parts[1],10)-1] + " " + parts[0];
+}
+function eur(n){ if(isNaN(n)) return "\u2014"; return n.toLocaleString("fr-FR",{minimumFractionDigits:2, maximumFractionDigits:2}) + " \u20ac"; }
+
+function computeCompleteness(){
+  const g = id => (document.getElementById(id).value||"").trim();
+  const isVente = typeMission === "vente";
+  const fields = [
+    {id:"p_nom", label:"votre nom"},
+    {id:"p_siret", label:"votre SIRET"},
+    {id:"p_adresse", label:"votre adresse"},
+    {id:"c_nom", label:"nom du client"},
+    {id:"c_adresse", label:"adresse du client"},
+    {id:"o_titre", label: isVente?"nom du bien":"titre de la prestation"},
+    {id:"o_description", label:"description"},
+    {id:"pr_montant", label:"montant"},
+    {id:"s_lieu", label:"lieu de signature"},
+    {id:"s_date", label:"date de signature"}
+  ];
+  if(isVente){ fields.push({id:"livr_date", label:"date de livraison"}); }
+  else if(document.getElementById("d_mode").value === "delai"){ fields.push({id:"d_debut", label:"date de d\u00e9but"}); fields.push({id:"d_delai", label:"d\u00e9lai d\u2019ex\u00e9cution"}); }
+  else { fields.push({id:"d_debut", label:"date de d\u00e9but"}); fields.push({id:"d_fin", label:"date de fin"}); }
+  const missing = fields.filter(x=>!g(x.id));
+  const pct = Math.round(((fields.length - missing.length)/fields.length)*100);
+  return {pct, missing};
+}
+
+function renderCompletion(){
+  const r = computeCompleteness();
+  let html = '<div class="completion-label">Contrat compl\u00e9t\u00e9 \u00e0 ' + r.pct + ' %</div>';
+  html += '<div class="completion-track"><div class="completion-fill" style="width:'+r.pct+'%;"></div></div>';
+  if(r.missing.length){
+    html += '<div class="completion-missing">\u00c0 compl\u00e9ter : ' + r.missing.map(m=>m.label).join(", ") + '.</div>';
+  }
+  document.getElementById("completionBox").innerHTML = html;
+}
+
+function artHeading(title){
+  artNum++;
+  return '<h4 class="art">Article ' + artNum + ' \u2014 ' + title + '</h4>';
+}
+
+function buildContract(){
+  artNum = 0;
+  const g = id => document.getElementById(id).value;
+  const checked = id => document.getElementById(id).checked;
+
+  const isVente = typeMission === "vente";
+  const isCreatif = typeMission === "creatif";
+  const roleP = isVente ? "le Vendeur" : "le Prestataire";
+  const RoleP = isVente ? "Le Vendeur" : "Le Prestataire";
+  const roleC = isVente ? "l\u2019Acheteur" : "le Client";
+  const RoleC = isVente ? "L\u2019Acheteur" : "Le Client";
+  const duP = isVente ? "du Vendeur" : "du Prestataire";
+  const duC = isVente ? "de l\u2019Acheteur" : "du Client";
+  const isExpedition = g("livr_mode") === "Exp\u00e9dition par transporteur";
+  const momentRisque = isExpedition ? "d\u00e8s la remise du bien au transporteur" : "d\u00e8s la livraison";
+
+  const montant = parseFloat(g("pr_montant")) || 0;
+  const tvaTaux = parseFloat(g("p_tva")) || 0;
+  const ttc = tvaTaux > 0 ? montant * (1 + tvaTaux/100) : montant;
+
+  let acompteMontant = 0, soldeMontant = 0, acomptePct = parseFloat(g("pr_acompte_pct")) || 0;
+  if(modePaiement === "acompte"){
+    acompteMontant = ttc * acomptePct / 100;
+    soldeMontant = ttc - acompteMontant;
+  }
+
+  const calcRows = [];
+  if(tvaTaux > 0){
+    calcRows.push({v: eur(montant), l: "Montant HT"});
+    calcRows.push({v: eur(ttc-montant), l: "TVA (" + tvaTaux + " %)"});
+    calcRows.push({v: eur(ttc), l: "Total TTC"});
+  }
+  if(modePaiement === "acompte"){
+    calcRows.push({v: eur(acompteMontant), l: "Acompte"});
+    calcRows.push({v: eur(soldeMontant), l: "Solde"});
+  }
+  document.getElementById("calcBox").innerHTML = calcRows.map(r=>'<div class="calc-item"><div class="cv">'+r.v+'</div><div class="cl">'+r.l+'</div></div>').join("");
+
+  const dMode = g("d_mode");
+  let html = "";
+
+  const docTitle = isVente ? "Contrat de vente" : "Contrat de prestation de services";
+  html += '<h2 class="doc-title">' + docTitle + '</h2>';
+  html += '<div class="doc-ref">Contrat n\u00b0 ' + f(g("s_numero"),"r\u00e9f\u00e9rence") + (g("s_date") ? " \u2014 " + fmtDate(g("s_date")) : '') + '</div>';
+
+  html += '<p>Entre les soussign\u00e9s :</p>';
+  html += '<div class="party-block"><span class="party-label">' + (isVente ? "Le Vendeur" : "Le Prestataire") + '</span><br>' +
+    f(g("p_nom"),"nom") + ', ' + f(g("p_statut"),"statut juridique") +
+    ', SIRET ' + f(g("p_siret"),"n\u00b0 SIRET") + ', domicili\u00e9(e) au ' + f(g("p_adresse"),"adresse") +
+    (g("p_email") ? ', e-mail ' + esc(g("p_email")) : '') +
+    (g("p_tel") ? ', t\u00e9l. ' + esc(g("p_tel")) : '') +
+    '.</div>';
+
+  html += '<p style="text-align:center;font-weight:600;">ET</p>';
+
+  html += '<div class="party-block"><span class="party-label">' + (isVente ? "L\u2019Acheteur" : "Le Client") + '</span><br>' +
+    f(g("c_nom"), natureClient==="pro" ? "raison sociale" : "nom du client") +
+    (natureClient==="pro" ? ', SIRET ' + f(g("c_siret"),"n\u00b0 SIRET") : '') +
+    ', ' + (natureClient==="pro" ? "dont le si\u00e8ge social est situ\u00e9 au " : "domicili\u00e9(e) au ") + f(g("c_adresse"),"adresse") +
+    (g("c_email") ? ', e-mail ' + esc(g("c_email")) : '') +
+    '.</div>';
+
+  html += '<p>Il a \u00e9t\u00e9 convenu ce qui suit :</p>';
+
+  if(isVente){
+    html += artHeading('D\u00e9signation du bien vendu');
+    html += '<p>Le pr\u00e9sent contrat a pour objet la vente, par ' + roleP + ' \u00e0 ' + roleC + ', du bien suivant : <strong>' + f(g("o_titre"),"nom du bien") + '</strong>.</p>';
+    html += '<p>' + f(g("o_description"),"description du bien") + '</p>';
+    if(g("bien_etat")) html += '<p>\u00c9tat : ' + esc(g("bien_etat")) + '.</p>';
+  } else {
+    html += artHeading('Objet du contrat');
+    html += '<p>Le pr\u00e9sent contrat a pour objet de d\u00e9finir les conditions dans lesquelles ' + roleP + ' r\u00e9alise pour ' + roleC + ' la prestation suivante : <strong>' + f(g("o_titre"),"titre de la prestation") + '</strong>.</p>';
+    html += '<p>' + f(g("o_description"),"description d\u00e9taill\u00e9e de la prestation") + '</p>';
+  }
+  const lv = livrables.filter(l=>l.trim());
+  if(lv.length){
+    html += '<p>' + (isVente ? "Le bien est fourni avec les \u00e9l\u00e9ments suivants :" : "Les livrables suivants sont attendus :") + '</p><ul>';
+    lv.forEach(l=> html += '<li>' + esc(l) + '</li>');
+    html += '</ul>';
+  }
+
+  if(isVente){
+    html += artHeading('Livraison');
+    html += '<p>Le bien sera livr\u00e9 \u00e0 ' + roleC + ' le ' + (g("livr_date") ? fmtDate(g("livr_date")) : f("","date de livraison")) + ', selon les modalit\u00e9s suivantes : ' + esc(g("livr_mode")) + '.</p>';
+    if(isExpedition){
+      if(g("livr_adresse")) html += '<p>Le bien sera exp\u00e9di\u00e9 \u00e0 l\u2019adresse suivante : ' + esc(g("livr_adresse")) + '.</p>';
+      const FraisTxt = g("livr_frais_port") === "acheteur" ? RoleC : RoleP;
+      html += '<p>' + FraisTxt + ' prend en charge les frais de transport.</p>';
+    }
+  } else {
+    html += artHeading('Dur\u00e9e et d\u00e9lai d\u2019ex\u00e9cution');
+    html += '<p>La prestation d\u00e9bute le ' + (g("d_debut") ? fmtDate(g("d_debut")) : f("","date de d\u00e9but")) + '. ';
+    if(dMode === "delai"){
+      html += 'Elle doit \u00eatre achev\u00e9e dans le d\u00e9lai suivant : ' + f(g("d_delai"),"d\u00e9lai d\u2019ex\u00e9cution") + '.</p>';
+    } else {
+      html += 'Elle se termine le ' + (g("d_fin") ? fmtDate(g("d_fin")) : f("","date de fin")) + '.</p>';
+    }
+    html += '<p>Tout d\u00e9lai suppl\u00e9mentaire devra faire l\u2019objet d\u2019un accord \u00e9crit entre les parties.</p>';
+  }
+
+  html += artHeading('Prix et modalit\u00e9s de paiement');
+  html += '<p>Le prix ' + (isVente ? "du bien" : "de la prestation") + ' est fix\u00e9 \u00e0 <strong>' + eur(ttc) + '</strong>' + (tvaTaux > 0 ? ' TTC (TVA ' + tvaTaux + ' % incluse)' : ' (TVA non applicable, article 293 B du Code g\u00e9n\u00e9ral des imp\u00f4ts)') + '.</p>';
+  if(modePaiement === "acompte"){
+    html += '<p>Un acompte de ' + acomptePct + ' % (' + eur(acompteMontant) + ') est vers\u00e9 \u00e0 la signature du pr\u00e9sent contrat. Le solde de ' + eur(soldeMontant) + ' est vers\u00e9 ' + (isVente ? "\u00e0 la livraison du bien" : "\u00e0 la livraison de la prestation") + ', dans un d\u00e9lai de ' + f(g("pr_delai_paiement"),"d\u00e9lai de paiement") + ' \u00e0 compter de la date de facturation.</p>';
+  } else {
+    html += '<p>Le montant est payable en totalit\u00e9 \u00e0 r\u00e9ception de facture, dans un d\u00e9lai de ' + f(g("pr_delai_paiement"),"d\u00e9lai de paiement") + '.</p>';
+  }
+  if(natureClient === "pro"){
+    html += '<p>En cas de retard de paiement, des p\u00e9nalit\u00e9s seront appliqu\u00e9es au taux d\u2019int\u00e9r\u00eat l\u00e9gal en vigueur, ainsi qu\u2019une indemnit\u00e9 forfaitaire de recouvrement de 40 \u20ac, conform\u00e9ment \u00e0 l\u2019article L441-10 du Code de commerce.</p>';
+  } else {
+    html += '<p>En cas de retard de paiement, des int\u00e9r\u00eats de retard au taux l\u00e9gal en vigueur pourront \u00eatre appliqu\u00e9s, conform\u00e9ment aux r\u00e8gles de droit commun applicables entre un professionnel et un consommateur.</p>';
+  }
+
+  html += artHeading('Obligations des parties');
+  if(isVente){
+    html += '<p>' + RoleP + ' s\u2019engage \u00e0 d\u00e9livrer un bien conforme \u00e0 la description convenue, conform\u00e9ment \u00e0 l\u2019article 1604 du Code civil. ' + RoleC + ' s\u2019engage \u00e0 r\u00e9gler le prix convenu et \u00e0 prendre livraison du bien dans les conditions pr\u00e9vues.</p>';
+  } else {
+    html += '<p>' + RoleP + ' s\u2019engage \u00e0 ex\u00e9cuter la prestation avec soin et diligence, conform\u00e9ment aux r\u00e8gles de l\u2019art de sa profession. ' + RoleC + ' s\u2019engage \u00e0 fournir les informations et \u00e9l\u00e9ments n\u00e9cessaires \u00e0 la bonne ex\u00e9cution de la prestation, et \u00e0 r\u00e9gler le prix convenu dans les d\u00e9lais fix\u00e9s.</p>';
+  }
+
+  if(!isVente && checked("cl_perimetre")){
+    html += artHeading('\u00c9volution du p\u00e9rim\u00e8tre');
+    html += '<p>Toute demande de modification substantielle du p\u00e9rim\u00e8tre d\u00e9fini \u00e0 l\u2019Article 1, non pr\u00e9vue initialement, fera l\u2019objet d\u2019un devis compl\u00e9mentaire ou d\u2019un avenant \u00e9crit, distinct de la pr\u00e9sente prestation.</p>';
+  }
+
+  if(isCreatif){
+    html += artHeading('Propri\u00e9t\u00e9 intellectuelle');
+    if(checked("cl_cession_limitee")){
+      html += '<p>\u00c0 compter du paiement int\u00e9gral du prix, ' + roleP + ' c\u00e8de \u00e0 ' + roleC + ' les droits suivants, dans les limites ci-apr\u00e8s pr\u00e9cis\u00e9es : ' + f(g("cession_detail"),"\u00e9tendue de la cession") + '.</p>';
+    } else {
+      html += '<p>\u00c0 compter du paiement int\u00e9gral du prix, ' + roleP + ' c\u00e8de \u00e0 ' + roleC + ' les droits patrimoniaux d\u2019exploitation sur les livrables r\u00e9alis\u00e9s dans le cadre de la pr\u00e9sente prestation, pour le monde entier et pour la dur\u00e9e l\u00e9gale de protection du droit d\u2019auteur, conform\u00e9ment \u00e0 l\u2019article L131-3 du Code de la propri\u00e9t\u00e9 intellectuelle.</p>';
+    }
+    html += '<p>Cette cession ne porte pas atteinte au droit moral ' + duP + ', incessible et imprescriptible (articles L121-1 et suivants du Code de la propri\u00e9t\u00e9 intellectuelle). ' + RoleP + ' conserve notamment le droit de mentionner la r\u00e9alisation dans son portfolio, sauf clause de confidentialit\u00e9 contraire.</p>';
+  }
+
+  if(isVente){
+    html += artHeading('Transfert de propri\u00e9t\u00e9 et des risques');
+    if(checked("cl_reserve_propriete")){
+      html += '<p>Par d\u00e9rogation \u00e0 l\u2019article 1583 du Code civil, et conform\u00e9ment \u00e0 la clause de r\u00e9serve de propri\u00e9t\u00e9 pr\u00e9vue par l\u2019article 2367 du Code civil, ' + roleP + ' conserve la propri\u00e9t\u00e9 du bien jusqu\u2019au complet paiement du prix par ' + roleC + '. Les risques de perte ou de d\u00e9t\u00e9rioration du bien sont toutefois transf\u00e9r\u00e9s \u00e0 ' + roleC + ' ' + momentRisque + ', conform\u00e9ment \u00e0 l\u2019article 1196 du Code civil.</p>';
+    } else {
+      html += '<p>Conform\u00e9ment \u00e0 l\u2019article 1583 du Code civil, la propri\u00e9t\u00e9 du bien est transf\u00e9r\u00e9e \u00e0 ' + roleC + ' d\u00e8s l\u2019accord des parties sur la chose et sur le prix, ind\u00e9pendamment de la livraison ou du paiement effectif. Les risques de perte ou de d\u00e9t\u00e9rioration du bien sont transf\u00e9r\u00e9s \u00e0 ' + roleC + ' ' + momentRisque + ', conform\u00e9ment \u00e0 l\u2019article 1196 du Code civil.</p>';
+    }
+
+    html += artHeading('Garanties');
+    html += '<p>Conform\u00e9ment \u00e0 l\u2019article 1641 du Code civil, ' + roleP + ' garantit ' + roleC + ' contre les d\u00e9fauts cach\u00e9s du bien qui le rendraient impropre \u00e0 l\u2019usage auquel il est destin\u00e9, ou qui en diminueraient tellement l\u2019usage que ' + roleC + ' ne l\u2019aurait pas acquis, ou n\u2019en aurait donn\u00e9 qu\u2019un moindre prix, s\u2019il les avait connus.</p>';
+    if(natureClient === "particulier"){
+      html += '<p>En compl\u00e9ment, conform\u00e9ment aux articles L217-3 et suivants du Code de la consommation, ' + roleP + ' est tenu de livrer un bien conforme au contrat et r\u00e9pond des d\u00e9fauts de conformit\u00e9 existant \u00e0 la d\u00e9livrance, pendant un d\u00e9lai de deux ans \u00e0 compter de celle-ci.</p>';
+    }
+
+    if(checked("bien_oeuvre")){
+      html += artHeading('\u0152uvre originale et droits d\u2019auteur');
+      html += '<p>Le bien vendu constitue une \u0153uvre originale. La vente emporte transfert de la propri\u00e9t\u00e9 mat\u00e9rielle de l\u2019\u0153uvre, mais non des droits de propri\u00e9t\u00e9 intellectuelle qui y sont attach\u00e9s, conform\u00e9ment \u00e0 l\u2019article L111-3 du Code de la propri\u00e9t\u00e9 intellectuelle. Toute reproduction, repr\u00e9sentation ou exploitation de l\u2019\u0153uvre par ' + roleC + ' n\u00e9cessite l\u2019accord \u00e9crit pr\u00e9alable ' + duP + ', en sa qualit\u00e9 d\u2019auteur.</p>';
+    }
+  }
+
+  if(checked("cl_confidentialite")){
+    html += artHeading('Confidentialit\u00e9');
+    html += '<p>Sur le fondement de la libert\u00e9 contractuelle pr\u00e9vue par l\u2019article 1103 du Code civil, les parties s\u2019engagent \u00e0 garder confidentielles les informations \u00e9chang\u00e9es dans le cadre de l\u2019ex\u00e9cution du pr\u00e9sent contrat, et \u00e0 ne pas les divulguer \u00e0 des tiers sans accord \u00e9crit pr\u00e9alable, pendant toute la dur\u00e9e du contrat et pour une dur\u00e9e de deux ans apr\u00e8s son terme. Cette obligation s\u2019applique sans pr\u00e9judice de la protection l\u00e9gale du secret des affaires pr\u00e9vue par les articles L151-1 et suivants du Code de commerce.</p>';
+  }
+
+  if(checked("cl_nonconcurrence")){
+    html += artHeading('Non-concurrence');
+    html += '<p>' + RoleP + ' s\u2019engage \u00e0 ne pas exercer d\u2019activit\u00e9 concurrente \u00e0 celle ' + duC + ' pendant une dur\u00e9e de ' + f(g("nc_duree"),"dur\u00e9e") + ', sur la zone g\u00e9ographique suivante : ' + f(g("nc_zone"),"zone g\u00e9ographique") + '. Cette clause repose sur le principe de la libert\u00e9 du commerce et de l\u2019industrie ; pour rester valable, elle doit \u00eatre proportionn\u00e9e et peut n\u00e9cessiter une contrepartie financi\u00e8re, \u00e0 d\u00e9faut de quoi elle est susceptible d\u2019\u00eatre annul\u00e9e par un juge.</p>';
+  }
+
+  if(!isVente && checked("cl_responsabilite")){
+    const plafond = (g("plafond_montant")||"").trim();
+    const plafondTxt = plafond ? esc(plafond) + ' \u20ac' : 'montant total per\u00e7u au titre de la prestation';
+    html += artHeading('Limitation de responsabilit\u00e9');
+    html += '<p>La responsabilit\u00e9 ' + duP + ' au titre du pr\u00e9sent contrat est limit\u00e9e, tous dommages confondus, au ' + plafondTxt + '. Cette limitation ne s\u2019applique pas en cas de faute lourde ou intentionnelle.</p>';
+  }
+
+  if(checked("cl_assurance")){
+    html += artHeading('Assurance');
+    html += '<p>' + RoleP + ' d\u00e9clare \u00eatre couvert\u00b7e par une assurance responsabilit\u00e9 civile professionnelle pour les dommages pouvant r\u00e9sulter de l\u2019ex\u00e9cution du pr\u00e9sent contrat.</p>';
+  }
+
+  if(!isVente && g("cl_soustraitance") === "autorisee"){
+    html += artHeading('Sous-traitance');
+    html += '<p>' + RoleP + ' est autoris\u00e9(e) \u00e0 recourir \u00e0 la sous-traitance pour l\u2019ex\u00e9cution de tout ou partie de la prestation, sous sa responsabilit\u00e9 exclusive.</p>';
+  } else if(!isVente && g("cl_soustraitance") === "interdite"){
+    html += artHeading('Sous-traitance');
+    html += '<p>' + RoleP + ' s\u2019engage \u00e0 ex\u00e9cuter personnellement la prestation et ne pourra recourir \u00e0 la sous-traitance sans l\u2019accord \u00e9crit pr\u00e9alable ' + duC + '.</p>';
+  }
+
+  if(checked("cl_rgpd")){
+    let txt = '<p>Dans le cadre de l\u2019ex\u00e9cution du pr\u00e9sent contrat, ' + roleP + ' peut \u00eatre amen\u00e9(e) \u00e0 traiter des donn\u00e9es \u00e0 caract\u00e8re personnel pour le compte ' + duC;
+    if(g("rgpd_finalite")) txt += ', aux fins suivantes : ' + esc(g("rgpd_finalite"));
+    txt += '. ';
+    if(g("rgpd_duree")) txt += 'Ces donn\u00e9es sont conserv\u00e9es pendant une dur\u00e9e de ' + esc(g("rgpd_duree")) + '. ';
+    txt += 'Les parties s\u2019engagent \u00e0 respecter les obligations pr\u00e9vues par le R\u00e8glement (UE) 2016/679 (RGPD) et la loi n\u00b0 78-17 du 6 janvier 1978 modifi\u00e9e.</p>';
+    html += artHeading('Protection des donn\u00e9es personnelles') + txt;
+  }
+
+  if(!isVente){
+    html += artHeading('R\u00e9siliation');
+    html += '<p>Le pr\u00e9sent contrat peut \u00eatre r\u00e9sili\u00e9 de fa\u00e7on anticip\u00e9e par l\u2019une ou l\u2019autre des parties en cas de manquement grave de l\u2019autre partie \u00e0 ses obligations, apr\u00e8s mise en demeure rest\u00e9e sans effet pendant 15 jours.' + (modePaiement==="acompte" ? ' Tout acompte vers\u00e9 reste d\u00fb \u00e0 ' + roleP + ' au titre des prestations d\u00e9j\u00e0 r\u00e9alis\u00e9es.' : '') + '</p>';
+  }
+
+  html += artHeading('Force majeure');
+  html += '<p>Aucune des parties ne pourra \u00eatre tenue responsable d\u2019un manquement \u00e0 ses obligations r\u00e9sultant d\u2019un cas de force majeure tel que d\u00e9fini par l\u2019article 1218 du Code civil.</p>';
+
+  if(natureClient === "particulier"){
+    html += artHeading('Droit de r\u00e9tractation');
+    const rc = g("retract_case");
+    if(rc === "personnalise"){
+      html += '<p>Conform\u00e9ment \u00e0 l\u2019article L221-28, 3\u00b0, du Code de la consommation, le droit de r\u00e9tractation ne s\u2019applique pas \u00e0 la fourniture de biens confectionn\u00e9s selon les sp\u00e9cifications du client ou nettement personnalis\u00e9s. Le ' + (isVente?'bien':'service') + ' objet du pr\u00e9sent contrat r\u00e9pond \u00e0 ce crit\u00e8re. Cette exception \u00e9tant interpr\u00e9t\u00e9e strictement par les tribunaux, ' + roleP + ' s\u2019engage \u00e0 en informer clairement ' + roleC + ' avant la conclusion du contrat.</p>';
+    } else if(rc === "renonce"){
+      html += '<p>Conform\u00e9ment \u00e0 l\u2019article L221-28, 1\u00b0, du Code de la consommation, ' + roleC + ' reconna\u00eet demander express\u00e9ment l\u2019ex\u00e9cution imm\u00e9diate de la prestation et la perte de son droit de r\u00e9tractation une fois celle-ci pleinement ex\u00e9cut\u00e9e.</p>';
+    } else {
+      html += '<p>Conform\u00e9ment \u00e0 l\u2019article L221-18 du Code de la consommation, ' + roleC + ' dispose d\u2019un d\u00e9lai de 14 jours \u00e0 compter de ' + (isVente ? 'la r\u00e9ception du bien' : 'la signature du pr\u00e9sent contrat') + ' pour exercer son droit de r\u00e9tractation, sans avoir \u00e0 justifier de motif ni \u00e0 supporter de p\u00e9nalit\u00e9.</p>';
+    }
+  }
+
+  html += artHeading('Int\u00e9gralit\u00e9 de l\u2019accord et modification');
+  html += '<p>Le pr\u00e9sent contrat exprime l\u2019int\u00e9gralit\u00e9 des engagements des parties relatifs \u00e0 son objet. Il annule et remplace tout accord ant\u00e9rieur, \u00e9crit ou oral, portant sur le m\u00eame objet. Toute modification devra faire l\u2019objet d\u2019un avenant \u00e9crit, dat\u00e9 et sign\u00e9 par les deux parties.</p>';
+
+  html += artHeading('Litiges et droit applicable');
+  html += '<p>Le pr\u00e9sent contrat est soumis au droit fran\u00e7ais. En cas de litige, les parties s\u2019efforceront de trouver une solution amiable avant toute action judiciaire.</p>';
+  if(natureClient === "particulier"){
+    html += '<p>Conform\u00e9ment \u00e0 l\u2019article R631-3 du Code de la consommation, le tribunal comp\u00e9tent est celui du lieu o\u00f9 demeure ' + roleC + ' au moment de la conclusion du contrat. ' + RoleC + ' peut \u00e9galement recourir gratuitement \u00e0 un m\u00e9diateur de la consommation, conform\u00e9ment \u00e0 l\u2019article L612-1 du m\u00eame code.</p>';
+  } else {
+    const trib = g("lit_tribunal")==="siege" ? "tribunal comp\u00e9tent du si\u00e8ge " + duP : "tribunal comp\u00e9tent du domicile du d\u00e9fendeur";
+    html += '<p>\u00c0 d\u00e9faut d\u2019accord amiable, le litige sera soumis au ' + trib + '.</p>';
+  }
+
+  html += '<p style="margin-top:24px;">Les parties peuvent signer le pr\u00e9sent contrat par voie \u00e9lectronique, au moyen de la solution de leur choix ; une telle signature a la m\u00eame valeur juridique qu\u2019une signature manuscrite, conform\u00e9ment aux articles 1366 et 1367 du Code civil.</p>';
+
+  html += '<div class="closing-block">';
+  html += '<p>Fait \u00e0 ' + f(g("s_lieu"),"lieu de signature") + ', le ' + (g("s_date") ? fmtDate(g("s_date")) : f("","date de signature")) + '.<br>En deux exemplaires originaux.</p>';
+  html += '<div class="sign-block">';
+  html += '<div class="sign-col"><div class="sign-line">' + (isVente?"Le Vendeur":"Le Prestataire") + ' \u2014 ' + f(g("p_nom"),"nom") + '</div><div class="seal-note">Lu et approuv\u00e9, bon pour accord</div></div>';
+  html += '<div class="sign-col"><div class="sign-line">' + (isVente?"L\u2019Acheteur":"Le Client") + ' \u2014 ' + f(g("c_nom"),"nom") + '</div><div class="seal-note">Lu et approuv\u00e9, bon pour accord</div></div>';
+  html += '</div>';
+  html += '</div>';
+
+  return html;
+}
+
+function update(){
+  document.getElementById("paper").innerHTML = buildContract();
+  renderCompletion();
+}
+
+function copyContract(){
+  const text = document.getElementById("paper").innerText;
+  navigator.clipboard.writeText(text).then(()=>{
+    const b = event.target; const old = b.textContent;
+    b.textContent = "Copi\u00e9"; setTimeout(()=>{ b.textContent = old; }, 1800);
+  });
+}
+
+function downloadContract(){
+  // Word (moteur de rendu HTML interne) ignore display:flex et empilerait les deux
+  // colonnes de signature verticalement. On clone le contrat, et on remplace
+  // uniquement le bloc des signatures par un <table> à deux colonnes, que Word
+  // sait positionner correctement côte à côte.
+  const paperClone = document.getElementById("paper").cloneNode(true);
+  const signBlock = paperClone.querySelector(".sign-block");
+  if(signBlock){
+    const cols = signBlock.querySelectorAll(".sign-col");
+    const table = document.createElement("table");
+    table.setAttribute("style", "width:100%;border-collapse:collapse;margin-top:30px;");
+    table.setAttribute("cellpadding", "0");
+    table.setAttribute("cellspacing", "0");
+    const tr = document.createElement("tr");
+    cols.forEach(function(col){
+      const td = document.createElement("td");
+      td.setAttribute("style", "width:50%;text-align:center;vertical-align:top;padding:0 15px;");
+      td.innerHTML = col.innerHTML;
+      tr.appendChild(td);
+    });
+    table.appendChild(tr);
+    signBlock.replaceWith(table);
+  }
+  const content = paperClone.innerHTML;
+  const full = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><title>Contrat</title>' +
+    '<style>body{font-family:Georgia,serif;color:#2B2620;line-height:1.6;} h4{border-bottom:1px solid #ddd;padding-bottom:4px;margin-top:24px;} .missing{color:#9B2C2C;font-style:italic;}' +
+    '.sign-line{border-top:1px solid #333;margin-top:50px;padding-top:6px;font-style:italic;} .doc-title{text-align:center;}' +
+    '.doc-ref{text-align:center;color:#777;font-size:.85em;margin-bottom:20px;}</style>' +
+    '</head><body>' + content + '</body></html>';
+  const blob = new Blob([full], {type:"application/msword;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "contrat.doc";
+  a.click();
+}
+
+renderLivrables();
+document.getElementById("s_date").value = new Date().toISOString().split("T")[0];
+document.getElementById("s_numero").value = "CTR-" + new Date().getFullYear() + "-" + String(Math.floor(Math.random()*900+100));
+document.getElementById("field-delai").classList.remove("show");
+updateRetractOptions();
+update();
+</script>
+</body>
+</html>
