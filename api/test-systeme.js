@@ -5,23 +5,23 @@ export default async function handler(req, res) {
   }
 
   try {
-    const [tagsRes, contactsRes] = await Promise.all([
-      fetch('https://api.systeme.io/api/tags', {
+    const [byEmailRes, byTagRes] = await Promise.all([
+      fetch('https://api.systeme.io/api/contacts?email=nicolas.audigier@gmail.com&limit=10', {
         headers: { 'X-API-Key': apiKey }
       }),
-      fetch('https://api.systeme.io/api/contacts?limit=10', {
+      fetch('https://api.systeme.io/api/contacts?tags[]=2068632&limit=10', {
         headers: { 'X-API-Key': apiKey }
       })
     ]);
 
-    const tags = await tagsRes.json();
-    const contacts = await contactsRes.json();
+    const byEmail = await byEmailRes.json();
+    const byTag = await byTagRes.json();
 
     res.status(200).json({
-      tags_status: tagsRes.status,
-      tags,
-      contacts_status: contactsRes.status,
-      contacts
+      byEmail_status: byEmailRes.status,
+      byEmail,
+      byTag_status: byTagRes.status,
+      byTag
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
