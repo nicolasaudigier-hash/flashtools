@@ -29,9 +29,11 @@
     });
   }
 
-  if (!isAllowed()) {
-    // On masque le contenu avant de rediriger pour éviter le "flash" de l'outil gratuit.
-    document.documentElement.style.visibility = "hidden";
+  if (isAllowed()) {
+    // Accès légitime : on réaffiche le contenu (masqué par défaut via le <style> du <head>).
+    document.documentElement.style.visibility = "visible";
+  } else {
+    // Accès refusé : on reste masqué (déjà le cas par défaut) et on redirige.
     window.location.replace(REDIRECT_URL);
   }
 
