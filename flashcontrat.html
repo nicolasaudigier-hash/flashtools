@@ -179,11 +179,7 @@ footer{text-align:center; padding:26px 16px 10px; color:var(--muted2); font-size
 </style>
 </head>
 <body>
-<div style="position:fixed;top:0;left:0;background:#000;color:#0f0;padding:10px;z-index:99999;visibility:visible;font-family:monospace;font-size:12px;max-width:90vw;word-break:break-all;">
-  inIframe : <span id="dbg1"></span><br>
-  referrer : "<span id="dbg2"></span>"
-</div>
-<script>
+<script src="https://nicolasaudigier-hash.github.io/flashtools/flashtools-guard.js?v=2"></script>
 document.getElementById('dbg1').textContent = (window.self !== window.top);
 document.getElementById('dbg2').textContent = document.referrer;
 document.documentElement.style.visibility = "visible";
