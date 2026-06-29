@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<style>html{visibility:hidden}</style>
+<meta name="robots" content="noindex">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FlashTréso | FlashTools</title>
@@ -246,6 +248,7 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
 </style>
 </head>
 <body>
+<script src="https://nicolasaudigier-hash.github.io/flashtools/flashtools-guard.js?v=2"></script>
 <div class="hdr">
   <div class="logo"><span style="font-size:1.35rem;line-height:1">💎</span><div class="lt"><span class="lf">Flash</span><span class="ls">Tréso</span></div></div>
   <div class="hdr-btns">
@@ -293,8 +296,7 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
       </select>
     </div>
     <div class="ig"><div class="il">CA mensuel moyen — activité principale <span>HT</span></div>
-      <input class="if if-lg" type="number" id="s-ca" placeholder="3 000" onblur="updStart()" onkeydown="if(event.key==='Enter'){this.blur();}">
-    </div>
+      <input class="if if-lg" type="number" id="s-ca" placeholder="3 000" onblur="updStart()" onkeydown="if(event.key==='Enter'){this.blur();}"></div>
     <div id="s-cma-row" class="ig" style="display:none">
       <div class="il">Artisan inscrit CMA ? <span>Chambre des Métiers</span></div>
       <div style="display:flex;gap:8px;margin-top:6px">
@@ -339,8 +341,7 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
         </select>
       </div>
       <div class="ig"><div class="il">CA mensuel moyen — activité secondaire <span>HT</span></div>
-        <input class="if" type="number" id="s-ca2" placeholder="1 000" onblur="updStart()" onkeydown="if(event.key==='Enter'){this.blur();}">
-      </div>
+        <input class="if" type="number" id="s-ca2" placeholder="1 000" onblur="updStart()" onkeydown="if(event.key==='Enter'){this.blur();}"></div>
     </div>
   </div>
   <div class="card">
