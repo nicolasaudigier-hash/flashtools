@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<style>html{visibility:hidden}</style>
+<meta name="robots" content="noindex">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Générateur QR Code Gratuit — FlashTools</title>
@@ -234,11 +236,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 .col-form .card:nth-child(3){animation-delay:.12s}
 .qr-pop{animation:qrIn .38s var(--spring) forwards}
 
-/* RESPONSIVE MOBILE
-   ─ Ordre : formulaire d'abord, aperçu en dessous
-   ─ Design + Guide : accordéon
-   ─ Pas de FAB, pas de tiroir
-*/
+/* RESPONSIVE MOBILE */
 @media(max-width:860px){
   .app{grid-template-columns:1fr;padding:12px 12px 40px;gap:12px}
   .col-form{order:1}
@@ -274,6 +272,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 </style>
 </head>
 <body>
+<script src="https://nicolasaudigier-hash.github.io/flashtools/flashtools-guard.js?v=2"></script>
 
 <header class="topbar">
   <a class="logo" href="#">
