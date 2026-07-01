@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <style>html{visibility:hidden}</style>
+    <meta name="robots" content="noindex">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Générateur de Palettes — FlashTools</title>
@@ -195,6 +197,7 @@
     </style>
 </head>
 <body>
+<script src="https://nicolasaudigier-hash.github.io/flashtools/flashtools-guard.js?v=2"></script>
 <div class="container">
     <header class="header">
         <div class="header-bg"></div>
@@ -428,7 +431,6 @@ function hslToHex(h,s,l){
     h=((h%360)+360)%360;
     s=Math.max(0,Math.min(100,s));
     l=Math.max(0,Math.min(100,l));
-    // Cas achromatique : saturation nulle → gris pur
     if(s===0){const v=Math.round(l/100*255);return'#'+v.toString(16).padStart(2,'0').repeat(3);}
     s/=100;l/=100;
     const c=(1-Math.abs(2*l-1))*s,x=c*(1-Math.abs((h/60)%2-1)),m=l-c/2;
@@ -464,7 +466,6 @@ function wcagBadges(color){
 }
 
 // ── DALTONISME — matrices de simulation ────────────────────
-// Source : Machado et al. (2009) — approximation linéaire sRGB
 const CVD_MATRICES={
     deuteranopia:[0.367,0.861,-0.228,0.280,0.673,0.047,-0.012,0.043,0.969],
     protanopia:  [0.152,1.053,-0.205,0.115,0.786,0.099,-0.004,-0.048,1.052],
@@ -478,13 +479,11 @@ function simulateCVD(hex,type){
     let r=parseInt(hex.slice(1,3),16)/255;
     let g=parseInt(hex.slice(3,5),16)/255;
     let b=parseInt(hex.slice(5,7),16)/255;
-    // linéariser
     const lin=v=>v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2.4);
     const rl=lin(r),gl=lin(g),bl=lin(b);
     const nr=m[0]*rl+m[1]*gl+m[2]*bl;
     const ng=m[3]*rl+m[4]*gl+m[5]*bl;
     const nb=m[6]*rl+m[7]*gl+m[8]*bl;
-    // re-gammaiser
     const gam=v=>v<=0.0031308?12.92*v:1.055*Math.pow(Math.max(0,v),1/2.4)-0.055;
     const toHex=v=>Math.round(Math.max(0,Math.min(1,gam(v)))*255).toString(16).padStart(2,'0');
     return'#'+toHex(nr)+toHex(ng)+toHex(nb);
@@ -506,7 +505,10 @@ function setCVD(tab,type,btn){
     document.querySelectorAll(`#cvdSection${tabPrefix} .cvd-tab`).forEach(t=>t.classList.remove('active'));
     btn.classList.add('active');
     const palette=tab==='gen'?currentPaletteGen:currentPaletteCorr;
+    if(tab==='gen') cvdModeGen=type; else cvdModeCorr=type;
     renderCVD(tabPrefix,palette,type);
+    const previewId=tab==='gen'?'previewGrid':'correctedPreviewGrid';
+    displayPreviews(palette,previewId,type);
 }
 
 // ── EXPORT ─────────────────────────────────────────────────
@@ -950,18 +952,6 @@ function restorePalette(id){
 
 // ── APERÇUS FILTRÉS CVD ────────────────────────────────────
 let cvdModeGen='normal', cvdModeCorr='normal';
-
-function setCVD(tab,type,btn){
-    const tabCap=tab==='gen'?'Gen':'Corr';
-    document.querySelectorAll(`#cvdSection${tabCap} .cvd-tab`).forEach(t=>t.classList.remove('active'));
-    btn.classList.add('active');
-    const palette=tab==='gen'?currentPaletteGen:currentPaletteCorr;
-    if(tab==='gen') cvdModeGen=type; else cvdModeCorr=type;
-    renderCVD(tabCap,palette,type);
-    // Mettre à jour les aperçus avec le filtre daltonisme
-    const previewId=tab==='gen'?'previewGrid':'correctedPreviewGrid';
-    displayPreviews(palette,previewId,type);
-}
 
 updateContextInfo();
 initColorInputs();
