@@ -1,17 +1,18 @@
 /* ============================================================
    FLASHTOOLS GUARD — fichier unique, partagé par les 26 apps
    Rôle réel : empêcher l'accès direct à l'URL GitHub brute.
-   La vérification d'abonnement elle-même est déjà faite par
-   Systeme.io en amont (page espace membre protégée).
+   La vérification d'abonnement elle-même doit être faite en
+   amont par la page qui embarque l'outil en iframe (page
+   Systeme.io réservée aux membres de la formation FlashTools Free).
    ============================================================ */
 (function () {
-
   // Domaine(s) autorisé(s) à embarquer les outils en iframe.
-  // ⚠️ À vérifier : si Systeme.io sert tes pages membres sous un
-  // sous-domaine *.systeme.io en plus de flashtools.fr, ajoute-le ici.
+  // Inclut le domaine personnalisé ET le sous-domaine natif
+  // Systeme.io utilisé par les leçons de la formation protégée.
   var ALLOWED_REFERRER_HOSTS = [
     "flashtools.fr",
-    "www.flashtools.fr"
+    "www.flashtools.fr",
+    "nicolas-audigier.systeme.io"
   ];
 
   // Page vers laquelle on redirige en cas de blocage.
@@ -36,5 +37,4 @@
     // Accès refusé : on reste masqué (déjà le cas par défaut) et on redirige.
     window.location.replace(REDIRECT_URL);
   }
-
 })();
