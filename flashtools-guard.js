@@ -2,27 +2,16 @@
    FLASHTOOLS GUARD — fichier unique, partagé par les 26 apps
    Vérifie l'abonnement réel via l'API Vercel (api/verify.js),
    qui interroge Systeme.io pour les tags acces_actif / acces_essai.
-   Garde aussi la protection iframe + referrer en complément.
+
+   Pas de contrainte iframe/referrer : un lien direct d'une app
+   vers une autre (ex. Charges Micro → Agenda Fiscal) doit rester
+   fonctionnel. La vérification email/API suffit à protéger l'accès
+   quel que soit le mode de chargement de la page.
    ============================================================ */
 (function () {
   var VERIFY_API = "https://flashtools.vercel.app/api/verify";
   var REDIRECT_URL = "https://nicolasaudigier-hash.github.io/flashtools/flash-offre.html?status=blocked";
   var STORAGE_KEY = "flashtools_email";
-
-  var ALLOWED_REFERRER_HOSTS = [
-    "flashtools.fr",
-    "www.flashtools.fr",
-    "nicolas-audigier.systeme.io"
-  ];
-
-  function isEmbeddedProperly() {
-    var inIframe = window.self !== window.top;
-    if (!inIframe) return false;
-    var ref = document.referrer || "";
-    return ALLOWED_REFERRER_HOSTS.some(function (host) {
-      return ref.indexOf(host) !== -1;
-    });
-  }
 
   function isValidEmail(value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -84,13 +73,6 @@
     checkAccess(email);
   }
 
-  // 1. Blocage immédiat si l'outil n'est pas chargé correctement en iframe.
-  if (!isEmbeddedProperly()) {
-    block();
-    return;
-  }
-
-  // 2. Vérification réelle de l'accès via l'API.
   var storedEmail = getStoredEmail();
   if (storedEmail && isValidEmail(storedEmail)) {
     checkAccess(storedEmail);
