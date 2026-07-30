@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <style>html{visibility:hidden}</style>
-    <meta name="robots" content="noindex">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Générateur Politique de Confidentialité RGPD | FlashTools</title>
@@ -465,7 +463,6 @@
     </style>
 </head>
 <body>
-    <script src="https://nicolasaudigier-hash.github.io/flashtools/flashtools-guard.js?v=2"></script>
     <div class="container">
         <!-- HEADER -->
         <div class="header">
@@ -540,8 +537,16 @@
                         <div class="checkbox-item">
                             <input type="checkbox" id="data-account" value="account">
                             <label for="data-account">
-                                <strong>Comptes utilisateurs</strong><br>
-                                <small>Inscription, connexion, profil</small>
+                                <strong>Comptes utilisateurs (avec mot de passe)</strong><br>
+                                <small>Inscription, connexion classique, profil</small>
+                            </label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="data-localstorage" value="localstorage">
+                            <label for="data-localstorage">
+                                <strong>Vérification d'accès sans mot de passe</strong><br>
+                                <small>Ex : email seul mémorisé dans le navigateur (localStorage) pour vérifier un abonnement, sans compte classique</small>
                             </label>
                         </div>
 
@@ -637,6 +642,13 @@
                             <input type="checkbox" id="service-sendinblue" value="sendinblue">
                             <label for="service-sendinblue">
                                 <strong>Brevo (Sendinblue)</strong> - Email marketing
+                            </label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="service-systemeio" value="systemeio">
+                            <label for="service-systemeio">
+                                <strong>Systeme.io</strong> - CRM, gestion d'abonnements et emails automatiques
                             </label>
                         </div>
 
@@ -914,6 +926,7 @@
                 hasContact: document.getElementById('data-contact').checked,
                 hasNewsletter: document.getElementById('data-newsletter').checked,
                 hasAccount: document.getElementById('data-account').checked,
+                hasLocalStorage: document.getElementById('data-localstorage').checked,
                 hasEcommerce: document.getElementById('data-ecommerce').checked,
                 hasComments: document.getElementById('data-comments').checked,
                 
@@ -928,6 +941,7 @@
                 hasPaypal: document.getElementById('service-paypal').checked,
                 hasMailchimp: document.getElementById('service-mailchimp').checked,
                 hasSendinblue: document.getElementById('service-sendinblue').checked,
+                hasSystemeio: document.getElementById('service-systemeio').checked,
                 hasCloudflare: document.getElementById('service-cloudflare').checked,
                 hasGoogleFonts: document.getElementById('service-googlefonts').checked,
                 otherServices: document.getElementById('otherServices').value.trim(),
@@ -973,6 +987,9 @@
             if (data.hasAccount) {
                 content += `<li><strong>Compte utilisateur :</strong> Nom, prénom, email, mot de passe (chiffré), date de création</li>`;
             }
+            if (data.hasLocalStorage) {
+                content += `<li><strong>Vérification d'accès sans mot de passe :</strong> Votre adresse email est mémorisée localement dans votre navigateur (stockage local / « localStorage ») pour vérifier votre accès sans vous la redemander à chaque visite. Cette donnée reste sur votre appareil et n'est transmise à nos serveurs que pour effectuer la vérification.</li>`;
+            }
             if (data.hasEcommerce) {
                 content += `<li><strong>Commandes :</strong> Nom, prénom, adresse de livraison, adresse de facturation, téléphone, email, historique des achats</li>`;
             }
@@ -997,6 +1014,9 @@
             }
             if (data.hasAccount) {
                 content += `<li><strong>Gestion de votre compte</strong> - Base légale : Exécution du contrat</li>`;
+            }
+            if (data.hasLocalStorage) {
+                content += `<li><strong>Vérification de votre droit d'accès aux services</strong> - Base légale : Exécution du contrat</li>`;
             }
             if (data.hasEcommerce) {
                 content += `<li><strong>Traitement des commandes</strong> - Base légale : Exécution du contrat</li>`;
@@ -1032,6 +1052,9 @@
             }
             if (data.hasSendinblue) {
                 content += `<li><strong>Brevo (Sendinblue)</strong> - Envoi d'emails marketing (UE)</li>`;
+            }
+            if (data.hasSystemeio) {
+                content += `<li><strong>Systeme.io</strong> - Gestion de la relation client, des abonnements et envoi des emails automatiques</li>`;
             }
             if (data.hasAnalytics) {
                 content += `<li><strong>Google Analytics</strong> - Analyse d'audience (USA, Google LLC certifié Data Privacy Framework)</li>`;
@@ -1120,17 +1143,23 @@
                     (<a href="https://www.cnil.fr" target="_blank">www.cnil.fr</a>) si vous estimez que vos droits ne sont pas respectés.
                 </p>
 
-                <h3>8. COOKIES</h3>
-                <p>Notre site utilise des cookies pour améliorer votre expérience de navigation.</p>
+                <h3>8. COOKIES${data.hasLocalStorage ? ' ET STOCKAGE LOCAL' : ''}</h3>
+                <p>Notre site utilise des cookies${data.hasLocalStorage ? ' et des technologies de stockage local' : ''} pour améliorer votre expérience de navigation.</p>
             `;
 
             // Types de cookies
-            content += `<p><strong>Types de cookies utilisés :</strong></p><ul>`;
+            content += `<p><strong>Types de cookies${data.hasLocalStorage ? ' et stockages' : ''} utilisés :</strong></p><ul>`;
             
             if (data.hasFunctional) {
                 content += `
                 <li><strong>Cookies essentiels :</strong> Nécessaires au fonctionnement du site (panier, connexion). 
                 Ces cookies ne nécessitent pas votre consentement.</li>
+                `;
+            }
+
+            if (data.hasLocalStorage) {
+                content += `
+                <li><strong>Stockage local (localStorage) :</strong> Utilisé pour mémoriser l'email associé à votre accès, afin de vérifier vos droits sans vous le redemander à chaque visite. Cette donnée reste stockée sur votre appareil et peut être effacée à tout moment via les paramètres de votre navigateur.</li>
                 `;
             }
             
@@ -1157,14 +1186,14 @@
 
             content += `
                 </ul>
-                <p><strong>Gestion des cookies :</strong></p>
+                <p><strong>Gestion des cookies${data.hasLocalStorage ? ' et du stockage local' : ''} :</strong></p>
                 <ul>
                     <li>Vous pouvez accepter ou refuser les cookies via notre bandeau de consentement</li>
                     <li>Vous pouvez modifier vos préférences à tout moment</li>
-                    <li>Vous pouvez configurer votre navigateur pour refuser les cookies</li>
+                    <li>Vous pouvez configurer votre navigateur pour refuser les cookies${data.hasLocalStorage ? ' ou effacer le stockage local' : ''}</li>
                 </ul>
                 <p>
-                    <strong>Note :</strong> Le refus des cookies peut limiter certaines fonctionnalités du site.
+                    <strong>Note :</strong> Le refus des cookies${data.hasLocalStorage ? ' ou l\'effacement du stockage local' : ''} peut limiter certaines fonctionnalités du site${data.hasLocalStorage ? ' (vous devrez ressaisir votre email à chaque visite)' : ''}.
                 </p>
             `;
 
@@ -1184,7 +1213,13 @@
                 </p>
                 <ul>
                     <li>Chiffrement SSL/TLS pour les transmissions de données</li>
-                    <li>Mots de passe chiffrés (hachage sécurisé)</li>
+            `;
+
+            if (data.hasAccount) {
+                content += `<li>Mots de passe chiffrés (hachage sécurisé)</li>`;
+            }
+
+            content += `
                     <li>Accès limité aux données aux seules personnes habilitées</li>
                     <li>Sauvegardes régulières</li>
                     <li>Mise à jour régulière des systèmes de sécurité</li>
@@ -1192,8 +1227,8 @@
 
                 <h3>10. MINEURS</h3>
                 <p>
-                    Notre site n'est pas destiné aux personnes de moins de 16 ans. Nous ne collectons pas sciemment de données 
-                    personnelles auprès de mineurs. Si vous êtes parent et pensez que votre enfant nous a fourni des données, 
+                    Notre site n'est pas destiné aux personnes de moins de 15 ans. Nous ne collectons pas sciemment de données 
+                    personnelles auprès de mineurs de moins de 15 ans sans le consentement conjoint de leur représentant légal, conformément à l'article 45 de la loi Informatique et Libertés. Si vous êtes parent et pensez que votre enfant nous a fourni des données, 
                     contactez-nous pour que nous puissions les supprimer.
                 </p>
 
