@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <style>html{visibility:hidden}</style>
+    <meta name="robots" content="noindex">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suggestions | FlashTools</title>
+    <meta name="description" content="Proposez vos idées d'outils ou d'améliorations pour FlashTools.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #0A0E1A;
+            color: #E2E8F0;
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container { max-width: 720px; margin: 0 auto; }
+
+        .logo {
+            font-size: 1.6em;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        .logo .flash { color: #06B6D4; }
+        .logo .tools { color: #8B5CF6; }
+
+        h1 {
+            font-size: 1.8em;
+            margin-bottom: 8px;
+            color: #F1F5F9;
+        }
+
+        .subtitle {
+            color: #94A3B8;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+
+        .rules-box {
+            background: #151D30;
+            border: 1px solid rgba(6,182,212,0.2);
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin-bottom: 30px;
+            font-size: 0.88em;
+            color: #CBD5E1;
+        }
+        .rules-box strong { color: #06B6D4; }
+        .rules-box ul { margin: 8px 0 0 18px; }
+        .rules-box li { margin-bottom: 4px; }
+
+        .form-card {
+            background: #151D30;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 40px;
+        }
+
+        .form-card h2 {
+            font-size: 1.1em;
+            margin-bottom: 14px;
+            color: #F1F5F9;
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 12px 14px;
+            background: #0A0E1A;
+            border: 1.5px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #E2E8F0;
+            font-family: inherit;
+            font-size: 0.95em;
+            resize: vertical;
+        }
+        textarea { min-height: 90px; margin-bottom: 12px; }
+        input[type="text"] { margin-bottom: 14px; }
+        textarea:focus, input:focus { outline: none; border-color: #06B6D4; }
+        textarea::placeholder, input::placeholder { color: #64748B; }
+
+        .char-count {
+            font-size: 0.78em;
+            color: #64748B;
+            text-align: right;
+            margin-top: -8px;
+            margin-bottom: 14px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #06B6D4, #8B5CF6);
+            color: #04141A;
+            border: none;
+            padding: 12px 26px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95em;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .btn-submit:hover { opacity: 0.9; }
+        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .form-message {
+            margin-top: 12px;
+            font-size: 0.88em;
+            display: none;
+        }
+        .form-message.success { color: #6EE7B7; display: block; }
+        .form-message.error { color: #FCA5A5; display: block; }
+
+        .list-title {
+            font-size: 1.2em;
+            margin-bottom: 16px;
+            color: #F1F5F9;
+        }
+
+        .suggestion-item {
+            background: #151D30;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .vote-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .vote-btn {
+            background: #1E293B;
+            border: 1.5px solid rgba(6,182,212,0.3);
+            color: #06B6D4;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .vote-btn:hover:not(:disabled) { background: rgba(6,182,212,0.15); }
+        .vote-btn:disabled {
+            opacity: 0.4;
+            cursor: default;
+            border-color: rgba(16,185,129,0.5);
+            color: #6EE7B7;
+        }
+
+        .vote-count {
+            font-size: 0.8em;
+            color: #94A3B8;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .suggestion-content { flex: 1; }
+        .suggestion-text { color: #E2E8F0; margin-bottom: 6px; white-space: pre-wrap; word-break: break-word; }
+        .suggestion-meta { font-size: 0.78em; color: #64748B; }
+
+        .empty-state {
+            color: #64748B;
+            text-align: center;
+            padding: 30px 0;
+            font-size: 0.9em;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #94A3B8;
+            text-decoration: none;
+            font-size: 0.88em;
+        }
+        .back-link:hover { color: #06B6D4; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo"><span class="flash">Flash</span><span class="tools">Tools</span>.fr</div>
+        <h1>Vos suggestions</h1>
+        <p class="subtitle">Proposez une idée d'outil ou d'amélioration. Les suggestions les plus votées orientent nos priorités.</p>
+
+        <div class="rules-box">
+            <strong>Règles de modération</strong>
+            <ul>
+                <li>Restez courtois — pas d'insultes, de propos discriminatoires ou de spam</li>
+                <li>Une suggestion par idée, décrite clairement</li>
+                <li>Les suggestions publiées peuvent être retirées à tout moment si elles ne respectent pas ces règles</li>
+                <li>Votre email n'est jamais affiché publiquement, seulement votre prénom</li>
+            </ul>
+        </div>
+
+        <div class="form-card">
+            <h2>Proposer une suggestion</h2>
+            <form id="suggestionForm">
+                <textarea id="texte" placeholder="Décrivez votre idée d'outil ou d'amélioration..." maxlength="1000" required></textarea>
+                <div class="char-count"><span id="charCount">0</span>/1000</div>
+                <input type="text" id="prenom" placeholder="Votre prénom" maxlength="60" required>
+                <button type="submit" class="btn-submit" id="submitBtn">Envoyer ma suggestion</button>
+                <div class="form-message" id="formMessage"></div>
+            </form>
+        </div>
+
+        <h2 class="list-title">Suggestions de la communauté</h2>
+        <div id="suggestionsList">
+            <div class="empty-state">Chargement…</div>
+        </div>
+
+        <a href="https://www.flashtools.fr/lesoutils" class="back-link">← Retour aux outils</a>
+    </div>
+
+    <script src="https://nicolasaudigier-hash.github.io/flashtools/flashtools-guard.js?v=3"></script>
+    <script>
+        var SUGGESTIONS_API = "https://flashtools.vercel.app/api/suggestions";
+        var STORAGE_KEY = "flashtools_email";
+
+        function getEmail() {
+            try {
+                return window.localStorage.getItem(STORAGE_KEY) || "";
+            } catch (e) {
+                return "";
+            }
+        }
+
+        function escapeHTML(str) {
+            var div = document.createElement('div');
+            div.textContent = str || '';
+            return div.innerHTML;
+        }
+
+        function formatDate(iso) {
+            if (!iso) return '';
+            var d = new Date(iso);
+            return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        function getVotedIds() {
+            try {
+                var raw = window.localStorage.getItem('flashtools_voted_ids');
+                return raw ? JSON.parse(raw) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function markVoted(id) {
+            try {
+                var ids = getVotedIds();
+                ids.push(id);
+                window.localStorage.setItem('flashtools_voted_ids', JSON.stringify(ids));
+            } catch (e) {}
+        }
+
+        function renderList(items) {
+            var container = document.getElementById('suggestionsList');
+            if (!items || items.length === 0) {
+                container.innerHTML = '<div class="empty-state">Aucune suggestion pour le moment. Soyez le premier à en proposer une !</div>';
+                return;
+            }
+            var votedIds = getVotedIds();
+            var html = '';
+            items.forEach(function (item) {
+                var alreadyVoted = votedIds.indexOf(item.id) !== -1;
+                html += '' +
+                    '<div class="suggestion-item">' +
+                        '<div class="vote-block">' +
+                            '<button class="vote-btn" data-id="' + item.id + '" ' + (alreadyVoted ? 'disabled' : '') + '>' +
+                                (alreadyVoted ? '✓' : '▲') +
+                            '</button>' +
+                            '<div class="vote-count">' + item.votes + '</div>' +
+                        '</div>' +
+                        '<div class="suggestion-content">' +
+                            '<div class="suggestion-text">' + escapeHTML(item.texte) + '</div>' +
+                            '<div class="suggestion-meta">' + escapeHTML(item.prenom || 'Anonyme') + ' · ' + formatDate(item.date) + '</div>' +
+                        '</div>' +
+                    '</div>';
+            });
+            container.innerHTML = html;
+
+            document.querySelectorAll('.vote-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    handleVote(btn.getAttribute('data-id'), btn);
+                });
+            });
+        }
+
+        function loadSuggestions() {
+            fetch(SUGGESTIONS_API)
+                .then(function (r) { return r.json(); })
+                .then(function (data) { renderList(data.items || []); })
+                .catch(function () {
+                    document.getElementById('suggestionsList').innerHTML =
+                        '<div class="empty-state">Impossible de charger les suggestions pour le moment.</div>';
+                });
+        }
+
+        function handleVote(id, btn) {
+            var email = getEmail();
+            if (!email) { return; }
+            btn.disabled = true;
+            fetch(SUGGESTIONS_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'vote', id: id, email: email })
+            })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (data.success) {
+                        markVoted(id);
+                        loadSuggestions();
+                    } else if (data.error === 'deja_vote') {
+                        markVoted(id);
+                        btn.textContent = '✓';
+                    } else {
+                        btn.disabled = false;
+                    }
+                })
+                .catch(function () { btn.disabled = false; });
+        }
+
+        // --- Formulaire ---
+        var textarea = document.getElementById('texte');
+        var charCount = document.getElementById('charCount');
+        textarea.addEventListener('input', function () {
+            charCount.textContent = textarea.value.length;
+        });
+
+        document.getElementById('suggestionForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var email = getEmail();
+            var texte = textarea.value.trim();
+            var prenom = document.getElementById('prenom').value.trim();
+            var messageEl = document.getElementById('formMessage');
+            var submitBtn = document.getElementById('submitBtn');
+
+            messageEl.className = 'form-message';
+            messageEl.textContent = '';
+
+            if (texte.length < 5) {
+                messageEl.className = 'form-message error';
+                messageEl.textContent = 'Décrivez votre idée un peu plus (au moins 5 caractères).';
+                return;
+            }
+            if (!prenom) {
+                messageEl.className = 'form-message error';
+                messageEl.textContent = 'Merci de renseigner votre prénom.';
+                return;
+            }
+            if (!email) {
+                messageEl.className = 'form-message error';
+                messageEl.textContent = 'Email non détecté — rechargez la page.';
+                return;
+            }
+
+            submitBtn.disabled = true;
+            fetch(SUGGESTIONS_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'create', texte: texte, prenom: prenom, email: email })
+            })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    submitBtn.disabled = false;
+                    if (data.success) {
+                        messageEl.className = 'form-message success';
+                        messageEl.textContent = 'Merci ! Votre suggestion a été publiée.';
+                        textarea.value = '';
+                        charCount.textContent = '0';
+                        loadSuggestions();
+                    } else {
+                        messageEl.className = 'form-message error';
+                        messageEl.textContent = "Une erreur est survenue, réessayez.";
+                    }
+                })
+                .catch(function () {
+                    submitBtn.disabled = false;
+                    messageEl.className = 'form-message error';
+                    messageEl.textContent = "Une erreur est survenue, réessayez.";
+                });
+        });
+
+        loadSuggestions();
+    </script>
+</body>
+</html>
