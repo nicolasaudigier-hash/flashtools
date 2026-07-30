@@ -269,7 +269,7 @@
             padding: 8px 12px;
             border-radius: 6px;
             white-space: normal;
-            width: 220px;
+            width: min(220px, calc(100vw - 40px));
             text-align: left;
             line-height: 1.4;
             z-index: 10;
@@ -508,6 +508,28 @@
                 gap: 10px;
             }
         }
+
+        @media (max-width: 380px) {
+            .header h1 {
+                font-size: 1.4em;
+            }
+
+            .header p {
+                font-size: 1em;
+            }
+
+            .form-section {
+                padding: 15px;
+            }
+
+            .form-section h2 {
+                font-size: 1.25em;
+            }
+
+            .btn-export {
+                min-width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -677,7 +699,44 @@
             <!-- SECTION 3 : CONDITIONS COMMERCIALES -->
             <div class="form-section">
                 <h2>3️⃣ Conditions commerciales</h2>
-                
+
+                <div class="form-group" id="subscriptionGroup" style="display:none;">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="isSubscription" name="isSubscription" value="oui">
+                        <label for="isSubscription" style="margin:0;">Vente sous forme d'abonnement récurrent (mensuel, annuel...)</label>
+                    </div>
+                    <p class="client-type-hint">💡 Cochez cette case si le Client paie de façon répétée (ex : abonnement mensuel ou annuel), pas pour un achat unique. Des clauses spécifiques (essai gratuit, reconduction tacite, résiliation, prix figé dans le temps) seront ajoutées automatiquement.</p>
+                </div>
+
+                <div class="form-group" id="subscriptionDetailsGroup" style="display:none;">
+                    <label>Périodicité proposée :</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="freqMonthly" name="subFrequency" value="mensuel" checked>
+                            <label for="freqMonthly">Abonnement mensuel</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="freqYearly" name="subFrequency" value="annuel">
+                            <label for="freqYearly">Abonnement annuel</label>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-option" style="margin-top: 15px;">
+                        <input type="checkbox" id="hasFreeTrial" name="hasFreeTrial" value="oui">
+                        <label for="hasFreeTrial" style="margin:0;">Période d'essai gratuite proposée</label>
+                    </div>
+                    <div class="form-group" id="trialDaysGroup" style="display:none; margin-top: 10px; margin-bottom: 0;">
+                        <label for="trialDays">Durée de l'essai gratuit (en jours) :</label>
+                        <input type="text" id="trialDays" name="trialDays" placeholder="Ex: 7" inputmode="numeric" pattern="[0-9]{1,3}" style="max-width: 120px;">
+                    </div>
+
+                    <div class="checkbox-option" style="margin-top: 15px;">
+                        <input type="checkbox" id="priceLocked" name="priceLocked" value="oui" checked>
+                        <label for="priceLocked" style="margin:0;">Le tarif souscrit par un Client ne changera jamais tant que son abonnement reste actif</label>
+                    </div>
+                    <p class="client-type-hint">Si cette case est décochée, la clause classique (le Vendeur peut faire évoluer ses tarifs à tout moment, y compris pour les abonnements en cours) sera utilisée à la place.</p>
+                </div>
+
                 <div class="form-group" id="instantAccessGroup" style="display:none;">
                     <div class="checkbox-option">
                         <input type="checkbox" id="instantAccess" name="instantAccess" value="oui">
@@ -814,8 +873,8 @@
             });
         });
 
-        // Affiche/masque la zone géographique, le médiateur et l'accès immédiat selon les choix faits,
-        // et rend le médiateur obligatoire si la vente touche des particuliers (B2C)
+        // Affiche/masque la zone géographique, le médiateur, l'accès immédiat et le bloc
+        // abonnement selon les choix faits, et rend le médiateur obligatoire en B2C
         function updateConditionalFields() {
             var activity = document.querySelector('input[name="activityType"]:checked').value;
             var clientType = document.querySelector('input[name="clientType"]:checked').value;
@@ -830,6 +889,19 @@
             var mediatorRequiredMark = document.getElementById('mediatorRequiredMark');
             mediatorInput.required = isB2C;
             if (mediatorRequiredMark) mediatorRequiredMark.style.display = isB2C ? '' : 'none';
+
+            // Abonnement récurrent : pertinent seulement pour le numérique et les services
+            var subscriptionGroup = document.getElementById('subscriptionGroup');
+            var isSubscriptionInput = document.getElementById('isSubscription');
+            var showSubscriptionOption = activity === 'numerique' || activity === 'services';
+            subscriptionGroup.style.display = showSubscriptionOption ? '' : 'none';
+            if (!showSubscriptionOption) {
+                isSubscriptionInput.checked = false;
+            }
+
+            var subscriptionDetailsGroup = document.getElementById('subscriptionDetailsGroup');
+            var isSubscription = showSubscriptionOption && isSubscriptionInput.checked;
+            subscriptionDetailsGroup.style.display = isSubscription ? '' : 'none';
 
             // Accès immédiat après paiement : pertinent seulement pour le numérique et les services
             var instantAccessGroup = document.getElementById('instantAccessGroup');
@@ -850,6 +922,10 @@
         }
 
         document.getElementById('instantAccess').addEventListener('change', updateConditionalFields);
+        document.getElementById('isSubscription').addEventListener('change', updateConditionalFields);
+        document.getElementById('hasFreeTrial').addEventListener('change', function() {
+            document.getElementById('trialDaysGroup').style.display = this.checked ? '' : 'none';
+        });
 
         // Barre de progression : compte les champs obligatoires (y compris le médiateur,
         // requis dynamiquement en B2C) et le nombre déjà remplis
@@ -939,7 +1015,7 @@
             const data = {};
             
             formData.forEach((value, key) => {
-                if (key === 'zone' || key === 'payment') {
+                if (key === 'zone' || key === 'payment' || key === 'subFrequency') {
                     if (!data[key]) data[key] = [];
                     data[key].push(value);
                 } else {
@@ -947,11 +1023,17 @@
                 }
             });
 
+            // Cases à cocher : FormData ne renvoie rien si décoché, on force une valeur explicite
+            data.isSubscription = document.getElementById('isSubscription').checked;
+            data.hasFreeTrial = document.getElementById('hasFreeTrial').checked;
+            data.priceLocked = document.getElementById('priceLocked').checked;
+            data.instantAccess = document.getElementById('instantAccess').checked;
+
             // Échappement systématique de toutes les valeurs texte issues du formulaire
             Object.keys(data).forEach(function(key) {
                 if (Array.isArray(data[key])) {
                     data[key] = data[key].map(escapeHTML);
-                } else {
+                } else if (typeof data[key] !== 'boolean') {
                     data[key] = escapeHTML(data[key]);
                 }
             });
@@ -976,6 +1058,32 @@
             const payments = data.payment ? data.payment.join(', ') : 'Carte bancaire';
             const priceBasis = isB2BOnly ? 'HT' : 'TTC';
             const priceBasisLabel = isB2BOnly ? 'hors taxes (HT)' : 'toutes taxes comprises (TTC)';
+            const isSubscription = (data.activityType === 'numerique' || data.activityType === 'services') && data.isSubscription;
+            const frequencies = data.subFrequency && data.subFrequency.length ? data.subFrequency.join(' et ') : 'mensuel';
+
+            // Numérotation dynamique des articles, pour rester cohérente quel que soit
+            // le nombre de sections optionnelles activées (B2C, rétractation, abonnement...)
+            let n = 6;
+
+            let subscriptionArticle = '';
+            if (isSubscription) {
+                n++;
+                subscriptionArticle = `
+                <h3>ARTICLE ${n} - ABONNEMENT${data.hasFreeTrial ? ', ESSAI GRATUIT' : ''} ET RÉSILIATION</h3>
+                ${data.hasFreeTrial ? `
+                <p>
+                    Le Client peut bénéficier d'une période d'essai gratuite de ${data.trialDays || '7'} jours, sans engagement${data.activityType === 'numerique' ? ' et sans qu\'aucune carte bancaire ne soit demandée' : ''}. Cette période donne accès au Service dans les mêmes conditions qu'un abonnement payant.
+                </p>
+                <p>
+                    À l'expiration de cette période, l'accès au Service est automatiquement suspendu, sauf souscription préalable à une formule payante. Le Client est informé de la fin prochaine de son essai par email.
+                </p>` : ''}
+                <p>
+                    Le Service est proposé sous forme d'abonnement ${frequencies}, à durée indéterminée, avec reconduction tacite à chaque échéance, sauf résiliation par le Client.
+                </p>
+                <p>
+                    Le Client peut résilier son abonnement à tout moment, sans justification ni frais, depuis son espace client ou en écrivant à l'adresse email du Vendeur. La résiliation prend effet à la fin de la période d'abonnement en cours déjà payée ; aucun remboursement au prorata n'est effectué pour la période en cours.
+                </p>`;
+            }
 
             let content = `
                 <h2 style="text-align: center; font-size: 1.8em; margin-bottom: 30px;">CONDITIONS GÉNÉRALES DE VENTE</h2>
@@ -997,29 +1105,39 @@
 
                 <h3>ARTICLE 2 - OBJET ET CHAMP D'APPLICATION</h3>
                 <p>
-                    Les présentes Conditions Générales de Vente (CGV) régissent les relations contractuelles entre ${data.companyName} (ci-après "le Vendeur") et toute personne physique ou morale (ci-après "le Client") souhaitant procéder à un achat via les services du Vendeur.
+                    Les présentes Conditions Générales de Vente (CGV) régissent les relations contractuelles entre ${data.companyName} (ci-après "le Vendeur") et toute personne physique ou morale (ci-après "le Client") souhaitant procéder à un achat${isSubscription ? ' ou une souscription' : ''} via les services du Vendeur.
                 </p>
                 <p>
-                    Le Vendeur exerce une activité de ${getActivityDescription(data.activityType)}.
+                    Le Vendeur exerce une activité de ${getActivityDescription(data.activityType)}${isSubscription ? ', proposée sous forme d\'abonnement' : ''}.
                 </p>
                 <p>
-                    Ces CGV s'appliquent à l'exclusion de toutes autres conditions, notamment celles du Client. Toute commande implique l'acceptation sans réserve des présentes CGV.
+                    Ces CGV s'appliquent à l'exclusion de toutes autres conditions, notamment celles du Client. Toute commande${isSubscription ? ' ou souscription' : ''} implique l'acceptation sans réserve des présentes CGV.
                 </p>
 
                 <h3>ARTICLE 3 - PRIX</h3>
                 <p>
-                    Les prix sont indiqués en euros, ${priceBasisLabel}${!isB2BOnly ? ', incluant la TVA applicable au jour de la commande' : ''}. Le Vendeur se réserve le droit de modifier ses prix à tout moment, étant entendu que le prix figurant sur la commande sera le seul applicable au Client.
+                    Les prix sont indiqués en euros, ${priceBasisLabel}${!isB2BOnly ? ', incluant la TVA applicable au jour de la commande' : ''}.
                 </p>
+                ${isSubscription && data.priceLocked ? `
+                <p>
+                    Pour les abonnements, le tarif applicable au Client est celui affiché et accepté au moment de sa souscription. Ce tarif reste inchangé pour toute la durée pendant laquelle l'abonnement du Client demeure actif sans interruption, y compris en cas de reconduction tacite : le Vendeur s'engage à ne jamais augmenter le tarif d'un abonnement en cours. Le Vendeur conserve la possibilité de faire évoluer ses tarifs pour les nouvelles souscriptions futures, sans effet rétroactif sur les abonnements déjà souscrits.
+                </p>
+                <p>
+                    En cas de résiliation puis de nouvelle souscription ultérieure par le même Client, le tarif applicable est celui en vigueur au moment de cette nouvelle souscription.
+                </p>` : `
+                <p>
+                    Le Vendeur se réserve le droit de modifier ses prix à tout moment, étant entendu que le prix figurant sur la commande sera le seul applicable au Client${isSubscription ? ' pour la période en cours' : ''}.
+                </p>`}
                 <p>
                     Les frais de livraison sont ${data.activityType === 'services' || data.activityType === 'numerique' ? 'non applicables' : 'indiqués avant validation de la commande'}.
                 </p>
 
                 <h3>ARTICLE 4 - COMMANDE</h3>
                 <p>
-                    Le Client passe commande ${data.activityType === 'numerique' ? 'en ligne' : 'selon les modalités définies par le Vendeur'}. La validation de la commande vaut acceptation des présentes CGV et engagement de payer les sommes dues.
+                    Le Client passe commande ${data.activityType === 'numerique' ? 'en ligne' : 'selon les modalités définies par le Vendeur'}. La validation de la commande${isSubscription ? ' ou de la souscription' : ''} vaut acceptation des présentes CGV et engagement de payer les sommes dues${isSubscription ? ' selon la périodicité choisie' : ''}.
                 </p>
                 <p>
-                    Le Vendeur confirmera la commande par email à l'adresse indiquée par le Client. Cette confirmation fera foi entre les parties.
+                    Le Vendeur confirmera la commande${isSubscription ? ' et chaque renouvellement' : ''} par email à l'adresse indiquée par le Client. Cette confirmation fera foi entre les parties.
                 </p>
 
                 <h3>ARTICLE 5 - PAIEMENT</h3>
@@ -1031,7 +1149,7 @@
                     <strong>Pour les ventes entre professionnels :</strong> En cas de retard de paiement, des pénalités égales à trois fois le taux d'intérêt légal seront appliquées automatiquement, sans mise en demeure préalable, conformément à l'article L441-10 du Code de commerce. Une indemnité forfaitaire de 40€ pour frais de recouvrement sera également due (article D441-5 du Code de commerce).
                 </p>` : ''}
                 <p>
-                    Le Vendeur se réserve le droit de suspendre toute commande en cas de défaut de paiement.
+                    Le Vendeur se réserve le droit de suspendre ${isSubscription ? "l'accès au Service" : 'toute commande'} en cas de défaut de paiement${isSubscription ? ', après information préalable du Client par email' : ''}.
                 </p>
 
                 <h3>ARTICLE 6 - ${getDeliveryTitle(data.activityType)}</h3>
@@ -1044,12 +1162,21 @@
                     Le transfert de propriété et des risques intervient à la livraison effective des produits. Une clause de réserve de propriété est applicable : les produits demeurent la propriété du Vendeur jusqu'au paiement intégral du prix.
                 </p>` : ''}
 
-                ${isB2C ? `
-                <h3>ARTICLE 7 - DROIT DE RÉTRACTATION</h3>
-                ${data.activityType === 'numerique' ? `
+                ${subscriptionArticle}
+
+                ${isB2C ? (function() {
+                    n++;
+                    let art = `<h3>ARTICLE ${n} - DROIT DE RÉTRACTATION</h3>`;
+                    if (data.activityType === 'numerique' && data.instantAccess) {
+                        art += `
                 <p>
-                    Conformément à l'article L221-28 du Code de la consommation, le droit de rétractation ne peut être exercé pour les contenus numériques fournis sur un support immatériel dont l'exécution a commencé avec l'accord préalable exprès du consommateur et son renoncement exprès à son droit de rétractation.
-                </p>` : `
+                    Conformément à l'article L221-28, 13° du Code de la consommation, le droit de rétractation ne s'applique pas aux contrats de fourniture d'un contenu numérique non fourni sur un support matériel dont l'exécution a commencé après accord préalable exprès du Client et renoncement exprès à son droit de rétractation.
+                </p>
+                <p>
+                    En validant sa commande et en cochant la case prévue à cet effet, le Client reconnaît que l'accès au ${isSubscription ? 'Service' : 'produit numérique'} commence immédiatement et renonce expressément à son droit de rétractation.
+                </p>`;
+                    } else {
+                        art += `
                 <p>
                     Conformément aux articles L221-18 et suivants du Code de la consommation, le Client dispose d'un délai de 14 jours à compter de la ${data.activityType === 'services' ? 'conclusion du contrat' : 'réception du produit'} pour exercer son droit de rétractation sans avoir à justifier de motifs ni à payer de pénalités.
                 </p>
@@ -1058,11 +1185,14 @@
                 </p>
                 <p>
                     Le remboursement sera effectué dans un délai de 14 jours à compter de la réception de la notification de rétractation.
-                </p>`}
-                ` : ''}
+                </p>`;
+                    }
+                    return art;
+                })() : ''}
 
-                <h3>ARTICLE ${isB2C ? '8' : '7'} - GARANTIES LÉGALES</h3>
-                ${isB2C ? `
+                ${(function() {
+                    n++;
+                    return `<h3>ARTICLE ${n} - GARANTIES LÉGALES</h3>` + (isB2C ? `
                 <p>
                     <strong>Garantie légale de conformité (articles L217-4 à L217-14 du Code de la consommation) :</strong><br>
                     Le Client bénéficie d'une garantie légale de conformité de 2 ans à compter de la délivrance du bien. Durant ce délai, le Client peut obtenir la réparation ou le remplacement du bien sans frais. Le Client peut également obtenir une réduction du prix ou la résolution du contrat dans les conditions prévues par la loi.
@@ -1073,31 +1203,45 @@
                 </p>` : `
                 <p>
                     Les garanties applicables sont celles prévues par le droit commun (Code civil).
-                </p>`}
+                </p>`);
+                })()}
 
-                <h3>ARTICLE ${isB2C ? '9' : '8'} - RESPONSABILITÉ</h3>
+                ${(function() {
+                    n++;
+                    return `<h3>ARTICLE ${n} - RESPONSABILITÉ</h3>
                 <p>
-                    Le Vendeur ne saurait être tenu responsable d'un dommage résultant d'un usage anormal ou d'une utilisation non conforme des ${data.activityType === 'services' ? 'services' : 'produits'}. Sa responsabilité est limitée au montant de la commande, sauf en cas de faute lourde ou de dommage corporel.
+                    Le Vendeur ne saurait être tenu responsable d'un dommage résultant d'un usage anormal ou d'une utilisation non conforme des ${data.activityType === 'services' ? 'services' : 'produits'}. Sa responsabilité est limitée au montant ${isSubscription ? "des sommes versées par le Client au titre de son abonnement en cours" : "de la commande"}, sauf en cas de faute lourde ou de dommage corporel.
                 </p>
                 <p>
-                    Le Vendeur ne saurait être tenu pour responsable en cas de force majeure ou de fait imprévisible et insurmontable d'un tiers.
-                </p>
+                    Le Vendeur ne saurait être tenu pour responsable en cas de force majeure ou de fait imprévisible et insurmontable d'un tiers${isSubscription ? ", notamment une indisponibilité temporaire du Service liée à un prestataire technique tiers" : ""}.
+                </p>`;
+                })()}
 
-                <h3>ARTICLE ${isB2C ? '10' : '9'} - PROPRIÉTÉ INTELLECTUELLE</h3>
+                ${(function() {
+                    n++;
+                    return `<h3>ARTICLE ${n} - PROPRIÉTÉ INTELLECTUELLE</h3>
                 <p>
                     Tous les contenus présents (textes, images, graphismes, logos, etc.) sont la propriété exclusive du Vendeur ou font l'objet d'une autorisation d'utilisation. Toute reproduction, distribution, modification, adaptation, retransmission ou publication de ces différents éléments est strictement interdite sans l'accord exprès du Vendeur.
-                </p>
+                </p>`;
+                })()}
 
-                <h3>ARTICLE ${isB2C ? '11' : '10'} - DONNÉES PERSONNELLES</h3>
+                ${(function() {
+                    n++;
+                    return `<h3>ARTICLE ${n} - DONNÉES PERSONNELLES</h3>
                 <p>
-                    Le Vendeur s'engage à respecter la réglementation en vigueur relative à la protection des données personnelles (RGPD - Règlement UE 2016/679). Les données collectées sont nécessaires au traitement et à l'exécution de la commande ainsi qu'à l'établissement des factures.
+                    Le Vendeur s'engage à respecter la réglementation en vigueur relative à la protection des données personnelles (RGPD - Règlement UE 2016/679). Les données collectées sont nécessaires au traitement et à l'exécution de la commande${isSubscription ? ', à la gestion de l\'abonnement' : ''} ainsi qu'à l'établissement des factures.
                 </p>
                 <p>
                     Conformément au RGPD, le Client dispose d'un droit d'accès, de rectification, d'effacement, de limitation du traitement, d'opposition et de portabilité de ses données. Ces droits peuvent être exercés en contactant le Vendeur à l'adresse : ${data.email}.
                 </p>
+                <p>
+                    Pour plus de détails, le Client est invité à consulter la Politique de confidentialité du Vendeur.
+                </p>`;
+                })()}
 
-                ${isB2C ? `
-                <h3>ARTICLE 12 - MÉDIATION DE LA CONSOMMATION</h3>
+                ${isB2C ? (function() {
+                    n++;
+                    return `<h3>ARTICLE ${n} - MÉDIATION DE LA CONSOMMATION</h3>
                 <p>
                     Conformément aux articles L611-1 et suivants du Code de la consommation, le Client a le droit de recourir gratuitement à un médiateur de la consommation en vue de la résolution amiable d'un litige l'opposant au Vendeur.
                 </p>
@@ -1106,13 +1250,17 @@
                 </p>
                 <p>
                     Le Client peut également utiliser la plateforme européenne de règlement en ligne des litiges : <a href="https://ec.europa.eu/consumers/odr" target="_blank">https://ec.europa.eu/consumers/odr</a>
-                </p>` : ''}
+                </p>`;
+                })() : ''}
 
-                <h3>ARTICLE ${isB2C ? '13' : '11'} - DROIT APPLICABLE ET JURIDICTION COMPÉTENTE</h3>
+                ${(function() {
+                    n++;
+                    return `<h3>ARTICLE ${n} - DROIT APPLICABLE ET JURIDICTION COMPÉTENTE</h3>
                 <p>
-                    Les présentes CGV sont soumises au droit français. En cas de litige, et à défaut d'accord amiable, le différend sera porté devant les tribunaux compétents conformément aux règles de droit commun.
+                    Les présentes CGV sont soumises au droit français. En cas de litige, et à défaut d'accord amiable${isB2C ? ' ou de recours au médiateur mentionné ci-dessus' : ''}, le différend sera porté devant les tribunaux compétents conformément aux règles de droit commun.
                 </p>
-                ${isB2C ? `<p>Pour les consommateurs, le tribunal compétent est celui du lieu de résidence du consommateur ou celui du lieu de livraison effective.</p>` : ''}
+                ${isB2C ? `<p>Pour les consommateurs, le tribunal compétent est celui du lieu de résidence du consommateur ou celui du lieu de livraison effective.</p>` : ''}`;
+                })()}
 
                 <p style="text-align: center; margin-top: 40px; font-style: italic; color: #718096;">
                     --- Fin des Conditions Générales de Vente ---
