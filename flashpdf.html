@@ -9,7 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;700&family=Roboto:wght@400;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Bebas+Neue&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
         :root{
@@ -73,6 +73,10 @@
         .file-name{font-size:.77em;color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
         .file-size{font-size:.7em;color:var(--text3);margin-top:4px;}
         .file-remove{position:absolute;top:7px;right:7px;background:var(--error);color:#fff;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.85em;}
+        .file-reorder{position:absolute;bottom:7px;right:7px;display:flex;gap:3px;}
+        .reorder-btn{background:var(--bg);border:1px solid var(--border2);color:var(--text2);width:22px;height:22px;border-radius:6px;cursor:pointer;font-size:.75em;display:flex;align-items:center;justify-content:center;}
+        .reorder-btn:active{border-color:var(--cyan);color:var(--cyan);}
+        .reorder-btn:disabled{opacity:.3;}
 
         /* BUTTONS */
         .btn{padding:12px 22px;border:none;border-radius:11px;font-size:.95em;font-weight:600;cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:8px;font-family:inherit;min-height:44px;}
@@ -140,6 +144,23 @@
         .guide-section ul{margin-left:18px;color:var(--text2);font-size:.83em;}
         .guide-section li{margin-bottom:5px;}
 
+        /* ===== RESPONSIVE MOBILE (ajout) ===== */
+        @media(max-width:1100px){
+            .main-grid{grid-template-columns:1fr;}
+            .sidebar{display:none;}
+            .mobile-tabs{display:flex;}
+            .guide-panel{margin-top:16px;}
+        }
+        @media(max-width:640px){
+            body{padding:10px;}
+            .header{padding:22px 16px;}
+            .main-panel{padding:18px;}
+            .option-row textarea{min-height:130px;}
+            .files-preview{grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:9px;}
+            .file-thumbnail{height:72px;}
+            .drag-handle{display:none;}
+            .file-card{cursor:default;}
+        }
     </style>
 </head>
 <body>
@@ -154,7 +175,7 @@
                 <text x="160" y="36" text-anchor="middle" font-family="Syne,sans-serif" font-size="36" font-weight="800" fill="url(#gh)">FlashPDF</text>
             </svg>
         </h1>
-        <p>8 Outils Gratuits &bull; 100% Privacy-First &bull; Aucun upload serveur</p>
+        <p>9 Outils Gratuits &bull; 100% Privacy-First &bull; Aucun upload serveur</p>
     </div>
 
     <!-- PRIVACY -->
@@ -162,6 +183,7 @@
         <span style="font-size:1.4em;flex-shrink:0">🔒</span>
         <div><strong>Vos fichiers restent privés</strong><span class="privacy-detail"> — Tout se passe dans votre navigateur. Aucun upload serveur. Zéro tracking.</span></div>
     </div>
+    <div class="info-box" style="margin-top:-6px">Limite actuelle : 40MB par fichier. Comme tout se traite dans votre navigateur (aucun serveur), la limite dépend de la mémoire de votre appareil — au-delà, les mobiles peuvent ralentir ou planter. Sur ordinateur, vous pouvez généralement pousser plus loin sans souci.</div>
 
     <!-- ONGLETS MOBILE -->
     <div class="mobile-tabs" id="mobileTabs">
@@ -169,6 +191,7 @@
         <button class="tab-btn" onclick="switchTool('compress',this)">🗜️ Compresser</button>
         <button class="tab-btn" onclick="switchTool('split',this)">✂️ Diviser</button>
         <button class="tab-btn" onclick="switchTool('unlock',this)">🔓 Déverrouiller</button>
+        <button class="tab-btn" onclick="switchTool('edit',this)">✏️ Éditer</button>
         <button class="tab-btn" onclick="switchTool('image-to-pdf',this)">🖼️ Images→PDF</button>
         <button class="tab-btn" onclick="switchTool('pdf-to-image',this)">📤 PDF→Images</button>
         <button class="tab-btn" onclick="switchTool('text-to-pdf',this)">📝 Texte→PDF</button>
@@ -184,6 +207,7 @@
             <button class="tool-btn" onclick="switchTool('compress',this)" data-tool="compress"><span>🗜️</span>Compresser PDF</button>
             <button class="tool-btn" onclick="switchTool('split',this)" data-tool="split"><span>✂️</span>Diviser PDF</button>
             <button class="tool-btn" onclick="switchTool('unlock',this)" data-tool="unlock"><span>🔓</span>Déverrouiller PDF</button>
+            <button class="tool-btn" onclick="switchTool('edit',this)" data-tool="edit"><span>✏️</span>Éditer PDF/Image</button>
             <div class="tool-cat-title">Conversion</div>
             <button class="tool-btn" onclick="switchTool('image-to-pdf',this)" data-tool="image-to-pdf"><span>🖼️</span>Images → PDF</button>
             <button class="tool-btn" onclick="switchTool('pdf-to-image',this)" data-tool="pdf-to-image"><span>📤</span>PDF → Images</button>
@@ -197,11 +221,11 @@
             <!-- FUSIONNER -->
             <div id="tool-merge" class="tool-panel active">
                 <h2><span>🔗</span>Fusionner PDF</h2>
-                <div class="info-box"><strong>Réorganisez vos fichiers</strong>Glissez-déposez les vignettes pour changer l'ordre. Le numéro indique la position dans le PDF final.</div>
+                <div class="info-box"><strong>Réorganisez vos fichiers</strong>Glissez-déposez les vignettes (desktop) ou utilisez les flèches ↑↓ (mobile) pour changer l'ordre. Le numéro indique la position dans le PDF final.</div>
                 <div class="upload-zone" onclick="document.getElementById('merge-input').click()" id="merge-zone">
                     <div class="upload-icon">📤</div>
                     <h3>Glissez vos PDFs ici</h3>
-                    <p>ou appuyez pour sélectionner (max 10 fichiers, 20MB chacun)</p>
+                    <p>ou appuyez pour sélectionner (max 10 fichiers, 40MB chacun)</p>
                     <input type="file" id="merge-input" accept=".pdf" multiple>
                 </div>
                 <div id="merge-files" class="files-preview"></div>
@@ -218,7 +242,7 @@
                 <div class="upload-zone" onclick="document.getElementById('compress-input').click()">
                     <div class="upload-icon">📤</div>
                     <h3>Glissez votre PDF ici</h3>
-                    <p>ou appuyez pour sélectionner (1 fichier, max 20MB)</p>
+                    <p>ou appuyez pour sélectionner (1 fichier, max 40MB)</p>
                     <input type="file" id="compress-input" accept=".pdf">
                 </div>
                 <div id="compress-options" style="display:none">
@@ -253,7 +277,7 @@
                 <div class="upload-zone" onclick="document.getElementById('split-input').click()">
                     <div class="upload-icon">📤</div>
                     <h3>Glissez votre PDF ici</h3>
-                    <p>ou appuyez pour sélectionner (1 fichier, max 20MB)</p>
+                    <p>ou appuyez pour sélectionner (1 fichier, max 40MB)</p>
                     <input type="file" id="split-input" accept=".pdf">
                 </div>
                 <div id="split-options" style="display:none">
@@ -278,7 +302,7 @@
             <!-- IMAGES → PDF -->
             <div id="tool-image-to-pdf" class="tool-panel">
                 <h2><span>🖼️</span>Images → PDF</h2>
-                <div class="info-box"><strong>Réorganisez vos images</strong>Glissez-déposez les vignettes pour changer l'ordre des pages.</div>
+                <div class="info-box"><strong>Réorganisez vos images</strong>Glissez-déposez les vignettes (desktop) ou utilisez les flèches ↑↓ (mobile) pour changer l'ordre des pages.</div>
                 <div class="upload-zone" onclick="document.getElementById('image-input').click()">
                     <div class="upload-icon">📤</div>
                     <h3>Glissez vos images ici</h3>
@@ -326,7 +350,7 @@
                 <div class="upload-zone" onclick="document.getElementById('pdf-to-image-input').click()">
                     <div class="upload-icon">📤</div>
                     <h3>Glissez votre PDF ici</h3>
-                    <p>ou appuyez pour sélectionner (1 fichier, max 20MB)</p>
+                    <p>ou appuyez pour sélectionner (1 fichier, max 40MB)</p>
                     <input type="file" id="pdf-to-image-input" accept=".pdf">
                 </div>
                 <div id="pdf-to-image-options" style="display:none">
@@ -366,7 +390,7 @@
                 <div class="upload-zone" onclick="document.getElementById('unlock-input').click()">
                     <div class="upload-icon">📤</div>
                     <h3>Glissez votre PDF protégé ici</h3>
-                    <p>ou appuyez pour sélectionner (1 fichier, max 20MB)</p>
+                    <p>ou appuyez pour sélectionner (1 fichier, max 40MB)</p>
                     <input type="file" id="unlock-input" accept=".pdf">
                 </div>
                 <div id="unlock-actions" style="display:none" class="btn-row">
@@ -374,6 +398,50 @@
                     <button class="btn btn-secondary" onclick="resetUnlock()">↻ Recommencer</button>
                 </div>
                 <div id="unlock-loading" class="loading"><div class="spinner"></div><p>Déverrouillage en cours…</p></div>
+            </div>
+
+            <!-- ÉDITER PDF/IMAGE -->
+            <div id="tool-edit" class="tool-panel">
+                <h2><span>✏️</span>Éditer PDF/Image</h2>
+                <div class="info-box"><strong>Comment ça marche</strong>Chargez une page PDF ou une image. Ajoutez des blocs "masque + texte" pour recouvrir/corriger du texte existant, ou des blocs "texte libre" pour ajouter une mention. Chaque nouveau bloc apparaît en haut de la zone visible (jamais caché au milieu du texte) — glissez-le où vous voulez, réglez police/gras/italique/taille. Rendu final en haute résolution. Tout se fait en local, aucune donnée ne quitte votre navigateur.</div>
+                <div class="upload-zone" onclick="document.getElementById('edit-input').click()" id="edit-zone">
+                    <div class="upload-icon">📤</div>
+                    <h3>Glissez un PDF ou une image ici</h3>
+                    <p>ou appuyez pour sélectionner (PDF, JPG, PNG - max 40MB)</p>
+                    <input type="file" id="edit-input" accept=".pdf,image/jpeg,image/png">
+                </div>
+                <div id="edit-workspace" style="display:none">
+                    <div id="edit-page-nav" class="btn-row" style="display:none;margin-top:0;margin-bottom:14px">
+                        <button class="btn btn-secondary" onclick="editPrevPage()">← Page préc.</button>
+                        <span id="edit-page-label" style="align-self:center;color:var(--text2);font-size:.9em">Page 1</span>
+                        <button class="btn btn-secondary" onclick="editNextPage()">Page suiv. →</button>
+                    </div>
+                    <div class="options-group">
+                        <div class="option-row" style="margin-bottom:10px">
+                            <label>Ajouter un bloc</label>
+                            <div class="radio-group">
+                                <button class="btn btn-secondary" type="button" onclick="addEditBlock('mask')">⬜ Masque + Texte</button>
+                                <button class="btn btn-secondary" type="button" onclick="addEditBlock('text')">🔤 Texte libre</button>
+                            </div>
+                        </div>
+                        <div class="option-row" style="margin-bottom:0">
+                            <label class="radio-option" style="min-height:38px;display:inline-flex">
+                                <input type="checkbox" id="edit-scan-effect">
+                                <span>🖨️ Uniformiser en rendu scan (toute la page)</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div style="overflow:auto;border:1.5px solid var(--border2);border-radius:11px;background:var(--bg2);touch-action:none">
+                        <div id="edit-canvas-wrap" style="position:relative;display:inline-block;"></div>
+                    </div>
+                    <div id="edit-blocks-list" style="margin-top:16px"></div>
+                    <div id="edit-status" class="info-box" style="display:none"></div>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" onclick="exportEdited()">💾 Générer et Télécharger</button>
+                        <button class="btn btn-secondary" onclick="resetEdit()">↻ Recommencer</button>
+                    </div>
+                </div>
+                <div id="edit-loading" class="loading"><div class="spinner"></div><p>Traitement…</p></div>
             </div>
 
             <!-- TEXTE → PDF -->
@@ -451,12 +519,13 @@ pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/p
 let mergeFiles=[],compressFile=null,splitFile=null,imageFiles=[],pdfToImageFile=null,unlockFile=null;
 
 const guides={
-    'merge':`<div class="guide-section"><h4>Quand fusionner ?</h4><ul><li>Dossiers administratifs : devis + facture + CGV</li><li>Rapports : fusionner plusieurs documents</li><li>Envoi client : 1 seul fichier</li></ul></div><div class="guide-section"><h4>Réorganiser l'ordre</h4><ul><li><strong>Glisser-déposer</strong> : maintenez ⋮⋮ et déplacez</li><li>Le badge indique la position finale</li><li>× pour retirer un fichier</li></ul></div><div class="info-box warning"><strong>Limites</strong>Max 10 PDFs · 20MB par fichier</div>`,
+    'merge':`<div class="guide-section"><h4>Quand fusionner ?</h4><ul><li>Dossiers administratifs : devis + facture + CGV</li><li>Rapports : fusionner plusieurs documents</li><li>Envoi client : 1 seul fichier</li></ul></div><div class="guide-section"><h4>Réorganiser l'ordre</h4><ul><li><strong>Desktop</strong> : maintenez ⋮⋮ et déplacez</li><li><strong>Mobile</strong> : utilisez les flèches ↑↓</li><li>Le badge indique la position finale</li><li>× pour retirer un fichier</li></ul></div><div class="info-box warning"><strong>Limites</strong>Max 10 PDFs · 40MB par fichier</div>`,
     'compress':`<div class="guide-section"><h4>Pourquoi compresser ?</h4><ul><li>Envoyer par email (limite 10-25MB)</li><li>Charger plus vite sur le web</li><li>Économiser de l'espace</li></ul></div><div class="guide-section"><h4>Quel niveau ?</h4><p><strong>Légère</strong> : réduction 15-30%, qualité préservée</p><p><strong>Moyenne</strong> : 30-50%, bon compromis</p><p><strong>Forte</strong> : 50-70%, qualité réduite</p></div><div class="info-box warning"><strong>Important</strong>Le texte devient image (non sélectionnable). Gardez l'original !</div>`,
     'split':`<div class="guide-section"><h4>Quand diviser ?</h4><ul><li>Extraire pages d'un contrat</li><li>Séparer sections d'un rapport</li><li>Découper un chapitre</li></ul></div><div class="guide-section"><h4>Format des pages</h4><ul><li>"1-5" → Pages 1 à 5</li><li>"1,3,5" → Pages spécifiques</li><li>"1-5,8,10-12" → Combinaison</li></ul></div>`,
     'image-to-pdf':`<div class="guide-section"><h4>Cas d'usage</h4><ul><li>Portfolio professionnel</li><li>Numérisation de documents</li><li>Présentation visuelle</li></ul></div><div class="guide-section"><h4>Options</h4><p><strong>Orientation</strong> : Portrait (vertical) ou Paysage</p><p><strong>Marges</strong> : Aucune = pleine page</p></div><div class="info-box"><strong>Note</strong>1 image = 1 page PDF.</div>`,
     'pdf-to-image':`<div class="guide-section"><h4>Cas d'usage</h4><ul><li>Réseaux sociaux : 1 page = 1 post</li><li>Extraire un graphique</li><li>Miniatures pour site web</li></ul></div><div class="guide-section"><h4>JPG ou PNG ?</h4><p><strong>JPG</strong> : léger, pas de transparence</p><p><strong>PNG</strong> : qualité max, transparence</p></div>`,
     'unlock':`<div class="guide-section"><h4>Types de protection</h4><p><strong>Retirable :</strong></p><ul><li>Impression non autorisée</li><li>Copie de texte désactivée</li></ul><p><strong>Impossible à retirer :</strong></p><ul><li>Mot de passe à l'ouverture</li></ul></div><div class="info-box warning"><strong>Légalité</strong>Utilisez uniquement sur vos propres documents.</div>`,
+    'edit':`<div class="guide-section"><h4>Ce que ça fait</h4><ul><li>Recouvre une zone de texte par un masque blanc puis écrit un nouveau texte par-dessus</li><li>Ajoute du texte libre n'importe où sur la page</li><li>Fonctionne sur une page PDF (rendue en image) ou une image directement</li></ul></div><div class="guide-section"><h4>Positionnement</h4><ul><li>Chaque nouveau bloc apparaît en haut de la zone visible, jamais caché au milieu du texte</li><li>Glissez pour déplacer, tirez le coin cyan pour redimensionner</li></ul></div><div class="guide-section"><h4>Typographie</h4><ul><li>13 polices (système + web) — les polices web (Roboto, Merriweather...) s'affichent identiquement chez tous les lecteurs</li><li>Taille libre de 6 à 96pt, gras, italique, souligné</li><li>Le surligné n'entoure que le texte, pas tout le cadre</li></ul></div><div class="guide-section"><h4>Rendu scan</h4><p>Case "Uniformiser en rendu scan" : applique un léger niveaux de gris + contraste sur toute la page pour que les zones ajoutées se fondent mieux avec un document scanné/photographié.</p></div><div class="guide-section"><h4>Limites</h4><ul><li>Ce n'est pas une édition "en place" du texte PDF natif (police/flux d'origine)</li><li>Le rendu final d'un PDF édité redevient une image (comme un scan)</li></ul></div><div class="info-box warning"><strong>Astuce</strong>Zoomez avec les gestes du navigateur pour un positionnement précis sur mobile.</div>`,
     'text-to-pdf':`<div class="guide-section"><h4>Détection automatique</h4><ul><li><strong>Chapitre 1, PARTIE I</strong> → Titre principal</li><li><strong>1. Titre</strong> → Sous-titre</li><li><strong>1.1 Section</strong> → Sous-section</li><li><strong>MAJUSCULES</strong> → Titre</li></ul></div><div class="guide-section"><h4>Conseils</h4><ul><li>Lignes vides pour séparer les paragraphes</li><li>Titres courts sans ponctuation finale</li></ul></div>`,
     'html-to-pdf':`<div class="guide-section"><h4>Balises supportées</h4><ul><li>Titres : h1, h2, h3</li><li>Texte : p, b, i, u, br</li><li>Listes : ul, ol, li</li></ul></div><div class="info-box warning"><strong>Limitations</strong>CSS, images et tableaux non supportés. Pour HTML complexe : Ctrl+P dans le navigateur.</div>`
 };
@@ -469,15 +538,23 @@ function switchTool(toolId, btn) {
     document.querySelectorAll('.tool-panel').forEach(p=>p.classList.remove('active'));
     document.getElementById('tool-'+toolId).classList.add('active');
     if(btn) btn.classList.add('active');
-    // Sync sidebar btn
+    // Sync sidebar btn + tab btn together (whichever triggered)
     const sideBtn = document.querySelector(`.tool-btn[data-tool="${toolId}"]`);
     if(sideBtn) sideBtn.classList.add('active');
+    document.querySelectorAll('.mobile-tabs .tab-btn').forEach(b=>{
+        if(b.textContent.trim() && guideLabelMatches(toolId,b)) b.classList.add('active');
+    });
     document.getElementById('guide-content').innerHTML = guides[toolId]||'';
     // Reset guide toggle
     guideVisible = false;
     const gp = document.getElementById('guidePanel');
     if(window.innerWidth<=1100) gp.classList.add('hidden');
     document.getElementById('guideToggle').textContent = '📖 Voir le guide de cet outil';
+}
+function guideLabelMatches(toolId,btn){
+    // matches tab button to toolId based on onclick attribute
+    const attr = btn.getAttribute('onclick')||'';
+    return attr.includes(`'${toolId}'`);
 }
 
 function toggleGuide() {
@@ -518,7 +595,7 @@ document.getElementById('merge-input').addEventListener('change',async function(
     const files=Array.from(e.target.files);
     if(!files.length)return;
     if(files.length>10){alert('Maximum 10 fichiers');return;}
-    for(const f of files){if(f.size>20*1024*1024){alert(f.name+' dépasse 20MB');return;}}
+    for(const f of files){if(f.size>40*1024*1024){alert(f.name+' dépasse 40MB');return;}}
     mergeFiles=files;displayMergeFiles();
     document.getElementById('merge-actions').style.display='flex';
 });
@@ -527,12 +604,16 @@ function displayMergeFiles(){
     const c=document.getElementById('merge-files');c.innerHTML='';
     mergeFiles.forEach((file,i)=>{
         const card=document.createElement('div');card.className='file-card';card.draggable=true;card.dataset.index=i;
-        card.innerHTML=`<span class="drag-handle">⋮⋮</span><span class="file-order">${i+1}</span><div class="file-thumbnail">📄</div><div class="file-name">${file.name}</div><div class="file-size">${formatBytes(file.size)}</div><button class="file-remove" onclick="removeMergeFile(${i})">×</button>`;
+        card.innerHTML=`<span class="drag-handle">⋮⋮</span><span class="file-order">${i+1}</span><div class="file-thumbnail">📄</div><div class="file-name">${file.name}</div><div class="file-size">${formatBytes(file.size)}</div><button class="file-remove" onclick="removeMergeFile(${i})">×</button><div class="file-reorder"><button class="reorder-btn" onclick="moveMergeFile(${i},-1)" ${i===0?'disabled':''}>↑</button><button class="reorder-btn" onclick="moveMergeFile(${i},1)" ${i===mergeFiles.length-1?'disabled':''}>↓</button></div>`;
         card.addEventListener('dragstart',handleDragStart);card.addEventListener('dragend',handleDragEnd);
         card.addEventListener('dragover',handleDragOver);card.addEventListener('dragenter',handleDragEnter);
         card.addEventListener('dragleave',handleDragLeave);card.addEventListener('drop',handleDrop);
         c.appendChild(card);
     });
+}
+function moveMergeFile(i,dir){
+    const t=i+dir;if(t<0||t>=mergeFiles.length)return;
+    const f=mergeFiles[i];mergeFiles.splice(i,1);mergeFiles.splice(t,0,f);displayMergeFiles();
 }
 
 let draggedIndex=null;
@@ -566,7 +647,7 @@ function resetMerge(){mergeFiles=[];document.getElementById('merge-input').value
 // ── COMPRESSER ───────────────────────────────────────
 document.getElementById('compress-input').addEventListener('change',async function(e){
     const file=e.target.files[0];if(!file)return;
-    if(file.size>20*1024*1024){alert('Max 20MB');return;}
+    if(file.size>40*1024*1024){alert('Max 40MB');return;}
     compressFile=file;document.getElementById('compress-original-size').textContent=formatBytes(file.size);
     document.getElementById('compress-options').style.display='block';document.getElementById('compress-result').style.display='none';
 });
@@ -604,7 +685,7 @@ function resetCompress(){compressFile=null;document.getElementById('compress-inp
 // ── DIVISER ──────────────────────────────────────────
 document.getElementById('split-input').addEventListener('change',async function(e){
     const file=e.target.files[0];if(!file)return;
-    if(file.size>20*1024*1024){alert('Max 20MB');return;}
+    if(file.size>40*1024*1024){alert('Max 40MB');return;}
     splitFile=file;const ab=await file.arrayBuffer();const pdf=await PDFLib.PDFDocument.load(ab);
     document.getElementById('split-total-pages').textContent=pdf.getPageCount();
     document.getElementById('split-options').style.display='block';
@@ -646,13 +727,17 @@ function displayImageFiles(){
     imageFiles.forEach((file,i)=>{
         const reader=new FileReader();reader.onload=function(e){
             const card=document.createElement('div');card.className='file-card';card.draggable=true;card.dataset.index=i;
-            card.innerHTML=`<span class="drag-handle">⋮⋮</span><span class="file-order">${i+1}</span><div class="file-thumbnail"><img src="${e.target.result}"></div><div class="file-name">${file.name}</div><div class="file-size">${formatBytes(file.size)}</div><button class="file-remove" onclick="removeImageFile(${i})">×</button>`;
+            card.innerHTML=`<span class="drag-handle">⋮⋮</span><span class="file-order">${i+1}</span><div class="file-thumbnail"><img src="${e.target.result}"></div><div class="file-name">${file.name}</div><div class="file-size">${formatBytes(file.size)}</div><button class="file-remove" onclick="removeImageFile(${i})">×</button><div class="file-reorder"><button class="reorder-btn" onclick="moveImageFile(${i},-1)" ${i===0?'disabled':''}>↑</button><button class="reorder-btn" onclick="moveImageFile(${i},1)" ${i===imageFiles.length-1?'disabled':''}>↓</button></div>`;
             card.addEventListener('dragstart',handleImgDragStart);card.addEventListener('dragend',handleImgDragEnd);
             card.addEventListener('dragover',handleDragOver);card.addEventListener('dragenter',handleDragEnter);
             card.addEventListener('dragleave',handleDragLeave);card.addEventListener('drop',handleImgDrop);
             c.appendChild(card);
         };reader.readAsDataURL(file);
     });
+}
+function moveImageFile(i,dir){
+    const t=i+dir;if(t<0||t>=imageFiles.length)return;
+    const f=imageFiles[i];imageFiles.splice(i,1);imageFiles.splice(t,0,f);displayImageFiles();
 }
 
 let draggedImg=null;
@@ -694,7 +779,7 @@ function resetImageToPDF(){imageFiles=[];document.getElementById('image-input').
 // ── PDF → IMAGES ─────────────────────────────────────
 document.getElementById('pdf-to-image-input').addEventListener('change',async function(e){
     const file=e.target.files[0];if(!file)return;
-    if(file.size>20*1024*1024){alert('Max 20MB');return;}
+    if(file.size>40*1024*1024){alert('Max 40MB');return;}
     pdfToImageFile=file;const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;
     document.getElementById('pdf-to-image-pages').textContent=pdf.numPages;
     document.getElementById('pdf-to-image-options').style.display='block';
@@ -725,7 +810,7 @@ function resetPDFToImage(){pdfToImageFile=null;document.getElementById('pdf-to-i
 // ── DÉVERROUILLER ────────────────────────────────────
 document.getElementById('unlock-input').addEventListener('change',function(e){
     const file=e.target.files[0];if(!file)return;
-    if(file.size>20*1024*1024){alert('Max 20MB');return;}
+    if(file.size>40*1024*1024){alert('Max 40MB');return;}
     unlockFile=file;document.getElementById('unlock-actions').style.display='flex';
 });
 
@@ -739,6 +824,404 @@ async function unlockPDF(){
     }catch(e){console.error(e);alert('Impossible de déverrouiller ce PDF.');document.getElementById('unlock-loading').classList.remove('active');document.getElementById('unlock-actions').style.display='flex';}
 }
 function resetUnlock(){unlockFile=null;document.getElementById('unlock-input').value='';document.getElementById('unlock-actions').style.display='none';document.getElementById('unlock-loading').classList.remove('active');}
+
+// ── ÉDITER PDF/IMAGE ─────────────────────────────────
+let editPdfDoc=null,editPages=[],editCurPage=0,editBlocks=[],editBaseCanvas=null,editScale=1,editIsImage=false;
+
+document.getElementById('edit-input').addEventListener('change',async function(e){
+    const file=e.target.files[0];if(!file)return;
+    if(file.size>40*1024*1024){alert('Max 40MB');return;}
+    document.getElementById('edit-loading').classList.add('active');
+    try{
+        editBlocks=[];editCurPage=0;editPages=[];editPdfDoc=null;editIsImage=false;
+        if(file.type==='application/pdf'||file.name.toLowerCase().endsWith('.pdf')){
+            const ab=await file.arrayBuffer();
+            editPdfDoc=await pdfjsLib.getDocument({data:ab}).promise;
+            for(let i=1;i<=editPdfDoc.numPages;i++)editPages.push(i);
+            document.getElementById('edit-page-nav').style.display= editPages.length>1?'flex':'none';
+            await renderEditPage();
+        }else{
+            editIsImage=true;
+            const dataUrl=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
+            const img=new Image();await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=dataUrl;});
+            editPages=[img];
+            document.getElementById('edit-page-nav').style.display='none';
+            await renderEditPage();
+        }
+        document.getElementById('edit-workspace').style.display='block';
+    }catch(err){console.error(err);alert('Erreur de chargement: '+err.message);}
+    document.getElementById('edit-loading').classList.remove('active');
+});
+
+async function renderEditPage(){
+    const wrap=document.getElementById('edit-canvas-wrap');wrap.innerHTML='';
+    const maxW=Math.min(wrap.parentElement.clientWidth||900,900);
+    let cv=document.createElement('canvas');
+    if(editIsImage){
+        const img=editPages[0];
+        editScale=Math.min(1,maxW/img.width);
+        cv.width=Math.round(img.width*editScale);cv.height=Math.round(img.height*editScale);
+        cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+        editBaseCanvas={displayWidth:cv.width,displayHeight:cv.height,scale:editScale,natural:img};
+    }else{
+        const page=await editPdfDoc.getPage(editPages[editCurPage]);
+        const vp1=page.getViewport({scale:1});
+        editScale=Math.min(1.4,maxW/vp1.width);
+        const vp=page.getViewport({scale:editScale});
+        cv.width=Math.round(vp.width);cv.height=Math.round(vp.height);
+        await page.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;
+        editBaseCanvas={displayWidth:cv.width,displayHeight:cv.height,scale:editScale,pageNum:editPages[editCurPage]};
+        document.getElementById('edit-page-label').textContent=`Page ${editCurPage+1} / ${editPages.length}`;
+    }
+    // Canvas affiché à sa taille native en pixels (pas de mise à l'échelle CSS) pour que
+    // les coordonnées des blocs correspondent exactement, sans décalage d'arrondi.
+    cv.style.display='block';cv.style.width=cv.width+'px';cv.style.height=cv.height+'px';cv.id='edit-base-canvas';
+    wrap.appendChild(cv);
+    wrap.style.width=cv.width+'px';wrap.style.height=cv.height+'px';
+    renderEditBlocks();
+}
+
+function editPrevPage(){if(editCurPage>0){editCurPage--;renderEditPage();}}
+function editNextPage(){if(editCurPage<editPages.length-1){editCurPage++;renderEditPage();}}
+
+function addEditBlock(type){
+    const wrap=document.getElementById('edit-canvas-wrap');
+    const scrollBox=wrap.parentElement;
+    const w=wrap.clientWidth||300;
+    const curPage=editIsImage?0:editCurPage;
+    const countOnPage=editBlocks.filter(b=>b.page===curPage).length;
+    // Toujours près du haut de la zone visible actuelle (pas au milieu du texte),
+    // avec un léger décalage à chaque ajout pour ne pas empiler les blocs pile au même endroit.
+    const visibleTop=scrollBox?scrollBox.scrollTop:0;
+    const y=visibleTop+16+(countOnPage%6)*38;
+    const x=Math.max(10,w/2-70);
+    const block={id:'b'+Date.now()+Math.random().toString(36).slice(2,6),type,page:curPage,
+        x,y,w:140,h:32,text:type==='mask'?'Nouveau texte':'Texte',fontSize:14,bold:false,italic:false,fontFamily:'Helvetica',inkIntensity:100,underlineThickness:2,strokeWidth:0};
+    editBlocks.push(block);renderEditBlocks();renderEditBlocksList();
+    if(scrollBox) scrollBox.scrollTop=Math.max(0,y-10);
+}
+
+function inkColor(intensity){
+    const i=Math.max(20,Math.min(100,intensity==null?100:intensity));
+    const v=Math.round(255*(1-i/100));
+    return`rgb(${v},${v},${v})`;
+}
+
+function renderEditBlocks(){
+    const wrap=document.getElementById('edit-canvas-wrap');
+    wrap.querySelectorAll('.edit-block').forEach(el=>el.remove());
+    const curPage=editIsImage?0:editCurPage;
+    editBlocks.filter(b=>b.page===curPage).forEach(b=>{
+        const el=document.createElement('div');
+        el.className='edit-block';el.dataset.id=b.id;
+        el.style.cssText=`position:absolute;left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px;border:1.5px dashed ${b.type==='mask'?'#06B6D4':'#8B5CF6'};background:${b.type==='mask'?'rgba(255,255,255,.9)':'rgba(139,92,246,.12)'};display:flex;align-items:center;justify-content:flex-start;color:#111;cursor:move;overflow:hidden;user-select:none;touch-action:none;padding-left:4px;box-sizing:border-box;`;
+        const span=document.createElement('span');
+        span.className='edit-block-text-span';
+        span.textContent=b.text;
+        span.style.cssText=`font-size:${Math.min(b.fontSize,16)}px;font-weight:${b.bold?'700':'400'};font-style:${b.italic?'italic':'normal'};font-family:${fontFamilyCss(b.fontFamily)};text-decoration:${b.underline?'underline':'none'};text-decoration-thickness:${b.underlineThickness!=null?b.underlineThickness:2}px;-webkit-text-stroke:${(b.strokeWidth||0)>0?`${b.strokeWidth}px ${inkColor(b.inkIntensity)}`:'0'};background:${b.highlight?'rgba(255,224,60,.65)':'transparent'};color:${inkColor(b.inkIntensity)};padding:0 2px;border-radius:2px;white-space:nowrap;`;
+        el.appendChild(span);
+        const handle=document.createElement('span');
+        handle.className='edit-resize-handle';
+        handle.style.cssText='position:absolute;right:-2px;bottom:-2px;width:18px;height:18px;background:var(--cyan);border:2px solid var(--bg);border-radius:4px;cursor:nwse-resize;touch-action:none;';
+        el.appendChild(handle);
+        makeDraggable(el,b);
+        makeResizable(handle,el,b);
+        wrap.appendChild(el);
+    });
+}
+
+function fontFamilyCss(name){
+    if(name==='Times')return"'Times New Roman', Times, serif";
+    if(name==='Courier')return"'Courier New', Courier, monospace";
+    if(name==='Georgia')return"Georgia, 'Times New Roman', serif";
+    if(name==='Verdana')return"Verdana, Geneva, sans-serif";
+    if(name==='Trebuchet')return"'Trebuchet MS', sans-serif";
+    if(name==='Comic')return"'Comic Sans MS', 'Comic Sans', cursive";
+    if(name==='Impact')return"Impact, 'Arial Narrow Bold', sans-serif";
+    if(name==='Roboto')return"'Roboto', sans-serif";
+    if(name==='Merriweather')return"'Merriweather', serif";
+    if(name==='PlayfairDisplay')return"'Playfair Display', serif";
+    if(name==='BebasNeue')return"'Bebas Neue', sans-serif";
+    if(name==='Caveat')return"'Caveat', cursive";
+    return"Helvetica, Arial, sans-serif";
+}
+const WEBFONT_NAMES={Roboto:'Roboto','Playfair Display':'PlayfairDisplay',Merriweather:'Merriweather','Bebas Neue':'BebasNeue',Caveat:'Caveat'};
+async function ensureWebFontsLoaded(blocks){
+    const families=new Set();
+    blocks.forEach(b=>{
+        if(b.fontFamily==='Roboto')families.add(`700 16px 'Roboto'`);
+        if(b.fontFamily==='Merriweather')families.add(`700 16px 'Merriweather'`);
+        if(b.fontFamily==='PlayfairDisplay')families.add(`700 16px 'Playfair Display'`);
+        if(b.fontFamily==='BebasNeue')families.add(`16px 'Bebas Neue'`);
+        if(b.fontFamily==='Caveat')families.add(`700 16px 'Caveat'`);
+    });
+    if(!families.size)return;
+    try{await Promise.all([...families].map(f=>document.fonts.load(f)));await document.fonts.ready;}catch(e){/* non bloquant */}
+}
+
+function makeDraggable(el,block){
+    let sx,sy,ox,oy,dragging=false;
+    function start(clientX,clientY){dragging=true;sx=clientX;sy=clientY;ox=block.x;oy=block.y;}
+    function move(clientX,clientY){
+        if(!dragging)return;
+        block.x=Math.max(0,ox+(clientX-sx));block.y=Math.max(0,oy+(clientY-sy));
+        el.style.left=block.x+'px';el.style.top=block.y+'px';
+    }
+    function end(){dragging=false;}
+    el.addEventListener('mousedown',e=>{if(e.target.classList.contains('edit-resize-handle'))return;e.preventDefault();start(e.clientX,e.clientY);});
+    window.addEventListener('mousemove',e=>move(e.clientX,e.clientY));
+    window.addEventListener('mouseup',end);
+    el.addEventListener('touchstart',e=>{if(e.target.classList.contains('edit-resize-handle'))return;const t=e.touches[0];start(t.clientX,t.clientY);},{passive:true});
+    el.addEventListener('touchmove',e=>{if(!dragging)return;const t=e.touches[0];move(t.clientX,t.clientY);e.preventDefault();},{passive:false});
+    el.addEventListener('touchend',end);
+}
+
+function makeResizable(handle,el,block){
+    let sx,sy,ow,oh,resizing=false;
+    function start(clientX,clientY){resizing=true;sx=clientX;sy=clientY;ow=block.w;oh=block.h;}
+    function move(clientX,clientY){
+        if(!resizing)return;
+        block.w=Math.max(30,ow+(clientX-sx));block.h=Math.max(18,oh+(clientY-sy));
+        el.style.width=block.w+'px';el.style.height=block.h+'px';
+    }
+    function end(){resizing=false;}
+    handle.addEventListener('mousedown',e=>{e.preventDefault();e.stopPropagation();start(e.clientX,e.clientY);});
+    window.addEventListener('mousemove',e=>move(e.clientX,e.clientY));
+    window.addEventListener('mouseup',end);
+    handle.addEventListener('touchstart',e=>{e.stopPropagation();const t=e.touches[0];start(t.clientX,t.clientY);},{passive:true});
+    handle.addEventListener('touchmove',e=>{if(!resizing)return;e.stopPropagation();const t=e.touches[0];move(t.clientX,t.clientY);e.preventDefault();},{passive:false});
+    handle.addEventListener('touchend',e=>{e.stopPropagation();end();});
+}
+
+function renderEditBlocksList(){
+    const c=document.getElementById('edit-blocks-list');c.innerHTML='';
+    const curPage=editIsImage?0:editCurPage;
+    const blocks=editBlocks.filter(b=>b.page===curPage);
+    if(!blocks.length){c.innerHTML='<div class="info-box">Aucun bloc sur cette page. Ajoutez un masque ou du texte libre ci-dessus.</div>';return;}
+    blocks.forEach(b=>{
+        const row=document.createElement('div');row.className='options-group';row.style.marginBottom='10px';
+        row.innerHTML=`
+            <div class="option-row" style="margin-bottom:8px">
+                <label>${b.type==='mask'?'⬜ Masque + texte':'🔤 Texte libre'}</label>
+                <input type="text" value="${b.text.replace(/"/g,'&quot;')}" data-id="${b.id}" class="edit-block-text">
+            </div>
+            <div class="option-row" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+                <div style="flex:2;min-width:130px"><label style="font-size:.8em">Police</label><select data-id="${b.id}" class="edit-block-font">
+                    <optgroup label="Système">
+                        <option value="Helvetica">Helvetica</option><option value="Times">Times</option><option value="Courier">Courier</option>
+                        <option value="Georgia">Georgia</option><option value="Verdana">Verdana</option><option value="Trebuchet">Trebuchet MS</option>
+                        <option value="Comic">Comic Sans MS</option><option value="Impact">Impact</option>
+                    </optgroup>
+                    <optgroup label="Web (rendu garanti)">
+                        <option value="Roboto">Roboto</option><option value="Merriweather">Merriweather</option>
+                        <option value="PlayfairDisplay">Playfair Display</option><option value="BebasNeue">Bebas Neue</option>
+                        <option value="Caveat">Caveat (manuscrite)</option>
+                    </optgroup>
+                </select></div>
+                <div style="flex:1;min-width:70px"><label style="font-size:.8em">Taille (pt)</label><input type="number" min="6" max="96" step="1" data-id="${b.id}" class="edit-block-size"></div>
+            </div>
+            <div class="option-row" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:8px">
+                <label class="radio-option" style="min-height:38px"><input type="checkbox" data-id="${b.id}" class="edit-block-bold"><span><b>G</b> Gras</span></label>
+                <label class="radio-option" style="min-height:38px"><input type="checkbox" data-id="${b.id}" class="edit-block-italic"><span><i>I</i> Italique</span></label>
+                <label class="radio-option" style="min-height:38px"><input type="checkbox" data-id="${b.id}" class="edit-block-underline"><span><u>S</u> Souligné</span></label>
+                <label class="radio-option" style="min-height:38px"><input type="checkbox" data-id="${b.id}" class="edit-block-highlight"><span>🖍️ Surligné</span></label>
+                <button class="btn btn-secondary" style="height:38px;margin-left:auto" onclick="removeEditBlock('${b.id}')">🗑 Retirer</button>
+            </div>
+            <div class="option-row" style="margin-bottom:8px">
+                <label style="font-size:.8em">Intensité de l'encre (gris → noir) : <span class="edit-block-ink-value">${b.inkIntensity!=null?b.inkIntensity:100}%</span></label>
+                <input type="range" min="20" max="100" step="5" data-id="${b.id}" class="edit-block-ink">
+            </div>
+            <div class="option-row" style="margin-bottom:8px">
+                <label style="font-size:.8em">Épaisseur du soulignement : <span class="edit-block-ulw-value">${b.underlineThickness!=null?b.underlineThickness:2}px</span></label>
+                <input type="range" min="1" max="6" step="1" data-id="${b.id}" class="edit-block-ulw">
+            </div>
+            <div class="option-row" style="margin-bottom:0">
+                <label style="font-size:.8em">Épaisseur du trait des lettres (effet stylo qui appuie) : <span class="edit-block-strokew-value">${b.strokeWidth!=null?b.strokeWidth:0}</span></label>
+                <input type="range" min="0" max="3" step="0.5" data-id="${b.id}" class="edit-block-strokew">
+            </div>`;
+        c.appendChild(row);
+    });
+    c.querySelectorAll('.edit-block-text').forEach(inp=>{
+        inp.value=blocks.find(b=>b.id===inp.dataset.id).text;
+        inp.addEventListener('input',()=>{
+            const b=editBlocks.find(x=>x.id===inp.dataset.id);b.text=inp.value;
+            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);if(span)span.textContent=b.text;
+        });
+    });
+    c.querySelectorAll('.edit-block-size').forEach(inp=>{
+        const b=blocks.find(x=>x.id===inp.dataset.id);inp.value=b.fontSize;
+        inp.addEventListener('input',()=>{
+            const v=parseInt(inp.value);if(isNaN(v))return;
+            b.fontSize=Math.max(6,Math.min(96,v));
+            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);if(span)span.style.fontSize=Math.min(b.fontSize,16)+'px';
+        });
+    });
+    c.querySelectorAll('.edit-block-font').forEach(sel=>{
+        const b=blocks.find(x=>x.id===sel.dataset.id);sel.value=b.fontFamily||'Helvetica';
+        sel.addEventListener('change',()=>{
+            b.fontFamily=sel.value;
+            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);if(span)span.style.fontFamily=fontFamilyCss(b.fontFamily);
+        });
+    });
+    c.querySelectorAll('.edit-block-bold').forEach(chk=>{
+        const b=blocks.find(x=>x.id===chk.dataset.id);chk.checked=!!b.bold;
+        chk.addEventListener('change',()=>{
+            b.bold=chk.checked;
+            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);if(span)span.style.fontWeight=b.bold?'700':'400';
+        });
+    });
+    c.querySelectorAll('.edit-block-italic').forEach(chk=>{
+        const b=blocks.find(x=>x.id===chk.dataset.id);chk.checked=!!b.italic;
+        chk.addEventListener('change',()=>{
+            b.italic=chk.checked;
+            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);if(span)span.style.fontStyle=b.italic?'italic':'normal';
+        });
+    });
+    c.querySelectorAll('.edit-block-underline').forEach(chk=>{
+        const b=blocks.find(x=>x.id===chk.dataset.id);chk.checked=!!b.underline;
+        chk.addEventListener('change',()=>{
+            b.underline=chk.checked;
+            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);if(span)span.style.textDecoration=b.underline?'underline':'none';
+        });
+    });
+    c.querySelectorAll('.edit-block-highlight').forEach(chk=>{
+        const b=blocks.find(x=>x.id===chk.dataset.id);chk.checked=!!b.highlight;
+        chk.addEventListener('change',()=>{
+            b.highlight=chk.checked;
+            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);
+            if(span)span.style.background=b.highlight?'rgba(255,224,60,.65)':'transparent';
+        });
+    });
+    c.querySelectorAll('.edit-block-ink').forEach(rng=>{
+        const b=blocks.find(x=>x.id===rng.dataset.id);rng.value=b.inkIntensity!=null?b.inkIntensity:100;
+        rng.addEventListener('input',()=>{
+            b.inkIntensity=parseInt(rng.value);
+            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);if(span)span.style.color=inkColor(b.inkIntensity);
+            const valEl=rng.closest('.option-row').querySelector('.edit-block-ink-value');if(valEl)valEl.textContent=b.inkIntensity+'%';
+        });
+    });
+    c.querySelectorAll('.edit-block-ulw').forEach(rng=>{
+        const b=blocks.find(x=>x.id===rng.dataset.id);rng.value=b.underlineThickness!=null?b.underlineThickness:2;
+        rng.addEventListener('input',()=>{
+            b.underlineThickness=parseInt(rng.value);
+            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);if(span)span.style.textDecorationThickness=b.underlineThickness+'px';
+            const valEl=rng.closest('.option-row').querySelector('.edit-block-ulw-value');if(valEl)valEl.textContent=b.underlineThickness+'px';
+        });
+    });
+    c.querySelectorAll('.edit-block-strokew').forEach(rng=>{
+        const b=blocks.find(x=>x.id===rng.dataset.id);rng.value=b.strokeWidth!=null?b.strokeWidth:0;
+        rng.addEventListener('input',()=>{
+            b.strokeWidth=parseFloat(rng.value);
+            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);
+            if(span)span.style.webkitTextStroke=b.strokeWidth>0?`${b.strokeWidth}px ${inkColor(b.inkIntensity)}`:'0';
+            const valEl=rng.closest('.option-row').querySelector('.edit-block-strokew-value');if(valEl)valEl.textContent=b.strokeWidth;
+        });
+    });
+}
+function removeEditBlock(id){editBlocks=editBlocks.filter(b=>b.id!==id);renderEditBlocks();renderEditBlocksList();}
+
+async function exportEdited(){
+    const statusEl=document.getElementById('edit-status');
+    statusEl.style.display='none';
+    if(!editBlocks.length){showEditStatus('Ajoutez au moins un bloc avant de générer.',true);return;}
+    if(!editIsImage && !editPdfDoc){showEditStatus('Aucun PDF chargé.',true);return;}
+    if(editIsImage && !editPages.length){showEditStatus('Aucune image chargée.',true);return;}
+    if(!editBaseCanvas){showEditStatus('La page n\'est pas encore prête, réessayez dans un instant.',true);return;}
+    document.getElementById('edit-loading').classList.add('active');
+    try{
+        await ensureWebFontsLoaded(editBlocks);
+        const scanEffect=document.getElementById('edit-scan-effect').checked;
+        const outDoc=await PDFLib.PDFDocument.create();
+        const pagesToRender=editIsImage?[0]:editPages.map((_,i)=>i);
+        // Sécurité mémoire navigateur : on plafonne la résolution d'export pour éviter
+        // qu'un très gros document ne fasse planter la génération sur mobile.
+        const MAX_DIM=4200;
+        for(const pIdx of pagesToRender){
+            let cv=document.createElement('canvas');
+            let natW,natH;
+            if(editIsImage){
+                const img=editPages[0];natW=img.width;natH=img.height;
+                const shrink=Math.min(1,MAX_DIM/Math.max(natW,natH));
+                natW=Math.round(natW*shrink);natH=Math.round(natH*shrink);
+                cv.width=natW;cv.height=natH;
+                const ictx=cv.getContext('2d');ictx.imageSmoothingQuality='high';ictx.drawImage(img,0,0,natW,natH);
+            }else{
+                const page=await editPdfDoc.getPage(editPages[pIdx]);
+                const vp1=page.getViewport({scale:1});
+                let renderScale=3;
+                if(Math.max(vp1.width,vp1.height)*renderScale>MAX_DIM){renderScale=MAX_DIM/Math.max(vp1.width,vp1.height);}
+                renderScale=Math.max(renderScale,1.2); // ne jamais descendre sous une qualité correcte
+                const vp=page.getViewport({scale:renderScale});
+                cv.width=Math.round(vp.width);cv.height=Math.round(vp.height);
+                const rctx=cv.getContext('2d');rctx.imageSmoothingQuality='high';
+                await page.render({canvasContext:rctx,viewport:vp}).promise;
+                natW=cv.width;natH=cv.height;
+            }
+            const ctx=cv.getContext('2d');
+            const factor=natW/editBaseCanvas.displayWidth;
+            editBlocks.filter(b=>b.page===pIdx).forEach(b=>{
+                const bx=b.x*factor,by=b.y*factor,bw=b.w*factor,bh=b.h*factor,bfs=b.fontSize*factor;
+                if(b.type==='mask'){ctx.fillStyle='#ffffff';ctx.fillRect(bx,by,bw,bh);}
+                ctx.font=`${b.italic?'italic ':''}${b.bold?'700 ':''}${bfs}px ${fontFamilyCss(b.fontFamily)}`;
+                ctx.textBaseline='middle';
+                const tx=bx+4*factor,ty=by+bh/2;
+                const tw=ctx.measureText(b.text).width;
+                if(b.highlight){
+                    ctx.fillStyle='rgba(255,224,60,.65)';
+                    ctx.fillRect(tx-2,ty-bfs*0.62,tw+4,bfs*0.82);
+                }
+                ctx.fillStyle=inkColor(b.inkIntensity);
+                ctx.fillText(b.text,tx,ty);
+                if((b.strokeWidth||0)>0){
+                    ctx.strokeStyle=inkColor(b.inkIntensity);
+                    ctx.lineWidth=b.strokeWidth*factor;
+                    ctx.strokeText(b.text,tx,ty);
+                }
+                if(b.underline){
+                    ctx.strokeStyle=inkColor(b.inkIntensity);
+                    ctx.lineWidth=Math.max(1,(b.underlineThickness!=null?b.underlineThickness:2)*factor);
+                    ctx.beginPath();ctx.moveTo(tx,ty+bfs*0.38);ctx.lineTo(tx+tw,ty+bfs*0.38);ctx.stroke();
+                }
+            });
+            if(scanEffect){
+                const rawCv=document.createElement('canvas');rawCv.width=cv.width;rawCv.height=cv.height;
+                rawCv.getContext('2d').drawImage(cv,0,0);
+                ctx.filter='grayscale(14%) contrast(112%) brightness(103%)';
+                ctx.clearRect(0,0,cv.width,cv.height);
+                ctx.drawImage(rawCv,0,0);
+                ctx.filter='none';
+            }
+            const jpeg=cv.toDataURL('image/jpeg',0.95);
+            if(!jpeg||jpeg==='data:,'){throw new Error('Le rendu de la page a échoué (canvas vide). Essayez avec un fichier plus petit ou moins de blocs.');}
+            const bytes=Uint8Array.from(atob(jpeg.split(',')[1]),c=>c.charCodeAt(0));
+            const img=await outDoc.embedJpg(bytes);
+            const page=outDoc.addPage([natW,natH]);
+            page.drawImage(img,{x:0,y:0,width:natW,height:natH});
+        }
+        const bytes=await outDoc.save();
+        downloadFile(new Blob([bytes],{type:'application/pdf'}),`edite-${Date.now()}.pdf`);
+        showEditStatus('✅ Document édité généré et téléchargé.',false);
+    }catch(e){
+        console.error(e);
+        showEditStatus('❌ Erreur pendant la génération : '+e.message,true);
+    }
+    document.getElementById('edit-loading').classList.remove('active');
+}
+function showEditStatus(msg,isError){
+    const el=document.getElementById('edit-status');
+    el.textContent=msg;el.style.display='block';
+    el.className='info-box'+(isError?' warning':' success-box');
+}
+
+function resetEdit(){
+    editPdfDoc=null;editPages=[];editCurPage=0;editBlocks=[];editIsImage=false;editBaseCanvas=null;
+    document.getElementById('edit-input').value='';
+    document.getElementById('edit-workspace').style.display='none';
+    document.getElementById('edit-canvas-wrap').innerHTML='';
+    document.getElementById('edit-blocks-list').innerHTML='';
+    document.getElementById('edit-status').style.display='none';
+    document.getElementById('edit-loading').classList.remove('active');
+}
 
 // ── CLEAN TEXT ───────────────────────────────────────
 function cleanTextForPDF(text){
