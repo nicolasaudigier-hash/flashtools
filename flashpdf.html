@@ -320,7 +320,8 @@
                             </label>
                         </div>
                     </div>
-                    <div id="edit-scroll-box" style="overflow:auto;border:1.5px solid var(--border2);border-radius:11px;background:var(--bg2);touch-action:none">
+                    <div id="edit-scroll-top" style="overflow-x:auto;overflow-y:hidden;height:14px;margin-bottom:2px;border:1.5px solid var(--border2);border-radius:8px 8px 0 0;background:var(--bg2);"><div id="edit-scroll-top-spacer" style="height:1px;"></div></div>
+                    <div id="edit-scroll-box" style="overflow:auto;border:1.5px solid var(--border2);border-radius:0 0 11px 11px;background:var(--bg2);touch-action:none">
                         <div id="edit-canvas-wrap" style="position:relative;display:inline-block;"></div>
                     </div>
                     <div id="edit-blocks-list" style="margin-top:16px"></div>
@@ -762,6 +763,8 @@ async function renderEditPage(){
     cv.style.display='block';cv.style.width=cv.width+'px';cv.style.height=cv.height+'px';cv.id='edit-base-canvas';
     wrap.appendChild(cv);
     wrap.style.width=cv.width+'px';wrap.style.height=cv.height+'px';
+    var topSpacer=document.getElementById('edit-scroll-top-spacer');
+    if(topSpacer) topSpacer.style.width=cv.width+'px';
     renderEditBlocks();
     updateZoomLabel();
 }
@@ -818,7 +821,7 @@ function renderEditBlocks(){
         span.className='edit-block-text-span';
         span.textContent=b.text;
         const textHighlightBg=(b.highlight&&b.highlightMode==='text')?hexToRgba(b.highlightColor,.65):'transparent';
-        span.style.cssText=`font-size:${Math.min(b.fontSize,16)}px;font-weight:${b.bold?'700':'400'};font-style:${b.italic?'italic':'normal'};font-family:${fontFamilyCss(b.fontFamily)};text-decoration:${b.underline?'underline':'none'};text-decoration-thickness:${b.underlineThickness!=null?b.underlineThickness:2}px;-webkit-text-stroke:${(b.strokeWidth||0)>0?`${b.strokeWidth}px ${inkColor(b.inkIntensity,b.color)}`:'0'};background:${textHighlightBg};color:${inkColor(b.inkIntensity,b.color)};padding:0 2px;border-radius:2px;white-space:nowrap;`;
+        span.style.cssText=`font-size:${b.fontSize}px;font-weight:${b.bold?'700':'400'};font-style:${b.italic?'italic':'normal'};font-family:${fontFamilyCss(b.fontFamily)};text-decoration:${b.underline?'underline':'none'};text-decoration-thickness:${b.underlineThickness!=null?b.underlineThickness:2}px;-webkit-text-stroke:${(b.strokeWidth||0)>0?`${b.strokeWidth}px ${inkColor(b.inkIntensity,b.color)}`:'0'};background:${textHighlightBg};color:${inkColor(b.inkIntensity,b.color)};padding:0 2px;border-radius:2px;white-space:nowrap;`;
         el.appendChild(span);
         const handle=document.createElement('span');
         handle.className='edit-resize-handle';
@@ -891,6 +894,25 @@ function makeResizable(handle,el,block){
     handle.addEventListener('touchmove',e=>{if(!resizing)return;e.stopPropagation();const t=e.touches[0];move(t.clientX,t.clientY);e.preventDefault();},{passive:false});
     handle.addEventListener('touchend',e=>{e.stopPropagation();end();});
 }
+
+// ── SYNCHRONISATION DES DEUX BARRES DE DÉFILEMENT HORIZONTALES ──
+// La barre du bas est facile à manquer (il faut scroller la page ou
+// deviner qu'elle existe) ; celle du haut reste visible en permanence
+// dès qu'on ouvre l'outil Éditer.
+(function syncScrollBars(){
+    var top=document.getElementById('edit-scroll-top');
+    var box=document.getElementById('edit-scroll-box');
+    if(!top||!box) return;
+    var syncing=false;
+    top.addEventListener('scroll',function(){
+        if(syncing) return; syncing=true;
+        box.scrollLeft=top.scrollLeft; syncing=false;
+    });
+    box.addEventListener('scroll',function(){
+        if(syncing) return; syncing=true;
+        top.scrollLeft=box.scrollLeft; syncing=false;
+    });
+})();
 
 // ── ZOOM (boutons + pincement tactile) ────────────────
 let editZoom=1;
@@ -1029,7 +1051,7 @@ function renderEditBlocksList(){
         inp.addEventListener('input',()=>{
             const v=parseInt(inp.value);if(isNaN(v))return;
             b.fontSize=Math.max(6,Math.min(96,v));
-            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);if(span)span.style.fontSize=Math.min(b.fontSize,16)+'px';
+            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);if(span)span.style.fontSize=b.fontSize+'px';
         });
     });
     c.querySelectorAll('.edit-block-font').forEach(sel=>{
