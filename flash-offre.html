@@ -19,8 +19,10 @@
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
 .wrap{max-width:520px;margin:0 auto;padding:48px 20px 56px;}
 
-.brand{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:32px;font-family:'Syne',sans-serif;font-weight:800;font-size:17px;}
+.brand{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-bottom:32px;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:17px;text-decoration:none;}
 .brand span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.brand .ext{color:var(--text-dim);font-weight:600;}
 
 .banner{display:none;align-items:center;gap:8px;text-align:center;justify-content:center;
   background:var(--surface);border:1px solid var(--border-cyan);border-radius:12px;
@@ -63,7 +65,9 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webk
 <body>
 <div class="wrap">
 
-  <div class="brand"><span>FlashTools</span></div>
+  <a class="brand" href="https://www.flashtools.fr">
+    <span>FlashTools</span><span class="ext">.fr</span>
+  </a>
 
   <div class="banner" id="banner"></div>
 
