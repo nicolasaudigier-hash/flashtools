@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Bienvenue à bord | FlashTools</title>
+<meta name="description" content="Ton abonnement FlashTools est actif.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0E27; --surface:#111827; --card:#1E293B;
+  --border:rgba(255,255,255,.08); --border-cyan:rgba(6,182,212,.35);
+  --cyan:#06B6D4; --violet:#8B5CF6; --text:#E2E8F0; --text-dim:#94A3B8;
+  --grad: linear-gradient(135deg, var(--cyan), var(--violet));
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:480px;margin:0 auto;padding:56px 20px 64px;text-align:center;}
+
+.brand{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:36px;font-family:'Syne',sans-serif;font-weight:800;font-size:17px;}
+.brand span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;}
+
+.check{
+  width:56px;height:56px;margin:0 auto 22px;border-radius:50%;
+  background:var(--grad); display:flex; align-items:center; justify-content:center;
+}
+.check svg{width:26px;height:26px;}
+
+.hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(24px,5vw,30px);color:#fff;margin-bottom:10px;line-height:1.25;}
+.hero p{font-size:14.5px;color:var(--text-dim);margin-bottom:28px;line-height:1.6;}
+
+.recap{
+  background:var(--card); border:1px solid var(--border); border-radius:14px;
+  padding:18px 20px; margin-bottom:26px; text-align:left;
+}
+.recap .row{display:flex; justify-content:space-between; align-items:center; font-size:13.5px; padding:6px 0;}
+.recap .row + .row{border-top:1px solid var(--border);}
+.recap .k{color:var(--text-dim);}
+.recap .v{color:#fff; font-weight:600; font-family:'JetBrains Mono',monospace; font-size:13px;}
+
+.cta{
+  display:inline-block; width:100%; text-decoration:none; text-align:center; font-weight:600; font-size:15px;
+  padding:14px 20px; border-radius:10px; background:var(--grad); color:#fff; margin-bottom:22px;
+}
+
+.note{font-size:13px; color:var(--text-dim); line-height:1.6;}
+.note a{color:var(--cyan); text-decoration:none; font-weight:600;}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand"><span>FlashTools</span></div>
+
+  <div class="check">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 12.5L9.5 18L20 6" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <div class="hero">
+    <h1>Bienvenue à bord.</h1>
+    <p>Ton abonnement FlashTools est actif dès maintenant.</p>
+  </div>
+
+  <div class="recap" id="recap" style="display:none;">
+    <div class="row"><span class="k">Offre</span><span class="v" id="recap-plan">—</span></div>
+    <div class="row"><span class="k">Prochaine échéance</span><span class="v" id="recap-next">—</span></div>
+  </div>
+
+  <a class="cta" href="https://www.flashtools.fr/les-outils">Accéder à mes outils →</a>
+
+  <p class="note">
+    Un email de confirmation arrive dans quelques minutes.<br>
+    Une question ? Réponds-y directement, ou écris à
+    <a href="mailto:contact@flashtools.fr">contact@flashtools.fr</a>.
+  </p>
+
+</div>
+
+<script>
+// Personnalise le récap si la page est appelée avec ?plan=mensuel ou ?plan=annuel
+var plan = new URLSearchParams(location.search).get('plan');
+if (plan === 'mensuel' || plan === 'annuel') {
+  document.getElementById('recap-plan').textContent = plan === 'mensuel' ? '5€ / mois' : '50€ / an';
+  var next = new Date();
+  if (plan === 'mensuel') { next.setMonth(next.getMonth() + 1); }
+  else { next.setFullYear(next.getFullYear() + 1); }
+  document.getElementById('recap-next').textContent = next.toLocaleDateString('fr-FR');
+  document.getElementById('recap').style.display = 'block';
+}
+</script>
+</body>
+</html>
