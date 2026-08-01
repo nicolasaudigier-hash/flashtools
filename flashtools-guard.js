@@ -79,10 +79,10 @@
     var style = document.createElement("style");
     style.textContent =
       "#ft-guard-overlay{position:fixed;inset:0;z-index:999999;display:flex;" +
-      "align-items:center;justify-content:center;padding:20px;" +
+      "align-items:center;justify-content:center;padding:20px;visibility:visible!important;" +
       "background:rgba(7,8,15,0.92);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;}" +
       "#ft-guard-box{width:100%;max-width:380px;background:#11131c;border:1px solid #252d42;" +
-      "border-radius:16px;padding:28px 24px;box-sizing:border-box;}" +
+      "border-radius:16px;padding:28px 24px;box-sizing:border-box;visibility:visible!important;}" +
       "#ft-guard-title{font-size:17px;font-weight:700;color:#F1F5F9;margin:0 0 8px;}" +
       "#ft-guard-sub{font-size:13px;color:#94A3B8;margin:0 0 18px;line-height:1.5;}" +
       "#ft-guard-input{width:100%;box-sizing:border-box;padding:12px 14px;border-radius:9px;" +
