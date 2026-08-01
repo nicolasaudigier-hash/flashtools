@@ -82,6 +82,8 @@
     .color-pick{display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;}
     .color-pick label{font-size:.68em;color:var(--text2);text-align:center;}
     .color-pick input[type=color]{width:34px;height:24px;border:1px solid var(--border);border-radius:5px;cursor:pointer;background:none;padding:2px;}
+    .color-pick input[type=text].hex-input{width:100%;max-width:74px;background:var(--surface);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:.66em;padding:3px 4px;text-align:center;font-family:'Share Tech Mono',monospace;margin-top:2px;outline:none;}
+    .color-pick input[type=text].hex-input:focus{border-color:var(--cyan);}
     .color-pick.disabled{opacity:.3;pointer-events:none;}
     .color-pick.disabled::after{content:'—';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--text3);font-size:.7em;}
     .accent-hint{font-size:.67em;color:var(--text2);opacity:.6;margin-bottom:8px;font-style:italic;}
@@ -122,7 +124,7 @@
     @media(max-width:860px){
       .app-layout{grid-template-columns:1fr;grid-template-rows:auto 1fr;}
       .preview-area{order:-1;padding:14px 12px;}
-      #previewCanvas{max-height:55vw;}
+      #previewCanvas{max-height:70vh;}
       .controls{max-height:none;border-right:none;border-top:1px solid var(--border);}
       .themes-grid{grid-template-columns:repeat(7,1fr);}
       .tpl-grid{grid-template-columns:repeat(5,1fr);}
@@ -130,6 +132,9 @@
     @media(max-width:480px){
       .header{padding:18px 14px 14px;}
       .controls{padding:12px;}
+      .themes-grid{grid-template-columns:repeat(4,1fr);}
+      .tpl-grid{grid-template-columns:repeat(3,1fr);}
+      .color-pick input[type=color]{width:100%;height:30px;}
     }
   </style>
 </head>
@@ -175,19 +180,19 @@
   <!-- COULEURS -->
   <div class="sec">Couleurs <span style="font-size:.75em;color:var(--text2);text-transform:none;letter-spacing:0;font-weight:400">(grisé = géré par le template)</span></div>
   <div class="color-grid" id="colorGrid">
-    <div class="color-pick" id="cp-accent"><label>Accent</label><input type="color" id="cAccent" oninput="onAccentChange()"></div>
-    <div class="color-pick" id="cp-title"><label>Titre</label><input type="color" id="cTitle" oninput="render()"></div>
-    <div class="color-pick" id="cp-body"><label>Texte</label><input type="color" id="cBody" oninput="render()"></div>
-    <div class="color-pick" id="cp-btn"><label>Bouton</label><input type="color" id="cBtn" oninput="onBtnChange()"></div>
-    <div class="color-pick" id="cp-btntext"><label>Txt btn</label><input type="color" id="cBtnText" oninput="render()"></div>
-    <div class="color-pick" id="cp-bg"><label>Fond</label><input type="color" id="cBg" oninput="onBgChange()"></div>
+    <div class="color-pick" id="cp-accent"><label>Accent</label><input type="color" id="cAccent" oninput="onAccentChange()"><input type="text" class="hex-input" id="tAccent" maxlength="7" placeholder="#000000" oninput="onHexTyped('Accent')"></div>
+    <div class="color-pick" id="cp-title"><label>Titre</label><input type="color" id="cTitle"><input type="text" class="hex-input" id="tTitle" maxlength="7" placeholder="#000000" oninput="onHexTyped('Title')"></div>
+    <div class="color-pick" id="cp-body"><label>Texte</label><input type="color" id="cBody"><input type="text" class="hex-input" id="tBody" maxlength="7" placeholder="#000000" oninput="onHexTyped('Body')"></div>
+    <div class="color-pick" id="cp-btn"><label>Bouton</label><input type="color" id="cBtn" oninput="onBtnChange()"><input type="text" class="hex-input" id="tBtn" maxlength="7" placeholder="#000000" oninput="onHexTyped('Btn')"></div>
+    <div class="color-pick" id="cp-btntext"><label>Txt btn</label><input type="color" id="cBtnText"><input type="text" class="hex-input" id="tBtnText" maxlength="7" placeholder="#000000" oninput="onHexTyped('BtnText')"></div>
+    <div class="color-pick" id="cp-bg"><label>Fond</label><input type="color" id="cBg" oninput="onBgChange()"><input type="text" class="hex-input" id="tBg" maxlength="7" placeholder="#000000" oninput="onHexTyped('Bg')"></div>
   </div>
   <div class="slider-row">
     <label>Intensité fond</label>
     <input type="range" id="bgDarken" min="-70" max="70" value="0" oninput="onBgDarken(this)">
     <span class="slider-val" id="bgDarkenVal">0</span>
   </div>
-  <p class="accent-hint">Les couleurs s'adaptent automatiquement au thème si non modifiées.</p>
+  <p class="accent-hint">Les couleurs s'adaptent automatiquement au thème si non modifiées. Sur mobile, si la pastille ne propose pas assez de choix, tapez directement le code couleur (ex: #06B6D4) dans le champ juste en dessous.</p>
 
   <!-- PHOTO DE FOND -->
   <div class="sec-row">
@@ -370,7 +375,6 @@ function drawCover(c,img,x,y,w,h,zoom,px,py,bw,op){
   c.save();c.globalAlpha=op;
   const sc=zoom/100;const ir=img.width/img.height;const ar=w/h;
   let sw,sh;if(ir>ar){sh=h*sc;sw=sh*ir;}else{sw=w*sc;sh=sw/ir;}
-  // px/py de 0 à 100 permettent de déplacer librement même hors zone
   const ox=x+(w-sw)*(px/100);const oy=y+(h-sh)*(py/100);
   if(bw){
     const tmp=document.createElement('canvas');tmp.width=img.width;tmp.height=img.height;
@@ -459,7 +463,6 @@ function drawHalo(c,x,y,r,col,alpha){
   c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();c.restore();
 }
 
-// Titre adaptatif — retourne la hauteur occupée
 function drawTitle(c,text,x,y,maxW,font,fontSize,maxH,align,shadowInvert){
   if(!text)return 0;
   let size=fontSize;const min=fontSize*.35;
@@ -512,7 +515,7 @@ function drawBtn(c,text,x,y,maxW,h,bgCol,textCol,fontSize){
   c.font=`700 ${fontSize}px 'DM Sans',sans-serif`;
   const tw=Math.min(c.measureText(text).width+maxW*.24,maxW);
   c.fillStyle=bgCol;rrect(c,x,y,tw,h,h*.44);c.fill();
-  clearShadow(c);// pas d'ombre sur le bouton lui-même
+  clearShadow(c);
   c.fillStyle=textCol;c.textAlign='center';c.fillText(text,x+tw/2,y+h*.645);
 }
 function drawBtnCenter(c,text,cx,y,maxW,h,bgCol,textCol,fontSize){
@@ -537,8 +540,6 @@ function shadeHex(hex,pct){if(!hex||!hex.startsWith('#'))return hex||'#000000';c
 function luminance(hex){if(!hex||!hex.startsWith('#'))return 0;const r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;return .2126*r+.7152*g+.0722*b;}
 
 // ── TEMPLATES (10) ───────────────────────────────────────
-// colorMask: quels pickers sont actifs pour ce template
-// 'all' = tous, sinon tableau d'ids
 const TEMPLATES=[
   { name:'Néon', colorMask:'all',
     draw(c,W,H,d,t){
@@ -565,7 +566,7 @@ const TEMPLATES=[
       if(dualActive)drawDualImgs(c,W,H,t.accent);else drawBgImg(c,W,H);
       c.save();c.globalAlpha=.13;c.fillStyle=t.accent;c.beginPath();c.moveTo(W,0);c.lineTo(W,H*.52);c.lineTo(W*.42,0);c.closePath();c.fill();c.restore();
       c.fillStyle=t.accent;c.fillRect(0,H*.44,W,H*.112);
-      c.fillStyle='#fff';// titre toujours blanc sur bande accent
+      c.fillStyle='#fff';
       drawTitle(c,d.title,W/2,H*.488,W*.88,t.font,W*.088,H*.1,'center',false);
       c.fillStyle=hexA(t.text,.88);
       drawMultiline(c,d.sub,W/2,H*.29,W*.8,`600 ${W*.031}px ${t.font}`,W*.038,'center',2,luminance(t.bg)>.5);
@@ -640,16 +641,12 @@ const TEMPLATES=[
     draw(c,W,H,d,t){
       c.fillStyle=t.bg;c.fillRect(0,0,W,H);
       if(dualActive)drawDualImgs(c,W,H,t.accent);else drawBgImg(c,W,H);
-      // Bande diagonale accent
       c.save();c.globalAlpha=.88;c.fillStyle=t.accent;
       c.beginPath();c.moveTo(0,H*.35);c.lineTo(W,H*.22);c.lineTo(W,H*.48);c.lineTo(0,H*.62);c.closePath();c.fill();c.restore();
-      // Titre sur bande diagonale — blanc forcé
       c.fillStyle='#fff';
       drawTitle(c,d.title,W*.08,H*.41,W*.84,t.font,W*.088,H*.1,'left',false);
-      // Sous-titre au-dessus
       c.fillStyle=t._titleColor;
       drawLine(c,d.sub,W*.08,H*.28,W*.84,`600 ${W*.03}px ${t.font}`,'left',luminance(t.bg)>.5);
-      // Corps en-dessous
       c.fillStyle=t._bodyColor;
       drawMultiline(c,d.body,W*.08,H*.68,W*.84,`300 ${W*.025}px 'DM Sans',sans-serif`,W*.03,'left',3,luminance(t.bg)>.5);
       drawBtn(c,d.cta,W*.08,H*.785,W*.54,H*.066,t._btnColor,t._btnTxtColor,W*.027);
@@ -659,18 +656,14 @@ const TEMPLATES=[
   },
   { name:'Magazine', colorMask:['cp-accent','cp-btn','cp-btntext'],
     draw(c,W,H,d,t){
-      // Photo pleine page puis overlay dégradé en bas
       c.fillStyle=t.bg;c.fillRect(0,0,W,H);
       if(dualActive)drawDualImgs(c,W,H,t.accent);
       else if(imgs[1])drawCover(c,imgs[1],0,0,W,H,parseInt(document.getElementById('img1Zoom').value),parseInt(document.getElementById('img1PX').value),parseInt(document.getElementById('img1PY').value),document.getElementById('img1BW').checked,1);
       else{fillBg(c,W,H,t.bg,t.bg2);}
-      // Overlay dégradé bas — toujours fort pour lisibilité
       const grad=c.createLinearGradient(0,H*.45,0,H);
       grad.addColorStop(0,'rgba(0,0,0,0)');grad.addColorStop(1,'rgba(0,0,0,.88)');
       c.fillStyle=grad;c.fillRect(0,0,W,H);
-      // Accent line top
       c.fillStyle=t.accent;c.fillRect(0,0,W,H*.008);
-      // Tout le texte en blanc sur overlay sombre
       c.fillStyle='#fff';
       drawTitle(c,d.title,W*.07,H*.62,W*.86,t.font,W*.092,H*.13,'left',false);
       c.fillStyle='rgba(255,255,255,.85)';
@@ -683,13 +676,10 @@ const TEMPLATES=[
     }
   },
   { name:'Brut', colorMask:'all',
-    // Neo-Brutalism : typo oversizée, blocs plats, volontairement radical
     draw(c,W,H,d,t){
       c.fillStyle=t.bg;c.fillRect(0,0,W,H);
       if(dualActive)drawDualImgs(c,W,H,t.accent);else drawBgImg(c,W,H);
-      // Bloc accent massif
       c.fillStyle=t.accent;c.fillRect(0,H*.38,W,H*.26);
-      // Titre ÉNORME — débordement volontaire
       c.fillStyle=t.bg===t.text?'#000':t.text;
       c.textAlign='left';
       let size=W*.14;const minS=W*.06;
@@ -698,7 +688,6 @@ const TEMPLATES=[
       setShadow(c,W,luminance(t.bg)>.5);
       c.fillText((d.title||'TITRE').toUpperCase(),W*.05,H*.38);
       clearShadow(c);
-      // Sous-titre sur bande
       c.fillStyle=luminance(t.accent)>.45?'#000':'#fff';
       c.font=`700 ${W*.04}px ${t.font}`;c.textAlign='left';
       let sub=d.sub||'';while(c.measureText(sub).width>W*.86&&sub.length>3)sub=sub.slice(0,-1);if(sub!==d.sub&&d.sub)sub=sub.slice(0,-1)+'…';
@@ -716,47 +705,34 @@ const TEMPLATES=[
     draw(c,W,H,d,t){
       c.fillStyle=t.bg;c.fillRect(0,0,W,H);
       if(dualActive)drawDualImgs(c,W,H,t.accent);else drawBgImg(c,W,H);
-      // Badge cercle en haut
       const cx=W/2,cy=H*.36,r=W*.32;
       c.fillStyle=hexA(t.bg,.92);c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.fill();
       c.strokeStyle=t.accent;c.lineWidth=W*.006;c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.stroke();
       c.save();c.strokeStyle=t.accent;c.lineWidth=W*.0018;c.globalAlpha=.3;
       c.beginPath();c.arc(cx,cy,r+W*.015,0,Math.PI*2);c.stroke();c.restore();
-      // Titre dans badge
       c.fillStyle=t._titleColor;
       drawTitle(c,d.title,cx,cy-W*.065,W*.52,t.font,W*.068,W*.16,'center',false);
-      // Trait + sous-titre dans badge
       c.fillStyle=t.accent;c.fillRect(cx-W*.08,cy+W*.055,W*.16,W*.003);
       c.fillStyle=t.accent;
       drawLine(c,d.sub,cx,cy+W*.1,W*.5,`600 ${W*.024}px ${t.font}`,'center',false);
-      // Zone texte bas — séparateur
       c.fillStyle=hexA(t.accent,.4);c.fillRect(W*.12,H*.698,W*.76,W*.002);
-      // Corps — aligné LEFT depuis le centre pour éviter coupure
       const bodyX=W*.12,bodyMaxW=W*.76;
       c.fillStyle=t._bodyColor;
       drawMultiline(c,d.body,bodyX,H*.73,bodyMaxW,`300 ${W*.024}px 'DM Sans',sans-serif`,W*.031,'left',2,luminance(t.bg)>.5);
-      // CTA
       drawBtnCenter(c,d.cta,W/2,H*.838,W*.54,H*.068,t._btnColor,t._btnTxtColor,W*.027);
-      // Marque
       c.fillStyle=hexA(t._bodyColor,.7);
       drawLine(c,d.brand,W/2,H*.952,W*.55,`600 ${W*.02}px ${t.font}`,'center',false);
     }
   },
   { name:'Typo', colorMask:'all',
-    // 100% typographique, pas de photo
     draw(c,W,H,d,t){
       c.fillStyle=t.bg;c.fillRect(0,0,W,H);
-      // Pattern points
       c.fillStyle=hexA(t.accent,.08);
       for(let x=0;x<W;x+=W*.05)for(let y=0;y<H;y+=W*.05){c.beginPath();c.arc(x,y,W*.008,0,Math.PI*2);c.fill();}
-      // Barre verticale épaisse
       c.fillStyle=t.accent;c.fillRect(W*.06,H*.1,W*.018,H*.8);
-      // Titre très grand
       c.fillStyle=t._titleColor;
       drawTitle(c,d.title,W*.12,H*.22,W*.82,t.font,W*.1,H*.2,'left',luminance(t.bg)>.5);
-      // Ligne accent sous titre
       c.fillStyle=t.accent;c.fillRect(W*.12,H*.46,W*.15,W*.005);
-      // Sous-titre
       c.fillStyle=t.accent;
       drawLine(c,d.sub,W*.12,H*.535,W*.82,`600 ${W*.032}px ${t.font}`,'left',luminance(t.bg)>.5);
       c.fillStyle=t._bodyColor;
@@ -811,24 +787,19 @@ const TEMPLATES=[
         c.fillStyle=col;c.fillRect(0,y*H,W,h*H);return y+h;
       },0);
       if(dualActive)drawDualImgs(c,W,H,t.accent);else drawBgImg(c,W,H);
-      // Bande 1 haut — marque
       c.fillStyle=hexA(t.text,.65);
       drawLine(c,d.brand,W*.08,H*.115,W*.84,`600 ${W*.02}px ${t.font}`,'left',false);
-      // Bande 2 accent — titre
       c.fillStyle=luminance(t.accent)>.45?'#000':'#fff';
       drawTitle(c,d.title,W/2,H*.245,W*.88,t.font,W*.088,H*.12,'center',false);
-      // Bande 3 — sous-titre + corps
       c.fillStyle=t._titleColor;
       drawLine(c,d.sub,W*.08,H*.425,W*.84,`600 ${W*.031}px ${t.font}`,'left',luminance(bg2)>.5);
       c.fillStyle=t._bodyColor;
       drawMultiline(c,d.body,W*.08,H*.495,W*.84,`300 ${W*.025}px 'DM Sans',sans-serif`,W*.032,'left',3,luminance(bg2)>.5);
-      // Bande 4 accent — CTA
       c.fillStyle=luminance(t.accent)>.45?'#000':'#fff';
       c.font=`700 ${W*.032}px 'DM Sans',sans-serif`;c.textAlign='center';
       setShadow(c,W,false);
       let cta=d.cta||'';while(c.measureText(cta).width>W*.8&&cta.length>3)cta=cta.slice(0,-1);
       c.fillText(cta,W/2,H*.785+H*.03);clearShadow(c);
-      // Bande 5 bas — info
       c.fillStyle=hexA(t.text,.55);
       drawLine(c,d.sub,W*.08,H*.925,W*.7,`400 ${W*.019}px 'DM Sans',sans-serif`,'left',luminance(t.bg)>.5);
     }
@@ -851,8 +822,6 @@ function updateColorMask(){
 function getData(){return{title:v('fTitle')||'TITRE',sub:v('fSub')||'',body:v('fBody')||'',cta:v('fCta')||'',brand:v('fBrand')||'',url:v('fUrl')||'#'};}
 function v(id){return document.getElementById(id).value.trim();}
 
-// Résolution preview réduite pour éviter les problèmes navigateur
-// Preview limité à 800px max côté long
 function getPreviewScale(){
   const fmt=FORMATS[currentFormat];
   const maxPx=800;
@@ -876,13 +845,37 @@ function render(exportCanvas){
 
 // ── CONTRÔLES ────────────────────────────────────────────
 function setFormat(fmt,btn){currentFormat=fmt;document.querySelectorAll('.fmt-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render();}
-function onAccentChange(){ovAccent=document.getElementById('cAccent').value;if(!ovBtn)document.getElementById('cBtn').value=ovAccent;render();}
-function onBtnChange(){ovBtn=document.getElementById('cBtn').value;render();}
-function onBgChange(){ovBg=document.getElementById('cBg').value;render();}
+
+function isValidHex(v){return /^#[0-9A-Fa-f]{6}$/.test(v);}
+
+function onAccentChange(){ovAccent=document.getElementById('cAccent').value;document.getElementById('tAccent').value=ovAccent;if(!ovBtn){document.getElementById('cBtn').value=ovAccent;document.getElementById('tBtn').value=ovAccent;}render();}
+function onBtnChange(){ovBtn=document.getElementById('cBtn').value;document.getElementById('tBtn').value=ovBtn;render();}
+function onBgChange(){ovBg=document.getElementById('cBg').value;document.getElementById('tBg').value=ovBg;render();}
 function onBgDarken(el){bgDarkenVal=parseInt(el.value);document.getElementById('bgDarkenVal').textContent=bgDarkenVal>0?'+'+bgDarkenVal:bgDarkenVal;render();}
-document.getElementById('cTitle').addEventListener('input',()=>{ovTitle=document.getElementById('cTitle').value;render();});
-document.getElementById('cBody').addEventListener('input',()=>{ovBody=document.getElementById('cBody').value;render();});
-document.getElementById('cBtnText').addEventListener('input',()=>{ovBtnText=document.getElementById('cBtnText').value;render();});
+document.getElementById('cTitle').addEventListener('input',()=>{ovTitle=document.getElementById('cTitle').value;document.getElementById('tTitle').value=ovTitle;render();});
+document.getElementById('cBody').addEventListener('input',()=>{ovBody=document.getElementById('cBody').value;document.getElementById('tBody').value=ovBody;render();});
+document.getElementById('cBtnText').addEventListener('input',()=>{ovBtnText=document.getElementById('cBtnText').value;document.getElementById('tBtnText').value=ovBtnText;render();});
+
+// Saisie manuelle du code hexadécimal — contourne les sélecteurs de couleur
+// natifs mobiles qui ne proposent parfois qu'une palette limitée (7-8 teintes).
+const HEX_MAP={
+  Accent:{color:'cAccent',setter:v=>{ovAccent=v;if(!ovBtn){document.getElementById('cBtn').value=v;document.getElementById('tBtn').value=v;}}},
+  Title:{color:'cTitle',setter:v=>{ovTitle=v;}},
+  Body:{color:'cBody',setter:v=>{ovBody=v;}},
+  Btn:{color:'cBtn',setter:v=>{ovBtn=v;}},
+  BtnText:{color:'cBtnText',setter:v=>{ovBtnText=v;}},
+  Bg:{color:'cBg',setter:v=>{ovBg=v;}}
+};
+function onHexTyped(key){
+  const input=document.getElementById('t'+key);
+  let val=input.value.trim();
+  if(val && !val.startsWith('#')) val='#'+val;
+  if(!isValidHex(val)) return; // on attend une saisie complète et valide avant d'appliquer
+  const map=HEX_MAP[key];
+  document.getElementById(map.color).value=val;
+  map.setter(val);
+  render();
+}
 
 function syncPickers(t){
   document.getElementById('cAccent').value=ovAccent||t.accent;
@@ -891,6 +884,12 @@ function syncPickers(t){
   document.getElementById('cBody').value=ovBody||shadeHex(t.text,luminance(t.bg)<.3?-10:10).slice(0,7);
   document.getElementById('cBtn').value=ovBtn||t.accent;
   document.getElementById('cBtnText').value=ovBtnText||(luminance(t.accent)>.45?'#0F172A':'#FFFFFF');
+  document.getElementById('tAccent').value=document.getElementById('cAccent').value;
+  document.getElementById('tBg').value=document.getElementById('cBg').value;
+  document.getElementById('tTitle').value=document.getElementById('cTitle').value;
+  document.getElementById('tBody').value=document.getElementById('cBody').value;
+  document.getElementById('tBtn').value=document.getElementById('cBtn').value;
+  document.getElementById('tBtnText').value=document.getElementById('cBtnText').value;
 }
 
 // ── BUILD UI ─────────────────────────────────────────────
