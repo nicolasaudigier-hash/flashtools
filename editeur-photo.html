@@ -754,6 +754,30 @@
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
+                    // Les photos prises directement à l'appareil (mobile) peuvent dépasser
+                    // les limites de surface de canvas de certains navigateurs (notamment
+                    // Safari iOS), ce qui produit un aperçu vide/blanc sans erreur visible.
+                    // On redimensionne donc en amont si l'image est trop grande.
+                    const MAX_DIM = 2800;
+                    if (img.width > MAX_DIM || img.height > MAX_DIM) {
+                        const scale = Math.min(MAX_DIM / img.width, MAX_DIM / img.height);
+                        const resizedCanvas = document.createElement('canvas');
+                        resizedCanvas.width = Math.round(img.width * scale);
+                        resizedCanvas.height = Math.round(img.height * scale);
+                        resizedCanvas.getContext('2d').drawImage(img, 0, 0, resizedCanvas.width, resizedCanvas.height);
+                        const resizedImg = new Image();
+                        resizedImg.onload = function() {
+                            originalImage = resizedImg;
+                            currentImage = resizedImg;
+                            undoStack = [];
+                            drawImage(resizedImg);
+                            document.getElementById('uploadZone').style.display = 'none';
+                            document.getElementById('canvasContainer').style.display = 'flex';
+                            updateStats();
+                        };
+                        resizedImg.src = resizedCanvas.toDataURL();
+                        return;
+                    }
                     originalImage = img;
                     currentImage = img;
                     undoStack = [];
