@@ -82,6 +82,14 @@
     .color-pick{display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;}
     .color-pick label{font-size:.68em;color:var(--text2);text-align:center;}
     .color-pick input[type=color]{width:34px;height:24px;border:1px solid var(--border);border-radius:5px;cursor:pointer;background:none;padding:2px;}
+    /* Sur écran tactile, le sélecteur natif ne propose souvent qu'une poignée
+       de couleurs prédéfinies (moche, limité). On désactive son ouverture au
+       toucher : le carré reste un aperçu visuel de la couleur, et la saisie
+       se fait via le champ hexadécimal juste en dessous, qui fonctionne
+       de façon identique et fiable sur tous les appareils. */
+    @media (pointer:coarse){
+      .color-pick input[type=color]{pointer-events:none;}
+    }
     .color-pick input[type=text].hex-input{width:100%;max-width:74px;background:var(--surface);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:.66em;padding:3px 4px;text-align:center;font-family:'Share Tech Mono',monospace;margin-top:2px;outline:none;}
     .color-pick input[type=text].hex-input:focus{border-color:var(--cyan);}
     .color-pick.disabled{opacity:.3;pointer-events:none;}
@@ -255,7 +263,7 @@
   <div class="field"><label>Corps du texte</label><textarea id="fBody" oninput="render()">Du 15 au 31 juillet
 Venez profiter de nos offres</textarea></div>
   <div class="field"><label>Appel à l'action / Bouton</label><input type="text" id="fCta" value="Découvrir les offres" oninput="render()"></div>
-  <div class="field"><label>Lien du bouton (export web)</label><input type="text" id="fUrl" value="https://monsite.fr"></div>
+  <div class="field"><label>Lien du bouton (export web)</label><input type="text" id="fUrl" value="https://monsite.fr" placeholder="https://monsite.fr"><div style="font-size:.68em;color:var(--text2);margin-top:3px;">Le lien fonctionne quel que soit le format tapé (monsite.fr, www.monsite.fr, https://...) — le préfixe manquant est ajouté automatiquement.</div></div>
   <div class="field"><label>Nom / marque</label><input type="text" id="fBrand" value="Ma Boutique" oninput="render()"></div>
 
   <!-- EXPORT -->
@@ -819,7 +827,14 @@ function updateColorMask(){
 }
 
 // ── DATA ─────────────────────────────────────────────────
-function getData(){return{title:v('fTitle')||'TITRE',sub:v('fSub')||'',body:v('fBody')||'',cta:v('fCta')||'',brand:v('fBrand')||'',url:v('fUrl')||'#'};}
+function normalizeUrl(u){
+  u=(u||'').trim();
+  if(!u) return '#';
+  if(/^https?:\/\//i.test(u)) return u;
+  if(/^\/\//.test(u)) return 'https:'+u; // //monsite.fr → https://monsite.fr
+  return 'https://'+u; // monsite.fr, www.monsite.fr, monsite.fr/page → https://...
+}
+function getData(){return{title:v('fTitle')||'TITRE',sub:v('fSub')||'',body:v('fBody')||'',cta:v('fCta')||'',brand:v('fBrand')||'',url:normalizeUrl(v('fUrl'))};}
 function v(id){return document.getElementById(id).value.trim();}
 
 function getPreviewScale(){
