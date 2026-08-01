@@ -4,7 +4,7 @@
 <style>html{visibility:hidden}</style>
 <meta name="robots" content="noindex">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=3.0, user-scalable=yes">
 <title>FlashScript — Transcription vocale</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -285,7 +285,53 @@
   .btn-action:active { transform: scale(0.97); }
   .btn-action:hover, .btn-action:focus { border-color: var(--cyan); color: var(--cyan); background: rgba(6,182,212,0.08); }
   .btn-action.danger:hover, .btn-action.danger:focus { border-color: var(--error); color: var(--error); background: rgba(239,68,68,0.08); }
+  .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn-action svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+  /* TRANSLATION BLOCK */
+  .translate-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  .translate-title {
+    font-size: 12px;
+    color: var(--violet);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .translate-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 0;
+  }
+  .translate-row .lang-select { margin-bottom: 0; flex: 1; }
+  .btn-translate {
+    flex-shrink: 0;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #8B5CF6, #06B6D4);
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+  }
+  .btn-translate:active { opacity: 0.85; }
+  .btn-translate:disabled { opacity: 0.5; cursor: not-allowed; }
+  .translate-note {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+    line-height: 1.4;
+  }
 
   /* TOAST */
   .toast {
@@ -321,11 +367,12 @@
     .tips-grid { grid-template-columns: 1fr; }
     .actions { grid-template-columns: 1fr 1fr; }
     .btn-action:last-child { grid-column: span 2; }
+    .translate-row { flex-direction: column; }
   }
 </style>
 </head>
 <body>
-<script src="https://nicolasaudigier-hash.github.io/flashtools/flashtools-guard.js?v=2"></script>
+<script src="https://nicolasaudigier-hash.github.io/flashtools/flashtools-guard.js?v=3"></script>
 
 <div class="header">
   <div class="logo-text">FlashScript</div>
@@ -433,6 +480,45 @@
       </svg>
       Effacer
     </button>
+  </div>
+
+  <div class="translate-block">
+    <div class="translate-title">🌐 Traduire la transcription</div>
+    <div class="translate-row">
+      <select class="lang-select" id="targetLangSelect">
+        <option value="fr">🇫🇷 Vers le français</option>
+        <option value="en" selected>🇬🇧 Vers l'anglais</option>
+        <option value="es">🇪🇸 Vers l'espagnol</option>
+        <option value="de">🇩🇪 Vers l'allemand</option>
+        <option value="it">🇮🇹 Vers l'italien</option>
+        <option value="pt">🇵🇹 Vers le portugais</option>
+        <option value="ar">🇸🇦 Vers l'arabe</option>
+      </select>
+      <button class="btn-translate" id="btnTranslate" onclick="translateTranscript()">Traduire</button>
+    </div>
+    <p class="translate-note">Traduction automatique gratuite — pratique pour un usage courant, à faire vérifier par une personne bilingue pour un usage juridique ou professionnel sensible.</p>
+  </div>
+
+  <div id="translationSection" style="display:none;">
+    <div class="textarea-label">
+      <span>Traduction</span>
+      <span class="char-count" id="translatedCharCount">0 caractère</span>
+    </div>
+    <textarea id="translatedArea" readonly placeholder="La traduction apparaîtra ici…"></textarea>
+    <div class="actions" style="grid-template-columns: 1fr 1fr;">
+      <button class="btn-action" onclick="copyTranslated()">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+        </svg>
+        Copier
+      </button>
+      <button class="btn-action" onclick="downloadTranslated()">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Télécharger
+      </button>
+    </div>
   </div>
 </div>
 
@@ -768,6 +854,105 @@
     const arrow = document.getElementById(arrowId);
     body.classList.toggle('open');
     arrow.classList.toggle('open');
+  }
+
+  // ════════════════════════════════════════════
+  // TRADUCTION — MyMemory Translation API (gratuite, sans clé).
+  // Le texte est découpé par phrases pour rester sous la limite d'environ
+  // 500 caractères par requête acceptée sans inscription côté MyMemory.
+  // ════════════════════════════════════════════
+  function langCodeFromRecognition(v) {
+    return v.split('-')[0];
+  }
+
+  function splitIntoChunks(text, maxLen) {
+    const sentences = text.match(/[^.!?\n]+[.!?\n]*/g) || [text];
+    const chunks = [];
+    let current = '';
+    sentences.forEach(s => {
+      if ((current + s).length > maxLen && current) {
+        chunks.push(current.trim());
+        current = s;
+      } else {
+        current += s;
+      }
+    });
+    if (current.trim()) chunks.push(current.trim());
+    return chunks;
+  }
+
+  async function translateChunk(text, source, target) {
+    const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=' + source + '|' + target;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data && data.responseData && typeof data.responseData.translatedText === 'string') {
+      return data.responseData.translatedText;
+    }
+    throw new Error('Réponse de traduction invalide');
+  }
+
+  async function translateTranscript() {
+    const text = document.getElementById('transcriptArea').value.trim();
+    if (!text) { showToast('Rien à traduire', '#F59E0B'); return; }
+
+    const source = langCodeFromRecognition(document.getElementById('langSelect').value);
+    const target = document.getElementById('targetLangSelect').value;
+    if (source === target) { showToast('Langue source et cible identiques', '#F59E0B'); return; }
+
+    const btn = document.getElementById('btnTranslate');
+    const originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Traduction…';
+
+    const section = document.getElementById('translationSection');
+    section.style.display = 'block';
+    document.getElementById('translatedArea').value = '';
+
+    try {
+      const chunks = splitIntoChunks(text, 450);
+      let result = '';
+      for (const chunk of chunks) {
+        const translated = await translateChunk(chunk, source, target);
+        result += (result ? ' ' : '') + translated;
+      }
+      document.getElementById('translatedArea').value = result.trim();
+      updateTranslatedCount();
+      showToast('✓ Traduit !');
+    } catch (e) {
+      showToast('Erreur de traduction — réessayez', '#EF4444');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+    }
+  }
+
+  function updateTranslatedCount() {
+    const n = document.getElementById('translatedArea').value.length;
+    document.getElementById('translatedCharCount').textContent = n + ' caractère' + (n > 1 ? 's' : '');
+  }
+
+  function copyTranslated() {
+    const t = document.getElementById('translatedArea').value;
+    if (!t.trim()) { showToast('Rien à copier', '#F59E0B'); return; }
+    navigator.clipboard.writeText(t)
+      .then(() => showToast('✓ Copié !'))
+      .catch(() => {
+        document.getElementById('translatedArea').select();
+        document.execCommand('copy');
+        showToast('✓ Copié !');
+      });
+  }
+
+  function downloadTranslated() {
+    const t = document.getElementById('translatedArea').value;
+    if (!t.trim()) { showToast('Rien à télécharger', '#F59E0B'); return; }
+    const blob = new Blob([t], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'flashscript-traduction-' + new Date().toISOString().slice(0,10) + '.txt';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showToast('✓ Téléchargé !');
   }
 
   if (SpeechRecognition) {
