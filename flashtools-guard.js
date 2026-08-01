@@ -6,17 +6,23 @@
    vers une autre (ex. Charges Micro → Agenda Fiscal) doit rester
    fonctionnel. La vérification email/API suffit à protéger l'accès
    quel que soit le mode de chargement de la page.
-
    v3 : expose en plus le statut détaillé (actif / essai / expire /
    aucun) et, en essai, le nombre de jours restants, via
    window.flashToolsStatus et l'événement "flashtools:status" —
    utilisé par exemple pour afficher un badge sur /lesoutils.
    Le comportement de blocage/révélation est inchangé.
+   v4 : remplace window.prompt() par une fenêtre HTML maison —
+   window.prompt() est fréquemment bloqué ou supprimé silencieusement
+   par les navigateurs mobiles quand il est déclenché automatiquement
+   au chargement (surtout en navigation privée), ce qui laissait la
+   page bloquée indéfiniment sans aucun retour visible pour la personne.
+   REDIRECT_URL mise à jour vers la page Systeme.io actuelle.
    ============================================================ */
 (function () {
   var VERIFY_API = "https://flashtools.vercel.app/api/verify";
-  var REDIRECT_URL = "https://nicolasaudigier-hash.github.io/flashtools/flash-offre.html?status=blocked";
+  var REDIRECT_URL = "https://www.flashtools.fr/flash-offre?status=blocked";
   var STORAGE_KEY = "flashtools_email";
+
   function isValidEmail(value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   }
@@ -42,8 +48,6 @@
     }
   }
   function publishStatus(data) {
-    // Rendu disponible pour tout script de la page (ex. badge sur /lesoutils),
-    // sans rien changer au comportement de blocage lui-même.
     window.flashToolsStatus = data;
     try {
       document.dispatchEvent(new CustomEvent("flashtools:status", { detail: data }));
@@ -65,24 +69,77 @@
         }
       })
       .catch(function () {
-        // Panne API : on bloque par prudence plutôt que de laisser
-        // passer un accès non vérifié.
         publishStatus({ access: false, status: "erreur" });
         block();
       });
   }
-  function promptForEmail() {
-    var email = window.prompt(
-      "Entrez l'email associé à votre compte FlashTools pour accéder à cet outil :"
-    );
-    if (!email || !isValidEmail(email.trim())) {
-      block();
-      return;
+
+  // ── Fenêtre email maison (remplace window.prompt) ──
+  function showEmailModal(onSubmit) {
+    var style = document.createElement("style");
+    style.textContent =
+      "#ft-guard-overlay{position:fixed;inset:0;z-index:999999;display:flex;" +
+      "align-items:center;justify-content:center;padding:20px;" +
+      "background:rgba(7,8,15,0.92);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;}" +
+      "#ft-guard-box{width:100%;max-width:380px;background:#11131c;border:1px solid #252d42;" +
+      "border-radius:16px;padding:28px 24px;box-sizing:border-box;}" +
+      "#ft-guard-title{font-size:17px;font-weight:700;color:#F1F5F9;margin:0 0 8px;}" +
+      "#ft-guard-sub{font-size:13px;color:#94A3B8;margin:0 0 18px;line-height:1.5;}" +
+      "#ft-guard-input{width:100%;box-sizing:border-box;padding:12px 14px;border-radius:9px;" +
+      "border:1.5px solid #252d42;background:#07080f;color:#F1F5F9;font-size:15px;outline:none;" +
+      "margin-bottom:10px;}" +
+      "#ft-guard-input:focus{border-color:#06B6D4;}" +
+      "#ft-guard-error{font-size:12.5px;color:#F87171;margin:0 0 10px;display:none;}" +
+      "#ft-guard-submit{width:100%;padding:12px;border:none;border-radius:9px;cursor:pointer;" +
+      "font-size:14.5px;font-weight:600;color:#fff;" +
+      "background:linear-gradient(135deg,#06B6D4,#8B5CF6);}" +
+      "#ft-guard-submit:active{opacity:0.85;}";
+    document.head.appendChild(style);
+
+    var overlay = document.createElement("div");
+    overlay.id = "ft-guard-overlay";
+    overlay.innerHTML =
+      '<div id="ft-guard-box">' +
+      '<p id="ft-guard-title">Accès FlashTools</p>' +
+      '<p id="ft-guard-sub">Entrez l\'email associé à votre compte pour accéder à cet outil.</p>' +
+      '<input id="ft-guard-input" type="email" inputmode="email" autocomplete="email" placeholder="vous@exemple.fr">' +
+      '<p id="ft-guard-error">Merci d\'entrer un email valide.</p>' +
+      '<button id="ft-guard-submit" type="button">Continuer</button>' +
+      "</div>";
+    document.body.appendChild(overlay);
+
+    var input = overlay.querySelector("#ft-guard-input");
+    var errorEl = overlay.querySelector("#ft-guard-error");
+    var submitBtn = overlay.querySelector("#ft-guard-submit");
+
+    function submit() {
+      var value = (input.value || "").trim();
+      if (!isValidEmail(value)) {
+        errorEl.style.display = "block";
+        input.focus();
+        return;
+      }
+      overlay.remove();
+      style.remove();
+      onSubmit(value);
     }
-    email = email.trim();
-    storeEmail(email);
-    checkAccess(email);
+
+    submitBtn.addEventListener("click", submit);
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") submit();
+    });
+    // Petit délai avant le focus : certains navigateurs mobiles ignorent
+    // un focus() déclenché dans la même frame que l'insertion du DOM.
+    setTimeout(function () { input.focus(); }, 50);
   }
+
+  function promptForEmail() {
+    showEmailModal(function (email) {
+      storeEmail(email);
+      checkAccess(email);
+    });
+  }
+
   var storedEmail = getStoredEmail();
   if (storedEmail && isValidEmail(storedEmail)) {
     checkAccess(storedEmail);
