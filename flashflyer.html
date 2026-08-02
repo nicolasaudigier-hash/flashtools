@@ -101,10 +101,11 @@
     #colorPopover{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:999;align-items:center;justify-content:center;padding:20px;}
     #colorPopover.open{display:flex;}
     .pop-box{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px;width:100%;max-width:320px;}
-    .pop-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
-    .pop-preview{width:40px;height:40px;border-radius:8px;border:1.5px solid var(--border);flex-shrink:0;}
-    .pop-head input.hex-input{max-width:96px;font-size:.8em;padding:6px 8px;}
-    .pop-head span{margin-left:auto;font-size:.78em;color:var(--text2);font-weight:600;}
+    .pop-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+    .pop-preview{width:64px;height:64px;border-radius:10px;border:2.5px solid rgba(255,255,255,.25);flex-shrink:0;box-shadow:0 3px 10px rgba(0,0,0,.4);}
+    .pop-head-info{display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;}
+    .pop-head input.hex-input{max-width:110px;font-size:.85em;padding:7px 9px;}
+    .pop-head span{font-size:.78em;color:var(--text2);font-weight:600;}
     .pop-slider{margin-bottom:12px;}
     .pop-slider label{display:block;font-size:.72em;color:var(--text2);margin-bottom:4px;font-weight:500;}
     .pop-slider input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:22px;border-radius:11px;outline:none;}
@@ -225,8 +226,10 @@
     <div class="pop-box">
       <div class="pop-head">
         <div class="pop-preview" id="popPreview"></div>
-        <input type="text" class="hex-input" id="popHex" maxlength="7" placeholder="#000000">
-        <span id="popLabel"></span>
+        <div class="pop-head-info">
+          <span id="popLabel"></span>
+          <input type="text" class="hex-input" id="popHex" maxlength="7" placeholder="#000000">
+        </div>
       </div>
       <div class="pop-slider"><label>Teinte</label><input type="range" id="popHue" min="0" max="360" step="1" value="200"></div>
       <div class="pop-slider"><label>Saturation</label><input type="range" id="popSat" min="0" max="100" step="1" value="70"></div>
