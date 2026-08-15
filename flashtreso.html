@@ -245,6 +245,9 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
 .hor-btn.on{background:var(--cyg);border-color:rgba(6,182,212,.3);color:var(--cy)}
 .scen-btn{flex:1;padding:7px;background:var(--bg4);border:1px solid var(--bo2);border-radius:8px;color:var(--tx3);font-family:'Syne',sans-serif;font-size:.64rem;font-weight:700;cursor:pointer;text-align:center;transition:all .2s}
 .scen-btn.on{background:var(--cyg);border-color:rgba(6,182,212,.3);color:var(--cy)}
+.step-nav{display:flex;gap:8px;margin-top:18px}
+.step-nav .btn-prev{flex:0 0 auto;background:var(--bg4);border:1px solid var(--bo2);color:var(--tx2)}
+.step-nav .btn-next{flex:1}
 </style>
 </head>
 <body>
@@ -360,16 +363,18 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
     <button onclick="addCompte()" style="width:100%;padding:9px;border-radius:9px;border:1px dashed rgba(6,182,212,.3);background:transparent;color:var(--cy);font-family:'Syne',sans-serif;font-size:.76rem;font-weight:700;cursor:pointer;margin-top:4px">+ Ajouter un compte</button>
   </div>
   <div id="conseil-box" style="display:none"><div class="conseil-box"><div class="cb-ico" id="cb-ico">💡</div><div class="cb-txt" id="cb-txt"></div><div class="cb-act" id="cb-act" style="display:none"></div></div></div>
+  <div class="step-nav"><button class="btn btn-cy btn-next" onclick="goToStep(1)">Suivant → Pro</button></div>
 </div>
 
 <!-- ═══ PRO ═══ -->
 <div id="pg-pro" class="pg">
-  <div class="pg-intro"><strong>Étape 1 — Encaissement pro.</strong> Saisis ce que tu as encaissé. Choisis combien tu te verses. Ce qui reste construit ton rempart.</div>
+  <div class="pg-intro"><strong>Étape 1 — Encaissement pro.</strong> Saisis ce que tu as encaissé. Choisis combien tu te verses. Ce qui reste construit ton <strong>rempart</strong> — la trésorerie de sécurité de ton activité, le 1ᵉʳ des 3 remparts de l'outil (détail complet dans l'onglet Réserves).</div>
   <div class="st">Encaissement pro</div>
   <div class="ss">CA → Obligations → Disponible → Tu choisis ton virement → Rempart.</div>
   <div class="card">
     <div class="ct"><span class="dot" style="background:var(--cy)"></span>Ce mois</div>
-    <div class="ig"><div class="il">CA encaissé <span>HT</span></div><input class="if if-lg" type="number" id="p-ca" placeholder="3 500" onblur="calcPro()" onkeydown="if(event.key==='Enter'){this.blur();}"></div>
+    <div class="ig"><div class="il">CA réellement encaissé ce mois <span>HT</span></div><input class="if if-lg" type="number" id="p-ca" placeholder="3 500" onblur="calcPro()" onkeydown="if(event.key==='Enter'){this.blur();}">
+      <div id="p-ca-reminder" style="font-size:.63rem;color:var(--tx3);margin-top:5px"></div></div>
     <div id="p-tva-bloc" style="display:none">
       <div class="rb" style="border-color:rgba(239,68,68,.25);background:var(--rdg)">
         <div class="rb-l"><div class="rb-n" style="color:var(--rd)">🔒 TVA collectée — intouchable</div><div class="rb-d"><span id="p-tva-ht"></span> HT → <strong id="p-tva-ttc"></strong> TTC</div></div>
@@ -506,6 +511,7 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
       <div style="font-size:.63rem;color:var(--tx3);margin-top:2px" id="rempart-solde-estime">—</div>
     </div>
   </div>
+  <div class="step-nav"><button class="btn btn-prev" onclick="goToStep(0)">← Profil</button><button class="btn btn-cy btn-next" onclick="goToStep(2)">Suivant → Perso</button></div>
 </div>
 
 <!-- ═══ PERSO ═══ -->
@@ -567,6 +573,7 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
     </div>
     <div id="pp-conseil" style="display:none" class="al a-cy"><span class="ai">💡</span><div id="pp-conseil-txt"></div></div>
   </div>
+  <div class="step-nav"><button class="btn btn-prev" onclick="goToStep(1)">← Pro</button><button class="btn btn-cy btn-next" onclick="goToStep(3)">Suivant → Réserves</button></div>
 </div>
 
 <!-- ═══ RÉSERVES ═══ -->
@@ -650,6 +657,12 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
       <div class="inv-desc">Compte-Titres Ordinaire (CTO) sans plafond · Assurance-vie avec avantage successoral · Plan d'Épargne Retraite (PER) si imposition élevée</div>
       <div class="inv-row"><span class="inv-lbl">Solde total</span><input class="inv-inp" type="number" id="inv-autre-sol" placeholder="0" onblur="dUpdRes()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€</span></div>
       <div class="inv-row"><span class="inv-lbl">Virement mensuel</span><input class="inv-inp" type="number" id="inv-autre-v" placeholder="0" onblur="dUpdRes()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€/mois</span></div>
+    </div>
+    <div class="inv-bloc">
+      <div class="inv-hdr"><div class="inv-name">SCPI</div><div class="inv-taux" style="color:#EC4899">~4,5%/an net</div></div>
+      <div class="inv-desc">Pierre-papier · Pas de plafond légal · Moins liquide (délai de revente parfois long) · Revenus imposés comme des revenus fonciers (IR + prélèvements sociaux) · Frais d'entrée ~8-10% déjà lissés dans le taux net</div>
+      <div class="inv-row"><span class="inv-lbl">Solde actuel</span><input class="inv-inp" type="number" id="inv-scpi-sol" placeholder="0" onblur="dUpdRes()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€</span></div>
+      <div class="inv-row"><span class="inv-lbl">Virement mensuel</span><input class="inv-inp" type="number" id="inv-scpi-v" placeholder="0" onblur="dUpdRes()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€/mois</span></div>
     </div>
   </div>
 
@@ -804,6 +817,7 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
     <div class="rg" style="border-color:var(--am)"><div class="rgt" style="color:var(--am)">2e — Réserve Imprévus</div><div class="rgd">Absorbe les chocs perso sans toucher au pro. 1-2 mois de fixes. Se reconstitue après chaque utilisation.</div></div>
     <div class="rg" style="border-color:var(--gr)"><div class="rgt" style="color:var(--gr)">3e — Réserve Perso</div><div class="rgd">6 mois de fixes. Une fois constituée, tu peux augmenter ton virement et commencer à investir.</div></div>
   </div>
+  <div class="step-nav"><button class="btn btn-prev" onclick="goToStep(2)">← Perso</button><button class="btn btn-cy btn-next" onclick="goToStep(4)">Suivant → Projections</button></div>
 </div>
 
 <!-- ═══ PROJECTIONS ═══ -->
@@ -853,7 +867,7 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
   <div id="proj-invest" style="display:none">
     <div class="card">
       <div class="ct"><span class="dot" style="background:var(--cy)"></span>Taux par enveloppe <span style="font-size:.6rem;font-weight:400;color:var(--tx3);margin-left:4px;text-transform:none;letter-spacing:0">modifiables</span></div>
-      <div class="al a-am" style="margin-bottom:10px"><span class="ai">ℹ️</span><div style="font-size:.7rem">Ces 4 enveloppes peuvent toutes investir en ETF — même rendement brut potentiel, fiscalité différente à la sortie. L'assurance-vie en fonds euros est la seule à capital garanti, donc rendement plus faible.</div></div>
+      <div class="al a-am" style="margin-bottom:10px"><span class="ai">ℹ️</span><div style="font-size:.7rem">PEA, CTO et assurance-vie peuvent tous investir en ETF — même rendement brut potentiel, fiscalité différente à la sortie. L'assurance-vie en fonds euros est la seule à capital garanti, donc rendement plus faible. La SCPI suit un mécanisme distinct (revenus locatifs mutualisés), moins liquide que les autres enveloppes.</div></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <div style="background:var(--bg4);border-radius:9px;padding:10px 11px">
           <div style="font-size:.65rem;font-weight:700;color:var(--vi);margin-bottom:6px">Actions (PEA) <span style="color:var(--tx3);font-weight:400">Exonéré impôt après 5 ans</span></div>
@@ -883,10 +897,17 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
             <span style="font-size:.7rem;color:var(--tx3)">%/an · ETF + retraite</span>
           </div>
         </div>
+        <div style="background:var(--bg4);border-radius:9px;padding:10px 11px;grid-column:1/-1">
+          <div style="font-size:.65rem;font-weight:700;color:#EC4899;margin-bottom:6px">SCPI <span style="color:var(--tx3);font-weight:400">Pierre-papier, moins liquide</span></div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input type="number" id="taux-scpi" value="4.5" step="0.1" min="0" max="15" style="width:62px;background:var(--bg5);border:1px solid var(--bo2);border-radius:6px;padding:5px 7px;color:#EC4899;font-family:var(--mn);font-size:.82rem;outline:none;text-align:center" onblur="calcAllProj()" onkeydown="if(event.key==='Enter'){this.blur()}">
+            <span style="font-size:.7rem;color:var(--tx3)">%/an net · revenus fonciers</span>
+          </div>
+        </div>
       </div>
       <div style="font-size:.62rem;color:#8899AA;margin-top:9px;line-height:1.6;background:rgba(255,255,255,.03);border-radius:8px;padding:8px 10px">
         <strong style="color:var(--tx2)">Légende des abréviations</strong><br>
-        <strong style="color:var(--vi)">PEA</strong> = Plan d'Épargne en Actions · <strong style="color:var(--am)">CTO</strong> = Compte-Titres Ordinaire · <strong style="color:var(--cy)">AV €</strong> = Assurance-Vie en fonds euros (sécurisé) · <strong style="color:var(--gr)">AV UC / PER</strong> = Assurance-Vie en Unités de Compte / Plan d'Épargne Retraite (risqués, potentiel plus élevé)
+        <strong style="color:var(--vi)">PEA</strong> = Plan d'Épargne en Actions · <strong style="color:var(--am)">CTO</strong> = Compte-Titres Ordinaire · <strong style="color:var(--cy)">AV €</strong> = Assurance-Vie en fonds euros (sécurisé) · <strong style="color:var(--gr)">AV UC / PER</strong> = Assurance-Vie en Unités de Compte / Plan d'Épargne Retraite (risqués, potentiel plus élevé) · <strong style="color:#EC4899">SCPI</strong> = Société Civile de Placement Immobilier (pierre-papier)
       </div>
       <div style="font-size:.63rem;color:var(--tx3);margin-top:8px;line-height:1.5">
         📅 Versements mensuels — DCA (Dollar Cost Averaging) · Lisse le prix d'entrée sur la durée<br>
@@ -914,8 +935,8 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
     </div>
     <div class="card"><div class="ct"><span class="dot" style="background:var(--cy)"></span>Courbes par enveloppe</div><canvas id="chartInvest" height="120"></canvas></div>
     <div class="card"><div class="ct"><span class="dot" style="background:var(--vi)"></span>Tableau</div>
-      <table class="ptbl"><thead><tr><th>Horizon</th><th style="color:var(--vi)">PEA</th><th style="color:var(--am)">CTO</th><th style="color:var(--cy)">AV €</th><th style="color:var(--gr)">AV UC</th><th>Total</th></tr></thead><tbody id="tbody-invest"></tbody></table>
-      <div style="font-size:.6rem;color:#8899AA;margin-top:8px;line-height:1.5">PEA = Actions (Plan d'Épargne en Actions) · CTO = Compte-Titres Ordinaire · AV € = Assurance-vie sécurisée · AV UC = Assurance-vie dynamique / Retraite</div>
+      <table class="ptbl"><thead><tr><th>Horizon</th><th style="color:var(--vi)">PEA</th><th style="color:var(--am)">CTO</th><th style="color:var(--cy)">AV €</th><th style="color:var(--gr)">AV UC</th><th style="color:#EC4899">SCPI</th><th>Total</th></tr></thead><tbody id="tbody-invest"></tbody></table>
+      <div style="font-size:.6rem;color:#8899AA;margin-top:8px;line-height:1.5">PEA = Actions (Plan d'Épargne en Actions) · CTO = Compte-Titres Ordinaire · AV € = Assurance-vie sécurisée · AV UC = Assurance-vie dynamique / Retraite · SCPI = pierre-papier</div>
     </div>
     <div class="card">
       <div class="ct"><span class="dot" style="background:var(--am)"></span>Les règles qui ne changent pas</div>
@@ -1015,6 +1036,7 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
       </div>
     </div>
   </div>
+  <div class="step-nav"><button class="btn btn-prev" onclick="goToStep(3)">← Réserves</button></div>
 </div>
 
 <div class="disclaimer">
@@ -1076,6 +1098,14 @@ function showPg(id,btn,step){
   if(step!==undefined)updateProgress(step);
   if(id==='reserves'){buildAllCompteOptions();updLivrets();updRes();}
   if(id==='proj')calcAllProj();
+}
+const STEP_IDS=['start','pro','perso','reserves','proj'];
+function goToStep(idx){
+  if(idx<0||idx>=STEP_IDS.length)return;
+  const id=STEP_IDS[idx];
+  const btn=document.querySelectorAll('.nt')[idx];
+  showPg(id,btn,idx);
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 function gotoChangerVirement(){
   // Bascule vers l'onglet Pro et amène le focus sur le champ "montant à se verser"
@@ -1177,6 +1207,10 @@ function updStart(){
   S.type=type;S.ca=ca;S.tva_assujetti=(document.getElementById('s-tva')?.value==='oui');
   S.ca2=gvCA2();S.type2=getType2();
   sh('s-cma-row',type==='services'||type==='ventes'||type==='mixte');
+  const pcaInput=document.getElementById('p-ca');
+  const pcaReminder=document.getElementById('p-ca-reminder');
+  if(pcaInput&&ca>0)pcaInput.placeholder=Math.round(ca);
+  if(pcaReminder)pcaReminder.textContent=ca>0?`Tu as indiqué ${fmt(ca)}€ en moyenne dans Profil — ajuste ici si ce mois diffère.`:'';
   if(!type||!ca){sh('conseil-box',false);return;}
   let ico='💡',txt='',act='';
   if(!S.cpro){ico='🏦';txt=`Sans compte pro séparé, impossible de construire le rempart. <strong>Un compte pro dédié est indispensable.</strong>`;act='Shine 7€/mois ou Blank 6€/mois';}
@@ -1483,8 +1517,8 @@ function syncMensualitesPerso(){
   });
 
   const totalEpargne=vExt+vPer+vLivretsLibres; // réserves + livrets non affectés, sans double comptage
-  const vPea=gv('inv-pea-v',0),vAutre=gv('inv-autre-v',0);
-  const totalPlacement=vPea+vAutre; // virements vers investissement
+  const vPea=gv('inv-pea-v',0),vAutre=gv('inv-autre-v',0),vScpi=gv('inv-scpi-v',0);
+  const totalPlacement=vPea+vAutre+vScpi; // virements vers investissement
   const inpEpar=document.getElementById('pp-epargne-res');
   const inpPlac=document.getElementById('pp-epargne-inv');
   if(inpEpar)inpEpar.value=totalEpargne>0?Math.round(totalEpargne):'';
@@ -1615,7 +1649,7 @@ function showProj(id,btn){
 
 function getTauxEnv(id){
   const v=parseFloat(document.getElementById(id)?.value);
-  const defaults={'taux-pea':7,'taux-cto':7,'taux-av-euros':2.5,'taux-av-uc':6};
+  const defaults={'taux-pea':7,'taux-cto':7,'taux-av-euros':2.5,'taux-av-uc':6,'taux-scpi':4.5};
   return(!isNaN(v)?v:(defaults[id]||7))/100;
 }
 
@@ -1640,6 +1674,7 @@ function calcInvestProj(){
   se('invest-horizon-lbl',h);
   const sP=gv('inv-pea-sol'),vP=gv('inv-pea-v');
   const sA=gv('inv-autre-sol'),vA=gv('inv-autre-v');
+  const sScpi=gv('inv-scpi-sol'),vScpi=gv('inv-scpi-v');
   // Répartition du poste "autre" : 50% CTO, 30% AV euros, 20% AV UC
   const sCTO=sA*0.5,vCTO=vA*0.5;
   const sAVe=sA*0.3,vAVe=vA*0.3;
@@ -1648,16 +1683,18 @@ function calcInvestProj(){
   const tCTO=getTauxEnv('taux-cto');
   const tAVe=getTauxEnv('taux-av-euros');
   const tAVu=getTauxEnv('taux-av-uc');
+  const tScpi=getTauxEnv('taux-scpi');
   // Courbes annuelles jusqu'à h
-  const labels=[],dPEA=[],dCTO=[],dAVe=[],dAVu=[],dTot=[];
+  const labels=[],dPEA=[],dCTO=[],dAVe=[],dAVu=[],dScpi=[],dTot=[];
   for(let a=1;a<=h;a++){
     const pea=projEnv(sP,vP,tPEA,a);
     const cto=projEnv(sCTO,vCTO,tCTO,a);
     const ave=projEnv(sAVe,vAVe,tAVe,a);
     const avu=projEnv(sAVu,vAVu,tAVu,a);
+    const scpi=projEnv(sScpi,vScpi,tScpi,a);
     labels.push(a+'a');
-    dPEA.push(pea);dCTO.push(cto);dAVe.push(ave);dAVu.push(avu);
-    dTot.push(pea+cto+ave+avu);
+    dPEA.push(pea);dCTO.push(cto);dAVe.push(ave);dAVu.push(avu);dScpi.push(scpi);
+    dTot.push(pea+cto+ave+avu+scpi);
   }
   const tH=dTot[h-1];
   se('pj-tot',fmtK(tH));
@@ -1669,6 +1706,7 @@ function calcInvestProj(){
       {n:'CTO',c:'#F59E0B',v:dCTO[h-1]},
       {n:'AV fonds €',c:'#06B6D4',v:dAVe[h-1]},
       {n:'AV UC/PER',c:'#10B981',v:dAVu[h-1]},
+      {n:'SCPI',c:'#EC4899',v:dScpi[h-1]},
     ];
     envBox.innerHTML=items.map(it=>`<div style="background:rgba(255,255,255,.05);border-radius:8px;padding:8px;text-align:center">
       <div style="font-size:.58rem;color:${it.c};margin-bottom:3px;font-weight:700">${it.n}</div>
@@ -1691,6 +1729,7 @@ function calcInvestProj(){
       {label:'CTO',data:dCTO,borderColor:'#F59E0B',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],tension:.4,pointRadius:0},
       {label:'AV €',data:dAVe,borderColor:'#06B6D4',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],tension:.4,pointRadius:0},
       {label:'AV UC',data:dAVu,borderColor:'#EF4444',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],tension:.4,pointRadius:0},
+      {label:'SCPI',data:dScpi,borderColor:'#EC4899',backgroundColor:'transparent',borderWidth:1.5,borderDash:[2,2],tension:.4,pointRadius:0},
     ]},
     options:{responsive:true,plugins:{legend:{display:true,labels:{color:'#94A3B8',font:{size:9},boxWidth:10}},tooltip:{backgroundColor:'#1C2640',titleColor:'#E2E8F0',bodyColor:'#94A3B8',callbacks:{label:c=>` ${c.dataset.label}: ${fmtK(c.raw)}`}}},
     scales:{x:{ticks:{color:'#64748B',font:{size:9},maxTicksLimit:10},grid:{color:'rgba(255,255,255,0.03)'}},y:{ticks:{color:'#64748B',font:{size:9},callback:v=>fmtK(v)},grid:{color:'rgba(255,255,255,0.03)'}}}}
@@ -1702,8 +1741,9 @@ function calcInvestProj(){
     const cto=projEnv(sCTO,vCTO,tCTO,a);
     const ave=projEnv(sAVe,vAVe,tAVe,a);
     const avu=projEnv(sAVu,vAVu,tAVu,a);
-    const tot=pea+cto+ave+avu;
-    return`<tr><td class="${a===h?'hl':''}">${a}an${a>1?'s':''}</td><td style="color:var(--vi)">${fmtK(pea)}</td><td style="color:var(--am)">${fmtK(cto)}</td><td style="color:var(--cy)">${fmtK(ave)}</td><td style="color:var(--gr)">${fmtK(avu)}</td><td class="${a===h?'big':''}">${fmtK(tot)}</td></tr>`;
+    const scpi=projEnv(sScpi,vScpi,tScpi,a);
+    const tot=pea+cto+ave+avu+scpi;
+    return`<tr><td class="${a===h?'hl':''}">${a}an${a>1?'s':''}</td><td style="color:var(--vi)">${fmtK(pea)}</td><td style="color:var(--am)">${fmtK(cto)}</td><td style="color:var(--cy)">${fmtK(ave)}</td><td style="color:var(--gr)">${fmtK(avu)}</td><td style="color:#EC4899">${fmtK(scpi)}</td><td class="${a===h?'big':''}">${fmtK(tot)}</td></tr>`;
   }).join('');
 }
 
@@ -1792,6 +1832,7 @@ function calcTotalProj(){
   const livsLibres=livDefs.filter(l=>!comptesAffectes.has(l.id));
 
   const sP=gv('inv-pea-sol'),vP=gv('inv-pea-v'),sA=gv('inv-autre-sol'),vA=gv('inv-autre-v');
+  const sScpi=gv('inv-scpi-sol'),vScpi=gv('inv-scpi-v'),tScpi=getTauxEnv('taux-scpi');
 
   // Valeurs des 3 réserves selon le mode choisi
   const objRempart=(()=>{if(S.rempartObjManuel!=null)return S.rempartObjManuel;const ca=gv('p-ca',S.ca||0);return ca>0?Math.max(500,Math.round(ca*2/100)*100):0;})();
@@ -1803,7 +1844,7 @@ function calcTotalProj(){
 
   // Calcul Livrets — uniquement ceux non affectés à une réserve
   const cL=(a)=>{let t=0;livsLibres.forEach(l=>{let s=l.sol;for(let m=0;m<a*12;m++){if(s<l.plaf)s=Math.min(l.plaf,s+l.vir);s+=s*(l.taux/12);}t+=s;});return Math.round(t);};
-  const cI=(a)=>projEnv(sP,vP,tPEA,a)+projEnv(sA*0.5,vA*0.5,tCTO,a)+projEnv(sA*0.3,vA*0.3,tAVe,a)+projEnv(sA*0.2,vA*0.2,tAVu,a);
+  const cI=(a)=>projEnv(sP,vP,tPEA,a)+projEnv(sA*0.5,vA*0.5,tCTO,a)+projEnv(sA*0.3,vA*0.3,tAVe,a)+projEnv(sA*0.2,vA*0.2,tAVu,a)+projEnv(sScpi,vScpi,tScpi,a);
 
   // Cartes fixes 10/20/30 ans (toujours affichées, mêmes réserves constantes)
   const t10=cL(Math.min(10,40))+cI(Math.min(10,40))+rempart+ext+per;
@@ -2056,10 +2097,11 @@ function calcVueGlobale(){
   });
 
   // Investissement (PEA + CTO/AV/PER) — jamais utilisé comme compte de réserve actuellement, donc toujours "libre"
-  const sPea=gv('inv-pea-sol',0),sAutre=gv('inv-autre-sol',0);
-  const totalInvest=sPea+sAutre;
+  const sPea=gv('inv-pea-sol',0),sAutre=gv('inv-autre-sol',0),sScpiVg=gv('inv-scpi-sol',0);
+  const totalInvest=sPea+sAutre+sScpiVg;
   if(sPea>0)livLibreItems.push(`<div class="rb"><div class="rb-l"><div class="rb-n">📈 PEA</div></div><div class="rb-v" style="color:var(--gr)">${fmt(sPea)}€</div></div>`);
   if(sAutre>0)livLibreItems.push(`<div class="rb"><div class="rb-l"><div class="rb-n">📊 CTO / AV / PER</div></div><div class="rb-v" style="color:var(--gr)">${fmt(sAutre)}€</div></div>`);
+  if(sScpiVg>0)livLibreItems.push(`<div class="rb"><div class="rb-l"><div class="rb-n">🏢 SCPI</div></div><div class="rb-v" style="color:#EC4899">${fmt(sScpiVg)}€</div></div>`);
 
   // Comptes supplémentaires — exclure ceux affectés à une réserve
   let totalExtraLibre=0;
