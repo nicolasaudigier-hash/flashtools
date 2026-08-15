@@ -24,8 +24,8 @@
 body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;padding-bottom:90px}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 10% 15%,rgba(6,182,212,0.05) 0%,transparent 40%),radial-gradient(ellipse at 90% 85%,rgba(139,92,246,0.05) 0%,transparent 40%);pointer-events:none;z-index:0}
 .hdr{position:sticky;top:0;z-index:100;background:rgba(10,14,26,0.95);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-bottom:1px solid var(--bo);padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
-.logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.lt{font-size:1.05rem;font-weight:800;letter-spacing:-.5px}
+.logo{display:flex;align-items:center;gap:8px;flex-shrink:1;min-width:0;overflow:hidden}
+.lt{font-size:1.05rem;font-weight:800;letter-spacing:-.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lf{color:var(--cy)}.ls{color:var(--tx)}
 .hdr-btns{display:flex;gap:5px;flex-shrink:0}
 .hbtn{padding:6px 10px;border-radius:8px;border:none;font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
@@ -598,7 +598,7 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
         <div style="text-align:center">
           <div style="font-size:.6rem;color:var(--tx3);margin-bottom:3px">💧 Livret A</div>
           <div style="display:flex;align-items:center;justify-content:center;gap:2px">
-            <input type="number" id="taux-la" value="1.5" step="0.1" min="0" max="10"
+            <input type="number" id="taux-la" value="1.7" step="0.1" min="0" max="10"
               style="width:58px;background:var(--bg5);border:1px solid var(--bo2);border-radius:6px;padding:4px 6px;color:var(--cy);font-family:var(--mn);font-size:.78rem;outline:none;text-align:center"
               onblur="updTaux()" onkeydown="if(event.key==='Enter'){this.blur()}">
             <span style="font-size:.65rem;color:var(--tx3)">%</span>
@@ -607,7 +607,7 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
         <div style="text-align:center">
           <div style="font-size:.6rem;color:var(--tx3);margin-bottom:3px">🌿 LDDS</div>
           <div style="display:flex;align-items:center;justify-content:center;gap:2px">
-            <input type="number" id="taux-ldds" value="1.5" step="0.1" min="0" max="10"
+            <input type="number" id="taux-ldds" value="1.7" step="0.1" min="0" max="10"
               style="width:58px;background:var(--bg5);border:1px solid var(--bo2);border-radius:6px;padding:4px 6px;color:var(--gr);font-family:var(--mn);font-size:.78rem;outline:none;text-align:center"
               onblur="updTaux()" onkeydown="if(event.key==='Enter'){this.blur()}">
             <span style="font-size:.65rem;color:var(--tx3)">%</span>
@@ -622,13 +622,13 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
       <div id="lep-status"></div>
     </div>
     <div class="liv-bloc">
-      <div class="liv-hdr"><div class="liv-name">💧 Livret A</div><div class="liv-taux" style="color:var(--cy)">1,5% net</div></div>
+      <div class="liv-hdr"><div class="liv-name">💧 Livret A</div><div class="liv-taux" style="color:var(--cy)">1,7% net</div></div>
       <div class="liv-row"><span class="liv-lbl">Solde actuel</span><input class="liv-inp" type="number" id="sol-la" placeholder="0" onblur="dUpdLivrets()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€</span></div>
       <div class="liv-row"><span class="liv-lbl">Virement mensuel</span><input class="liv-inp" type="number" id="v-la" placeholder="0" onblur="dUpdLivrets()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€/mois</span></div>
       <div id="la-status"></div>
     </div>
     <div class="liv-bloc">
-      <div class="liv-hdr"><div class="liv-name">🌿 LDDS</div><div class="liv-taux" style="color:var(--gr)">1,5% net</div></div>
+      <div class="liv-hdr"><div class="liv-name">🌿 LDDS</div><div class="liv-taux" style="color:var(--gr)">1,7% net</div></div>
       <div class="liv-row"><span class="liv-lbl">Solde actuel</span><input class="liv-inp" type="number" id="sol-ldds" placeholder="0" onblur="dUpdLivrets()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€</span></div>
       <div class="liv-row"><span class="liv-lbl">Virement mensuel</span><input class="liv-inp" type="number" id="v-ldds" placeholder="0" onblur="dUpdLivrets()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€/mois</span></div>
       <div id="ldds-status"></div>
@@ -1019,7 +1019,7 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
 
 <div class="disclaimer">
   <strong>FlashTréso — outil d'aide à la gestion, ne remplace pas un expert-comptable.</strong><br>
-  Taux fiscaux 2026 · Sources URSSAF, impots.gouv.fr · Taux livrets au 01/08/2025 — révisés 2x/an<br>
+  Taux fiscaux 2026 · Sources URSSAF, impots.gouv.fr · Taux livrets au 01/08/2026 — révisés 2x/an<br>
   Tes données restent sur ton appareil.
 </div>
 <div class="toast" id="toast"></div>
@@ -1050,7 +1050,7 @@ const TX={
   mixte_cma:{urssaf:.175,ir:.014,cfp:.002,tfcc:.0035,tfcc_lbl:'CMA',label:'Mixte · CMA — taux pondérés estimés'}
 };
 const PLAFONDS={lep:10000,la:22950,ldds:12000,pea:150000};
-const TAUX_LIV_DEFAULT={lep:.025,la:.015,ldds:.015};
+const TAUX_LIV_DEFAULT={lep:.025,la:.017,ldds:.017};
 let TAUX_LIV={...TAUX_LIV_DEFAULT};
 
 function updTaux(){
@@ -1092,7 +1092,7 @@ function startEdit(k){const c=document.getElementById(k+'-cur'),i=document.getEl
 function commitEdit(k){const c=document.getElementById(k+'-cur'),i=document.getElementById(k+'-inp');if(!c||!i)return;const v=parseFloat(i.value);if(!isNaN(v)&&v>=0)S[EDIT_MAP[k]]=v;i.style.display='none';c.style.display='inline-block';updRes();calcRempart();}
 function collectAllFields(){const f={};document.querySelectorAll('input[id],select[id]').forEach(el=>{if(el.type==='file')return;f[el.id]=el.value;});return f;}
 function exportData(){
-  const data={version:2,date:new Date().toISOString().slice(0,10),state:{...S,charts:{}},fields:collectAllFields()};
+  const data={version:2,date:new Date().toISOString().slice(0,10),state:{...S,charts:{}},fields:collectAllFields(),extraComptes:extraComptes};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='flashtreso-'+data.date+'.json';a.click();URL.revokeObjectURL(url);
   showToast('✓ Sauvegardé — conserve ce fichier pour reprendre plus tard');
@@ -1105,15 +1105,38 @@ function importData(e){
     try{
       const data=JSON.parse(ev.target.result);
       if(!data.fields)throw new Error('Format invalide');
+      // Comptes supplémentaires en premier : les champs "tp-cpt"/"ext-cpt"/"per-cpt" (restaurés
+      // juste après) peuvent référencer des comptes "extra_..." — il faut donc que la liste
+      // extraComptes existe déjà avant que buildAllCompteOptions() ne reconstruise ces <select>.
+      extraComptes=Array.isArray(data.extraComptes)?data.extraComptes:[];
+      extraId=extraComptes.reduce((max,c)=>{const n=parseInt((c.id||'').replace('ec_',''))||0;return Math.max(max,n);},0);
+      renderExtraComptes();
       Object.entries(data.fields).forEach(([id,val])=>{const el=document.getElementById(id);if(!el||el.type==='file')return;el.value=val;});
       if(data.state)Object.keys(data.state).forEach(k=>{if(k!=='charts')S[k]=data.state[k];});
       ['cc','cpro','la','lep','ldds','pea','inv'].forEach(k=>document.getElementById('tg-'+k)?.classList.toggle('on',S[k]));
-      updStart();calcPro();calcPerso();updLivrets();
+      // Remet à jour les boutons visuels CMA / VFL / Activité secondaire pour qu'ils reflètent
+      // l'état importé (le calcul lit déjà S.cma/S.vfl/S.secondaire directement, donc les montants
+      // étaient corrects même sans ceci — mais l'affichage induisait en erreur).
+      syncToggleVisuals();
+      sh('s-sec-row',S.secondaire);
+      updStart();calcPro();calcPerso();updLivrets();updRes();calcAllProj();
       showToast('✓ Session restaurée — '+data.date);
     }catch(err){showToast('⚠ Fichier invalide');}
     e.target.value='';
   };
   reader.readAsText(file);
+}
+// Aligne les boutons Oui/Non (CMA, VFL, Activité secondaire) sur l'état réel de S — appelé après
+// un import, où S est modifié directement sans passer par setCMA()/setVFL()/setSecondaire().
+function syncToggleVisuals(){
+  const oui=document.getElementById('s-cma-oui'),non=document.getElementById('s-cma-non');
+  if(oui&&non){oui.style.cssText=_bs(S.cma,'am');non.style.cssText=_bs(!S.cma,'cy');}
+  const info=document.getElementById('s-cma-info');
+  if(info){if(S.cma){info.style.display='flex';document.getElementById('s-cma-txt').innerHTML=`Taxe CMA : <strong>${S.type==='ventes'?'0,22%':'0,48%'} du CA HT</strong>`;}else info.style.display='none';}
+  const vOui=document.getElementById('s-vfl-oui'),vNon=document.getElementById('s-vfl-non');
+  if(vOui&&vNon){vOui.style.cssText=_bs(S.vfl,'cy');vNon.style.cssText=_bs(!S.vfl,'cy');}
+  const sOui=document.getElementById('s-sec-oui'),sNon=document.getElementById('s-sec-non');
+  if(sOui&&sNon){sOui.style.cssText=_bs(S.secondaire,'cy');sNon.style.cssText=_bs(!S.secondaire,'cy');}
 }
 function togC(n){S[n]=!S[n];document.getElementById('tg-'+n)?.classList.toggle('on',S[n]);updStart();}
 function _bs(active,col='cy'){const c=col==='cy'?'var(--cy)':col==='am'?'var(--am)':'var(--gr)';return active?`flex:1;padding:8px;border-radius:8px;border:1.5px solid ${c};background:${c}22;color:${c};font-family:'Syne',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer`:`flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--bo2);background:var(--bg4);color:var(--tx3);font-family:'Syne',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer`;}
@@ -1154,14 +1177,13 @@ function updStart(){
   S.type=type;S.ca=ca;S.tva_assujetti=(document.getElementById('s-tva')?.value==='oui');
   S.ca2=gvCA2();S.type2=getType2();
   sh('s-cma-row',type==='services'||type==='ventes'||type==='mixte');
-  if(!type||!ca){sh('conseil-box',false);sh('start-btn',false);return;}
+  if(!type||!ca){sh('conseil-box',false);return;}
   let ico='💡',txt='',act='';
   if(!S.cpro){ico='🏦';txt=`Sans compte pro séparé, impossible de construire le rempart. <strong>Un compte pro dédié est indispensable.</strong>`;act='Shine 7€/mois ou Blank 6€/mois';}
   else if(!S.lep){ico='⭐';txt=`Le LEP (2,5% net) est le meilleur taux garanti — priorité pour la Réserve Perso.`;act='Caisse Épargne, Boursorama';}
   else if(!S.pea){ico='📈';txt=`Ouvrir un PEA avec <strong>1€ maintenant</strong> démarre 5 ans d'antériorité fiscale.`;act='Fortuneo ou Boursorama';}
   sh('conseil-box',!!txt);
   if(txt){se('cb-ico',ico);document.getElementById('cb-txt').innerHTML=txt;const ac=document.getElementById('cb-act');ac.textContent=act;ac.style.display=act?'inline-block':'none';}
-  sh('start-btn',true);
   buildAllCompteOptions();
   calcPro();
 }
@@ -1496,7 +1518,7 @@ function genRep(somme){
   const totLivD=lepD+laD+lddsD,peaD=Math.max(0,PLAFONDS.pea-gv('inv-pea-sol'));
   let r=somme,items=[];
   if(mE>0){const brut=Math.min(r,mE);const v=roundNice(brut,r);items.push({n:'Réserve Imprévus',c:'var(--am)',m:v,w:'Priorité absolue — 2e rempart'});r-=v;}
-  if(r>0&&mP>0){const brut=Math.min(r,Math.round(r*.7));const v=roundNice(brut,r);const lbl=S.lep?'⭐ LEP (2,5%)':'💧 Livret A (1,5%)';items.push({n:'Réserve Perso',c:'var(--gr)',m:v,w:lbl});r-=v;}
+  if(r>0&&mP>0){const brut=Math.min(r,Math.round(r*.7));const v=roundNice(brut,r);const lbl=S.lep?'⭐ LEP (2,5%)':'💧 Livret A (1,7%)';items.push({n:'Réserve Perso',c:'var(--gr)',m:v,w:lbl});r-=v;}
   if(r>0){
     if(totLivD>0){const brut=Math.min(r,Math.round(r*.7));const v=roundNice(brut,r);const lbl=lepD>0?'⭐ LEP → 💧 Livret A → 🌿 LDDS':laD>0?'💧 Livret A → 🌿 LDDS':'🌿 LDDS';items.push({n:'Livrets réglementés',c:'var(--vi)',m:v,w:lbl});r-=v;}
     if(r>0){
