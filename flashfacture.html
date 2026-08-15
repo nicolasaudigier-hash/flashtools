@@ -197,7 +197,10 @@
                 <div class="section-title">Logo (optionnel)</div>
                 <label class="logo-upload" for="logoInput">
                     Cliquez pour ajouter un logo
-                    <input type="file" id="logoInput" accept="image/*" class="visually-hidden-file" onchange="handleLogo(event)" onclick="this.value=null">
+                    <input type="file" id="logoInput" accept="image/*" class="visually-hidden-file"
+                           onchange="handleLogo(event)"
+                           oncancel="recreateLogoInput()"
+                           onclick="this.value=null;window.__logoPickerOpenedAt=Date.now();">
                 </label>
                 <div id="logoControls" style="display:none">
                     <div class="logo-controls-grid">
@@ -599,6 +602,40 @@ function removeLogo(){
     document.getElementById('logoInput').value='';
     updatePreview();
 }
+
+// ── ROBUSTESSE MOBILE : input logo bloqué après annulation ──────────────
+// Bug WebKit connu : un <input type="file"> situé dans une iframe cross-origin
+// (cas de FlashFacture, embarqué via flashtools.fr) peut rester "verrouillé"
+// après une annulation du sélecteur natif — aucun déclenchement ultérieur
+// (label ou JS) ne rouvre alors le picker, même si l'élément est toujours là.
+// Solution : recréer entièrement le nœud DOM de l'input dès qu'une annulation
+// est détectée. Comme cloneNode() copie tous les attributs (onchange, oncancel,
+// onclick, accept...), le nouvel input reste identique et fonctionnel — WebKit
+// le traite comme un tout nouvel élément et le débloque.
+function recreateLogoInput(){
+    var oldInput=document.getElementById('logoInput');
+    if(!oldInput)return;
+    var newInput=oldInput.cloneNode(false);
+    newInput.value='';
+    oldInput.parentNode.replaceChild(newInput,oldInput);
+}
+
+// Filet de sécurité pour les navigateurs qui ne supportent pas encore
+// l'événement standard "cancel" sur input[type=file] (support récent,
+// pas universel sur toutes les versions iOS/Android). Si la page reprend
+// le focus après une ouverture du sélecteur sans qu'aucun fichier n'ait
+// été chargé peu après, on considère que le picker a été annulé et on
+// recrée l'input par sécurité.
+window.addEventListener('focus',function(){
+    if(!window.__logoPickerOpenedAt)return;
+    window.__logoPickerOpenedAt=0;
+    setTimeout(function(){
+        var input=document.getElementById('logoInput');
+        if(input&&(!input.files||input.files.length===0)){
+            recreateLogoInput();
+        }
+    },400);
+});
 
 // Appelé quand on change la position du logo : affiche/cache le sous-réglage
 // "Étendue du filigrane" (uniquement pertinent en mode Transparence), et plafonne
