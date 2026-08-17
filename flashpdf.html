@@ -24,7 +24,7 @@
         .main-grid{display:grid;grid-template-columns:260px 1fr 360px;gap:22px;}#flashpdf-app /* SIDEBAR */
         .sidebar{background:var(--surface);padding:22px;border-radius:18px;border:1px solid var(--border2);height:fit-content;position:sticky;top:16px;}#flashpdf-app .sidebar h3{margin-bottom:18px;color:var(--text);font-size:1.1em;font-family:'Syne',sans-serif;}#flashpdf-app .tool-cat-title{font-size:.7em;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin:16px 0 8px 4px;}#flashpdf-app .tool-cat-title:first-of-type{margin-top:0;}#flashpdf-app .tool-btn{width:100%;padding:12px 14px;margin-bottom:7px;border:1.5px solid var(--border2);border-radius:11px;background:var(--bg2);cursor:pointer;font-size:.87em;font-weight:600;text-align:left;transition:all .25s;display:flex;align-items:center;gap:9px;color:var(--text);font-family:inherit;min-height:44px;}#flashpdf-app .tool-btn:hover{border-color:var(--cyan);background:rgba(6,182,212,.07);}#flashpdf-app .tool-btn.active{border-color:var(--cyan);background:linear-gradient(135deg,rgba(6,182,212,.15),rgba(139,92,246,.15));color:var(--cyan);}#flashpdf-app /* MAIN PANEL */
         .main-panel{background:var(--surface);padding:32px;border-radius:18px;border:1px solid var(--border2);min-height:500px;}#flashpdf-app .main-panel h2{color:var(--text);margin-bottom:22px;display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:1.3em;}#flashpdf-app /* UPLOAD ZONE */
-        .upload-zone{border:2px dashed var(--border2);border-radius:14px;padding:40px 24px;text-align:center;cursor:pointer;background:var(--bg2);transition:all .3s;margin-bottom:22px;}#flashpdf-app .upload-zone:hover, #flashpdf-app .upload-zone.drag-over{border-color:var(--cyan);background:rgba(6,182,212,.06);}#flashpdf-app .upload-icon{font-size:2.8em;margin-bottom:14px;}#flashpdf-app .upload-zone h3{font-size:1.15em;margin-bottom:8px;color:var(--text);}#flashpdf-app .upload-zone p{color:var(--text2);font-size:.9em;}#flashpdf-app input[type="file"]{display:none;}#flashpdf-app /* FILES PREVIEW */
+        .upload-zone{display:block;border:2px dashed var(--border2);border-radius:14px;padding:40px 24px;text-align:center;cursor:pointer;background:var(--bg2);transition:all .3s;margin-bottom:22px;}#flashpdf-app .upload-zone:hover, #flashpdf-app .upload-zone.drag-over{border-color:var(--cyan);background:rgba(6,182,212,.06);}#flashpdf-app .upload-icon{font-size:2.8em;margin-bottom:14px;}#flashpdf-app .upload-zone h3{font-size:1.15em;margin-bottom:8px;color:var(--text);}#flashpdf-app .upload-zone p{color:var(--text2);font-size:.9em;}#flashpdf-app input[type="file"]{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}#flashpdf-app /* FILES PREVIEW */
         .files-preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin:16px 0;}#flashpdf-app .file-card{border:1.5px solid var(--border2);border-radius:11px;padding:12px;text-align:center;position:relative;background:var(--bg2);transition:all .25s;cursor:grab;}#flashpdf-app .file-card:hover{border-color:var(--cyan);}#flashpdf-app .file-card.dragging{opacity:.45;border-color:var(--violet);}#flashpdf-app .file-card.drag-over{border-color:var(--cyan);background:rgba(6,182,212,.08);}#flashpdf-app .drag-handle{position:absolute;top:7px;left:7px;color:var(--text3);cursor:grab;font-size:1em;padding:3px;border-radius:4px;}#flashpdf-app .drag-handle:hover{color:var(--cyan);}#flashpdf-app .file-order{position:absolute;bottom:7px;left:7px;background:var(--cyan);color:var(--bg);font-size:.68em;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;}#flashpdf-app .file-thumbnail{width:100%;height:88px;background:var(--bg);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:2.2em;margin-bottom:8px;overflow:hidden;}#flashpdf-app .file-thumbnail img{width:100%;height:100%;object-fit:cover;}#flashpdf-app .file-name{font-size:.77em;color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}#flashpdf-app .file-size{font-size:.7em;color:var(--text3);margin-top:4px;}#flashpdf-app .file-remove{position:absolute;top:7px;right:7px;background:var(--error);color:#fff;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.85em;}#flashpdf-app .file-reorder{position:absolute;bottom:7px;right:7px;display:flex;gap:3px;}#flashpdf-app .reorder-btn{background:var(--bg);border:1px solid var(--border2);color:var(--text2);width:22px;height:22px;border-radius:6px;cursor:pointer;font-size:.75em;display:flex;align-items:center;justify-content:center;}#flashpdf-app .reorder-btn:active{border-color:var(--cyan);color:var(--cyan);}#flashpdf-app .reorder-btn:disabled{opacity:.3;}#flashpdf-app /* BUTTONS */
         .btn{padding:12px 22px;border:none;border-radius:11px;font-size:.95em;font-weight:600;cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:8px;font-family:inherit;min-height:44px;}#flashpdf-app .btn-primary{background:var(--grad);color:#fff;}#flashpdf-app .btn-primary:hover{opacity:.88;transform:translateY(-1px);}#flashpdf-app .btn-secondary{background:var(--bg2);color:var(--cyan);border:1.5px solid var(--cyan);}#flashpdf-app .btn-secondary:hover{background:var(--cyan);color:var(--bg);}#flashpdf-app .btn:disabled{opacity:.45;cursor:not-allowed;}#flashpdf-app .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;}#flashpdf-app /* OPTIONS */
         .options-group{background:var(--bg2);padding:18px;border-radius:11px;margin:16px 0;border:1px solid var(--border2);}#flashpdf-app .option-row{margin-bottom:14px;}#flashpdf-app .option-row:last-child{margin-bottom:0;}#flashpdf-app .option-row label{display:block;font-weight:600;margin-bottom:7px;color:var(--text);font-size:.9em;}#flashpdf-app .option-row select, #flashpdf-app .option-row input[type="text"], #flashpdf-app .option-row textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border2);border-radius:8px;font-size:.9em;background:var(--bg);color:var(--text);transition:border-color .2s;font-family:inherit;}#flashpdf-app .option-row select:focus, #flashpdf-app .option-row input[type="text"]:focus, #flashpdf-app .option-row textarea:focus{outline:none;border-color:var(--cyan);}#flashpdf-app .option-row textarea{min-height:180px;resize:vertical;font-family:'Courier New',monospace;}#flashpdf-app .radio-group{display:flex;gap:10px;flex-wrap:wrap;}#flashpdf-app .radio-option{display:flex;align-items:center;gap:7px;cursor:pointer;padding:9px 13px;border:1.5px solid var(--border2);border-radius:8px;transition:all .2s;background:var(--bg);font-size:.88em;min-height:44px;}#flashpdf-app .radio-option:hover{border-color:var(--cyan);}#flashpdf-app .radio-option input[type="radio"]{accent-color:var(--cyan);width:16px;height:16px;}#flashpdf-app /* STATS */
@@ -104,12 +104,12 @@
             <div id="tool-merge" class="tool-panel active">
                 <h2><span>🔗</span>Fusionner PDF</h2>
                 <div class="info-box"><strong>Réorganisez vos fichiers</strong>Glissez-déposez les vignettes (desktop) ou utilisez les flèches ↑↓ (mobile) pour changer l'ordre. Le numéro indique la position dans le PDF final.</div>
-                <div class="upload-zone" onclick="document.getElementById('merge-input').click()" id="merge-zone">
+                <label class="upload-zone" for="merge-input" id="merge-zone" onclick="armFilePicker('merge-input')">
                     <div class="upload-icon">📤</div>
                     <h3>Glissez vos PDFs ici</h3>
                     <p>ou appuyez pour sélectionner (max 10 fichiers, 40MB chacun)</p>
-                    <input type="file" id="merge-input" accept=".pdf" multiple>
-                </div>
+                    <input type="file" id="merge-input" accept=".pdf" multiple oncancel="recreateFileInput('merge-input')">
+                </label>
                 <div id="merge-files" class="files-preview"></div>
                 <div id="merge-actions" style="display:none" class="btn-row">
                     <button class="btn btn-primary" onclick="mergePDFs()">🔗 Fusionner et Télécharger</button>
@@ -121,12 +121,12 @@
             <!-- COMPRESSER -->
             <div id="tool-compress" class="tool-panel">
                 <h2><span>🗜️</span>Compresser PDF</h2>
-                <div class="upload-zone" onclick="document.getElementById('compress-input').click()">
+                <label class="upload-zone" for="compress-input" onclick="armFilePicker('compress-input')">
                     <div class="upload-icon">📤</div>
                     <h3>Glissez votre PDF ici</h3>
                     <p>ou appuyez pour sélectionner (1 fichier, max 40MB)</p>
-                    <input type="file" id="compress-input" accept=".pdf">
-                </div>
+                    <input type="file" id="compress-input" accept=".pdf" oncancel="recreateFileInput('compress-input')">
+                </label>
                 <div id="compress-options" style="display:none">
                     <div class="stats-box">
                         <div class="stat-row"><span class="stat-label">Fichier sélectionné</span><span class="stat-value" id="compress-original-size">-</span></div>
@@ -156,12 +156,12 @@
             <!-- DIVISER -->
             <div id="tool-split" class="tool-panel">
                 <h2><span>✂️</span>Diviser PDF</h2>
-                <div class="upload-zone" onclick="document.getElementById('split-input').click()">
+                <label class="upload-zone" for="split-input" onclick="armFilePicker('split-input')">
                     <div class="upload-icon">📤</div>
                     <h3>Glissez votre PDF ici</h3>
                     <p>ou appuyez pour sélectionner (1 fichier, max 40MB)</p>
-                    <input type="file" id="split-input" accept=".pdf">
-                </div>
+                    <input type="file" id="split-input" accept=".pdf" oncancel="recreateFileInput('split-input')">
+                </label>
                 <div id="split-options" style="display:none">
                     <div class="info-box"><strong>Format des pages</strong>"1-5" → Pages 1 à 5 &nbsp;|&nbsp; "1,3,5" → Pages 1, 3 et 5 &nbsp;|&nbsp; "1-5,8,10-12" → Combinaison</div>
                     <div class="options-group">
@@ -185,12 +185,12 @@
             <div id="tool-image-to-pdf" class="tool-panel">
                 <h2><span>🖼️</span>Images → PDF</h2>
                 <div class="info-box"><strong>Réorganisez vos images</strong>Glissez-déposez les vignettes (desktop) ou utilisez les flèches ↑↓ (mobile) pour changer l'ordre des pages.</div>
-                <div class="upload-zone" onclick="document.getElementById('image-input').click()">
+                <label class="upload-zone" for="image-input" onclick="armFilePicker('image-input')">
                     <div class="upload-icon">📤</div>
                     <h3>Glissez vos images ici</h3>
                     <p>ou appuyez pour sélectionner (JPG, PNG - max 10 images)</p>
-                    <input type="file" id="image-input" accept="image/jpeg,image/png" multiple>
-                </div>
+                    <input type="file" id="image-input" accept="image/jpeg,image/png" multiple oncancel="recreateFileInput('image-input')">
+                </label>
                 <div id="image-files" class="files-preview"></div>
                 <div id="image-options" style="display:none">
                     <div class="options-group">
@@ -229,12 +229,12 @@
             <!-- PDF → IMAGES -->
             <div id="tool-pdf-to-image" class="tool-panel">
                 <h2><span>📤</span>PDF → Images</h2>
-                <div class="upload-zone" onclick="document.getElementById('pdf-to-image-input').click()">
+                <label class="upload-zone" for="pdf-to-image-input" onclick="armFilePicker('pdf-to-image-input')">
                     <div class="upload-icon">📤</div>
                     <h3>Glissez votre PDF ici</h3>
                     <p>ou appuyez pour sélectionner (1 fichier, max 40MB)</p>
-                    <input type="file" id="pdf-to-image-input" accept=".pdf">
-                </div>
+                    <input type="file" id="pdf-to-image-input" accept=".pdf" oncancel="recreateFileInput('pdf-to-image-input')">
+                </label>
                 <div id="pdf-to-image-options" style="display:none">
                     <div class="options-group">
                         <div class="option-row">
@@ -269,12 +269,12 @@
             <div id="tool-unlock" class="tool-panel">
                 <h2><span>🔓</span>Déverrouiller PDF</h2>
                 <div class="info-box warning"><strong>Limitations techniques</strong>Cet outil retire les restrictions de lecture/impression, mais ne peut pas déverrouiller un PDF protégé par mot de passe à l'ouverture.</div>
-                <div class="upload-zone" onclick="document.getElementById('unlock-input').click()">
+                <label class="upload-zone" for="unlock-input" onclick="armFilePicker('unlock-input')">
                     <div class="upload-icon">📤</div>
                     <h3>Glissez votre PDF protégé ici</h3>
                     <p>ou appuyez pour sélectionner (1 fichier, max 40MB)</p>
-                    <input type="file" id="unlock-input" accept=".pdf">
-                </div>
+                    <input type="file" id="unlock-input" accept=".pdf" oncancel="recreateFileInput('unlock-input')">
+                </label>
                 <div id="unlock-actions" style="display:none" class="btn-row">
                     <button class="btn btn-primary" onclick="unlockPDF()">🔓 Déverrouiller et Télécharger</button>
                     <button class="btn btn-secondary" onclick="resetUnlock()">↻ Recommencer</button>
@@ -286,12 +286,12 @@
             <div id="tool-edit" class="tool-panel">
                 <h2><span>✏️</span>Éditer PDF/Image</h2>
                 <div class="info-box"><strong>Comment ça marche</strong>Chargez une page PDF ou une image. Ajoutez des blocs "masque + texte" pour recouvrir/corriger du texte existant, ou des blocs "texte libre" pour ajouter une mention. Chaque nouveau bloc apparaît en haut de la zone visible (jamais caché au milieu du texte) — glissez-le où vous voulez, réglez police/gras/italique/taille. Rendu final en haute résolution. Tout se fait en local, aucune donnée ne quitte votre navigateur.</div>
-                <div class="upload-zone" onclick="document.getElementById('edit-input').click()" id="edit-zone">
+                <label class="upload-zone" for="edit-input" id="edit-zone" onclick="armFilePicker('edit-input')">
                     <div class="upload-icon">📤</div>
                     <h3>Glissez un PDF ou une image ici</h3>
                     <p>ou appuyez pour sélectionner (PDF, JPG, PNG - max 40MB)</p>
-                    <input type="file" id="edit-input" accept=".pdf,image/jpeg,image/png">
-                </div>
+                    <input type="file" id="edit-input" accept=".pdf,image/jpeg,image/png" oncancel="recreateFileInput('edit-input')">
+                </label>
                 <div id="edit-workspace" style="display:none">
                     <div id="edit-page-nav" class="btn-row" style="display:none;margin-top:0;margin-bottom:14px">
                         <button class="btn btn-secondary" onclick="editPrevPage()">← Page préc.</button>
@@ -407,6 +407,51 @@
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+// ── ROBUSTESSE MOBILE : inputs file "verrouillés" après annulation ────────
+// Bug WebKit connu : un <input type="file"> situé dans une iframe cross-origin
+// (le cas de chaque outil FlashTools intégré via systeme.io) peut rester
+// verrouillé après une annulation du sélecteur natif — aucun déclenchement
+// ultérieur (même via <label>) ne le réactive tant que l'élément n'est pas
+// recréé. Système générique pour les 7 inputs de cette app : on recrée le
+// nœud DOM dès qu'une annulation est détectée, et on réattache l'écouteur
+// 'change' d'origine (perdu par cloneNode, contrairement aux attributs
+// inline comme oncancel qui eux sont bien copiés).
+const FILE_INPUT_HANDLERS={};
+function registerFileInput(id,handler){
+    FILE_INPUT_HANDLERS[id]=handler;
+    document.getElementById(id).addEventListener('change',handler);
+}
+function recreateFileInput(id){
+    const oldInput=document.getElementById(id);
+    if(!oldInput)return;
+    const newInput=oldInput.cloneNode(false);
+    newInput.value='';
+    oldInput.parentNode.replaceChild(newInput,oldInput);
+    const handler=FILE_INPUT_HANDLERS[id];
+    if(handler)newInput.addEventListener('change',handler);
+}
+function armFilePicker(id){
+    const input=document.getElementById(id);
+    if(input)input.value='';
+    window.__filePickerOpenedAt=Date.now();
+    window.__filePickerOpenedId=id;
+}
+window.__filePickerOpenedAt=0;
+window.__filePickerOpenedId=null;
+// Filet de sécurité pour les navigateurs qui ne déclenchent pas encore l'événement
+// standard 'cancel' sur input[type=file] (support récent, pas universel).
+window.addEventListener('focus',function(){
+    if(!window.__filePickerOpenedAt)return;
+    const id=window.__filePickerOpenedId;
+    window.__filePickerOpenedAt=0;window.__filePickerOpenedId=null;
+    setTimeout(function(){
+        const input=document.getElementById(id);
+        if(input&&(!input.files||input.files.length===0)){
+            recreateFileInput(id);
+        }
+    },400);
+});
+
 let mergeFiles=[],compressFile=null,splitFile=null,imageFiles=[],pdfToImageFile=null,unlockFile=null;
 
 const guides={
@@ -477,14 +522,15 @@ window.onload=function(){
 };
 
 // ── FUSIONNER ────────────────────────────────────────
-document.getElementById('merge-input').addEventListener('change',async function(e){
+async function handleMergeInputChange(e){
     const files=Array.from(e.target.files);
     if(!files.length)return;
     if(files.length>10){alert('Maximum 10 fichiers');return;}
     for(const f of files){if(f.size>40*1024*1024){alert(f.name+' dépasse 40MB');return;}}
     mergeFiles=files;displayMergeFiles();
     document.getElementById('merge-actions').style.display='flex';
-});
+}
+registerFileInput('merge-input',handleMergeInputChange);
 
 function displayMergeFiles(){
     const c=document.getElementById('merge-files');c.innerHTML='';
@@ -531,12 +577,13 @@ async function mergePDFs(){
 function resetMerge(){mergeFiles=[];document.getElementById('merge-input').value='';document.getElementById('merge-files').innerHTML='';document.getElementById('merge-actions').style.display='none';document.getElementById('merge-loading').classList.remove('active');}
 
 // ── COMPRESSER ───────────────────────────────────────
-document.getElementById('compress-input').addEventListener('change',async function(e){
+async function handleCompressInputChange(e){
     const file=e.target.files[0];if(!file)return;
     if(file.size>40*1024*1024){alert('Max 40MB');return;}
     compressFile=file;document.getElementById('compress-original-size').textContent=formatBytes(file.size);
     document.getElementById('compress-options').style.display='block';document.getElementById('compress-result').style.display='none';
-});
+}
+registerFileInput('compress-input',handleCompressInputChange);
 
 async function compressPDF(){
     if(!compressFile)return;
@@ -569,13 +616,14 @@ async function compressPDF(){
 function resetCompress(){compressFile=null;document.getElementById('compress-input').value='';document.getElementById('compress-options').style.display='none';document.getElementById('compress-loading').classList.remove('active');}
 
 // ── DIVISER ──────────────────────────────────────────
-document.getElementById('split-input').addEventListener('change',async function(e){
+async function handleSplitInputChange(e){
     const file=e.target.files[0];if(!file)return;
     if(file.size>40*1024*1024){alert('Max 40MB');return;}
     splitFile=file;const ab=await file.arrayBuffer();const pdf=await PDFLib.PDFDocument.load(ab);
     document.getElementById('split-total-pages').textContent=pdf.getPageCount();
     document.getElementById('split-options').style.display='block';
-});
+}
+registerFileInput('split-input',handleSplitInputChange);
 
 function parsePageRange(s,max){
     const pages=new Set();
@@ -602,11 +650,12 @@ async function splitPDF(){
 function resetSplit(){splitFile=null;document.getElementById('split-input').value='';document.getElementById('split-pages').value='';document.getElementById('split-options').style.display='none';document.getElementById('split-loading').classList.remove('active');}
 
 // ── IMAGES → PDF ─────────────────────────────────────
-document.getElementById('image-input').addEventListener('change',function(e){
+function handleImageInputChange(e){
     const files=Array.from(e.target.files);if(!files.length)return;
     if(files.length>10){alert('Max 10 images');return;}
     imageFiles=files;displayImageFiles();document.getElementById('image-options').style.display='block';
-});
+}
+registerFileInput('image-input',handleImageInputChange);
 
 function displayImageFiles(){
     const c=document.getElementById('image-files');c.innerHTML='';
@@ -663,13 +712,14 @@ async function imagesToPDF(){
 function resetImageToPDF(){imageFiles=[];document.getElementById('image-input').value='';document.getElementById('image-files').innerHTML='';document.getElementById('image-options').style.display='none';document.getElementById('image-loading').classList.remove('active');}
 
 // ── PDF → IMAGES ─────────────────────────────────────
-document.getElementById('pdf-to-image-input').addEventListener('change',async function(e){
+async function handlePdfToImageInputChange(e){
     const file=e.target.files[0];if(!file)return;
     if(file.size>40*1024*1024){alert('Max 40MB');return;}
     pdfToImageFile=file;const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;
     document.getElementById('pdf-to-image-pages').textContent=pdf.numPages;
     document.getElementById('pdf-to-image-options').style.display='block';
-});
+}
+registerFileInput('pdf-to-image-input',handlePdfToImageInputChange);
 
 async function pdfToImages(){
     if(!pdfToImageFile)return;
@@ -694,11 +744,12 @@ async function pdfToImages(){
 function resetPDFToImage(){pdfToImageFile=null;document.getElementById('pdf-to-image-input').value='';document.getElementById('pdf-to-image-options').style.display='none';document.getElementById('pdf-to-image-loading').classList.remove('active');}
 
 // ── DÉVERROUILLER ────────────────────────────────────
-document.getElementById('unlock-input').addEventListener('change',function(e){
+function handleUnlockInputChange(e){
     const file=e.target.files[0];if(!file)return;
     if(file.size>40*1024*1024){alert('Max 40MB');return;}
     unlockFile=file;document.getElementById('unlock-actions').style.display='flex';
-});
+}
+registerFileInput('unlock-input',handleUnlockInputChange);
 
 async function unlockPDF(){
     if(!unlockFile)return;
@@ -714,7 +765,7 @@ function resetUnlock(){unlockFile=null;document.getElementById('unlock-input').v
 // ── ÉDITER PDF/IMAGE ─────────────────────────────────
 let editPdfDoc=null,editPages=[],editCurPage=0,editBlocks=[],editBaseCanvas=null,editScale=1,editIsImage=false;
 
-document.getElementById('edit-input').addEventListener('change',async function(e){
+async function handleEditInputChange(e){
     const file=e.target.files[0];if(!file)return;
     if(file.size>40*1024*1024){alert('Max 40MB');return;}
     document.getElementById('edit-loading').classList.add('active');
@@ -737,7 +788,8 @@ document.getElementById('edit-input').addEventListener('change',async function(e
         document.getElementById('edit-workspace').style.display='block';
     }catch(err){console.error(err);alert('Erreur de chargement: '+err.message);}
     document.getElementById('edit-loading').classList.remove('active');
-});
+}
+registerFileInput('edit-input',handleEditInputChange);
 
 async function renderEditPage(){
     const wrap=document.getElementById('edit-canvas-wrap');wrap.innerHTML='';
