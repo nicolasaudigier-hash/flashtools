@@ -185,15 +185,8 @@
         .preview-label{font-family:'Syne',sans-serif;font-weight:700;font-size:0.72em;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);}
 
         /* ── SÉLECTEUR DE COULEUR PERSONNALISÉ ────────────────────── */
-        .cp-overlay{position:fixed;inset:0;background:rgba(3,5,10,0.75);backdrop-filter:blur(3px);display:flex;align-items:flex-end;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity 0.2s;}
-        .cp-overlay.show{opacity:1;pointer-events:auto;}
-        .cp-modal{width:100%;max-width:360px;background:var(--surface);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:20px 20px 24px;transform:translateY(16px);transition:transform 0.25s;box-shadow:0 -20px 60px rgba(0,0,0,0.5);}
-        .cp-overlay.show .cp-modal{transform:translateY(0);}
-        @media(min-width:640px){
-            .cp-overlay{align-items:center;}
-            .cp-modal{border-radius:20px;transform:translateY(0) scale(0.96);}
-            .cp-overlay.show .cp-modal{transform:translateY(0) scale(1);}
-        }
+        .cp-popover{position:absolute;z-index:1000;width:min(320px,92vw);background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,0.55);display:none;}
+        .cp-popover.show{display:block;}
         .cp-modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
         .cp-modal-header span{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95em;}
         .cp-close{background:var(--surface2);border:1px solid var(--border);color:var(--text-muted);width:30px;height:30px;border-radius:9px;cursor:pointer;font-size:0.9em;}
@@ -252,7 +245,7 @@
                     <div class="form-group">
                         <label>Votre couleur principale</label>
                         <div class="color-picker-row">
-                            <div class="cp-trigger" id="baseColorSwatch" style="background:#06b6d4;" onclick="openColorPicker(document.getElementById('baseHex').value,function(hex){document.getElementById('baseColorSwatch').style.background=hex;syncFromPicker(hex);})"></div>
+                            <div class="cp-trigger" id="baseColorSwatch" style="background:#06b6d4;" onclick="openColorPicker(document.getElementById('baseHex').value,function(hex){document.getElementById('baseColorSwatch').style.background=hex;syncFromPicker(hex);},this)"></div>
                             <div class="hex-input-wrap">
                                 <div class="hex-preview" id="hexPreview" style="background:#06b6d4;"></div>
                                 <input type="text" id="baseHex" value="#06b6d4" placeholder="#rrggbb" oninput="syncFromHex(this.value)" maxlength="7" spellcheck="false" autocomplete="off">
@@ -413,26 +406,24 @@
 </div>
 
 <!-- ── SÉLECTEUR DE COULEUR PERSONNALISÉ ────────────────────── -->
-<div class="cp-overlay" id="cpOverlay" onmousedown="if(event.target===this)closeColorPicker()">
-    <div class="cp-modal">
-        <div class="cp-modal-header">
-            <span>Choisir une couleur</span>
-            <button class="cp-close" onclick="closeColorPicker()">✕</button>
-        </div>
-        <div class="cp-sv-wrap" id="cpSVWrap">
-            <canvas id="cpSV" width="280" height="200"></canvas>
-            <div class="cp-sv-thumb" id="cpSVThumb"></div>
-        </div>
-        <div class="cp-hue-wrap" id="cpHueWrap">
-            <canvas id="cpHue" width="280" height="24"></canvas>
-            <div class="cp-hue-thumb" id="cpHueThumb"></div>
-        </div>
-        <div class="cp-preview-row">
-            <div class="cp-preview-swatch" id="cpPreviewSwatch"></div>
-            <input type="text" id="cpHexInput" class="cp-hex-input" maxlength="7" spellcheck="false" autocomplete="off" oninput="cpOnHexInput(this.value)">
-        </div>
-        <button class="cp-confirm-btn" onclick="confirmColorPicker()">✓ Valider cette couleur</button>
+<div class="cp-popover" id="cpPopover">
+    <div class="cp-modal-header">
+        <span>Choisir une couleur</span>
+        <button class="cp-close" onclick="closeColorPicker()">✕</button>
     </div>
+    <div class="cp-sv-wrap" id="cpSVWrap">
+        <canvas id="cpSV" width="280" height="200"></canvas>
+        <div class="cp-sv-thumb" id="cpSVThumb"></div>
+    </div>
+    <div class="cp-hue-wrap" id="cpHueWrap">
+        <canvas id="cpHue" width="280" height="24"></canvas>
+        <div class="cp-hue-thumb" id="cpHueThumb"></div>
+    </div>
+    <div class="cp-preview-row">
+        <div class="cp-preview-swatch" id="cpPreviewSwatch"></div>
+        <input type="text" id="cpHexInput" class="cp-hex-input" maxlength="7" spellcheck="false" autocomplete="off" oninput="cpOnHexInput(this.value)">
+    </div>
+    <button class="cp-confirm-btn" onclick="confirmColorPicker()">✓ Valider cette couleur</button>
 </div>
 
 <script>
@@ -728,20 +719,50 @@ function cpOnHexInput(value){
     }
 }
 
-function openColorPicker(currentHex,onConfirm){
+function openColorPicker(currentHex,onConfirm,anchorEl){
     cpInitCanvases();
     const hex=/^#[0-9a-fA-F]{6}$/.test(currentHex)?currentHex:'#06b6d4';
     [cpH,cpS,cpV]=hexToHSV(hex);
     cpCallback=onConfirm;
     cpDrawSV();
-    document.getElementById('cpOverlay').classList.add('show');
-    // Positionner les curseurs après que le modal soit rendu (dimensions réelles disponibles)
+    const pop=document.getElementById('cpPopover');
+    pop.classList.add('show');
+    cpPositionPopover(anchorEl||(window.event&&window.event.currentTarget));
+    // Positionner les curseurs après que le popover soit rendu (dimensions réelles disponibles)
     requestAnimationFrame(()=>{cpPositionThumbs();cpUpdatePreview();});
+    // Fermeture au clic/tap en dehors du popover (ajouté après ce tick pour ne pas
+    // se déclencher immédiatement sur le clic qui vient d'ouvrir le picker)
+    setTimeout(()=>document.addEventListener('pointerdown',cpOutsideClick,true),0);
+}
+
+function cpPositionPopover(anchorEl){
+    const pop=document.getElementById('cpPopover');
+    if(!anchorEl){pop.style.top='20px';pop.style.left='20px';return;}
+    const margin=10;
+    const scrollX=window.scrollX||window.pageXOffset||0;
+    const scrollY=window.scrollY||window.pageYOffset||0;
+    const vw=document.documentElement.clientWidth||window.innerWidth;
+    const rect=anchorEl.getBoundingClientRect();
+    const popW=pop.offsetWidth||300;
+    let left=rect.left+scrollX;
+    if(left+popW>scrollX+vw-margin) left=scrollX+vw-popW-margin;
+    if(left<scrollX+margin) left=scrollX+margin;
+    const top=rect.bottom+scrollY+margin;
+    pop.style.left=left+'px';
+    pop.style.top=top+'px';
+}
+
+function cpOutsideClick(e){
+    const pop=document.getElementById('cpPopover');
+    if(pop.classList.contains('show')&&!pop.contains(e.target)){
+        closeColorPicker();
+    }
 }
 
 function closeColorPicker(){
-    document.getElementById('cpOverlay').classList.remove('show');
+    document.getElementById('cpPopover').classList.remove('show');
     cpCallback=null;
+    document.removeEventListener('pointerdown',cpOutsideClick,true);
 }
 
 function confirmColorPicker(){
@@ -917,7 +938,7 @@ function analyzeInputs(){
 function renderColorInputs(){
     document.getElementById('colorInputsGrid').innerHTML=colorInputs.map(ci=>`
         <div class="color-input-row${ci.outlier?' outlier':''}" id="row_${ci.id}" style="${ci.locked?'border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.04);':''}">
-            <div class="swatch-wrapper" title="Cliquer pour choisir" onclick="openColorPicker('${ci.color}',function(hex){updateInputColor('${ci.id}',hex);})">
+            <div class="swatch-wrapper" title="Cliquer pour choisir" onclick="openColorPicker('${ci.color}',function(hex){updateInputColor('${ci.id}',hex);},this)">
                 <div class="swatch-display" style="background:${ci.color};">
                     <div class="swatch-hint">Changer</div>
                 </div>
@@ -931,13 +952,13 @@ function renderColorInputs(){
 }
 function updateInputColor(id,value){
     const ci=colorInputs.find(c=>c.id===id);
-    if(ci){ci.color=value;const row=document.getElementById('row_'+id);if(row){row.querySelector('.color-hex-input').value=value;row.querySelector('.swatch-display').style.background=value;row.querySelector('.swatch-wrapper').setAttribute('onclick',`openColorPicker('${value}',function(hex){updateInputColor('${id}',hex);})`);}analyzeInputs();}
+    if(ci){ci.color=value;const row=document.getElementById('row_'+id);if(row){row.querySelector('.color-hex-input').value=value;row.querySelector('.swatch-display').style.background=value;row.querySelector('.swatch-wrapper').setAttribute('onclick',`openColorPicker('${value}',function(hex){updateInputColor('${id}',hex);},this)`);}analyzeInputs();}
 }
 function updateInputHex(id,value){
     const v=value.startsWith('#')?value:'#'+value;
     if(/^#[0-9a-fA-F]{6}$/.test(v)){
         const ci=colorInputs.find(c=>c.id===id);
-        if(ci){ci.color=v;const row=document.getElementById('row_'+id);if(row){row.querySelector('.swatch-display').style.background=v;row.querySelector('.swatch-wrapper').setAttribute('onclick',`openColorPicker('${v}',function(hex){updateInputColor('${id}',hex);})`);}analyzeInputs();}
+        if(ci){ci.color=v;const row=document.getElementById('row_'+id);if(row){row.querySelector('.swatch-display').style.background=v;row.querySelector('.swatch-wrapper').setAttribute('onclick',`openColorPicker('${v}',function(hex){updateInputColor('${id}',hex);},this)`);}analyzeInputs();}
     }
 }
 
