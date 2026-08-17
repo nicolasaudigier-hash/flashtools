@@ -608,12 +608,7 @@ document.addEventListener('touchmove', e => {
     folderEl.classList.add('drag-over');
     const targetFolderId = folderEl.getAttribute('data-folderid');
     const wrap = folderEl.querySelector('.files-wrap');
-    const cards = Array.from(wrap.querySelectorAll('.file-card'));
-    let insertIndex = cards.length;
-    for(let i=0;i<cards.length;i++) {
-      const r = cards[i].getBoundingClientRect();
-      if(t.clientX < r.left + r.width/2) { insertIndex = i; break; }
-    }
+    const insertIndex = computeInsertIndex(wrap, t.clientX, t.clientY);
     const changed = !dragOverState || dragOverState.folderId !== targetFolderId || dragOverState.insertIndex !== insertIndex;
     if(changed) {
       dragOverState = { folderId: targetFolderId, insertIndex };
@@ -737,14 +732,8 @@ function renderFolders(numbered) {
     card.ondragover = e => {
       e.preventDefault(); e.stopPropagation();
       card.classList.add('drag-over');
-      // Calcul de l'index d'insertion selon position souris dans les file cards
       const wrap = card.querySelector('.files-wrap');
-      const cards = Array.from(wrap.querySelectorAll('.file-card'));
-      let insertIndex = folder.files.length; // par défaut : à la fin
-      for(let i=0;i<cards.length;i++) {
-        const r = cards[i].getBoundingClientRect();
-        if(e.clientX < r.left + r.width/2) { insertIndex = i; break; }
-      }
+      const insertIndex = computeInsertIndex(wrap, e.clientX, e.clientY);
       const changed = !dragOverState || dragOverState.folderId !== folder.id || dragOverState.insertIndex !== insertIndex;
       if(changed) {
         dragOverState = { folderId: folder.id, insertIndex };
@@ -851,6 +840,32 @@ function renderFolders(numbered) {
 }
 
 // Dessine les indicateurs d'insertion sans re-render toute la grille
+// Calcule l'index d'insertion en tenant compte de la LIGNE (Y) puis de la position
+// horizontale (X) dans cette ligne — indispensable dès qu'un dossier contient assez
+// de fichiers pour former plusieurs lignes (flex-wrap). Une comparaison X seule
+// désigne parfois un fichier de la mauvaise ligne comme point d'insertion.
+function computeInsertIndex(wrap, clientX, clientY) {
+  const cards = Array.from(wrap.querySelectorAll('.file-card'));
+  if(!cards.length) return 0;
+  const rects = cards.map(c => c.getBoundingClientRect());
+  // Ligne survolée : celle dont l'intervalle vertical contient le curseur
+  let targetTop = null;
+  for(const r of rects) {
+    if(clientY >= r.top && clientY <= r.bottom) { targetTop = r.top; break; }
+  }
+  if(targetTop === null) {
+    // Curseur au-dessus de tout (première ligne) ou en dessous de tout (dernière ligne)
+    targetTop = clientY < rects[0].top ? rects[0].top : rects[rects.length-1].top;
+  }
+  // Indices des cartes appartenant à cette ligne (tolérance pour arrondis de layout)
+  const rowIdx = [];
+  rects.forEach((r,i) => { if(Math.abs(r.top - targetTop) < 8) rowIdx.push(i); });
+  for(const i of rowIdx) {
+    if(clientX < rects[i].left + rects[i].width/2) return i;
+  }
+  return rowIdx.length ? rowIdx[rowIdx.length-1] + 1 : cards.length;
+}
+
 function renderInsertIndicators() {
   // Supprimer tous les indicateurs existants
   document.querySelectorAll('.drop-indicator').forEach(el => el.remove());
