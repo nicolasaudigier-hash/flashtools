@@ -286,12 +286,17 @@
             <div id="tool-edit" class="tool-panel">
                 <h2><span>✏️</span>Éditer PDF/Image</h2>
                 <div class="info-box"><strong>Comment ça marche</strong>Chargez une page PDF ou une image. Ajoutez des blocs "masque + texte" pour recouvrir/corriger du texte existant, ou des blocs "texte libre" pour ajouter une mention. Chaque nouveau bloc apparaît en haut de la zone visible (jamais caché au milieu du texte) — glissez-le où vous voulez, réglez police/gras/italique/taille. Rendu final en haute résolution. Tout se fait en local, aucune donnée ne quitte votre navigateur.</div>
-                <label class="upload-zone" for="edit-input" id="edit-zone" onclick="armFilePicker('edit-input')">
+                <div class="upload-zone" id="edit-zone">
                     <div class="upload-icon">📤</div>
                     <h3>Glissez un PDF ou une image ici</h3>
-                    <p>ou appuyez pour sélectionner (PDF, JPG, PNG - max 40MB)</p>
-                    <input type="file" id="edit-input" accept="application/pdf,image/jpeg,image/png" oncancel="recreateFileInput('edit-input')">
-                </label>
+                    <p>ou choisissez ci-dessous (PDF, JPG, PNG - max 40MB)</p>
+                    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px">
+                        <label class="btn btn-secondary" for="edit-input-pdf" onclick="armFilePicker('edit-input-pdf');event.stopPropagation();" style="cursor:pointer">📄 Choisir un PDF</label>
+                        <label class="btn btn-secondary" for="edit-input-image" onclick="armFilePicker('edit-input-image');event.stopPropagation();" style="cursor:pointer">🖼️ Choisir une image</label>
+                    </div>
+                    <input type="file" id="edit-input-pdf" accept="application/pdf" oncancel="recreateFileInput('edit-input-pdf')">
+                    <input type="file" id="edit-input-image" accept="image/jpeg,image/png" oncancel="recreateFileInput('edit-input-image')">
+                </div>
                 <div id="edit-workspace" style="display:none">
                     <div id="edit-page-nav" class="btn-row" style="display:none;margin-top:0;margin-bottom:14px">
                         <button class="btn btn-secondary" onclick="editPrevPage()">← Page préc.</button>
@@ -765,8 +770,8 @@ function resetUnlock(){unlockFile=null;document.getElementById('unlock-input').v
 // ── ÉDITER PDF/IMAGE ─────────────────────────────────
 let editPdfDoc=null,editPages=[],editCurPage=0,editBlocks=[],editBaseCanvas=null,editScale=1,editIsImage=false;
 
-async function handleEditInputChange(e){
-    const file=e.target.files[0];if(!file)return;
+async function processEditFile(file){
+    if(!file)return;
     if(file.size>40*1024*1024){alert('Max 40MB');return;}
     document.getElementById('edit-loading').classList.add('active');
     try{
@@ -789,7 +794,10 @@ async function handleEditInputChange(e){
     }catch(err){console.error(err);alert('Erreur de chargement: '+err.message);}
     document.getElementById('edit-loading').classList.remove('active');
 }
-registerFileInput('edit-input',handleEditInputChange);
+async function handleEditPdfInputChange(e){ await processEditFile(e.target.files[0]); }
+async function handleEditImageInputChange(e){ await processEditFile(e.target.files[0]); }
+registerFileInput('edit-input-pdf',handleEditPdfInputChange);
+registerFileInput('edit-input-image',handleEditImageInputChange);
 
 async function renderEditPage(){
     const wrap=document.getElementById('edit-canvas-wrap');wrap.innerHTML='';
@@ -1290,7 +1298,8 @@ function showEditStatus(msg,isError){
 
 function resetEdit(){
     editPdfDoc=null;editPages=[];editCurPage=0;editBlocks=[];editIsImage=false;editBaseCanvas=null;editZoom=1;
-    document.getElementById('edit-input').value='';
+    document.getElementById('edit-input-pdf').value='';
+    document.getElementById('edit-input-image').value='';
     document.getElementById('edit-workspace').style.display='none';
     document.getElementById('edit-canvas-wrap').innerHTML='';
     document.getElementById('edit-blocks-list').innerHTML='';
