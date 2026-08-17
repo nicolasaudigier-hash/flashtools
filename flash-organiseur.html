@@ -76,7 +76,8 @@
     .empty-hint{width:100%;text-align:center;padding:16px;color:var(--text3);font-size:12px;}
 
     /* FILE CARD */
-    .file-card{width:116px;border-radius:11px;overflow:hidden;cursor:grab;background:rgba(255,255,255,.025);border:1.5px solid var(--border2);transition:opacity .15s;flex-shrink:0;}
+    .file-card{width:116px;border-radius:11px;overflow:hidden;cursor:grab;background:rgba(255,255,255,.025);border:1.5px solid var(--border2);transition:opacity .15s;flex-shrink:0;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
+    .file-card img{-webkit-user-drag:none;-webkit-touch-callout:none;}
     .file-card:active{cursor:grabbing;}
     .file-card.dragging{opacity:.4;}
     .file-thumb{height:86px;display:flex;align-items:center;justify-content:center;position:relative;background:linear-gradient(135deg,var(--surface),var(--surface2));}
@@ -323,6 +324,10 @@ let dragItem = null, dragSource = null, dragOverFolderId = null;
 // État d'insertion précis — folderId + index où sera inséré le fichier
 let dragOverState = null; // { folderId, insertIndex }
 let touchGhost = null, touchDragging = null;
+// Un toucher est d'abord "en attente" — on ne le promeut en vrai glisser
+// qu'après un mouvement suffisant, pour ne pas confondre un tap avec un drag.
+let pendingTouch = null;
+const TOUCH_DRAG_THRESHOLD = 10; // px
 
 // ── UTILS ───────────────────────────────────────────────
 const genId = () => 'f-'+Date.now()+'-'+Math.random().toString(36).substr(2,8);
@@ -566,6 +571,11 @@ function setupDropZones() {
 // survol visuel des dossiers/corbeille, et dépôt à l'index précis (pas juste en fin de liste).
 function onTouchStartFile(e, file, folderId, index, cardEl) {
   const touch = e.touches[0];
+  pendingTouch = { file, folderId, index, cardEl, startX: touch.clientX, startY: touch.clientY };
+}
+
+function startTouchDragNow() {
+  const { file, folderId, index, cardEl } = pendingTouch;
   const rect = cardEl.getBoundingClientRect();
   touchDragging = {file, folderId, index};
   touchGhost = cardEl.cloneNode(true);
@@ -576,6 +586,7 @@ function onTouchStartFile(e, file, folderId, index, cardEl) {
   touchGhost.style.top = rect.top+'px';
   document.body.appendChild(touchGhost);
   cardEl.style.opacity = '.35';
+  pendingTouch = null;
 }
 
 function touchTargetsAt(clientX, clientY) {
@@ -588,8 +599,20 @@ function touchTargetsAt(clientX, clientY) {
 }
 
 document.addEventListener('touchmove', e => {
-  if(!touchGhost||!touchDragging) return;
+  if(!pendingTouch && !touchDragging) return;
   const t = e.touches[0];
+
+  // Toucher encore "en attente" : on regarde si le mouvement dépasse le seuil
+  // avant de considérer que c'est un glisser plutôt qu'un simple tap
+  if(pendingTouch && !touchDragging) {
+    const dx = t.clientX - pendingTouch.startX;
+    const dy = t.clientY - pendingTouch.startY;
+    if(Math.hypot(dx,dy) < TOUCH_DRAG_THRESHOLD) return; // sous le seuil : on ignore, laisse faire le tap
+    startTouchDragNow();
+  }
+
+  if(!touchGhost||!touchDragging) return;
+  e.preventDefault(); // glisser confirmé : on reprend la main sur le scroll natif (vertical inclus)
   touchGhost.style.left = (t.clientX - parseInt(touchGhost.style.width)/2)+'px';
   touchGhost.style.top = (t.clientY - parseInt(touchGhost.style.height)/2)+'px';
 
@@ -618,9 +641,26 @@ document.addEventListener('touchmove', e => {
     dragOverState = null;
     renderInsertIndicators();
   }
+}, {passive:false});
+
+document.addEventListener('touchcancel', () => {
+  pendingTouch = null;
+  if(touchGhost) touchGhost.remove();
+  touchGhost = null;
+  document.querySelectorAll('.folder-card.drag-over').forEach(c=>c.classList.remove('drag-over'));
+  document.getElementById('trashDrop').classList.remove('drag-over');
+  document.querySelectorAll('.drop-indicator').forEach(el=>el.remove());
+  dragOverState = null;
+  if(touchDragging) renderAll(); // restaure l'opacité normale de la carte d'origine
+  touchDragging = null;
 }, {passive:true});
 
 document.addEventListener('touchend', e => {
+  if(pendingTouch && !touchDragging) {
+    // Mouvement resté sous le seuil : c'était un simple tap, rien à déplacer
+    pendingTouch = null;
+    return;
+  }
   if(!touchGhost||!touchDragging) return;
   const t = e.changedTouches[0];
   touchGhost.remove(); touchGhost=null;
