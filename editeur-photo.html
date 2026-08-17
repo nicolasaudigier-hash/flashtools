@@ -407,7 +407,7 @@
                     <div class="upload-icon">📷</div>
                     <h2 style="margin-bottom: 10px; color: var(--text); font-size: 1.3em;">Appuyez pour choisir une image</h2>
                     <p style="color: var(--text-muted);">ou glissez-déposez sur ordinateur</p>
-                    <input type="file" id="fileInput" accept="image/*" capture="environment">
+                    <input type="file" id="fileInput" accept="image/*">
                 </label>
 
                 <!-- CANVAS AREA -->
@@ -740,10 +740,7 @@
             cropCanvas = document.getElementById('cropCanvas');
             cropCtx = cropCanvas.getContext('2d');
 
-            document.getElementById('fileInput').onchange = function(e) {
-                const file = e.target.files[0];
-                if (file) loadImage(file);
-            };
+            bindFileInput();
 
             const uploadZone = document.getElementById('uploadZone');
             uploadZone.ondragover = function(e) { e.preventDefault(); uploadZone.classList.add('dragover'); };
@@ -755,6 +752,54 @@
                 if (file && file.type.startsWith('image/')) loadImage(file);
             };
         };
+
+        // ── ROBUSTESSE MOBILE : input fichier bloqué après annulation ───────────
+        // Bug WebKit connu : un <input type="file"> situé dans une iframe cross-origin
+        // (cas de l'Éditeur Photo, embarqué via flashtools.fr) peut rester "verrouillé"
+        // après une annulation du sélecteur natif — aucun déclenchement ultérieur
+        // (label ou JS) ne rouvre alors le picker, même si l'élément est toujours là.
+        // Solution : recréer entièrement le nœud DOM de l'input dès qu'une annulation
+        // est détectée (événement standard `cancel`, avec filet de sécurité au retour
+        // de focus pour les navigateurs plus anciens qui ne le supportent pas).
+        let __filePickerOpenedAt = 0;
+
+        function bindFileInput() {
+            const input = document.getElementById('fileInput');
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) loadImage(file);
+            };
+            input.onclick = function() {
+                this.value = null;
+                __filePickerOpenedAt = Date.now();
+            };
+            input.oncancel = function() {
+                recreateFileInput();
+            };
+            // Filet de sécurité : si la fenêtre reprend le focus juste après
+            // l'ouverture du picker sans qu'onchange ait été déclenché, on
+            // considère que c'était une annulation et on recrée l'input.
+            window.addEventListener('focus', function onFocusCheck() {
+                if (!__filePickerOpenedAt) return;
+                const elapsed = Date.now() - __filePickerOpenedAt;
+                __filePickerOpenedAt = 0;
+                if (elapsed > 300) {
+                    setTimeout(function() {
+                        const cur = document.getElementById('fileInput');
+                        if (cur && (!cur.files || cur.files.length === 0)) recreateFileInput();
+                    }, 250);
+                }
+            });
+        }
+
+        function recreateFileInput() {
+            const old = document.getElementById('fileInput');
+            if (!old) return;
+            const fresh = old.cloneNode(true);
+            fresh.value = '';
+            old.parentNode.replaceChild(fresh, old);
+            bindFileInput();
+        }
 
         function loadImage(file) {
             const reader = new FileReader();
