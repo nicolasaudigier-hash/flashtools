@@ -273,9 +273,9 @@
     <div class="trash-drop" id="trashDrop">🗑️ <span id="trashCount"></span></div>
   </div>
 
-  <div id="welcomeHint" style="display:none;padding:24px;background:rgba(6,182,212,.05);border:2px dashed rgba(6,182,212,.2);border-radius:14px;text-align:center;margin-bottom:16px">
-    <div style="font-size:24px;margin-bottom:8px">👋</div>
-    <div style="font-size:15px;font-weight:700;color:var(--cyan)">Importez des fichiers pour commencer</div>
+  <div id="welcomeHint" style="display:none;padding:16px 20px;background:var(--surface);border:1px solid var(--border2);border-radius:12px;text-align:center;margin-bottom:16px">
+    <div style="font-size:20px;margin-bottom:6px">👋</div>
+    <div style="font-size:13px;font-weight:600;color:var(--text2)">Importez des fichiers pour commencer</div>
   </div>
 
   <div class="folders-grid" id="foldersGrid"></div>
@@ -522,6 +522,7 @@ function startRenameFolder(id, el) {
   };
   input.onblur = done;
   input.onkeydown = e => { if(e.key==='Enter') done(); e.stopPropagation(); };
+  input.onclick = e => e.stopPropagation();
 }
 
 // ── PREVIEW ─────────────────────────────────────────────
@@ -561,6 +562,8 @@ function setupDropZones() {
 }
 
 // ── TOUCH DRAG ──────────────────────────────────────────
+// Miroir complet du comportement souris : indicateur de position d'insertion,
+// survol visuel des dossiers/corbeille, et dépôt à l'index précis (pas juste en fin de liste).
 function onTouchStartFile(e, file, folderId, index, cardEl) {
   const touch = e.touches[0];
   const rect = cardEl.getBoundingClientRect();
@@ -575,37 +578,92 @@ function onTouchStartFile(e, file, folderId, index, cardEl) {
   cardEl.style.opacity = '.35';
 }
 
+function touchTargetsAt(clientX, clientY) {
+  // On masque temporairement le fantôme pour ne pas se détecter lui-même
+  if(touchGhost) touchGhost.style.display = 'none';
+  const el = document.elementFromPoint(clientX, clientY);
+  if(touchGhost) touchGhost.style.display = '';
+  if(!el) return { trashEl:null, folderEl:null };
+  return { trashEl: el.closest('#trashDrop'), folderEl: el.closest('.folder-card') };
+}
+
 document.addEventListener('touchmove', e => {
-  if(!touchGhost) return;
+  if(!touchGhost||!touchDragging) return;
   const t = e.touches[0];
   touchGhost.style.left = (t.clientX - parseInt(touchGhost.style.width)/2)+'px';
   touchGhost.style.top = (t.clientY - parseInt(touchGhost.style.height)/2)+'px';
+
+  const { trashEl, folderEl } = touchTargetsAt(t.clientX, t.clientY);
+
+  document.querySelectorAll('.folder-card.drag-over').forEach(c=>c.classList.remove('drag-over'));
+  document.getElementById('trashDrop').classList.remove('drag-over');
+
+  if(trashEl) {
+    trashEl.classList.add('drag-over');
+    if(dragOverState){ dragOverState=null; renderInsertIndicators(); }
+    return;
+  }
+
+  if(folderEl) {
+    folderEl.classList.add('drag-over');
+    const targetFolderId = folderEl.getAttribute('data-folderid');
+    const wrap = folderEl.querySelector('.files-wrap');
+    const cards = Array.from(wrap.querySelectorAll('.file-card'));
+    let insertIndex = cards.length;
+    for(let i=0;i<cards.length;i++) {
+      const r = cards[i].getBoundingClientRect();
+      if(t.clientX < r.left + r.width/2) { insertIndex = i; break; }
+    }
+    const changed = !dragOverState || dragOverState.folderId !== targetFolderId || dragOverState.insertIndex !== insertIndex;
+    if(changed) {
+      dragOverState = { folderId: targetFolderId, insertIndex };
+      renderInsertIndicators();
+    }
+  } else if(dragOverState) {
+    dragOverState = null;
+    renderInsertIndicators();
+  }
 }, {passive:true});
 
 document.addEventListener('touchend', e => {
   if(!touchGhost||!touchDragging) return;
   const t = e.changedTouches[0];
   touchGhost.remove(); touchGhost=null;
-  // Restaurer opacité
-  renderAll();
-  const el = document.elementFromPoint(t.clientX, t.clientY);
-  if(!el) {touchDragging=null;return;}
-  const trashEl = el.closest('[data-trash]');
-  const folderEl = el.closest('[data-folderid]');
+  document.querySelectorAll('.folder-card.drag-over').forEach(c=>c.classList.remove('drag-over'));
+  document.getElementById('trashDrop').classList.remove('drag-over');
+
+  const { trashEl, folderEl } = touchTargetsAt(t.clientX, t.clientY);
+  const finalState = dragOverState;
+  dragOverState = null;
+  document.querySelectorAll('.drop-indicator').forEach(el=>el.remove());
+
   if(trashEl) {
     folders=folders.map(f=>f.id===touchDragging.folderId?{...f,files:f.files.filter((_,i)=>i!==touchDragging.index)}:f);
     trash=[...trash,touchDragging.file];
     showAlert('Fichier supprimé','info');
   } else if(folderEl) {
     const targetId = folderEl.getAttribute('data-folderid');
-    if(targetId && targetId!==touchDragging.folderId) {
-      folders=folders.map(f=>{
-        if(f.id===touchDragging.folderId) return {...f,files:f.files.filter((_,i)=>i!==touchDragging.index)};
-        if(f.id===targetId) return {...f,files:[...f.files,touchDragging.file]};
-        return f;
-      });
-      showAlert('Fichier déplacé','success');
+    const sameFolder = targetId === touchDragging.folderId;
+    folders = folders.map(f => {
+      if(f.id===touchDragging.folderId) return {...f, files: f.files.filter((_,i)=>i!==touchDragging.index)};
+      return f;
+    });
+    let insertAt = (finalState && finalState.folderId===targetId) ? finalState.insertIndex : undefined;
+    if(insertAt===undefined) {
+      const targetFolder = folders.find(f=>f.id===targetId);
+      insertAt = targetFolder ? targetFolder.files.length : 0;
+    } else if(sameFolder && touchDragging.index < insertAt) {
+      insertAt = Math.max(0, insertAt-1);
     }
+    folders = folders.map(f=>{
+      if(f.id===targetId){
+        const newFiles=[...f.files];
+        newFiles.splice(insertAt,0,touchDragging.file);
+        return {...f, files:newFiles};
+      }
+      return f;
+    });
+    if(!sameFolder) showAlert('Fichier déplacé','success');
   }
   touchDragging=null;
   renderAll();
@@ -803,7 +861,9 @@ function renderInsertIndicators() {
   const cards = Array.from(wrap.querySelectorAll('.file-card'));
   const indicator = document.createElement('div');
   indicator.className = 'drop-indicator';
-  indicator.style.height = '86px'; // hauteur thumb
+  // Hauteur alignée sur la vignette réelle (86px desktop / 80px mobile via media query)
+  const sampleThumb = wrap.querySelector('.file-thumb');
+  indicator.style.height = (sampleThumb ? sampleThumb.getBoundingClientRect().height : (isMobile()?80:86)) + 'px';
   indicator.style.alignSelf = 'flex-start';
   if(insertIndex >= cards.length) {
     wrap.appendChild(indicator);
@@ -838,7 +898,7 @@ function buildFileCard(file, idx, folderId, numbered) {
     const img=document.createElement('img');
     img.src=file.preview; img.alt='';
     thumb.appendChild(img);
-    if(file.cat==='image') {
+    if(file.cat==='image'||file.cat==='pdf') {
       card.ondblclick = e => { e.stopPropagation(); openPreview(file.preview,file.name); };
     }
   } else {
