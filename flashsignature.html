@@ -473,7 +473,7 @@ const D={
   drawing:false, pts:[], strokes:[],
   lastX:0, lastY:0, lastT:0,
 };
-const MIN_DIST=3; // distance minimale entre 2 points (px)
+const MIN_DIST=3; // distance minimale entre 2 points, en pixels ÉCRAN réels (indépendant de la résolution du canvas)
 
 function initDraw(){
   const pad=document.getElementById('drawPad');
@@ -483,11 +483,14 @@ function initDraw(){
   const p=document.getElementById('drawPad');
   const hint=document.getElementById('drawHint');
 
+  // Retourne à la fois les coordonnées en espace CANVAS (nécessaires pour dessiner)
+  // et le facteur d'échelle courant (canvas / écran), pour que le calcul de vitesse
+  // en aval puisse être ramené en pixels écran réels — voir move().
   function getXY(e){
     const r=p.getBoundingClientRect();
     const sx=p.width/r.width, sy=p.height/r.height;
     const src=e.touches?e.touches[0]:e;
-    return{x:(src.clientX-r.left)*sx, y:(src.clientY-r.top)*sy, t:Date.now()};
+    return{x:(src.clientX-r.left)*sx, y:(src.clientY-r.top)*sy, t:Date.now(), scale:sx};
   }
 
   function down(e){
@@ -502,13 +505,19 @@ function initDraw(){
   function move(e){
     if(!D.drawing) return;
     e.preventDefault();
-    const {x,y,t}=getXY(e);
+    const {x,y,t,scale}=getXY(e);
     const dx=x-D.lastX, dy=y-D.lastY;
-    const dist=Math.sqrt(dx*dx+dy*dy);
-    // Ignorer les micro-mouvements → élimine les points parasites
-    if(dist<MIN_DIST) return;
+    const dist=Math.sqrt(dx*dx+dy*dy); // distance en espace canvas (résolution interne)
+    // Ramène la distance en pixels ÉCRAN réels : sans cette conversion, un canvas affiché
+    // en petit (mobile) donne un facteur d'échelle sx plus grand, donc une distance canvas
+    // artificiellement plus grande pour un même geste physique → vitesse surestimée → trait
+    // aminci plus agressivement que sur desktop pour un geste identique. En passant par
+    // l'espace écran, l'épaisseur ressentie reste cohérente quelle que soit la taille d'affichage.
+    const screenDist = dist/scale;
+    // Ignorer les micro-mouvements → élimine les points parasites (seuil en espace écran)
+    if(screenDist<MIN_DIST) return;
     const dt=Math.max(t-D.lastT,1);
-    const speed=dist/dt;
+    const speed=screenDist/dt;
     // Épaisseur inversement proportionnelle à la vitesse
     // Rapide → fin, lent → épais. Transition douce.
     const prevW=D.pts.length?D.pts[D.pts.length-1].w:D.baseW;
@@ -552,11 +561,16 @@ function redrawRaw(p,ctx){
   D.strokes.forEach(s=>drawStrokePts(ctx,s.pts,s.color));
 }
 
-// Rendu d'un stroke avec courbes Catmull-Rom lissées
-function drawStrokePts(ctx,pts,color){
-  if(pts.length<2) return;
+// ────────────────────────────────────────────────────────────────────────
+// Géométrie partagée d'un stroke (micro-segments + cercles de jonction),
+// indépendante du support de rendu. Canvas ET SVG consomment EXACTEMENT
+// la même géométrie ci-dessous — c'est ce qui garantit que le fichier SVG
+// exporté reproduit fidèlement l'effet plein/délié visible à l'écran,
+// au lieu d'un algorithme séparé à épaisseur unique par trait.
+// ────────────────────────────────────────────────────────────────────────
+function computeStrokeGeometry(pts){
+  if(pts.length<2) return {segments:[], joins:[]};
 
-  // Précalculer les points de contrôle Catmull-Rom pour toute la courbe
   const cps=[];
   for(let i=0;i<pts.length-1;i++){
     const p0=pts[Math.max(0,i-1)];
@@ -569,11 +583,8 @@ function drawStrokePts(ctx,pts,color){
     });
   }
 
-  // Pour chaque segment, subdiviser en N micro-segments
-  // et interpoler l'épaisseur de façon continue → pas de rupture
   const STEPS=14; // sous-divisions par segment
-  ctx.lineCap='round';
-  ctx.strokeStyle=color;
+  const segments=[], joins=[];
 
   for(let i=0;i<pts.length-1;i++){
     const p1=pts[i], p2=pts[i+1];
@@ -582,32 +593,42 @@ function drawStrokePts(ctx,pts,color){
 
     for(let s=0;s<STEPS;s++){
       const t0=s/STEPS, t1=(s+1)/STEPS;
-      // Point sur la courbe de Bézier à t0 et t1
       const bx0=bezierPoint(p1.x,cp1x,cp2x,p2.x,t0);
       const by0=bezierPoint(p1.y,cp1y,cp2y,p2.y,t0);
       const bx1=bezierPoint(p1.x,cp1x,cp2x,p2.x,t1);
       const by1=bezierPoint(p1.y,cp1y,cp2y,p2.y,t1);
-      // Épaisseur interpolée linéairement sur ce sous-segment
       const w=wStart+(wEnd-wStart)*((t0+t1)/2);
-
-      ctx.beginPath();
-      ctx.lineWidth=w;
-      ctx.moveTo(bx0,by0);
-      ctx.lineTo(bx1,by1);
-      ctx.stroke();
+      segments.push({x0:bx0,y0:by0,x1:bx1,y1:by1,w});
     }
 
     // Cercle de jonction au point p2 pour boucher les gaps entre segments
-    // (épaisseur = moyenne des deux segments adjacents)
     if(i<pts.length-2){
       const wNext=pts[i+2]?.w??wEnd;
       const wJoin=(wEnd+wNext)/2;
-      ctx.beginPath();
-      ctx.fillStyle=color;
-      ctx.arc(p2.x,p2.y,wJoin/2,0,Math.PI*2);
-      ctx.fill();
+      joins.push({x:p2.x,y:p2.y,w:wJoin});
     }
   }
+  return {segments,joins};
+}
+
+// Rendu d'un stroke sur canvas — consomme la géométrie partagée ci-dessus
+function drawStrokePts(ctx,pts,color){
+  const {segments,joins}=computeStrokeGeometry(pts);
+  ctx.lineCap='round';
+  ctx.strokeStyle=color;
+  segments.forEach(seg=>{
+    ctx.beginPath();
+    ctx.lineWidth=seg.w;
+    ctx.moveTo(seg.x0,seg.y0);
+    ctx.lineTo(seg.x1,seg.y1);
+    ctx.stroke();
+  });
+  ctx.fillStyle=color;
+  joins.forEach(j=>{
+    ctx.beginPath();
+    ctx.arc(j.x,j.y,j.w/2,0,Math.PI*2);
+    ctx.fill();
+  });
 }
 
 // Point sur courbe cubique de Bézier à paramètre t
@@ -776,6 +797,11 @@ function transformPoint(x,y,cx,cy,skewX,skewY,scaleY){
   return {x:tx+cx, y:ty+cy};
 }
 
+// Export SVG — reconstruit chaque stroke avec EXACTEMENT la même géométrie que le
+// canvas (computeStrokeGeometry : mêmes points de contrôle Catmull-Rom, mêmes 14
+// sous-segments, même épaisseur interpolée en continu). L'ancienne version utilisait
+// un algorithme séparé à épaisseur unique par trait, ce qui aplatissait l'effet
+// plein/délié dans le fichier exporté. Ici, PNG et SVG sont visuellement identiques.
 function dlSVG(){
   if(D.strokes.length===0){toast('Dessinez d\'abord votre signature');return;}
   const pad=document.getElementById('drawPad');
@@ -784,23 +810,25 @@ function dlSVG(){
   const scaleY=(+(document.getElementById('scaleYSlider')?.value||100))/100;
   const color=document.getElementById('resultColor')?.value||'#1a1a2e';
   const cx=pad.width/2, cy=pad.height/2;
-  let paths='';
+  let markup='';
   D.strokes.forEach(s=>{
     if(s.pts.length<2) return;
+    // La transformation (skew/compression) est affine : l'appliquer aux points de
+    // contrôle avant de calculer la géométrie donne exactement la même courbe que
+    // transformer le rendu final — donc SVG et canvas restent parfaitement alignés.
     const pts=s.pts.map(p=>{
       const t=transformPoint(p.x,p.y,cx,cy,skewX,skewY,scaleY);
-      return{x:t.x,y:t.y,w:p.w};
+      return {x:t.x,y:t.y,w:p.w};
     });
-    let d=`M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
-    for(let i=1;i<pts.length;i++){
-      const mx=((pts[i-1].x+pts[i].x)/2).toFixed(1);
-      const my=((pts[i-1].y+pts[i].y)/2).toFixed(1);
-      d+=` Q ${pts[i-1].x.toFixed(1)} ${pts[i-1].y.toFixed(1)} ${mx} ${my}`;
-    }
-    const w=((pts[0].w+pts[pts.length-1].w)/2).toFixed(1);
-    paths+=`<path d="${d}" stroke="${color}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>\n`;
+    const {segments,joins}=computeStrokeGeometry(pts);
+    segments.forEach(seg=>{
+      markup+=`<line x1="${seg.x0.toFixed(2)}" y1="${seg.y0.toFixed(2)}" x2="${seg.x1.toFixed(2)}" y2="${seg.y1.toFixed(2)}" stroke="${color}" stroke-width="${seg.w.toFixed(2)}" stroke-linecap="round"/>\n`;
+    });
+    joins.forEach(j=>{
+      markup+=`<circle cx="${j.x.toFixed(2)}" cy="${j.y.toFixed(2)}" r="${(j.w/2).toFixed(2)}" fill="${color}"/>\n`;
+    });
   });
-  const svg=`<svg viewBox="0 0 ${pad.width} ${pad.height}" xmlns="http://www.w3.org/2000/svg">\n${paths}</svg>`;
+  const svg=`<svg viewBox="0 0 ${pad.width} ${pad.height}" xmlns="http://www.w3.org/2000/svg">\n${markup}</svg>`;
   const blob=new Blob([svg],{type:'image/svg+xml'});
   const a=document.createElement('a');
   a.download='signature.svg'; a.href=URL.createObjectURL(blob); a.click();
