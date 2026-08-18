@@ -95,12 +95,12 @@
     .swatch-row{display:flex;align-items:center;gap:3px;}
     .picker-btn{width:22px;height:24px;flex-shrink:0;border:1px solid var(--border);border-radius:5px;background:var(--surface);cursor:pointer;font-size:.78em;padding:0;line-height:1;}
     .picker-btn:hover{border-color:var(--cyan);}
-    /* POPOVER SÉLECTEUR MAISON — palette complète via 3 curseurs (teinte,
-       saturation, luminosité), tactile-friendly, contrairement au picker
-       natif mobile qui ne propose souvent que 7-8 couleurs figées. */
-    #colorPopover{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:999;align-items:center;justify-content:center;padding:20px;}
-    #colorPopover.open{display:flex;}
-    .pop-box{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px;width:100%;max-width:320px;}
+    /* POPOVER SÉLECTEUR MAISON — ancré près du bouton cliqué (position absolue
+       dans le flux du document), pas plaqué au viewport de l'iframe : suit le
+       défilement de la page hôte au lieu d'apparaître hors-champ. */
+    #colorPopover{display:none;position:absolute;z-index:999;width:min(300px,92vw);}
+    #colorPopover.open{display:block;}
+    .pop-box{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.6);}
     .pop-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
     .pop-preview{width:64px;height:64px;border-radius:10px;border:2.5px solid rgba(255,255,255,.25);flex-shrink:0;box-shadow:0 3px 10px rgba(0,0,0,.4);}
     .pop-head-info{display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;}
@@ -127,9 +127,9 @@
     .toggle input:checked+.toggle-slider:before{transform:translateX(15px);}
 
     /* IMAGES */
-    .img-upload{border:1.5px dashed var(--border);border-radius:7px;padding:10px;text-align:center;cursor:pointer;background:rgba(6,182,212,.03);transition:all .2s;margin-bottom:7px;font-size:.78em;color:var(--text2);}
+    .img-upload{border:1.5px dashed var(--border);border-radius:7px;padding:10px;text-align:center;cursor:pointer;background:rgba(6,182,212,.03);transition:all .2s;margin-bottom:7px;font-size:.78em;color:var(--text2);display:block;}
     .img-upload:hover{border-color:var(--cyan);color:var(--text);}
-    .img-upload input{display:none;}
+    .img-upload input{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
     .img-loaded{display:flex;align-items:center;gap:6px;padding:6px 8px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.25);border-radius:7px;margin-bottom:7px;font-size:.76em;color:var(--cyan);}
     .img-loaded button{margin-left:auto;background:none;border:none;color:var(--text2);cursor:pointer;}
     .img-loaded button:hover{color:#ef4444;}
@@ -208,12 +208,12 @@
   <!-- COULEURS -->
   <div class="sec">Couleurs <span style="font-size:.75em;color:var(--text2);text-transform:none;letter-spacing:0;font-weight:400">(grisé = géré par le template)</span></div>
   <div class="color-grid" id="colorGrid">
-    <div class="color-pick" id="cp-accent"><label>Accent</label><div class="swatch-row"><input type="color" id="cAccent" oninput="onAccentChange()"><button type="button" class="picker-btn" onclick="openColorPopover('Accent')">🎨</button></div><input type="text" class="hex-input" id="tAccent" maxlength="7" placeholder="#000000" oninput="onHexTyped('Accent')"></div>
-    <div class="color-pick" id="cp-title"><label>Titre</label><div class="swatch-row"><input type="color" id="cTitle"><button type="button" class="picker-btn" onclick="openColorPopover('Title')">🎨</button></div><input type="text" class="hex-input" id="tTitle" maxlength="7" placeholder="#000000" oninput="onHexTyped('Title')"></div>
-    <div class="color-pick" id="cp-body"><label>Texte</label><div class="swatch-row"><input type="color" id="cBody"><button type="button" class="picker-btn" onclick="openColorPopover('Body')">🎨</button></div><input type="text" class="hex-input" id="tBody" maxlength="7" placeholder="#000000" oninput="onHexTyped('Body')"></div>
-    <div class="color-pick" id="cp-btn"><label>Bouton</label><div class="swatch-row"><input type="color" id="cBtn" oninput="onBtnChange()"><button type="button" class="picker-btn" onclick="openColorPopover('Btn')">🎨</button></div><input type="text" class="hex-input" id="tBtn" maxlength="7" placeholder="#000000" oninput="onHexTyped('Btn')"></div>
-    <div class="color-pick" id="cp-btntext"><label>Txt btn</label><div class="swatch-row"><input type="color" id="cBtnText"><button type="button" class="picker-btn" onclick="openColorPopover('BtnText')">🎨</button></div><input type="text" class="hex-input" id="tBtnText" maxlength="7" placeholder="#000000" oninput="onHexTyped('BtnText')"></div>
-    <div class="color-pick" id="cp-bg"><label>Fond</label><div class="swatch-row"><input type="color" id="cBg" oninput="onBgChange()"><button type="button" class="picker-btn" onclick="openColorPopover('Bg')">🎨</button></div><input type="text" class="hex-input" id="tBg" maxlength="7" placeholder="#000000" oninput="onHexTyped('Bg')"></div>
+    <div class="color-pick" id="cp-accent"><label>Accent</label><div class="swatch-row"><input type="color" id="cAccent" oninput="onAccentChange()"><button type="button" class="picker-btn" onclick="openColorPopover('Accent',this)">🎨</button></div><input type="text" class="hex-input" id="tAccent" maxlength="7" placeholder="#000000" oninput="onHexTyped('Accent')"></div>
+    <div class="color-pick" id="cp-title"><label>Titre</label><div class="swatch-row"><input type="color" id="cTitle"><button type="button" class="picker-btn" onclick="openColorPopover('Title',this)">🎨</button></div><input type="text" class="hex-input" id="tTitle" maxlength="7" placeholder="#000000" oninput="onHexTyped('Title')"></div>
+    <div class="color-pick" id="cp-body"><label>Texte</label><div class="swatch-row"><input type="color" id="cBody"><button type="button" class="picker-btn" onclick="openColorPopover('Body',this)">🎨</button></div><input type="text" class="hex-input" id="tBody" maxlength="7" placeholder="#000000" oninput="onHexTyped('Body')"></div>
+    <div class="color-pick" id="cp-btn"><label>Bouton</label><div class="swatch-row"><input type="color" id="cBtn" oninput="onBtnChange()"><button type="button" class="picker-btn" onclick="openColorPopover('Btn',this)">🎨</button></div><input type="text" class="hex-input" id="tBtn" maxlength="7" placeholder="#000000" oninput="onHexTyped('Btn')"></div>
+    <div class="color-pick" id="cp-btntext"><label>Txt btn</label><div class="swatch-row"><input type="color" id="cBtnText"><button type="button" class="picker-btn" onclick="openColorPopover('BtnText',this)">🎨</button></div><input type="text" class="hex-input" id="tBtnText" maxlength="7" placeholder="#000000" oninput="onHexTyped('BtnText')"></div>
+    <div class="color-pick" id="cp-bg"><label>Fond</label><div class="swatch-row"><input type="color" id="cBg" oninput="onBgChange()"><button type="button" class="picker-btn" onclick="openColorPopover('Bg',this)">🎨</button></div><input type="text" class="hex-input" id="tBg" maxlength="7" placeholder="#000000" oninput="onHexTyped('Bg')"></div>
   </div>
   <div class="slider-row">
     <label>Intensité fond</label>
@@ -242,10 +242,10 @@
   <div class="sec-row">
     <div class="sec">Photo de fond <span class="badge-desktop">Desktop</span></div>
   </div>
-  <div class="img-upload" id="img1Zone" onclick="document.getElementById('img1Input').click()">
+  <label class="img-upload" id="img1Zone" for="img1Input">
     + Ajouter une photo de fond
-    <input type="file" id="img1Input" accept="image/*" onchange="loadImg(1,this)">
-  </div>
+    <input type="file" id="img1Input" accept="image/*">
+  </label>
   <div class="img-loaded" id="img1Loaded" style="display:none">
     <span id="img1Name">photo.jpg</span>
     <button onclick="removeImg(1)">✕</button>
@@ -274,7 +274,7 @@
     <div class="slider-row"><label>Épaisseur</label><input type="range" id="sepSize" min="2" max="40" value="6" oninput="render();document.getElementById('sepSizeV').textContent=this.value+'px'"><span class="slider-val" id="sepSizeV">6px</span></div>
     <!-- Photo 1 -->
     <div style="font-size:.72em;color:var(--text2);margin-bottom:5px;font-weight:600">Photo gauche / haut</div>
-    <div class="img-upload" id="img2Zone" onclick="document.getElementById('img2Input').click()">+ Photo 1<input type="file" id="img2Input" accept="image/*" onchange="loadImg(2,this)"></div>
+    <label class="img-upload" id="img2Zone" for="img2Input">+ Photo 1<input type="file" id="img2Input" accept="image/*"></label>
     <div class="img-loaded" id="img2Loaded" style="display:none"><span id="img2Name">photo1.jpg</span><button onclick="removeImg(2)">✕</button></div>
     <div class="slider-row"><label>Opacité</label><input type="range" id="img2Op" min="0" max="100" value="100" oninput="render();document.getElementById('img2OpV').textContent=this.value+'%'"><span class="slider-val" id="img2OpV">100%</span></div>
     <div class="slider-row"><label>Zoom</label><input type="range" id="img2Zoom" min="80" max="220" value="100" oninput="render();document.getElementById('img2ZV').textContent=this.value+'%'"><span class="slider-val" id="img2ZV">100%</span></div>
@@ -283,7 +283,7 @@
     <div class="toggle-row"><label class="lbl">N&B photo 1</label><label class="toggle"><input type="checkbox" id="img2BW" onchange="render()"><span class="toggle-slider"></span></label></div>
     <!-- Photo 2 -->
     <div style="font-size:.72em;color:var(--text2);margin:8px 0 5px;font-weight:600">Photo droite / bas</div>
-    <div class="img-upload" id="img3Zone" onclick="document.getElementById('img3Input').click()">+ Photo 2<input type="file" id="img3Input" accept="image/*" onchange="loadImg(3,this)"></div>
+    <label class="img-upload" id="img3Zone" for="img3Input">+ Photo 2<input type="file" id="img3Input" accept="image/*"></label>
     <div class="img-loaded" id="img3Loaded" style="display:none"><span id="img3Name">photo2.jpg</span><button onclick="removeImg(3)">✕</button></div>
     <div class="slider-row"><label>Opacité</label><input type="range" id="img3Op" min="0" max="100" value="100" oninput="render();document.getElementById('img3OpV').textContent=this.value+'%'"><span class="slider-val" id="img3OpV">100%</span></div>
     <div class="slider-row"><label>Zoom</label><input type="range" id="img3Zoom" min="80" max="220" value="100" oninput="render();document.getElementById('img3ZV').textContent=this.value+'%'"><span class="slider-val" id="img3ZV">100%</span></div>
@@ -399,7 +399,9 @@ function loadImg(n,input){
   reader.readAsDataURL(file);
 }
 function removeImg(n){
-  imgs[n]=null;document.getElementById(`img${n}Input`).value='';
+  imgs[n]=null;
+  const inputEl=document.getElementById(`img${n}Input`);
+  if(inputEl) inputEl.value='';
   document.getElementById(`img${n}Zone`).style.display='block';
   document.getElementById(`img${n}Loaded`).style.display='none';
   if(n===1)document.getElementById('img1Controls').style.display='none';
@@ -961,7 +963,7 @@ function hslToHex(h,s,l){
   return'#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 
-function openColorPopover(key){
+function openColorPopover(key,anchorEl){
   currentPopKey=key;
   const hexEl=document.getElementById('t'+key);
   const startHex=isValidHex(hexEl.value)?hexEl.value:'#06B6D4';
@@ -971,11 +973,37 @@ function openColorPopover(key){
   document.getElementById('popLight').value=hsl.l;
   document.getElementById('popLabel').textContent=KEY_LABELS[key]||'';
   updatePopoverPreview();
-  document.getElementById('colorPopover').classList.add('open');
+  const pop=document.getElementById('colorPopover');
+  pop.classList.add('open');
+  positionColorPopover(anchorEl);
+  setTimeout(()=>document.addEventListener('pointerdown',colorPopoverOutsideClick,true),0);
+}
+function positionColorPopover(anchorEl){
+  const pop=document.getElementById('colorPopover');
+  if(!anchorEl){pop.style.top='20px';pop.style.left='20px';return;}
+  const margin=10;
+  const scrollX=window.scrollX||window.pageXOffset||0;
+  const scrollY=window.scrollY||window.pageYOffset||0;
+  const vw=document.documentElement.clientWidth||window.innerWidth;
+  const rect=anchorEl.getBoundingClientRect();
+  const popW=pop.offsetWidth||300;
+  let left=rect.left+scrollX;
+  if(left+popW>scrollX+vw-margin) left=scrollX+vw-popW-margin;
+  if(left<scrollX+margin) left=scrollX+margin;
+  const top=rect.bottom+scrollY+margin;
+  pop.style.left=left+'px';
+  pop.style.top=top+'px';
+}
+function colorPopoverOutsideClick(e){
+  const pop=document.getElementById('colorPopover');
+  if(pop.classList.contains('open')&&!pop.contains(e.target)){
+    closeColorPopover();
+  }
 }
 function closeColorPopover(){
   document.getElementById('colorPopover').classList.remove('open');
   currentPopKey=null;
+  document.removeEventListener('pointerdown',colorPopoverOutsideClick,true);
 }
 function updatePopoverPreview(){
   const h=+document.getElementById('popHue').value;
@@ -1007,9 +1035,6 @@ document.getElementById('popHex').addEventListener('input',function(){
   document.getElementById('popLight').value=hsl.l;
   updatePopoverPreview();
 });
-document.getElementById('colorPopover').addEventListener('click',function(e){
-  if(e.target===this) closeColorPopover(); // clic hors du panneau = fermer
-});
 
 function syncPickers(t){
   document.getElementById('cAccent').value=ovAccent||t.accent;
@@ -1025,6 +1050,48 @@ function syncPickers(t){
   document.getElementById('tBtn').value=document.getElementById('cBtn').value;
   document.getElementById('tBtnText').value=document.getElementById('cBtnText').value;
 }
+
+// ── ROBUSTESSE MOBILE : input fichier bloqué après annulation ───────────
+// Bug WebKit connu : un <input type="file"> situé dans une iframe cross-origin
+// (cas de FlashFlyer, embarqué via flashtools.fr) peut rester "verrouillé"
+// après une annulation du sélecteur natif — aucun déclenchement ultérieur
+// (label ou JS) ne rouvre alors le picker. Solution : recréer le nœud DOM de
+// l'input dès qu'une annulation est détectée (événement `cancel`, avec filet
+// de sécurité au retour de focus pour les navigateurs plus anciens).
+const __imgPickerOpenedAt={1:0,2:0,3:0};
+
+function bindImgInput(n){
+  const input=document.getElementById('img'+n+'Input');
+  if(!input)return;
+  input.onchange=function(e){
+    const file=this.files[0];
+    if(file) loadImg(n,this);
+  };
+  input.onclick=function(){this.value=null;__imgPickerOpenedAt[n]=Date.now();};
+  input.oncancel=function(){recreateImgInput(n);};
+}
+function recreateImgInput(n){
+  const old=document.getElementById('img'+n+'Input');
+  if(!old)return;
+  const fresh=old.cloneNode(true);
+  fresh.value='';
+  old.parentNode.replaceChild(fresh,old);
+  bindImgInput(n);
+}
+window.addEventListener('focus',function(){
+  [1,2,3].forEach(n=>{
+    if(!__imgPickerOpenedAt[n])return;
+    const elapsed=Date.now()-__imgPickerOpenedAt[n];
+    __imgPickerOpenedAt[n]=0;
+    if(elapsed>300){
+      setTimeout(()=>{
+        const cur=document.getElementById('img'+n+'Input');
+        if(cur&&(!cur.files||cur.files.length===0)) recreateImgInput(n);
+      },250);
+    }
+  });
+});
+[1,2,3].forEach(bindImgInput);
 
 // ── BUILD UI ─────────────────────────────────────────────
 function buildThemes(){
