@@ -655,6 +655,8 @@
     <script>
         let canvas, ctx, cropCanvas, cropCtx;
         let originalImage = null;
+        let originalFileSize = 0; // taille réelle du fichier importé (avant tout traitement)
+        let imageWasEdited = false; // true dès qu'une modification (crop/resize/rotation/filtre/ajustement) a été appliquée
         let currentImage = null;
         
         let cropActive = false;
@@ -678,6 +680,7 @@
         let undoStack = [];
 
         function pushUndo() {
+            imageWasEdited = true;
             const snap = document.createElement('canvas');
             snap.width = currentImage.width;
             snap.height = currentImage.height;
@@ -828,6 +831,11 @@
                             originalImage = resizedImg;
                             currentImage = resizedImg;
                             undoStack = [];
+                            // Le fichier a été pré-redimensionné silencieusement : la taille réelle
+                            // importée ne correspond plus aux pixels actuels, donc on ne peut pas
+                            // s'y fier pour "Taille originale" — on retombe sur un ré-encodage.
+                            originalFileSize = 0;
+                            imageWasEdited = true;
                             drawImage(resizedImg);
                             document.getElementById('uploadZone').style.display = 'none';
                             document.getElementById('canvasContainer').style.display = 'flex';
@@ -839,6 +847,8 @@
                     originalImage = img;
                     currentImage = img;
                     undoStack = [];
+                    originalFileSize = file.size;
+                    imageWasEdited = false;
                     drawImage(img);
                     document.getElementById('uploadZone').style.display = 'none';
                     document.getElementById('canvasContainer').style.display = 'flex';
@@ -1202,6 +1212,7 @@
             if (!originalImage) return;
             currentImage = originalImage;
             undoStack = [];
+            imageWasEdited = originalFileSize === 0; // reste "édité" seulement si on n'a pas de taille de référence fiable
             resetAdjustState();
             drawImage(originalImage);
             updateStats();
@@ -1339,15 +1350,27 @@
             const quality = parseInt(document.getElementById('quality').value);
             document.getElementById('qualityValue').textContent = quality + '%';
             const compressedDataUrl = canvas.toDataURL('image/jpeg', quality / 100);
-            const originalDataUrl = canvas.toDataURL('image/png');
-            getBlobSize(originalDataUrl, function(originalSize) {
-                getBlobSize(compressedDataUrl, function(compressedSize) {
-                    const gain = Math.max(0, Math.round(((originalSize - compressedSize) / originalSize) * 100));
-                    document.getElementById('originalSize').textContent = formatBytes(originalSize);
-                    document.getElementById('compressedSize').textContent = formatBytes(compressedSize);
-                    document.getElementById('compressionGain').textContent = gain + '% économisés';
-                });
+            getBlobSize(compressedDataUrl, function(compressedSize) {
+                if (!imageWasEdited && originalFileSize > 0) {
+                    // Image non modifiée depuis l'import : on affiche la vraie taille du fichier
+                    renderCompressionStats(originalFileSize, compressedSize);
+                } else {
+                    // Image modifiée (recadrage, rotation, filtre...) : la taille du fichier importé
+                    // ne correspond plus aux pixels actuels. On compare avec un JPEG qualité maximale
+                    // plutôt qu'un PNG, qui gonfle artificiellement la taille des photos (sans perte).
+                    const originalDataUrl = canvas.toDataURL('image/jpeg', 1.0);
+                    getBlobSize(originalDataUrl, function(originalSize) {
+                        renderCompressionStats(originalSize, compressedSize);
+                    });
+                }
             });
+        }
+
+        function renderCompressionStats(originalSize, compressedSize) {
+            const gain = Math.max(0, Math.round(((originalSize - compressedSize) / originalSize) * 100));
+            document.getElementById('originalSize').textContent = formatBytes(originalSize);
+            document.getElementById('compressedSize').textContent = formatBytes(compressedSize);
+            document.getElementById('compressionGain').textContent = gain + '% économisés';
         }
         
         function downloadCompressed() {
