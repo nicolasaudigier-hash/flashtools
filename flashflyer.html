@@ -244,7 +244,7 @@
   </div>
   <label class="img-upload" id="img1Zone" for="img1Input">
     + Ajouter une photo de fond
-    <input type="file" id="img1Input" accept="image/*">
+    <input type="file" id="img1Input">
   </label>
   <div class="img-loaded" id="img1Loaded" style="display:none">
     <span id="img1Name">photo.jpg</span>
@@ -274,7 +274,7 @@
     <div class="slider-row"><label>Épaisseur</label><input type="range" id="sepSize" min="2" max="40" value="6" oninput="render();document.getElementById('sepSizeV').textContent=this.value+'px'"><span class="slider-val" id="sepSizeV">6px</span></div>
     <!-- Photo 1 -->
     <div style="font-size:.72em;color:var(--text2);margin-bottom:5px;font-weight:600">Photo gauche / haut</div>
-    <label class="img-upload" id="img2Zone" for="img2Input">+ Photo 1<input type="file" id="img2Input" accept="image/*"></label>
+    <label class="img-upload" id="img2Zone" for="img2Input">+ Photo 1<input type="file" id="img2Input"></label>
     <div class="img-loaded" id="img2Loaded" style="display:none"><span id="img2Name">photo1.jpg</span><button onclick="removeImg(2)">✕</button></div>
     <div class="slider-row"><label>Opacité</label><input type="range" id="img2Op" min="0" max="100" value="100" oninput="render();document.getElementById('img2OpV').textContent=this.value+'%'"><span class="slider-val" id="img2OpV">100%</span></div>
     <div class="slider-row"><label>Zoom</label><input type="range" id="img2Zoom" min="80" max="220" value="100" oninput="render();document.getElementById('img2ZV').textContent=this.value+'%'"><span class="slider-val" id="img2ZV">100%</span></div>
@@ -283,7 +283,7 @@
     <div class="toggle-row"><label class="lbl">N&B photo 1</label><label class="toggle"><input type="checkbox" id="img2BW" onchange="render()"><span class="toggle-slider"></span></label></div>
     <!-- Photo 2 -->
     <div style="font-size:.72em;color:var(--text2);margin:8px 0 5px;font-weight:600">Photo droite / bas</div>
-    <label class="img-upload" id="img3Zone" for="img3Input">+ Photo 2<input type="file" id="img3Input" accept="image/*"></label>
+    <label class="img-upload" id="img3Zone" for="img3Input">+ Photo 2<input type="file" id="img3Input"></label>
     <div class="img-loaded" id="img3Loaded" style="display:none"><span id="img3Name">photo2.jpg</span><button onclick="removeImg(3)">✕</button></div>
     <div class="slider-row"><label>Opacité</label><input type="range" id="img3Op" min="0" max="100" value="100" oninput="render();document.getElementById('img3OpV').textContent=this.value+'%'"><span class="slider-val" id="img3OpV">100%</span></div>
     <div class="slider-row"><label>Zoom</label><input type="range" id="img3Zoom" min="80" max="220" value="100" oninput="render();document.getElementById('img3ZV').textContent=this.value+'%'"><span class="slider-val" id="img3ZV">100%</span></div>
@@ -1065,7 +1065,13 @@ function bindImgInput(n){
   if(!input)return;
   input.onchange=function(e){
     const file=this.files[0];
-    if(file) loadImg(n,this);
+    if(!file)return;
+    if(!file.type.startsWith('image/')){
+      alert('Ce fichier n\'est pas une image ('+(file.type||'type inconnu')+'). Merci de choisir un fichier JPG, PNG, WebP...');
+      this.value='';
+      return;
+    }
+    loadImg(n,this);
   };
   input.onclick=function(){this.value=null;__imgPickerOpenedAt[n]=Date.now();};
   input.oncancel=function(){recreateImgInput(n);};
