@@ -316,6 +316,11 @@
                             <div class="radio-group">
                                 <button class="btn btn-secondary" type="button" onclick="addEditBlock('mask')">⬜ Masque + Texte</button>
                                 <button class="btn btn-secondary" type="button" onclick="addEditBlock('text')">🔤 Texte libre</button>
+                                <button class="btn btn-secondary" type="button" id="detect-word-btn" onclick="startDetectWord()">🎯 Détecter un mot</button>
+                            </div>
+                            <div class="info-box" id="detect-word-hint" style="display:none;margin-top:10px;margin-bottom:0">
+                                <strong>🎯 Mode détection actif</strong>Touchez ou cliquez directement sur le mot à remplacer dans la page ci-dessous. La reconnaissance de texte (OCR) crée automatiquement un bloc masque + texte aligné pile sur le mot détecté.
+                                <button class="btn btn-secondary" type="button" style="margin-top:10px" onclick="cancelDetectWord()">Annuler</button>
                             </div>
                         </div>
                         <div class="option-row" style="margin-bottom:0">
@@ -336,7 +341,7 @@
                         <button class="btn btn-secondary" onclick="resetEdit()">↻ Recommencer</button>
                     </div>
                 </div>
-                <div id="edit-loading" class="loading"><div class="spinner"></div><p>Traitement…</p></div>
+                <div id="edit-loading" class="loading"><div class="spinner"></div><p id="edit-loading-msg">Traitement…</p></div>
             </div>
 
             <!-- TEXTE → PDF -->
@@ -412,6 +417,17 @@
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+// ── CHARGEMENT DIFFÉRÉ DE SCRIPTS TIERS ──────────────────
+// Utilisé pour Tesseract.js (OCR) : ~2-3 Mo, chargé uniquement au premier
+// clic sur "Détecter un mot", jamais au chargement initial de la page.
+function loadScript(src){
+    return new Promise((res,rej)=>{
+        if(document.querySelector(`script[src="${src}"]`)){res();return;}
+        const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;
+        document.head.appendChild(s);
+    });
+}
+
 // ── ROBUSTESSE MOBILE : inputs file "verrouillés" après annulation ────────
 // Bug WebKit connu : un <input type="file"> situé dans une iframe cross-origin
 // (le cas de chaque outil FlashTools intégré via systeme.io) peut rester
@@ -466,7 +482,7 @@ const guides={
     'image-to-pdf':`<div class="guide-section"><h4>Cas d'usage</h4><ul><li>Portfolio professionnel</li><li>Numérisation de documents</li><li>Présentation visuelle</li></ul></div><div class="guide-section"><h4>Options</h4><p><strong>Orientation</strong> : Portrait (vertical) ou Paysage</p><p><strong>Marges</strong> : Aucune = pleine page</p></div><div class="info-box"><strong>Note</strong>1 image = 1 page PDF.</div>`,
     'pdf-to-image':`<div class="guide-section"><h4>Cas d'usage</h4><ul><li>Réseaux sociaux : 1 page = 1 post</li><li>Extraire un graphique</li><li>Miniatures pour site web</li></ul></div><div class="guide-section"><h4>JPG ou PNG ?</h4><p><strong>JPG</strong> : léger, pas de transparence</p><p><strong>PNG</strong> : qualité max, transparence</p></div>`,
     'unlock':`<div class="guide-section"><h4>Types de protection</h4><p><strong>Retirable :</strong></p><ul><li>Impression non autorisée</li><li>Copie de texte désactivée</li></ul><p><strong>Impossible à retirer :</strong></p><ul><li>Mot de passe à l'ouverture</li></ul></div><div class="info-box warning"><strong>Légalité</strong>Utilisez uniquement sur vos propres documents.</div>`,
-    'edit':`<div class="guide-section"><h4>Ce que ça fait</h4><ul><li>Recouvre une zone de texte par un masque blanc puis écrit un nouveau texte par-dessus</li><li>Ajoute du texte libre n'importe où sur la page</li><li>Fonctionne sur une page PDF (rendue en image) ou une image directement</li></ul></div><div class="guide-section"><h4>Positionnement</h4><ul><li>Chaque nouveau bloc apparaît en haut de la zone visible, jamais caché au milieu du texte</li><li>Glissez pour déplacer, tirez le coin cyan pour redimensionner</li></ul></div><div class="guide-section"><h4>Typographie</h4><ul><li>13 polices (système + web) — les polices web (Roboto, Merriweather...) s'affichent identiquement chez tous les lecteurs</li><li>Taille libre de 6 à 96pt, gras, italique, souligné</li><li>Couleur du texte et du surlignage personnalisables</li><li>Surlignage "lettre uniquement" (collé au texte) ou "cadre étendu" (tout le bloc)</li><li>Alignement du texte à gauche, au centre ou à droite dans le bloc</li></ul></div><div class="guide-section"><h4>Zoom</h4><ul><li>Boutons +/- ou pincement à deux doigts sur mobile</li><li>"Ajuster" revient au zoom automatique</li></ul></div><div class="guide-section"><h4>Rendu scan</h4><p>Case "Uniformiser en rendu scan" : applique un léger niveaux de gris + contraste sur toute la page pour que les zones ajoutées se fondent mieux avec un document scanné/photographié.</p></div><div class="guide-section"><h4>Limites</h4><ul><li>Ce n'est pas une édition "en place" du texte PDF natif (police/flux d'origine)</li><li>Le rendu final d'un PDF édité redevient une image (comme un scan)</li></ul></div>`,
+    'edit':`<div class="guide-section"><h4>Ce que ça fait</h4><ul><li>Recouvre une zone de texte par un masque blanc puis écrit un nouveau texte par-dessus</li><li>Ajoute du texte libre n'importe où sur la page</li><li>Fonctionne sur une page PDF (rendue en image) ou une image directement</li></ul></div><div class="guide-section"><h4>🎯 Détecter un mot (OCR)</h4><ul><li>Touchez/cliquez directement sur le mot à remplacer dans la page</li><li>La reconnaissance de texte (Tesseract.js, 100% locale) retrouve le mot le plus proche du point touché</li><li>Un bloc masque + texte est créé automatiquement, déjà positionné et dimensionné sur le mot détecté, avec le texte reconnu pré-rempli</li><li>Ajustez ensuite le texte, la position ou la taille si besoin — l'alignement de départ est déjà quasi pixel-parfait</li><li>Premier usage : téléchargement ponctuel du moteur OCR (~2-3 Mo), mis en cache ensuite</li></ul></div><div class="guide-section"><h4>Positionnement manuel</h4><ul><li>Chaque nouveau bloc apparaît en haut de la zone visible, jamais caché au milieu du texte</li><li>Glissez pour déplacer, tirez le coin cyan pour redimensionner</li></ul></div><div class="guide-section"><h4>Typographie</h4><ul><li>13 polices (système + web) — les polices web (Roboto, Merriweather...) s'affichent identiquement chez tous les lecteurs</li><li>Taille libre de 6 à 96pt, gras, italique, souligné</li><li>Couleur du texte et du surlignage personnalisables</li><li>Surlignage "lettre uniquement" (collé au texte) ou "cadre étendu" (tout le bloc)</li><li>Alignement du texte à gauche, au centre ou à droite dans le bloc</li></ul></div><div class="guide-section"><h4>Zoom</h4><ul><li>Boutons +/- ou pincement à deux doigts sur mobile</li><li>"Ajuster" revient au zoom automatique</li></ul></div><div class="guide-section"><h4>Rendu scan</h4><p>Case "Uniformiser en rendu scan" : applique un léger niveaux de gris + contraste sur toute la page pour que les zones ajoutées se fondent mieux avec un document scanné/photographié.</p></div><div class="guide-section"><h4>Limites</h4><ul><li>Ce n'est pas une édition "en place" du texte PDF natif (police/flux d'origine)</li><li>Le rendu final d'un PDF édité redevient une image (comme un scan)</li><li>La détection OCR trouve la position du mot, pas sa police d'origine — choisissez la police manuellement si besoin</li></ul></div>`,
     'text-to-pdf':`<div class="guide-section"><h4>Détection automatique</h4><ul><li><strong>Chapitre 1, PARTIE I</strong> → Titre principal</li><li><strong>1. Titre</strong> → Sous-titre</li><li><strong>1.1 Section</strong> → Sous-section</li><li><strong>MAJUSCULES</strong> → Titre</li></ul></div><div class="guide-section"><h4>Conseils</h4><ul><li>Lignes vides pour séparer les paragraphes</li><li>Titres courts sans ponctuation finale</li></ul></div>`,
     'html-to-pdf':`<div class="guide-section"><h4>Balises supportées</h4><ul><li>Titres : h1, h2, h3</li><li>Texte : p, b, i, u, br</li><li>Listes : ul, ol, li</li></ul></div><div class="info-box warning"><strong>Limitations</strong>CSS, images et tableaux non supportés. Pour HTML complexe : Ctrl+P dans le navigateur.</div>`
 };
@@ -776,6 +792,7 @@ async function processEditFile(file){
     document.getElementById('edit-loading').classList.add('active');
     try{
         editBlocks=[];editCurPage=0;editPages=[];editPdfDoc=null;editIsImage=false;editZoom=1;
+        cancelDetectWord();
         if(file.type==='application/pdf'||file.name.toLowerCase().endsWith('.pdf')){
             const ab=await file.arrayBuffer();
             editPdfDoc=await pdfjsLib.getDocument({data:ab}).promise;
@@ -829,8 +846,8 @@ async function renderEditPage(){
     updateZoomLabel();
 }
 
-function editPrevPage(){if(editCurPage>0){editCurPage--;renderEditPage();}}
-function editNextPage(){if(editCurPage<editPages.length-1){editCurPage++;renderEditPage();}}
+function editPrevPage(){if(editCurPage>0){editCurPage--;cancelDetectWord();renderEditPage();}}
+function editNextPage(){if(editCurPage<editPages.length-1){editCurPage++;cancelDetectWord();renderEditPage();}}
 
 function addEditBlock(type){
     const wrap=document.getElementById('edit-canvas-wrap');
@@ -953,6 +970,146 @@ function makeResizable(handle,el,block){
     handle.addEventListener('touchstart',e=>{e.stopPropagation();const t=e.touches[0];start(t.clientX,t.clientY);},{passive:true});
     handle.addEventListener('touchmove',e=>{if(!resizing)return;e.stopPropagation();const t=e.touches[0];move(t.clientX,t.clientY);e.preventDefault();},{passive:false});
     handle.addEventListener('touchend',e=>{e.stopPropagation();end();});
+}
+
+// ── 🎯 DÉTECTER UN MOT (OCR local via Tesseract.js) ──────────────────
+// Principe : l'utilisateur touche un mot dans la page rendue → on découpe
+// une petite zone autour du point touché (pas toute la page, pour rester
+// rapide) → Tesseract.js (WebAssembly, 100% local, même politique de
+// confidentialité que le reste de l'app) reconnaît les mots de cette zone
+// avec leur position exacte → on choisit le mot dont le centre est le plus
+// proche du point touché → on crée un bloc "masque + texte" déjà positionné
+// et dimensionné sur ce mot, avec le texte reconnu pré-rempli.
+let detectWordMode=false;
+let tesseractWorkerPromise=null;
+
+function getTesseractWorker(){
+    if(!tesseractWorkerPromise){
+        tesseractWorkerPromise=loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js')
+            .then(()=>Tesseract.createWorker('fra'));
+    }
+    return tesseractWorkerPromise;
+}
+
+function startDetectWord(){
+    if(!editBaseCanvas){return;}
+    detectWordMode=true;
+    document.getElementById('edit-canvas-wrap').style.cursor='crosshair';
+    document.getElementById('detect-word-hint').style.display='block';
+    document.getElementById('detect-word-btn').classList.add('active');
+    // Précharger le moteur OCR en tâche de fond dès l'activation du mode,
+    // pour que le premier clic sur un mot soit plus rapide.
+    getTesseractWorker().catch(()=>{});
+}
+function cancelDetectWord(){
+    detectWordMode=false;
+    const wrap=document.getElementById('edit-canvas-wrap');
+    if(wrap) wrap.style.cursor='';
+    const hint=document.getElementById('detect-word-hint');
+    if(hint) hint.style.display='none';
+    const btn=document.getElementById('detect-word-btn');
+    if(btn) btn.classList.remove('active');
+}
+
+function wrapEventXY(e){
+    const wrap=document.getElementById('edit-canvas-wrap');
+    const rect=wrap.getBoundingClientRect();
+    let clientX,clientY;
+    if(e.changedTouches&&e.changedTouches.length){clientX=e.changedTouches[0].clientX;clientY=e.changedTouches[0].clientY;}
+    else{clientX=e.clientX;clientY=e.clientY;}
+    return{x:clientX-rect.left,y:clientY-rect.top};
+}
+
+async function onDetectWordTap(e){
+    if(!detectWordMode)return;
+    e.preventDefault();e.stopPropagation();
+    const{x,y}=wrapEventXY(e);
+    detectWordMode=false;
+    document.getElementById('edit-canvas-wrap').style.cursor='';
+    document.getElementById('detect-word-hint').style.display='none';
+    document.getElementById('detect-word-btn').classList.remove('active');
+    await detectWordAt(x,y);
+}
+(function attachDetectWordListeners(){
+    const wrap=document.getElementById('edit-canvas-wrap');
+    if(!wrap)return;
+    wrap.addEventListener('click',onDetectWordTap);
+    wrap.addEventListener('touchend',onDetectWordTap,{passive:false});
+})();
+
+async function detectWordAt(clickX,clickY){
+    const baseCv=document.getElementById('edit-base-canvas');
+    if(!baseCv){showEditStatus('❌ Page non chargée.',true);return;}
+    document.getElementById('edit-loading').classList.add('active');
+    document.getElementById('edit-loading-msg').textContent='Analyse du texte (première fois : téléchargement du moteur OCR)…';
+    showEditStatus('🎯 Analyse du texte en cours…',false);
+    try{
+        const worker=await getTesseractWorker();
+
+        // Zone recadrée autour du point touché — assez grande pour capter le mot
+        // en entier même s'il est long, assez petite pour rester rapide.
+        const cropW=300,cropH=90;
+        const sx=Math.max(0,Math.min(baseCv.width-1,clickX-cropW/2));
+        const sy=Math.max(0,Math.min(baseCv.height-1,clickY-cropH/2));
+        const sw=Math.min(cropW,baseCv.width-sx);
+        const sh=Math.min(cropH,baseCv.height-sy);
+
+        // Agrandissement x2 : améliore nettement la fiabilité de l'OCR sur du
+        // texte de petite taille, sans coût significatif vu la petite zone.
+        const upscale=2;
+        const crop=document.createElement('canvas');
+        crop.width=Math.round(sw*upscale);crop.height=Math.round(sh*upscale);
+        const cctx=crop.getContext('2d');
+        cctx.imageSmoothingEnabled=true;
+        cctx.drawImage(baseCv,sx,sy,sw,sh,0,0,crop.width,crop.height);
+
+        document.getElementById('edit-loading-msg').textContent='Reconnaissance du texte…';
+        const{data}=await worker.recognize(crop);
+        const words=(data.words||[]).filter(w=>w.text&&w.text.trim());
+
+        if(!words.length){
+            showEditStatus('❌ Aucun mot détecté à cet endroit. Essayez de cliquer plus précisément sur le texte, ou zoomez pour plus de précision.',true);
+            document.getElementById('edit-loading').classList.remove('active');
+            return;
+        }
+
+        const clickInCropX=(clickX-sx)*upscale;
+        const clickInCropY=(clickY-sy)*upscale;
+        let best=null,bestDist=Infinity;
+        words.forEach(w=>{
+            const b=w.bbox;
+            const cx=(b.x0+b.x1)/2,cy=(b.y0+b.y1)/2;
+            const dx=cx-clickInCropX,dy=cy-clickInCropY;
+            const d=dx*dx+dy*dy;
+            if(d<bestDist){bestDist=d;best=w;}
+        });
+
+        const bx0=sx+best.bbox.x0/upscale;
+        const by0=sy+best.bbox.y0/upscale;
+        const bw=(best.bbox.x1-best.bbox.x0)/upscale;
+        const bh=(best.bbox.y1-best.bbox.y0)/upscale;
+        const pad=Math.max(2,bh*0.15);
+
+        const curPage=editIsImage?0:editCurPage;
+        const block={
+            id:'b'+Date.now()+Math.random().toString(36).slice(2,6),
+            type:'mask',page:curPage,
+            x:Math.max(0,bx0-pad),y:Math.max(0,by0-pad),
+            w:bw+pad*2,h:bh+pad*2,
+            text:best.text.trim(),
+            fontSize:Math.max(6,Math.round(bh*0.78)),
+            bold:false,italic:false,fontFamily:'Helvetica',
+            inkIntensity:100,underlineThickness:2,strokeWidth:0,color:'#000000',
+            highlight:false,highlightColor:'#FFE066',highlightMode:'text',align:'left'
+        };
+        editBlocks.push(block);
+        renderEditBlocks();renderEditBlocksList();
+        showEditStatus('✅ Mot détecté : « '+best.text.trim()+' » — bloc créé et aligné. Corrigez le texte si besoin, ou glissez-le pour affiner.',false);
+    }catch(err){
+        console.error(err);
+        showEditStatus('❌ Erreur de détection : '+err.message,true);
+    }
+    document.getElementById('edit-loading').classList.remove('active');
 }
 
 // ── SYNCHRONISATION DES DEUX BARRES DE DÉFILEMENT HORIZONTALES ──
@@ -1207,6 +1364,7 @@ async function exportEdited(){
     if(editIsImage && !editPages.length){showEditStatus('Aucune image chargée.',true);return;}
     if(!editBaseCanvas){showEditStatus('La page n\'est pas encore prête, réessayez dans un instant.',true);return;}
     document.getElementById('edit-loading').classList.add('active');
+    document.getElementById('edit-loading-msg').textContent='Traitement…';
     try{
         await ensureWebFontsLoaded(editBlocks);
         const scanEffect=document.getElementById('edit-scan-effect').checked;
@@ -1298,6 +1456,7 @@ function showEditStatus(msg,isError){
 
 function resetEdit(){
     editPdfDoc=null;editPages=[];editCurPage=0;editBlocks=[];editIsImage=false;editBaseCanvas=null;editZoom=1;
+    cancelDetectWord();
     document.getElementById('edit-input-pdf').value='';
     document.getElementById('edit-input-image').value='';
     document.getElementById('edit-workspace').style.display='none';
