@@ -21,7 +21,7 @@
         }#flashpdf-app{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:16px;line-height:1.6;}#flashpdf-app .container{max-width:1800px;margin:0 auto;}#flashpdf-app /* HEADER */
         .header{background:var(--surface);padding:32px 24px;border-radius:18px;margin-bottom:24px;text-align:center;border:1px solid var(--border2);}#flashpdf-app .header h1{font-family:'Syne',sans-serif;font-size:clamp(1.8em,5vw,2.8em);font-weight:800;line-height:1.3;margin-bottom:8px;}#flashpdf-app .header h1 svg{display:inline-block;vertical-align:middle;}#flashpdf-app .header p{color:var(--text2);font-size:1em;}#flashpdf-app /* ONGLETS MOBILE */
         .mobile-tabs{display:none;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-direction:row;gap:7px;padding-bottom:10px;margin-bottom:16px;}#flashpdf-app .mobile-tabs::-webkit-scrollbar{display:none;}#flashpdf-app .tab-btn{flex-shrink:0;padding:9px 14px;border:1px solid var(--border2);border-radius:30px;background:transparent;cursor:pointer;font-size:.82em;font-weight:600;white-space:nowrap;color:var(--text);font-family:inherit;transition:all .2s;}#flashpdf-app .tab-btn.active{border-color:var(--cyan);background:rgba(6,182,212,.15);color:var(--cyan);}#flashpdf-app /* LAYOUT */
-        .main-grid{display:grid;grid-template-columns:260px 1fr 360px;gap:22px;}#flashpdf-app /* SIDEBAR */
+        .main-grid{display:grid;grid-template-columns:260px 1fr;gap:22px;}#flashpdf-app /* SIDEBAR */
         .sidebar{background:var(--surface);padding:22px;border-radius:18px;border:1px solid var(--border2);height:fit-content;position:sticky;top:16px;}#flashpdf-app .sidebar h3{margin-bottom:18px;color:var(--text);font-size:1.1em;font-family:'Syne',sans-serif;}#flashpdf-app .tool-cat-title{font-size:.7em;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin:16px 0 8px 4px;}#flashpdf-app .tool-cat-title:first-of-type{margin-top:0;}#flashpdf-app .tool-btn{width:100%;padding:12px 14px;margin-bottom:7px;border:1.5px solid var(--border2);border-radius:11px;background:var(--bg2);cursor:pointer;font-size:.87em;font-weight:600;text-align:left;transition:all .25s;display:flex;align-items:center;gap:9px;color:var(--text);font-family:inherit;min-height:44px;}#flashpdf-app .tool-btn:hover{border-color:var(--cyan);background:rgba(6,182,212,.07);}#flashpdf-app .tool-btn.active{border-color:var(--cyan);background:linear-gradient(135deg,rgba(6,182,212,.15),rgba(139,92,246,.15));color:var(--cyan);}#flashpdf-app /* MAIN PANEL */
         .main-panel{background:var(--surface);padding:32px;border-radius:18px;border:1px solid var(--border2);min-height:500px;}#flashpdf-app .main-panel h2{color:var(--text);margin-bottom:22px;display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:1.3em;}#flashpdf-app /* UPLOAD ZONE */
         .upload-zone{display:block;border:2px dashed var(--border2);border-radius:14px;padding:40px 24px;text-align:center;cursor:pointer;background:var(--bg2);transition:all .3s;margin-bottom:22px;}#flashpdf-app .upload-zone:hover, #flashpdf-app .upload-zone.drag-over{border-color:var(--cyan);background:rgba(6,182,212,.06);}#flashpdf-app .upload-icon{font-size:2.8em;margin-bottom:14px;}#flashpdf-app .upload-zone h3{font-size:1.15em;margin-bottom:8px;color:var(--text);}#flashpdf-app .upload-zone p{color:var(--text2);font-size:.9em;}#flashpdf-app input[type="file"]{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}#flashpdf-app /* FILES PREVIEW */
@@ -36,10 +36,10 @@
         .privacy-banner{background:linear-gradient(135deg,#0F6E56,#085041);color:#fff;padding:10px 16px;border-radius:11px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:.86em;}#flashpdf-app .privacy-banner strong{font-weight:700;}#flashpdf-app .privacy-detail{opacity:.9;}
 
         @media(max-width:480px){#flashpdf-app .header p{font-size:.82em;}#flashpdf-app .privacy-detail{display:none;}
-        }#flashpdf-app .guide-panel{background:var(--surface);padding:24px;border-radius:18px;border:1px solid var(--border2);height:fit-content;}#flashpdf-app .guide-toggle{display:none;width:100%;padding:11px 16px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.3);border-radius:10px;color:var(--cyan);font-weight:600;font-size:.88em;cursor:pointer;font-family:inherit;margin-top:12px;text-align:left;}
-        @media(max-width:1100px){#flashpdf-app .guide-toggle{display:block;}}#flashpdf-app .guide-panel.hidden{display:none;}#flashpdf-app .guide-panel h3{font-size:1.1em;margin-bottom:16px;color:var(--text);font-family:'Syne',sans-serif;}#flashpdf-app .guide-section{margin-bottom:16px;padding:15px;background:var(--bg2);border-radius:10px;border-left:3px solid var(--cyan);}#flashpdf-app .guide-section h4{font-size:.92em;margin-bottom:10px;color:var(--cyan);}#flashpdf-app .guide-section p{color:var(--text2);font-size:.83em;line-height:1.6;margin-bottom:8px;}#flashpdf-app .guide-section ul{margin-left:18px;color:var(--text2);font-size:.83em;}#flashpdf-app .guide-section li{margin-bottom:5px;}#flashpdf-app /* ===== RESPONSIVE MOBILE (ajout) ===== */
+        }#flashpdf-app .guide-panel{background:var(--surface);padding:24px;border-radius:18px;border:1px solid var(--border2);height:fit-content;margin-top:14px;}#flashpdf-app .guide-toggle{display:block;width:100%;padding:11px 16px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.3);border-radius:10px;color:var(--cyan);font-weight:600;font-size:.88em;cursor:pointer;font-family:inherit;margin-top:18px;text-align:left;}
+        #flashpdf-app .guide-panel.hidden{display:none;}#flashpdf-app .guide-panel h3{font-size:1.1em;margin-bottom:16px;color:var(--text);font-family:'Syne',sans-serif;}#flashpdf-app .guide-section{margin-bottom:16px;padding:15px;background:var(--bg2);border-radius:10px;border-left:3px solid var(--cyan);}#flashpdf-app .guide-section h4{font-size:.92em;margin-bottom:10px;color:var(--cyan);}#flashpdf-app .guide-section p{color:var(--text2);font-size:.83em;line-height:1.6;margin-bottom:8px;}#flashpdf-app .guide-section ul{margin-left:18px;color:var(--text2);font-size:.83em;}#flashpdf-app .guide-section li{margin-bottom:5px;}#flashpdf-app /* ===== RESPONSIVE MOBILE (ajout) ===== */
         @media(max-width:1100px){
-            .main-grid{grid-template-columns:1fr;}#flashpdf-app .sidebar{display:none;}#flashpdf-app .mobile-tabs{display:flex;}#flashpdf-app .guide-panel{margin-top:16px;}#flashpdf-app }
+            .main-grid{grid-template-columns:1fr;}#flashpdf-app .sidebar{display:none;}#flashpdf-app .mobile-tabs{display:flex;}#flashpdf-app }
         @media(max-width:640px){
             body{padding:10px;}#flashpdf-app .header{padding:22px 16px;}#flashpdf-app .main-panel{padding:18px;}#flashpdf-app .option-row textarea{min-height:130px;}#flashpdf-app .files-preview{grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:9px;}#flashpdf-app .file-thumbnail{height:72px;}#flashpdf-app .drag-handle{display:none;}#flashpdf-app .file-card{cursor:default;}
         }
@@ -318,6 +318,14 @@
                             </label>
                         </div>
                         <div class="option-row" style="margin-bottom:0;margin-top:10px">
+                            <label style="font-size:.85em">🎨 Teinte des masques (fond des zones "Masque + Texte")</label>
+                            <select id="edit-mask-tint" onchange="onMaskTintChange()" style="max-width:260px">
+                                <option value="#ffffff">Blanc pur</option>
+                                <option value="#f4efe4">Blanc cassé (papier légèrement crème)</option>
+                                <option value="#e6e6e2">Gris clair (papier terne / photocopie)</option>
+                            </select>
+                        </div>
+                        <div class="option-row" style="margin-bottom:0;margin-top:10px">
                             <label class="btn btn-secondary" for="edit-font-upload" style="cursor:pointer;display:inline-flex">📁 Importer votre police (.ttf, .otf, .woff, .woff2)</label>
                             <input type="file" id="edit-font-upload" accept=".ttf,.otf,.woff,.woff2">
                             <div id="edit-custom-fonts-list" style="margin-top:8px;font-size:.82em;color:var(--text2)"></div>
@@ -410,16 +418,14 @@
 
         </div><!-- /main-panel -->
 
-        <!-- GUIDE -->
-        <div class="guide-panel" id="guidePanel">
-            <h3>Guide</h3>
-            <div id="guide-content"></div>
-        </div>
-
     </div><!-- /main-grid -->
 
-    <!-- GUIDE TOGGLE MOBILE (hors grille) -->
+    <!-- GUIDE : bouton d'abord, contenu dépliable juste en dessous -->
     <button class="guide-toggle" id="guideToggle" onclick="toggleGuide()">📖 Voir le guide de cet outil</button>
+    <div class="guide-panel hidden" id="guidePanel">
+        <h3>Guide</h3>
+        <div id="guide-content"></div>
+    </div>
 
 </div><!-- /container -->
 </div>
@@ -492,7 +498,7 @@ const guides={
     'image-to-pdf':`<div class="guide-section"><h4>Cas d'usage</h4><ul><li>Portfolio professionnel</li><li>Numérisation de documents</li><li>Présentation visuelle</li></ul></div><div class="guide-section"><h4>Options</h4><p><strong>Orientation</strong> : Portrait (vertical) ou Paysage</p><p><strong>Marges</strong> : Aucune = pleine page</p></div><div class="info-box"><strong>Note</strong>1 image = 1 page PDF.</div>`,
     'pdf-to-image':`<div class="guide-section"><h4>Cas d'usage</h4><ul><li>Réseaux sociaux : 1 page = 1 post</li><li>Extraire un graphique</li><li>Miniatures pour site web</li></ul></div><div class="guide-section"><h4>JPG ou PNG ?</h4><p><strong>JPG</strong> : léger, pas de transparence</p><p><strong>PNG</strong> : qualité max, transparence</p></div>`,
     'unlock':`<div class="guide-section"><h4>Types de protection</h4><p><strong>Retirable :</strong></p><ul><li>Impression non autorisée</li><li>Copie de texte désactivée</li></ul><p><strong>Impossible à retirer :</strong></p><ul><li>Mot de passe à l'ouverture</li></ul></div><div class="info-box warning"><strong>Légalité</strong>Utilisez uniquement sur vos propres documents.</div>`,
-    'edit':`<div class="guide-section"><h4>Ce que ça fait</h4><ul><li>Recouvre une zone de texte par un masque blanc puis écrit un nouveau texte par-dessus</li><li>Ajoute du texte libre n'importe où sur la page</li><li>Fonctionne sur une page PDF (rendue en image) ou une image directement</li></ul></div><div class="guide-section"><h4>🎯 Détecter un mot (OCR)</h4><ul><li>Touchez/cliquez directement sur le mot à remplacer dans la page</li><li>La reconnaissance de texte (Tesseract.js, 100% locale) retrouve le mot le plus proche du point touché</li><li>Un bloc masque + texte est créé automatiquement, déjà positionné et dimensionné sur le mot détecté, avec le texte reconnu et sa couleur d'encre pré-remplis</li><li>Ajustez ensuite le texte, la position ou la taille si besoin — l'alignement de départ est déjà quasi pixel-parfait</li><li>Premier usage : téléchargement ponctuel du moteur OCR (~2-3 Mo), mis en cache ensuite</li></ul></div><div class="guide-section"><h4>⬜ Masque + Texte / 🔤 Texte libre</h4><ul><li><strong>Masque + Texte</strong> : recouvre la zone d'un rectangle blanc opaque avant d'écrire par-dessus — sert à corriger/remplacer du texte existant</li><li><strong>Texte libre</strong> : ajoute juste du texte, sans masque — sert à ajouter une mention, un tampon, une note</li><li>Chaque nouveau bloc apparaît en haut de la zone visible, jamais caché au milieu du texte existant</li></ul></div><div class="guide-section"><h4>Déplacer et redimensionner un bloc</h4><ul><li>Glissez n'importe où sur le bloc pour le déplacer</li><li>Tirez le petit carré cyan au coin bas-droit (légèrement à l'extérieur du bloc) pour l'agrandir ou le réduire</li><li>Le bloc s'élargit automatiquement si le texte tapé est plus long que sa largeur actuelle — il ne se réduit jamais tout seul</li></ul></div><div class="guide-section"><h4>Navigation et zoom (barre du haut, toujours visible)</h4><ul><li><strong>← Page préc. / Page suiv. →</strong> : n'apparaît que sur un PDF de plusieurs pages</li><li><strong>－ / ＋</strong> : zoom avant/arrière par palier</li><li><strong>↺ Ajuster</strong> : revient au zoom automatique qui remplit la largeur disponible</li><li><strong>Pincement à deux doigts</strong> : zoom fluide sur mobile</li><li>La zone document reste collée en haut de l'écran pendant que vous réglez les blocs plus bas — plus besoin de remonter à chaque changement</li></ul></div><div class="guide-section"><h4>Réglages de chaque bloc, un par un</h4><ul><li><strong>Champ de texte</strong> : le contenu affiché sur le document</li><li><strong>Police</strong> : 8 polices système (rendu variable selon l'appareil du lecteur si le PDF est ouvert ailleurs qu'à l'écran — sans incidence ici puisque tout est aplati en image) + 6 polices web à rendu garanti identique partout, dont Newsreader (police utilisée par FlashContrat) + vos polices importées si vous en avez ajouté</li><li><strong>Taille (pt)</strong> : de 6 à 96, saisie libre</li><li><strong>Couleur du texte</strong> : sélecteur de couleur classique — c'est la couleur de base, avant réglage d'intensité d'encre</li><li><strong>Alignement</strong> : gauche / centre / droite du texte à l'intérieur du bloc</li><li><strong>G (gras) / I (italique) / S (souligné)</strong> : cases à cocher, cumulables</li><li><strong>🖍️ Surligné</strong> : active un fond coloré derrière le texte — réglable via les deux contrôles juste en dessous</li><li><strong>Couleur du surlignage</strong> : n'a d'effet que si "Surligné" est coché</li><li><strong>Étendue du surlignage</strong> : "Lettre uniquement" colle le surlignage au texte réellement écrit ; "Cadre étendu" colore tout le rectangle du bloc</li><li><strong>Intensité de l'encre</strong> : curseur de -90 (très clair, dilué vers le blanc) à 0 (couleur choisie telle quelle) à 100 (assombri jusqu'au noir pur) — utile pour imiter un stylo qui appuie peu, ou au contraire foncer une couleur qui paraît trop claire/grise sur le document</li><li><strong>Épaisseur du soulignement</strong> : n'a d'effet que si "S" (souligné) est coché — épaisseur du trait, proportionnelle à la taille de police choisie</li><li><strong>Épaisseur du trait des lettres</strong> : ajoute un contour aux lettres (effet stylo qui appuie fort / feutre épais) — 0 = désactivé</li><li><strong>🗑 Retirer</strong> : supprime uniquement ce bloc, sans toucher aux autres</li></ul></div><div class="guide-section"><h4>📁 Importer votre police</h4><ul><li>Ajoutez un fichier .ttf, .otf, .woff ou .woff2 — votre propre police, ou celle d'un document que vous cherchez à imiter</li><li>Elle apparaît ensuite dans le menu déroulant "Police" de chaque bloc, dans une section "Vos polices importées"</li><li>Chargée localement dans votre navigateur, pour la durée de cette session uniquement — à réimporter si vous rechargez la page</li></ul></div><div class="guide-section"><h4>🖨️ Rendu scan</h4><p>Case "Uniformiser en rendu scan" : applique un léger niveaux de gris + contraste sur toute la page pour que les zones ajoutées se fondent mieux avec un document scanné/photographié.</p></div><div class="guide-section"><h4>Limites</h4><ul><li>Ce n'est pas une édition "en place" du texte PDF natif (police/flux d'origine)</li><li>Le rendu final d'un PDF édité redevient une image (comme un scan)</li><li>La détection OCR trouve la position et la couleur du mot, pas sa police d'origine — choisissez ou importez la police manuellement si besoin</li></ul></div>`,
+    'edit':`<div class="guide-section"><h4>Ce que ça fait</h4><ul><li>Recouvre une zone de texte par un masque blanc puis écrit un nouveau texte par-dessus</li><li>Ajoute du texte libre n'importe où sur la page</li><li>Fonctionne sur une page PDF (rendue en image) ou une image directement</li></ul></div><div class="guide-section"><h4>🎯 Détecter un mot (OCR)</h4><ul><li>Touchez/cliquez directement sur le mot à remplacer dans la page</li><li>La reconnaissance de texte (Tesseract.js, 100% locale) retrouve le mot le plus proche du point touché</li><li>Un bloc masque + texte est créé automatiquement, déjà positionné et dimensionné sur le mot détecté, avec le texte reconnu et sa couleur d'encre pré-remplis</li><li>Ajustez ensuite le texte, la position ou la taille si besoin — l'alignement de départ est déjà quasi pixel-parfait</li><li>Premier usage : téléchargement ponctuel du moteur OCR (~2-3 Mo), mis en cache ensuite</li></ul></div><div class="guide-section"><h4>⬜ Masque + Texte / 🔤 Texte libre</h4><ul><li><strong>Masque + Texte</strong> : recouvre la zone d'un rectangle blanc opaque avant d'écrire par-dessus — sert à corriger/remplacer du texte existant</li><li><strong>Texte libre</strong> : ajoute juste du texte, sans masque — sert à ajouter une mention, un tampon, une note</li><li>Chaque nouveau bloc apparaît en haut de la zone visible, jamais caché au milieu du texte existant</li></ul></div><div class="guide-section"><h4>Déplacer et redimensionner un bloc</h4><ul><li>Glissez n'importe où sur le bloc pour le déplacer</li><li>Tirez le petit carré cyan au coin bas-droit (légèrement à l'extérieur du bloc) pour l'agrandir ou le réduire</li><li>Le bloc s'élargit automatiquement si le texte tapé est plus long que sa largeur actuelle — il ne se réduit jamais tout seul</li></ul></div><div class="guide-section"><h4>Navigation et zoom (barre du haut, toujours visible)</h4><ul><li><strong>← Page préc. / Page suiv. →</strong> : n'apparaît que sur un PDF de plusieurs pages</li><li><strong>－ / ＋</strong> : zoom avant/arrière par palier</li><li><strong>↺ Ajuster</strong> : revient au zoom automatique qui remplit la largeur disponible</li><li><strong>Pincement à deux doigts</strong> : zoom fluide sur mobile</li><li>La zone document reste collée en haut de l'écran pendant que vous réglez les blocs plus bas — plus besoin de remonter à chaque changement</li></ul></div><div class="guide-section"><h4>Réglages de chaque bloc, un par un</h4><ul><li><strong>Champ de texte</strong> : le contenu affiché sur le document</li><li><strong>Police</strong> : 8 polices système (rendu variable selon l'appareil du lecteur si le PDF est ouvert ailleurs qu'à l'écran — sans incidence ici puisque tout est aplati en image) + 6 polices web à rendu garanti identique partout, dont Newsreader (police utilisée par FlashContrat) + vos polices importées si vous en avez ajouté</li><li><strong>Taille (pt)</strong> : de 6 à 96, saisie libre</li><li><strong>Couleur du texte</strong> : sélecteur de couleur classique — c'est la couleur de base, avant réglage d'intensité d'encre</li><li><strong>Alignement</strong> : gauche / centre / droite du texte à l'intérieur du bloc</li><li><strong>G (gras) / I (italique) / S (souligné)</strong> : cases à cocher, cumulables</li><li><strong>🖍️ Surligné</strong> : active un fond coloré derrière le texte — réglable via les deux contrôles juste en dessous</li><li><strong>Couleur du surlignage</strong> : n'a d'effet que si "Surligné" est coché</li><li><strong>Étendue du surlignage</strong> : "Lettre uniquement" colle le surlignage au texte réellement écrit ; "Cadre étendu" colore tout le rectangle du bloc</li><li><strong>Intensité de l'encre</strong> : curseur de -90 (très clair, dilué vers le blanc) à 0 (couleur choisie telle quelle) à 100 (assombri jusqu'au noir pur) — utile pour imiter un stylo qui appuie peu, ou au contraire foncer une couleur qui paraît trop claire/grise sur le document</li><li><strong>Épaisseur du soulignement</strong> : n'a d'effet que si "S" (souligné) est coché — épaisseur du trait, proportionnelle à la taille de police choisie</li><li><strong>Épaisseur du trait des lettres</strong> : ajoute un contour aux lettres (effet stylo qui appuie fort / feutre épais) — 0 = désactivé</li><li><strong>🗑 Retirer</strong> : supprime uniquement ce bloc, sans toucher aux autres</li></ul></div><div class="guide-section"><h4>📁 Importer votre police</h4><ul><li>Ajoutez un fichier .ttf, .otf, .woff ou .woff2 — votre propre police, ou celle d'un document que vous cherchez à imiter</li><li>Elle apparaît ensuite dans le menu déroulant "Police" de chaque bloc, dans une section "Vos polices importées"</li><li>Chargée localement dans votre navigateur, pour la durée de cette session uniquement — à réimporter si vous rechargez la page</li></ul></div><div class="guide-section"><h4>🎨 Teinte des masques</h4><ul><li>Le blanc pur détonne souvent sur un document scanné ou photographié, dont le papier n'est jamais parfaitement blanc</li><li>"Blanc cassé" et "Gris clair" imitent un papier légèrement vieilli ou une photocopie, pour que les corrections se fondent mieux dans le document</li><li>Réglage global : s'applique à tous les blocs "Masque + Texte" de la page, pas bloc par bloc</li></ul></div><div class="guide-section"><h4>🖨️ Rendu scan</h4><p>Case "Uniformiser en rendu scan" : applique un léger niveaux de gris + contraste sur toute la page pour que les zones ajoutées se fondent mieux avec un document scanné/photographié.</p></div><div class="guide-section"><h4>Limites</h4><ul><li>Ce n'est pas une édition "en place" du texte PDF natif (police/flux d'origine)</li><li>Le rendu final d'un PDF édité redevient une image (comme un scan)</li><li>La détection OCR trouve la position et la couleur du mot, pas sa police d'origine — choisissez ou importez la police manuellement si besoin</li></ul></div>`,
     'text-to-pdf':`<div class="guide-section"><h4>Détection automatique</h4><ul><li><strong>Chapitre 1, PARTIE I</strong> → Titre principal</li><li><strong>1. Titre</strong> → Sous-titre</li><li><strong>1.1 Section</strong> → Sous-section</li><li><strong>MAJUSCULES</strong> → Titre</li></ul></div><div class="guide-section"><h4>Conseils</h4><ul><li>Lignes vides pour séparer les paragraphes</li><li>Titres courts sans ponctuation finale</li></ul></div>`,
     'html-to-pdf':`<div class="guide-section"><h4>Balises supportées</h4><ul><li>Titres : h1, h2, h3</li><li>Texte : p, b, i, u, br</li><li>Listes : ul, ol, li</li></ul></div><div class="info-box warning"><strong>Limitations</strong>CSS, images et tableaux non supportés. Pour HTML complexe : Ctrl+P dans le navigateur.</div>`
 };
@@ -513,7 +519,7 @@ function switchTool(toolId, btn) {
     document.getElementById('guide-content').innerHTML = guides[toolId]||'';
     guideVisible = false;
     const gp = document.getElementById('guidePanel');
-    if(window.innerWidth<=1100) gp.classList.add('hidden');
+    gp.classList.add('hidden');
     document.getElementById('guideToggle').textContent = '📖 Voir le guide de cet outil';
 }
 function guideLabelMatches(toolId,btn){
@@ -547,9 +553,6 @@ function setupDragAndDrop(){
 window.onload=function(){
     document.getElementById('guide-content').innerHTML=guides['merge'];
     setupDragAndDrop();
-    if(window.innerWidth<=1100){
-        document.getElementById('guidePanel').classList.add('hidden');
-    }
 };
 
 // ── FUSIONNER ────────────────────────────────────────
@@ -795,6 +798,14 @@ function resetUnlock(){unlockFile=null;document.getElementById('unlock-input').v
 
 // ── ÉDITER PDF/IMAGE ─────────────────────────────────
 let editPdfDoc=null,editPages=[],editCurPage=0,editBlocks=[],editBaseCanvas=null,editScale=1,editIsImage=false;
+// Teinte appliquée derrière le texte des blocs "Masque + Texte" — le blanc pur
+// détonne sur un document scanné/photographié dont le papier n'est jamais
+// parfaitement blanc. Réglage global (toute la page), pas par bloc.
+let editMaskTint='#ffffff';
+function onMaskTintChange(){
+    editMaskTint=document.getElementById('edit-mask-tint').value;
+    renderEditBlocks();
+}
 
 async function processEditFile(file){
     if(!file)return;
@@ -963,7 +974,7 @@ function renderEditBlocks(){
         const el=document.createElement('div');
         el.className='edit-block';el.dataset.id=b.id;
         const frameHighlight=b.highlight&&b.highlightMode==='frame';
-        const baseBg=b.type==='mask'?'rgba(255,255,255,.9)':'rgba(139,92,246,.12)';
+        const baseBg=b.type==='mask'?hexToRgba(editMaskTint,.9):'rgba(139,92,246,.12)';
         const justify=b.align==='center'?'center':(b.align==='right'?'flex-end':'flex-start');
         el.style.cssText=`position:absolute;left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;border:1.5px dashed ${b.type==='mask'?'#06B6D4':'#8B5CF6'};background:${frameHighlight?hexToRgba(b.highlightColor,.65):baseBg};display:flex;align-items:center;justify-content:${justify};color:#111;cursor:move;overflow:hidden;user-select:none;touch-action:none;padding:0 4px;box-sizing:border-box;`;
         const span=document.createElement('span');
@@ -1558,7 +1569,7 @@ async function exportEdited(){
             const ctx=cv.getContext('2d');
             editBlocks.filter(b=>b.page===pIdx).forEach(b=>{
                 const bx=b.rx*natW,by=b.ry*natH,bw=b.rw*natW,bh=b.rh*natH,bfs=b.rfs*natH;
-                if(b.type==='mask'){ctx.fillStyle='#ffffff';ctx.fillRect(bx,by,bw,bh);}
+                if(b.type==='mask'){ctx.fillStyle=editMaskTint;ctx.fillRect(bx,by,bw,bh);}
                 ctx.font=`${b.italic?'italic ':''}${b.bold?'700 ':''}${bfs}px ${fontFamilyCss(b.fontFamily)}`;
                 ctx.textBaseline='middle';
                 const tw=ctx.measureText(b.text).width;
@@ -1617,10 +1628,11 @@ function showEditStatus(msg,isError){
 }
 
 function resetEdit(){
-    editPdfDoc=null;editPages=[];editCurPage=0;editBlocks=[];editIsImage=false;editBaseCanvas=null;editZoom=1;
+    editPdfDoc=null;editPages=[];editCurPage=0;editBlocks=[];editIsImage=false;editBaseCanvas=null;editZoom=1;editMaskTint='#ffffff';
     cancelDetectWord();
     document.getElementById('edit-input-pdf').value='';
     document.getElementById('edit-input-image').value='';
+    document.getElementById('edit-mask-tint').value='#ffffff';
     document.getElementById('edit-workspace').style.display='none';
     document.getElementById('edit-canvas-wrap').innerHTML='';
     document.getElementById('edit-blocks-list').innerHTML='';
