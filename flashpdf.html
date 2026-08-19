@@ -331,7 +331,7 @@
                         </div>
                     </div>
                     <div id="edit-scroll-top" style="overflow-x:auto;overflow-y:hidden;height:14px;margin-bottom:2px;border:1.5px solid var(--border2);border-radius:8px 8px 0 0;background:var(--bg2);"><div id="edit-scroll-top-spacer" style="height:1px;"></div></div>
-                    <div id="edit-scroll-box" style="overflow:auto;border:1.5px solid var(--border2);border-radius:0 0 11px 11px;background:var(--bg2);touch-action:none">
+                    <div id="edit-scroll-box" style="overflow:auto;border:1.5px solid var(--border2);border-radius:0 0 11px 11px;background:var(--bg2);touch-action:pan-x pan-y">
                         <div id="edit-canvas-wrap" style="position:relative;display:inline-block;"></div>
                     </div>
                     <div id="edit-blocks-list" style="margin-top:16px"></div>
@@ -885,7 +885,7 @@ function hexToRgba(hex,alpha){
 
 function renderEditBlocks(){
     const wrap=document.getElementById('edit-canvas-wrap');
-    wrap.querySelectorAll('.edit-block').forEach(el=>el.remove());
+    wrap.querySelectorAll('.edit-block, .edit-resize-handle').forEach(el=>el.remove());
     const curPage=editIsImage?0:editCurPage;
     editBlocks.filter(b=>b.page===curPage).forEach(b=>{
         const el=document.createElement('div');
@@ -900,14 +900,25 @@ function renderEditBlocks(){
         const textHighlightBg=(b.highlight&&b.highlightMode==='text')?hexToRgba(b.highlightColor,.65):'transparent';
         span.style.cssText=`font-size:${b.fontSize}px;font-weight:${b.bold?'700':'400'};font-style:${b.italic?'italic':'normal'};font-family:${fontFamilyCss(b.fontFamily)};text-decoration:${b.underline?'underline':'none'};text-decoration-thickness:${b.underlineThickness!=null?b.underlineThickness:2}px;-webkit-text-stroke:${(b.strokeWidth||0)>0?`${b.strokeWidth}px ${inkColor(b.inkIntensity,b.color)}`:'0'};background:${textHighlightBg};color:${inkColor(b.inkIntensity,b.color)};padding:0 2px;border-radius:2px;white-space:nowrap;`;
         el.appendChild(span);
+        // La poignée n'est PAS un enfant du bloc : le bloc a overflow:hidden
+        // (pour bien couper le texte qui dépasse), ce qui coupait aussi la
+        // poignée. Elle est ajoutée directement au wrapper et repositionnée
+        // manuellement à chaque déplacement/redimensionnement — entièrement
+        // à l'extérieur du bloc, donc ne recouvre plus jamais le texte.
         const handle=document.createElement('span');
         handle.className='edit-resize-handle';
-        handle.style.cssText='position:absolute;right:-2px;bottom:-2px;width:18px;height:18px;background:var(--cyan);border:2px solid var(--bg);border-radius:4px;cursor:nwse-resize;touch-action:none;';
-        el.appendChild(handle);
-        makeDraggable(el,b);
+        handle.style.cssText='position:absolute;width:20px;height:20px;background:var(--cyan);border:2px solid var(--bg);border-radius:4px;cursor:nwse-resize;touch-action:none;box-shadow:0 1px 4px rgba(0,0,0,.4);z-index:5;';
+        positionResizeHandle(handle,b);
+        makeDraggable(el,b,handle);
         makeResizable(handle,el,b);
         wrap.appendChild(el);
+        wrap.appendChild(handle);
     });
+}
+
+function positionResizeHandle(handle,block){
+    handle.style.left=(block.x+block.w-2)+'px';
+    handle.style.top=(block.y+block.h-2)+'px';
 }
 
 function fontFamilyCss(name){
@@ -938,13 +949,14 @@ async function ensureWebFontsLoaded(blocks){
     try{await Promise.all([...families].map(f=>document.fonts.load(f)));await document.fonts.ready;}catch(e){}
 }
 
-function makeDraggable(el,block){
+function makeDraggable(el,block,handle){
     let sx,sy,ox,oy,dragging=false;
     function start(clientX,clientY){dragging=true;sx=clientX;sy=clientY;ox=block.x;oy=block.y;}
     function move(clientX,clientY){
         if(!dragging)return;
         block.x=Math.max(0,ox+(clientX-sx));block.y=Math.max(0,oy+(clientY-sy));
         el.style.left=block.x+'px';el.style.top=block.y+'px';
+        if(handle)positionResizeHandle(handle,block);
     }
     function end(){dragging=false;}
     el.addEventListener('mousedown',e=>{if(e.target.classList.contains('edit-resize-handle'))return;e.preventDefault();start(e.clientX,e.clientY);});
@@ -962,6 +974,7 @@ function makeResizable(handle,el,block){
         if(!resizing)return;
         block.w=Math.max(30,ow+(clientX-sx));block.h=Math.max(18,oh+(clientY-sy));
         el.style.width=block.w+'px';el.style.height=block.h+'px';
+        positionResizeHandle(handle,block);
     }
     function end(){resizing=false;}
     handle.addEventListener('mousedown',e=>{e.preventDefault();e.stopPropagation();start(e.clientX,e.clientY);});
@@ -1037,6 +1050,30 @@ async function onDetectWordTap(e){
     wrap.addEventListener('touchend',onDetectWordTap,{passive:false});
 })();
 
+// Échantillonne les pixels sous la boîte du mot détecté pour estimer sa
+// couleur d'encre réelle (au lieu du noir par défaut). On ne moyenne que les
+// pixels sombres (probable encre), en ignorant les pixels clairs (probable
+// fond de page), pour ne pas diluer la couleur vers un gris pâle.
+function detectInkColor(baseCv,bx0,by0,bw,bh){
+    try{
+        const ctx=baseCv.getContext('2d');
+        const x=Math.max(0,Math.round(bx0)),y=Math.max(0,Math.round(by0));
+        const w=Math.min(Math.max(1,Math.round(bw)),baseCv.width-x);
+        const h=Math.min(Math.max(1,Math.round(bh)),baseCv.height-y);
+        if(w<=0||h<=0)return'#000000';
+        const data=ctx.getImageData(x,y,w,h).data;
+        let rSum=0,gSum=0,bSum=0,count=0;
+        for(let i=0;i<data.length;i+=4){
+            const r=data[i],g=data[i+1],b=data[i+2];
+            const lum=0.299*r+0.587*g+0.114*b;
+            if(lum<170){rSum+=r;gSum+=g;bSum+=b;count++;}
+        }
+        if(count===0)return'#000000';
+        const r=Math.round(rSum/count),g=Math.round(gSum/count),b=Math.round(bSum/count);
+        return'#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+    }catch(e){return'#000000';}
+}
+
 async function detectWordAt(clickX,clickY){
     const baseCv=document.getElementById('edit-base-canvas');
     if(!baseCv){showEditStatus('❌ Page non chargée.',true);return;}
@@ -1089,6 +1126,7 @@ async function detectWordAt(clickX,clickY){
         const bw=(best.bbox.x1-best.bbox.x0)/upscale;
         const bh=(best.bbox.y1-best.bbox.y0)/upscale;
         const pad=Math.max(2,bh*0.15);
+        const detectedColor=detectInkColor(baseCv,bx0,by0,bw,bh);
 
         const curPage=editIsImage?0:editCurPage;
         const block={
@@ -1099,12 +1137,12 @@ async function detectWordAt(clickX,clickY){
             text:best.text.trim(),
             fontSize:Math.max(6,Math.round(bh*0.78)),
             bold:false,italic:false,fontFamily:'Helvetica',
-            inkIntensity:100,underlineThickness:2,strokeWidth:0,color:'#000000',
+            inkIntensity:100,underlineThickness:2,strokeWidth:0,color:detectedColor,
             highlight:false,highlightColor:'#FFE066',highlightMode:'text',align:'left'
         };
         editBlocks.push(block);
         renderEditBlocks();renderEditBlocksList();
-        showEditStatus('✅ Mot détecté : « '+best.text.trim()+' » — bloc créé et aligné. Corrigez le texte si besoin, ou glissez-le pour affiner.',false);
+        showEditStatus('✅ Mot détecté : « '+best.text.trim()+' » — bloc créé, aligné et couleur d\'encre estimée automatiquement. Corrigez si besoin, ou glissez pour affiner.',false);
     }catch(err){
         console.error(err);
         showEditStatus('❌ Erreur de détection : '+err.message,true);
@@ -1149,7 +1187,14 @@ function setZoom(newZoom){
         const newWidth=editBaseCanvas.displayWidth;
         const ratio=oldWidth?newWidth/oldWidth:1;
         if(ratio&&ratio!==1){
-            editBlocks.forEach(b=>{b.x*=ratio;b.y*=ratio;b.w*=ratio;b.h*=ratio;b.fontSize=Math.round(b.fontSize*ratio*10)/10;});
+            // Arrondi au pixel entier : sans ça, des zoom/dézoom répétés accumulent
+            // de minuscules écarts flottants qui finissent par désaligner visiblement
+            // les blocs par rapport au texte d'origine.
+            editBlocks.forEach(b=>{
+                b.x=Math.round(b.x*ratio);b.y=Math.round(b.y*ratio);
+                b.w=Math.round(b.w*ratio);b.h=Math.round(b.h*ratio);
+                b.fontSize=Math.round(b.fontSize*ratio*10)/10;
+            });
             renderEditBlocks();renderEditBlocksList();
         }
     });
