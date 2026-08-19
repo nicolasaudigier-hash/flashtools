@@ -30,7 +30,7 @@
         .options-group{background:var(--bg2);padding:18px;border-radius:11px;margin:16px 0;border:1px solid var(--border2);}#flashpdf-app .option-row{margin-bottom:14px;}#flashpdf-app .option-row:last-child{margin-bottom:0;}#flashpdf-app .option-row label{display:block;font-weight:600;margin-bottom:7px;color:var(--text);font-size:.9em;}#flashpdf-app .option-row select, #flashpdf-app .option-row input[type="text"], #flashpdf-app .option-row textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border2);border-radius:8px;font-size:.9em;background:var(--bg);color:var(--text);transition:border-color .2s;font-family:inherit;}#flashpdf-app .option-row select:focus, #flashpdf-app .option-row input[type="text"]:focus, #flashpdf-app .option-row textarea:focus{outline:none;border-color:var(--cyan);}#flashpdf-app .option-row textarea{min-height:180px;resize:vertical;font-family:'Courier New',monospace;}#flashpdf-app .radio-group{display:flex;gap:10px;flex-wrap:wrap;}#flashpdf-app .radio-option{display:flex;align-items:center;gap:7px;cursor:pointer;padding:9px 13px;border:1.5px solid var(--border2);border-radius:8px;transition:all .2s;background:var(--bg);font-size:.88em;min-height:44px;}#flashpdf-app .radio-option:hover{border-color:var(--cyan);}#flashpdf-app .radio-option input[type="radio"]{accent-color:var(--cyan);width:16px;height:16px;}#flashpdf-app /* STATS */
         .stats-box{background:var(--bg2);padding:18px;border-radius:11px;margin:16px 0;border:1px solid var(--border2);}#flashpdf-app .stat-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);}#flashpdf-app .stat-row:last-child{border-bottom:none;}#flashpdf-app .stat-label{color:var(--text2);font-weight:500;font-size:.9em;}#flashpdf-app .stat-value{color:var(--text);font-weight:700;font-size:.9em;}#flashpdf-app .stat-value.success{color:var(--success);}#flashpdf-app /* INFO BOXES */
         .info-box{background:rgba(6,182,212,.08);border-left:3px solid var(--cyan);padding:13px 15px;border-radius:0 8px 8px 0;margin:14px 0;font-size:.88em;color:var(--text2);}#flashpdf-app .info-box strong{display:block;margin-bottom:6px;color:var(--text);}#flashpdf-app .info-box.warning{background:rgba(245,158,11,.08);border-color:var(--warn);}#flashpdf-app .info-box.success-box{background:rgba(16,185,129,.08);border-color:var(--success);}#flashpdf-app /* LOADING */
-        .loading{display:none;text-align:center;padding:32px;}#flashpdf-app .loading.active{display:block;}#flashpdf-app .spinner{border:3px solid var(--bg2);border-top:3px solid var(--cyan);border-radius:50%;width:44px;height:44px;animation:fp-spin 1s linear infinite;margin:0 auto 16px;}
+        .loading{display:none;text-align:center;padding:32px;}#flashpdf-app .loading.active{display:block;}#flashpdf-app .spinner{border:3px solid var(--bg2);border-top:3px solid var(--cyan);border-radius:50%;width:44px;height:44px;animation:fp-spin 1s linear infinite;margin:0 auto 16px;}#flashpdf-app #edit-preview-sticky{position:sticky;top:8px;z-index:8;background:var(--surface);padding-top:2px;padding-bottom:8px;}
         @keyframes fp-spin{to{transform:rotate(360deg)}}#flashpdf-app /* TOOL PANELS */
         .tool-panel{display:none;}#flashpdf-app .tool-panel.active{display:block;}#flashpdf-app /* PRIVACY */
         .privacy-banner{background:linear-gradient(135deg,#0F6E56,#085041);color:#fff;padding:10px 16px;border-radius:11px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:.86em;}#flashpdf-app .privacy-banner strong{font-weight:700;}#flashpdf-app .privacy-detail{opacity:.9;}
@@ -298,18 +298,6 @@
                     <input type="file" id="edit-input-image" accept="image/jpeg,image/png" oncancel="recreateFileInput('edit-input-image')">
                 </div>
                 <div id="edit-workspace" style="display:none">
-                    <div id="edit-page-nav" class="btn-row" style="display:none;margin-top:0;margin-bottom:14px">
-                        <button class="btn btn-secondary" onclick="editPrevPage()">← Page préc.</button>
-                        <span id="edit-page-label" style="align-self:center;color:var(--text2);font-size:.9em">Page 1</span>
-                        <button class="btn btn-secondary" onclick="editNextPage()">Page suiv. →</button>
-                    </div>
-                    <div class="btn-row" style="margin-top:0;margin-bottom:14px;align-items:center">
-                        <button class="btn btn-secondary" onclick="zoomOut()" aria-label="Zoom arrière">－</button>
-                        <span id="edit-zoom-label" style="align-self:center;color:var(--text2);font-size:.9em;min-width:48px;text-align:center">100%</span>
-                        <button class="btn btn-secondary" onclick="zoomIn()" aria-label="Zoom avant">＋</button>
-                        <button class="btn btn-secondary" onclick="zoomReset()">↺ Ajuster</button>
-                        <span style="align-self:center;color:var(--text3);font-size:.78em">Pincez avec deux doigts pour zoomer sur mobile</span>
-                    </div>
                     <div class="options-group">
                         <div class="option-row" style="margin-bottom:10px">
                             <label>Ajouter un bloc</label>
@@ -330,9 +318,26 @@
                             </label>
                         </div>
                     </div>
-                    <div id="edit-scroll-top" style="overflow-x:auto;overflow-y:hidden;height:14px;margin-bottom:2px;border:1.5px solid var(--border2);border-radius:8px 8px 0 0;background:var(--bg2);"><div id="edit-scroll-top-spacer" style="height:1px;"></div></div>
-                    <div id="edit-scroll-box" style="overflow:auto;border:1.5px solid var(--border2);border-radius:0 0 11px 11px;background:var(--bg2);touch-action:pan-x pan-y">
-                        <div id="edit-canvas-wrap" style="position:relative;display:inline-block;"></div>
+                    <!-- Aperçu collant : reste visible en haut de l'écran pendant qu'on
+                         descend régler la police/couleur/etc. dans la liste des blocs
+                         plus bas — plus besoin de remonter à chaque réglage. -->
+                    <div id="edit-preview-sticky">
+                        <div id="edit-page-nav" class="btn-row" style="display:none;margin-top:0;margin-bottom:14px">
+                            <button class="btn btn-secondary" onclick="editPrevPage()">← Page préc.</button>
+                            <span id="edit-page-label" style="align-self:center;color:var(--text2);font-size:.9em">Page 1</span>
+                            <button class="btn btn-secondary" onclick="editNextPage()">Page suiv. →</button>
+                        </div>
+                        <div class="btn-row" style="margin-top:0;margin-bottom:14px;align-items:center">
+                            <button class="btn btn-secondary" onclick="zoomOut()" aria-label="Zoom arrière">－</button>
+                            <span id="edit-zoom-label" style="align-self:center;color:var(--text2);font-size:.9em;min-width:48px;text-align:center">100%</span>
+                            <button class="btn btn-secondary" onclick="zoomIn()" aria-label="Zoom avant">＋</button>
+                            <button class="btn btn-secondary" onclick="zoomReset()">↺ Ajuster</button>
+                            <span style="align-self:center;color:var(--text3);font-size:.78em">Pincez avec deux doigts pour zoomer sur mobile</span>
+                        </div>
+                        <div id="edit-scroll-top" style="overflow-x:auto;overflow-y:hidden;height:14px;margin-bottom:2px;border:1.5px solid var(--border2);border-radius:8px 8px 0 0;background:var(--bg2);"><div id="edit-scroll-top-spacer" style="height:1px;"></div></div>
+                        <div id="edit-scroll-box" style="overflow:auto;max-height:56vh;border:1.5px solid var(--border2);border-radius:0 0 11px 11px;background:var(--bg2);touch-action:pan-x pan-y">
+                            <div id="edit-canvas-wrap" style="position:relative;display:inline-block;"></div>
+                        </div>
                     </div>
                     <div id="edit-blocks-list" style="margin-top:16px"></div>
                     <div id="edit-status" class="info-box" style="display:none"></div>
@@ -849,18 +854,64 @@ async function renderEditPage(){
 function editPrevPage(){if(editCurPage>0){editCurPage--;cancelDetectWord();renderEditPage();}}
 function editNextPage(){if(editCurPage<editPages.length-1){editCurPage++;cancelDetectWord();renderEditPage();}}
 
+// ── COORDONNÉES RELATIVES ────────────────────────────
+// Chaque bloc stocke sa position/taille en FRACTION de la page (0 à 1), pas
+// en pixels d'affichage. Ça élimine complètement les décalages liés au zoom
+// (plus besoin de recalculer un ratio à chaque zoom/dézoom, donc plus de
+// dérive flottante possible) et les décalages entre pages de tailles
+// différentes (l'export utilise directement les dimensions réelles de
+// CHAQUE page, pas celles de la dernière page affichée dans l'éditeur).
+function blockPixelRect(b){
+    const W=editBaseCanvas.displayWidth,H=editBaseCanvas.displayHeight;
+    return{x:b.rx*W,y:b.ry*H,w:b.rw*W,h:b.rh*H,fontSize:b.rfs*H};
+}
+function setBlockPixelPos(b,x,y){
+    const W=editBaseCanvas.displayWidth,H=editBaseCanvas.displayHeight;
+    b.rx=x/W;b.ry=y/H;
+}
+function setBlockPixelSize(b,w,h){
+    const W=editBaseCanvas.displayWidth,H=editBaseCanvas.displayHeight;
+    b.rw=w/W;b.rh=h/H;
+}
+function getBlockFontSizePx(b){return editBaseCanvas?b.rfs*editBaseCanvas.displayHeight:14;}
+function setBlockFontSizePx(b,px){if(editBaseCanvas)b.rfs=px/editBaseCanvas.displayHeight;}
+
+// Mesure la largeur réelle du texte avec la même police que l'export
+// (canvas 2D des deux côtés) — sert à agrandir automatiquement le bloc
+// pour que le texte ne soit jamais coupé, ni à l'écran ni au téléchargement.
+const __measureCanvas=document.createElement('canvas');
+const __measureCtx=__measureCanvas.getContext('2d');
+function measureTextWidthPx(text,fontPx,bold,italic,fontFamily){
+    __measureCtx.font=`${italic?'italic ':''}${bold?'700 ':''}${Math.max(1,fontPx)}px ${fontFamilyCss(fontFamily)}`;
+    return __measureCtx.measureText(text||'').width;
+}
+function autoFitBlockWidth(b){
+    if(!editBaseCanvas)return;
+    const W=editBaseCanvas.displayWidth;
+    const fontPx=getBlockFontSizePx(b);
+    const textW=measureTextWidthPx(b.text,fontPx,b.bold,b.italic,b.fontFamily);
+    const pad=10;
+    const neededPxW=textW+pad;
+    const curPxW=b.rw*W;
+    if(neededPxW>curPxW) b.rw=neededPxW/W;
+}
+
 function addEditBlock(type){
+    if(!editBaseCanvas)return;
     const wrap=document.getElementById('edit-canvas-wrap');
     const scrollBox=wrap.parentElement;
-    const w=wrap.clientWidth||300;
+    const w=editBaseCanvas.displayWidth||300;
     const curPage=editIsImage?0:editCurPage;
     const countOnPage=editBlocks.filter(b=>b.page===curPage).length;
     const visibleTop=scrollBox?scrollBox.scrollTop:0;
     const y=visibleTop+16+(countOnPage%6)*38;
     const x=Math.max(10,w/2-70);
     const block={id:'b'+Date.now()+Math.random().toString(36).slice(2,6),type,page:curPage,
-        x,y,w:140,h:32,text:type==='mask'?'Nouveau texte':'Texte',fontSize:14,bold:false,italic:false,fontFamily:'Helvetica',
-        inkIntensity:100,underlineThickness:2,strokeWidth:0,color:'#000000',highlight:false,highlightColor:'#FFE066',highlightMode:'text',align:'left'};
+        rx:0,ry:0,rw:0,rh:0,rfs:0,text:type==='mask'?'Nouveau texte':'Texte',bold:false,italic:false,fontFamily:'Helvetica',
+        inkIntensity:0,underlineThickness:2,strokeWidth:0,color:'#000000',highlight:false,highlightColor:'#FFE066',highlightMode:'text',align:'left'};
+    setBlockPixelPos(block,x,y);
+    setBlockPixelSize(block,140,32);
+    setBlockFontSizePx(block,14);
     editBlocks.push(block);renderEditBlocks();renderEditBlocksList();
     if(scrollBox) scrollBox.scrollTop=Math.max(0,y-10);
 }
@@ -871,34 +922,50 @@ function hexToRgbTuple(hex){
     const num=parseInt(hex,16);
     return{r:(num>>16)&255,g:(num>>8)&255,b:num&255};
 }
-function inkColor(intensity,hex){
-    const i=Math.max(20,Math.min(100,intensity==null?100:intensity));
-    const t=1-i/100;
+function inkColor(offset,hex){
+    const v=offset==null?0:offset;
     const rgb=hexToRgbTuple(hex);
-    const mix=c=>Math.round(c+(255-c)*t);
-    return`rgb(${mix(rgb.r)},${mix(rgb.g)},${mix(rgb.b)})`;
+    if(v<0){
+        const t=Math.min(1,-v/100);
+        const mix=c=>Math.round(c+(255-c)*t);
+        return`rgb(${mix(rgb.r)},${mix(rgb.g)},${mix(rgb.b)})`;
+    }else if(v>0){
+        const t=Math.min(1,v/100);
+        const mix=c=>Math.round(c*(1-t));
+        return`rgb(${mix(rgb.r)},${mix(rgb.g)},${mix(rgb.b)})`;
+    }
+    return`rgb(${rgb.r},${rgb.g},${rgb.b})`;
 }
 function hexToRgba(hex,alpha){
     const rgb=hexToRgbTuple(hex);
     return`rgba(${rgb.r},${rgb.g},${rgb.b},${alpha})`;
 }
 
+// Les curseurs "épaisseur" (1-6 pour le soulignement, 0-3 pour le trait) sont
+// calibrés visuellement pour une police de référence de 14px. On les met à
+// l'échelle proportionnellement à la taille de police réelle affichée/exportée,
+// sinon leur épaisseur restait fixe en pixels quel que soit le zoom ou la
+// taille du texte — désynchronisant l'aperçu de l'export.
+function relThickness(rawValue,fontPx){return(rawValue/14)*fontPx;}
+
 function renderEditBlocks(){
     const wrap=document.getElementById('edit-canvas-wrap');
     wrap.querySelectorAll('.edit-block, .edit-resize-handle').forEach(el=>el.remove());
+    if(!editBaseCanvas)return;
     const curPage=editIsImage?0:editCurPage;
     editBlocks.filter(b=>b.page===curPage).forEach(b=>{
+        const r=blockPixelRect(b);
         const el=document.createElement('div');
         el.className='edit-block';el.dataset.id=b.id;
         const frameHighlight=b.highlight&&b.highlightMode==='frame';
         const baseBg=b.type==='mask'?'rgba(255,255,255,.9)':'rgba(139,92,246,.12)';
         const justify=b.align==='center'?'center':(b.align==='right'?'flex-end':'flex-start');
-        el.style.cssText=`position:absolute;left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px;border:1.5px dashed ${b.type==='mask'?'#06B6D4':'#8B5CF6'};background:${frameHighlight?hexToRgba(b.highlightColor,.65):baseBg};display:flex;align-items:center;justify-content:${justify};color:#111;cursor:move;overflow:hidden;user-select:none;touch-action:none;padding:0 4px;box-sizing:border-box;`;
+        el.style.cssText=`position:absolute;left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;border:1.5px dashed ${b.type==='mask'?'#06B6D4':'#8B5CF6'};background:${frameHighlight?hexToRgba(b.highlightColor,.65):baseBg};display:flex;align-items:center;justify-content:${justify};color:#111;cursor:move;overflow:hidden;user-select:none;touch-action:none;padding:0 4px;box-sizing:border-box;`;
         const span=document.createElement('span');
         span.className='edit-block-text-span';
         span.textContent=b.text;
         const textHighlightBg=(b.highlight&&b.highlightMode==='text')?hexToRgba(b.highlightColor,.65):'transparent';
-        span.style.cssText=`font-size:${b.fontSize}px;font-weight:${b.bold?'700':'400'};font-style:${b.italic?'italic':'normal'};font-family:${fontFamilyCss(b.fontFamily)};text-decoration:${b.underline?'underline':'none'};text-decoration-thickness:${b.underlineThickness!=null?b.underlineThickness:2}px;-webkit-text-stroke:${(b.strokeWidth||0)>0?`${b.strokeWidth}px ${inkColor(b.inkIntensity,b.color)}`:'0'};background:${textHighlightBg};color:${inkColor(b.inkIntensity,b.color)};padding:0 2px;border-radius:2px;white-space:nowrap;`;
+        span.style.cssText=`font-size:${r.fontSize}px;font-weight:${b.bold?'700':'400'};font-style:${b.italic?'italic':'normal'};font-family:${fontFamilyCss(b.fontFamily)};text-decoration:${b.underline?'underline':'none'};text-decoration-thickness:${relThickness(b.underlineThickness!=null?b.underlineThickness:2,r.fontSize)}px;-webkit-text-stroke:${(b.strokeWidth||0)>0?`${relThickness(b.strokeWidth,r.fontSize)}px ${inkColor(b.inkIntensity,b.color)}`:'0'};background:${textHighlightBg};color:${inkColor(b.inkIntensity,b.color)};padding:0 2px;border-radius:2px;white-space:nowrap;`;
         el.appendChild(span);
         // La poignée n'est PAS un enfant du bloc : le bloc a overflow:hidden
         // (pour bien couper le texte qui dépasse), ce qui coupait aussi la
@@ -917,8 +984,9 @@ function renderEditBlocks(){
 }
 
 function positionResizeHandle(handle,block){
-    handle.style.left=(block.x+block.w-2)+'px';
-    handle.style.top=(block.y+block.h-2)+'px';
+    const r=blockPixelRect(block);
+    handle.style.left=(r.x+r.w-2)+'px';
+    handle.style.top=(r.y+r.h-2)+'px';
 }
 
 function fontFamilyCss(name){
@@ -951,11 +1019,13 @@ async function ensureWebFontsLoaded(blocks){
 
 function makeDraggable(el,block,handle){
     let sx,sy,ox,oy,dragging=false;
-    function start(clientX,clientY){dragging=true;sx=clientX;sy=clientY;ox=block.x;oy=block.y;}
+    function start(clientX,clientY){dragging=true;sx=clientX;sy=clientY;const r=blockPixelRect(block);ox=r.x;oy=r.y;}
     function move(clientX,clientY){
         if(!dragging)return;
-        block.x=Math.max(0,ox+(clientX-sx));block.y=Math.max(0,oy+(clientY-sy));
-        el.style.left=block.x+'px';el.style.top=block.y+'px';
+        const W=editBaseCanvas.displayWidth,H=editBaseCanvas.displayHeight;
+        const nx=Math.max(0,ox+(clientX-sx)),ny=Math.max(0,oy+(clientY-sy));
+        setBlockPixelPos(block,nx,ny);
+        el.style.left=nx+'px';el.style.top=ny+'px';
         if(handle)positionResizeHandle(handle,block);
     }
     function end(){dragging=false;}
@@ -969,11 +1039,12 @@ function makeDraggable(el,block,handle){
 
 function makeResizable(handle,el,block){
     let sx,sy,ow,oh,resizing=false;
-    function start(clientX,clientY){resizing=true;sx=clientX;sy=clientY;ow=block.w;oh=block.h;}
+    function start(clientX,clientY){resizing=true;sx=clientX;sy=clientY;const r=blockPixelRect(block);ow=r.w;oh=r.h;}
     function move(clientX,clientY){
         if(!resizing)return;
-        block.w=Math.max(30,ow+(clientX-sx));block.h=Math.max(18,oh+(clientY-sy));
-        el.style.width=block.w+'px';el.style.height=block.h+'px';
+        const nw=Math.max(30,ow+(clientX-sx)),nh=Math.max(18,oh+(clientY-sy));
+        setBlockPixelSize(block,nw,nh);
+        el.style.width=nw+'px';el.style.height=nh+'px';
         positionResizeHandle(handle,block);
     }
     function end(){resizing=false;}
@@ -1132,14 +1203,15 @@ async function detectWordAt(clickX,clickY){
         const block={
             id:'b'+Date.now()+Math.random().toString(36).slice(2,6),
             type:'mask',page:curPage,
-            x:Math.max(0,bx0-pad),y:Math.max(0,by0-pad),
-            w:bw+pad*2,h:bh+pad*2,
+            rx:0,ry:0,rw:0,rh:0,rfs:0,
             text:best.text.trim(),
-            fontSize:Math.max(6,Math.round(bh*0.78)),
             bold:false,italic:false,fontFamily:'Helvetica',
-            inkIntensity:100,underlineThickness:2,strokeWidth:0,color:detectedColor,
+            inkIntensity:0,underlineThickness:2,strokeWidth:0,color:detectedColor,
             highlight:false,highlightColor:'#FFE066',highlightMode:'text',align:'left'
         };
+        setBlockPixelPos(block,Math.max(0,bx0-pad),Math.max(0,by0-pad));
+        setBlockPixelSize(block,bw+pad*2,bh+pad*2);
+        setBlockFontSizePx(block,Math.max(6,Math.round(bh*0.78)));
         editBlocks.push(block);
         renderEditBlocks();renderEditBlocksList();
         showEditStatus('✅ Mot détecté : « '+best.text.trim()+' » — bloc créé, aligné et couleur d\'encre estimée automatiquement. Corrigez si besoin, ou glissez pour affiner.',false);
@@ -1180,24 +1252,11 @@ function updateZoomLabel(){
 
 function setZoom(newZoom){
     newZoom=Math.max(EDIT_ZOOM_MIN,Math.min(EDIT_ZOOM_MAX,newZoom));
-    if(!editBaseCanvas){editZoom=newZoom;updateZoomLabel();return;}
-    const oldWidth=editBaseCanvas.displayWidth;
     editZoom=newZoom;
-    renderEditPage().then(()=>{
-        const newWidth=editBaseCanvas.displayWidth;
-        const ratio=oldWidth?newWidth/oldWidth:1;
-        if(ratio&&ratio!==1){
-            // Arrondi au pixel entier : sans ça, des zoom/dézoom répétés accumulent
-            // de minuscules écarts flottants qui finissent par désaligner visiblement
-            // les blocs par rapport au texte d'origine.
-            editBlocks.forEach(b=>{
-                b.x=Math.round(b.x*ratio);b.y=Math.round(b.y*ratio);
-                b.w=Math.round(b.w*ratio);b.h=Math.round(b.h*ratio);
-                b.fontSize=Math.round(b.fontSize*ratio*10)/10;
-            });
-            renderEditBlocks();renderEditBlocksList();
-        }
-    });
+    // Les blocs sont stockés en coordonnées RELATIVES (fractions de page) : un
+    // simple nouveau rendu à la nouvelle échelle suffit à les repositionner
+    // correctement, sans recalcul de ratio ni risque de dérive flottante.
+    renderEditPage();
 }
 function zoomIn(){setZoom(editZoom*1.25);}
 function zoomOut(){setZoom(editZoom/1.25);}
@@ -1288,8 +1347,8 @@ function renderEditBlocksList(){
                 </div>
             </div>
             <div class="option-row" style="margin-bottom:8px">
-                <label style="font-size:.8em">Intensité de l'encre (clair → plein) : <span class="edit-block-ink-value">${b.inkIntensity!=null?b.inkIntensity:100}%</span></label>
-                <input type="range" min="20" max="100" step="5" data-id="${b.id}" class="edit-block-ink">
+                <label style="font-size:.8em">Intensité de l'encre (clair ← 0 → foncé) : <span class="edit-block-ink-value">${b.inkIntensity!=null?b.inkIntensity:0}</span></label>
+                <input type="range" min="-90" max="100" step="5" data-id="${b.id}" class="edit-block-ink">
             </div>
             <div class="option-row" style="margin-bottom:8px">
                 <label style="font-size:.8em">Épaisseur du soulignement : <span class="edit-block-ulw-value">${b.underlineThickness!=null?b.underlineThickness:2}px</span></label>
@@ -1305,22 +1364,25 @@ function renderEditBlocksList(){
         inp.value=blocks.find(b=>b.id===inp.dataset.id).text;
         inp.addEventListener('input',()=>{
             const b=editBlocks.find(x=>x.id===inp.dataset.id);b.text=inp.value;
-            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);if(span)span.textContent=b.text;
+            autoFitBlockWidth(b);
+            renderEditBlocks();
         });
     });
     c.querySelectorAll('.edit-block-size').forEach(inp=>{
-        const b=blocks.find(x=>x.id===inp.dataset.id);inp.value=b.fontSize;
+        const b=blocks.find(x=>x.id===inp.dataset.id);inp.value=Math.round(getBlockFontSizePx(b));
         inp.addEventListener('input',()=>{
             const v=parseInt(inp.value);if(isNaN(v))return;
-            b.fontSize=Math.max(6,Math.min(96,v));
-            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);if(span)span.style.fontSize=b.fontSize+'px';
+            setBlockFontSizePx(b,Math.max(6,Math.min(96,v)));
+            autoFitBlockWidth(b);
+            renderEditBlocks();
         });
     });
     c.querySelectorAll('.edit-block-font').forEach(sel=>{
         const b=blocks.find(x=>x.id===sel.dataset.id);sel.value=b.fontFamily||'Helvetica';
         sel.addEventListener('change',()=>{
             b.fontFamily=sel.value;
-            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);if(span)span.style.fontFamily=fontFamilyCss(b.fontFamily);
+            autoFitBlockWidth(b);
+            renderEditBlocks();
         });
     });
     c.querySelectorAll('.edit-block-color').forEach(inp=>{
@@ -1328,7 +1390,7 @@ function renderEditBlocksList(){
         inp.addEventListener('input',()=>{
             b.color=inp.value;
             const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);
-            if(span){span.style.color=inkColor(b.inkIntensity,b.color);if((b.strokeWidth||0)>0)span.style.webkitTextStroke=`${b.strokeWidth}px ${inkColor(b.inkIntensity,b.color)}`;}
+            if(span){span.style.color=inkColor(b.inkIntensity,b.color);if((b.strokeWidth||0)>0)span.style.webkitTextStroke=`${relThickness(b.strokeWidth,getBlockFontSizePx(b))}px ${inkColor(b.inkIntensity,b.color)}`;}
         });
     });
     c.querySelectorAll('.edit-block-align').forEach(radio=>{
@@ -1344,14 +1406,16 @@ function renderEditBlocksList(){
         const b=blocks.find(x=>x.id===chk.dataset.id);chk.checked=!!b.bold;
         chk.addEventListener('change',()=>{
             b.bold=chk.checked;
-            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);if(span)span.style.fontWeight=b.bold?'700':'400';
+            autoFitBlockWidth(b);
+            renderEditBlocks();
         });
     });
     c.querySelectorAll('.edit-block-italic').forEach(chk=>{
         const b=blocks.find(x=>x.id===chk.dataset.id);chk.checked=!!b.italic;
         chk.addEventListener('change',()=>{
             b.italic=chk.checked;
-            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);if(span)span.style.fontStyle=b.italic?'italic':'normal';
+            autoFitBlockWidth(b);
+            renderEditBlocks();
         });
     });
     c.querySelectorAll('.edit-block-underline').forEach(chk=>{
@@ -1374,18 +1438,18 @@ function renderEditBlocksList(){
         radio.addEventListener('change',()=>{if(!radio.checked)return;b.highlightMode=radio.value;renderEditBlocks();});
     });
     c.querySelectorAll('.edit-block-ink').forEach(rng=>{
-        const b=blocks.find(x=>x.id===rng.dataset.id);rng.value=b.inkIntensity!=null?b.inkIntensity:100;
+        const b=blocks.find(x=>x.id===rng.dataset.id);rng.value=b.inkIntensity!=null?b.inkIntensity:0;
         rng.addEventListener('input',()=>{
             b.inkIntensity=parseInt(rng.value);
             const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);if(span)span.style.color=inkColor(b.inkIntensity,b.color);
-            const valEl=rng.closest('.option-row').querySelector('.edit-block-ink-value');if(valEl)valEl.textContent=b.inkIntensity+'%';
+            const valEl=rng.closest('.option-row').querySelector('.edit-block-ink-value');if(valEl)valEl.textContent=b.inkIntensity;
         });
     });
     c.querySelectorAll('.edit-block-ulw').forEach(rng=>{
         const b=blocks.find(x=>x.id===rng.dataset.id);rng.value=b.underlineThickness!=null?b.underlineThickness:2;
         rng.addEventListener('input',()=>{
             b.underlineThickness=parseInt(rng.value);
-            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);if(span)span.style.textDecorationThickness=b.underlineThickness+'px';
+            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);if(span)span.style.textDecorationThickness=relThickness(b.underlineThickness,getBlockFontSizePx(b))+'px';
             const valEl=rng.closest('.option-row').querySelector('.edit-block-ulw-value');if(valEl)valEl.textContent=b.underlineThickness+'px';
         });
     });
@@ -1394,7 +1458,7 @@ function renderEditBlocksList(){
         rng.addEventListener('input',()=>{
             b.strokeWidth=parseFloat(rng.value);
             const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);
-            if(span)span.style.webkitTextStroke=b.strokeWidth>0?`${b.strokeWidth}px ${inkColor(b.inkIntensity,b.color)}`:'0';
+            if(span)span.style.webkitTextStroke=b.strokeWidth>0?`${relThickness(b.strokeWidth,getBlockFontSizePx(b))}px ${inkColor(b.inkIntensity,b.color)}`:'0';
             const valEl=rng.closest('.option-row').querySelector('.edit-block-strokew-value');if(valEl)valEl.textContent=b.strokeWidth;
         });
     });
@@ -1438,14 +1502,13 @@ async function exportEdited(){
                 natW=cv.width;natH=cv.height;
             }
             const ctx=cv.getContext('2d');
-            const factor=natW/editBaseCanvas.displayWidth;
             editBlocks.filter(b=>b.page===pIdx).forEach(b=>{
-                const bx=b.x*factor,by=b.y*factor,bw=b.w*factor,bh=b.h*factor,bfs=b.fontSize*factor;
+                const bx=b.rx*natW,by=b.ry*natH,bw=b.rw*natW,bh=b.rh*natH,bfs=b.rfs*natH;
                 if(b.type==='mask'){ctx.fillStyle='#ffffff';ctx.fillRect(bx,by,bw,bh);}
                 ctx.font=`${b.italic?'italic ':''}${b.bold?'700 ':''}${bfs}px ${fontFamilyCss(b.fontFamily)}`;
                 ctx.textBaseline='middle';
                 const tw=ctx.measureText(b.text).width;
-                const padX=4*factor;
+                const padX=Math.max(2,bfs*0.08);
                 let tx;
                 if(b.align==='center'){tx=bx+(bw-tw)/2;}
                 else if(b.align==='right'){tx=bx+bw-tw-padX;}
@@ -1460,12 +1523,12 @@ async function exportEdited(){
                 ctx.fillText(b.text,tx,ty);
                 if((b.strokeWidth||0)>0){
                     ctx.strokeStyle=inkColor(b.inkIntensity,b.color);
-                    ctx.lineWidth=b.strokeWidth*factor;
+                    ctx.lineWidth=relThickness(b.strokeWidth,bfs);
                     ctx.strokeText(b.text,tx,ty);
                 }
                 if(b.underline){
                     ctx.strokeStyle=inkColor(b.inkIntensity,b.color);
-                    ctx.lineWidth=Math.max(1,(b.underlineThickness!=null?b.underlineThickness:2)*factor);
+                    ctx.lineWidth=Math.max(1,relThickness(b.underlineThickness!=null?b.underlineThickness:2,bfs));
                     ctx.beginPath();ctx.moveTo(tx,ty+bfs*0.38);ctx.lineTo(tx+tw,ty+bfs*0.38);ctx.stroke();
                 }
             });
