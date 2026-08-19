@@ -6,7 +6,7 @@
      "container", "btn", "btn-primary"...) ne seront donc plus écrasées,
      et inversement le style du site ne cassera plus l'app.
 ============================================================ -->
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;700&family=Roboto:wght@400;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Bebas+Neue&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;700&family=Roboto:wght@400;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Bebas+Neue&family=Caveat:wght@400;700&family=Newsreader:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -317,6 +317,11 @@
                                 <span>🖨️ Uniformiser en rendu scan (toute la page)</span>
                             </label>
                         </div>
+                        <div class="option-row" style="margin-bottom:0;margin-top:10px">
+                            <label class="btn btn-secondary" for="edit-font-upload" style="cursor:pointer;display:inline-flex">📁 Importer votre police (.ttf, .otf, .woff, .woff2)</label>
+                            <input type="file" id="edit-font-upload" accept=".ttf,.otf,.woff,.woff2">
+                            <div id="edit-custom-fonts-list" style="margin-top:8px;font-size:.82em;color:var(--text2)"></div>
+                        </div>
                     </div>
                     <!-- Aperçu collant : reste visible en haut de l'écran pendant qu'on
                          descend régler la police/couleur/etc. dans la liste des blocs
@@ -487,7 +492,7 @@ const guides={
     'image-to-pdf':`<div class="guide-section"><h4>Cas d'usage</h4><ul><li>Portfolio professionnel</li><li>Numérisation de documents</li><li>Présentation visuelle</li></ul></div><div class="guide-section"><h4>Options</h4><p><strong>Orientation</strong> : Portrait (vertical) ou Paysage</p><p><strong>Marges</strong> : Aucune = pleine page</p></div><div class="info-box"><strong>Note</strong>1 image = 1 page PDF.</div>`,
     'pdf-to-image':`<div class="guide-section"><h4>Cas d'usage</h4><ul><li>Réseaux sociaux : 1 page = 1 post</li><li>Extraire un graphique</li><li>Miniatures pour site web</li></ul></div><div class="guide-section"><h4>JPG ou PNG ?</h4><p><strong>JPG</strong> : léger, pas de transparence</p><p><strong>PNG</strong> : qualité max, transparence</p></div>`,
     'unlock':`<div class="guide-section"><h4>Types de protection</h4><p><strong>Retirable :</strong></p><ul><li>Impression non autorisée</li><li>Copie de texte désactivée</li></ul><p><strong>Impossible à retirer :</strong></p><ul><li>Mot de passe à l'ouverture</li></ul></div><div class="info-box warning"><strong>Légalité</strong>Utilisez uniquement sur vos propres documents.</div>`,
-    'edit':`<div class="guide-section"><h4>Ce que ça fait</h4><ul><li>Recouvre une zone de texte par un masque blanc puis écrit un nouveau texte par-dessus</li><li>Ajoute du texte libre n'importe où sur la page</li><li>Fonctionne sur une page PDF (rendue en image) ou une image directement</li></ul></div><div class="guide-section"><h4>🎯 Détecter un mot (OCR)</h4><ul><li>Touchez/cliquez directement sur le mot à remplacer dans la page</li><li>La reconnaissance de texte (Tesseract.js, 100% locale) retrouve le mot le plus proche du point touché</li><li>Un bloc masque + texte est créé automatiquement, déjà positionné et dimensionné sur le mot détecté, avec le texte reconnu pré-rempli</li><li>Ajustez ensuite le texte, la position ou la taille si besoin — l'alignement de départ est déjà quasi pixel-parfait</li><li>Premier usage : téléchargement ponctuel du moteur OCR (~2-3 Mo), mis en cache ensuite</li></ul></div><div class="guide-section"><h4>Positionnement manuel</h4><ul><li>Chaque nouveau bloc apparaît en haut de la zone visible, jamais caché au milieu du texte</li><li>Glissez pour déplacer, tirez le coin cyan pour redimensionner</li></ul></div><div class="guide-section"><h4>Typographie</h4><ul><li>13 polices (système + web) — les polices web (Roboto, Merriweather...) s'affichent identiquement chez tous les lecteurs</li><li>Taille libre de 6 à 96pt, gras, italique, souligné</li><li>Couleur du texte et du surlignage personnalisables</li><li>Surlignage "lettre uniquement" (collé au texte) ou "cadre étendu" (tout le bloc)</li><li>Alignement du texte à gauche, au centre ou à droite dans le bloc</li></ul></div><div class="guide-section"><h4>Zoom</h4><ul><li>Boutons +/- ou pincement à deux doigts sur mobile</li><li>"Ajuster" revient au zoom automatique</li></ul></div><div class="guide-section"><h4>Rendu scan</h4><p>Case "Uniformiser en rendu scan" : applique un léger niveaux de gris + contraste sur toute la page pour que les zones ajoutées se fondent mieux avec un document scanné/photographié.</p></div><div class="guide-section"><h4>Limites</h4><ul><li>Ce n'est pas une édition "en place" du texte PDF natif (police/flux d'origine)</li><li>Le rendu final d'un PDF édité redevient une image (comme un scan)</li><li>La détection OCR trouve la position du mot, pas sa police d'origine — choisissez la police manuellement si besoin</li></ul></div>`,
+    'edit':`<div class="guide-section"><h4>Ce que ça fait</h4><ul><li>Recouvre une zone de texte par un masque blanc puis écrit un nouveau texte par-dessus</li><li>Ajoute du texte libre n'importe où sur la page</li><li>Fonctionne sur une page PDF (rendue en image) ou une image directement</li></ul></div><div class="guide-section"><h4>🎯 Détecter un mot (OCR)</h4><ul><li>Touchez/cliquez directement sur le mot à remplacer dans la page</li><li>La reconnaissance de texte (Tesseract.js, 100% locale) retrouve le mot le plus proche du point touché</li><li>Un bloc masque + texte est créé automatiquement, déjà positionné et dimensionné sur le mot détecté, avec le texte reconnu et sa couleur d'encre pré-remplis</li><li>Ajustez ensuite le texte, la position ou la taille si besoin — l'alignement de départ est déjà quasi pixel-parfait</li><li>Premier usage : téléchargement ponctuel du moteur OCR (~2-3 Mo), mis en cache ensuite</li></ul></div><div class="guide-section"><h4>⬜ Masque + Texte / 🔤 Texte libre</h4><ul><li><strong>Masque + Texte</strong> : recouvre la zone d'un rectangle blanc opaque avant d'écrire par-dessus — sert à corriger/remplacer du texte existant</li><li><strong>Texte libre</strong> : ajoute juste du texte, sans masque — sert à ajouter une mention, un tampon, une note</li><li>Chaque nouveau bloc apparaît en haut de la zone visible, jamais caché au milieu du texte existant</li></ul></div><div class="guide-section"><h4>Déplacer et redimensionner un bloc</h4><ul><li>Glissez n'importe où sur le bloc pour le déplacer</li><li>Tirez le petit carré cyan au coin bas-droit (légèrement à l'extérieur du bloc) pour l'agrandir ou le réduire</li><li>Le bloc s'élargit automatiquement si le texte tapé est plus long que sa largeur actuelle — il ne se réduit jamais tout seul</li></ul></div><div class="guide-section"><h4>Navigation et zoom (barre du haut, toujours visible)</h4><ul><li><strong>← Page préc. / Page suiv. →</strong> : n'apparaît que sur un PDF de plusieurs pages</li><li><strong>－ / ＋</strong> : zoom avant/arrière par palier</li><li><strong>↺ Ajuster</strong> : revient au zoom automatique qui remplit la largeur disponible</li><li><strong>Pincement à deux doigts</strong> : zoom fluide sur mobile</li><li>La zone document reste collée en haut de l'écran pendant que vous réglez les blocs plus bas — plus besoin de remonter à chaque changement</li></ul></div><div class="guide-section"><h4>Réglages de chaque bloc, un par un</h4><ul><li><strong>Champ de texte</strong> : le contenu affiché sur le document</li><li><strong>Police</strong> : 8 polices système (rendu variable selon l'appareil du lecteur si le PDF est ouvert ailleurs qu'à l'écran — sans incidence ici puisque tout est aplati en image) + 6 polices web à rendu garanti identique partout, dont Newsreader (police utilisée par FlashContrat) + vos polices importées si vous en avez ajouté</li><li><strong>Taille (pt)</strong> : de 6 à 96, saisie libre</li><li><strong>Couleur du texte</strong> : sélecteur de couleur classique — c'est la couleur de base, avant réglage d'intensité d'encre</li><li><strong>Alignement</strong> : gauche / centre / droite du texte à l'intérieur du bloc</li><li><strong>G (gras) / I (italique) / S (souligné)</strong> : cases à cocher, cumulables</li><li><strong>🖍️ Surligné</strong> : active un fond coloré derrière le texte — réglable via les deux contrôles juste en dessous</li><li><strong>Couleur du surlignage</strong> : n'a d'effet que si "Surligné" est coché</li><li><strong>Étendue du surlignage</strong> : "Lettre uniquement" colle le surlignage au texte réellement écrit ; "Cadre étendu" colore tout le rectangle du bloc</li><li><strong>Intensité de l'encre</strong> : curseur de -90 (très clair, dilué vers le blanc) à 0 (couleur choisie telle quelle) à 100 (assombri jusqu'au noir pur) — utile pour imiter un stylo qui appuie peu, ou au contraire foncer une couleur qui paraît trop claire/grise sur le document</li><li><strong>Épaisseur du soulignement</strong> : n'a d'effet que si "S" (souligné) est coché — épaisseur du trait, proportionnelle à la taille de police choisie</li><li><strong>Épaisseur du trait des lettres</strong> : ajoute un contour aux lettres (effet stylo qui appuie fort / feutre épais) — 0 = désactivé</li><li><strong>🗑 Retirer</strong> : supprime uniquement ce bloc, sans toucher aux autres</li></ul></div><div class="guide-section"><h4>📁 Importer votre police</h4><ul><li>Ajoutez un fichier .ttf, .otf, .woff ou .woff2 — votre propre police, ou celle d'un document que vous cherchez à imiter</li><li>Elle apparaît ensuite dans le menu déroulant "Police" de chaque bloc, dans une section "Vos polices importées"</li><li>Chargée localement dans votre navigateur, pour la durée de cette session uniquement — à réimporter si vous rechargez la page</li></ul></div><div class="guide-section"><h4>🖨️ Rendu scan</h4><p>Case "Uniformiser en rendu scan" : applique un léger niveaux de gris + contraste sur toute la page pour que les zones ajoutées se fondent mieux avec un document scanné/photographié.</p></div><div class="guide-section"><h4>Limites</h4><ul><li>Ce n'est pas une édition "en place" du texte PDF natif (police/flux d'origine)</li><li>Le rendu final d'un PDF édité redevient une image (comme un scan)</li><li>La détection OCR trouve la position et la couleur du mot, pas sa police d'origine — choisissez ou importez la police manuellement si besoin</li></ul></div>`,
     'text-to-pdf':`<div class="guide-section"><h4>Détection automatique</h4><ul><li><strong>Chapitre 1, PARTIE I</strong> → Titre principal</li><li><strong>1. Titre</strong> → Sous-titre</li><li><strong>1.1 Section</strong> → Sous-section</li><li><strong>MAJUSCULES</strong> → Titre</li></ul></div><div class="guide-section"><h4>Conseils</h4><ul><li>Lignes vides pour séparer les paragraphes</li><li>Titres courts sans ponctuation finale</li></ul></div>`,
     'html-to-pdf':`<div class="guide-section"><h4>Balises supportées</h4><ul><li>Titres : h1, h2, h3</li><li>Texte : p, b, i, u, br</li><li>Listes : ul, ol, li</li></ul></div><div class="info-box warning"><strong>Limitations</strong>CSS, images et tableaux non supportés. Pour HTML complexe : Ctrl+P dans le navigateur.</div>`
 };
@@ -965,7 +970,7 @@ function renderEditBlocks(){
         span.className='edit-block-text-span';
         span.textContent=b.text;
         const textHighlightBg=(b.highlight&&b.highlightMode==='text')?hexToRgba(b.highlightColor,.65):'transparent';
-        span.style.cssText=`font-size:${r.fontSize}px;font-weight:${b.bold?'700':'400'};font-style:${b.italic?'italic':'normal'};font-family:${fontFamilyCss(b.fontFamily)};text-decoration:${b.underline?'underline':'none'};text-decoration-thickness:${relThickness(b.underlineThickness!=null?b.underlineThickness:2,r.fontSize)}px;-webkit-text-stroke:${(b.strokeWidth||0)>0?`${relThickness(b.strokeWidth,r.fontSize)}px ${inkColor(b.inkIntensity,b.color)}`:'0'};background:${textHighlightBg};color:${inkColor(b.inkIntensity,b.color)};padding:0 2px;border-radius:2px;white-space:nowrap;`;
+        span.style.cssText=`font-size:${r.fontSize}px;font-weight:${b.bold?'700':'400'};font-style:${b.italic?'italic':'normal'};font-family:${fontFamilyCss(b.fontFamily)};text-decoration:${b.underline?'underline':'none'};text-decoration-thickness:${relThickness(b.underlineThickness!=null?b.underlineThickness:2,r.fontSize)}px;-webkit-text-stroke:${(b.strokeWidth||0)>0?`${relThickness(b.strokeWidth,r.fontSize)}px ${inkColor(b.inkIntensity,b.color)}`:'0'};background:${textHighlightBg};color:${inkColor(b.inkIntensity,b.color)};-webkit-text-fill-color:${inkColor(b.inkIntensity,b.color)};padding:0 2px;border-radius:2px;white-space:nowrap;`;
         el.appendChild(span);
         // La poignée n'est PAS un enfant du bloc : le bloc a overflow:hidden
         // (pour bien couper le texte qui dépasse), ce qui coupait aussi la
@@ -989,6 +994,49 @@ function positionResizeHandle(handle,block){
     handle.style.top=(r.y+r.h-2)+'px';
 }
 
+// ── POLICES PERSONNALISÉES IMPORTÉES ─────────────────
+// L'utilisateur peut importer sa propre police (.ttf/.otf/.woff/.woff2) pour
+// faire correspondre exactement le rendu d'un document généré par une autre
+// app FlashTools (ou tout autre document) qui utiliserait une police absente
+// de la liste par défaut. Chargée via la Font Loading API, 100% locale.
+let customFonts=[]; // {id, label, family}
+let customFontCounter=0;
+
+document.getElementById('edit-font-upload').addEventListener('change',async function(e){
+    const file=e.target.files[0];
+    if(!file)return;
+    const validExt=/\.(ttf|otf|woff2?|TTF|OTF|WOFF2?)$/;
+    if(!validExt.test(file.name)){
+        alert('Format non reconnu. Choisissez un fichier .ttf, .otf, .woff ou .woff2.');
+        this.value='';
+        return;
+    }
+    try{
+        const buf=await file.arrayBuffer();
+        customFontCounter++;
+        const familyName='FPCustomFont'+customFontCounter;
+        const label=file.name.replace(/\.(ttf|otf|woff2?|TTF|OTF|WOFF2?)$/,'').slice(0,40);
+        const face=new FontFace(familyName,buf);
+        await face.load();
+        document.fonts.add(face);
+        customFonts.push({id:familyName,label,family:familyName});
+        renderCustomFontsList();
+        renderEditBlocksList(); // rafraîchit les menus déroulants avec la nouvelle police disponible
+        this.value='';
+    }catch(err){
+        console.error(err);
+        alert('Impossible de charger cette police : '+err.message);
+        this.value='';
+    }
+});
+
+function renderCustomFontsList(){
+    const el=document.getElementById('edit-custom-fonts-list');
+    if(!el)return;
+    if(!customFonts.length){el.innerHTML='';return;}
+    el.innerHTML='Polices disponibles cette session : '+customFonts.map(f=>f.label).join(', ');
+}
+
 function fontFamilyCss(name){
     if(name==='Times')return"'Times New Roman', Times, serif";
     if(name==='Courier')return"'Courier New', Courier, monospace";
@@ -1002,6 +1050,9 @@ function fontFamilyCss(name){
     if(name==='PlayfairDisplay')return"'Playfair Display', serif";
     if(name==='BebasNeue')return"'Bebas Neue', sans-serif";
     if(name==='Caveat')return"'Caveat', cursive";
+    if(name==='Newsreader')return"'Newsreader', serif";
+    const custom=customFonts.find(f=>f.id===name);
+    if(custom)return`'${custom.family}', sans-serif`;
     return"Helvetica, Arial, sans-serif";
 }
 async function ensureWebFontsLoaded(blocks){
@@ -1012,6 +1063,7 @@ async function ensureWebFontsLoaded(blocks){
         if(b.fontFamily==='PlayfairDisplay')families.add(`700 16px 'Playfair Display'`);
         if(b.fontFamily==='BebasNeue')families.add(`16px 'Bebas Neue'`);
         if(b.fontFamily==='Caveat')families.add(`700 16px 'Caveat'`);
+        if(b.fontFamily==='Newsreader')families.add(`700 16px 'Newsreader'`);
     });
     if(!families.size)return;
     try{await Promise.all([...families].map(f=>document.fonts.load(f)));await document.fonts.ready;}catch(e){}
@@ -1315,8 +1367,9 @@ function renderEditBlocksList(){
                     <optgroup label="Web (rendu garanti)">
                         <option value="Roboto">Roboto</option><option value="Merriweather">Merriweather</option>
                         <option value="PlayfairDisplay">Playfair Display</option><option value="BebasNeue">Bebas Neue</option>
-                        <option value="Caveat">Caveat (manuscrite)</option>
+                        <option value="Caveat">Caveat (manuscrite)</option><option value="Newsreader">Newsreader (police FlashContrat)</option>
                     </optgroup>
+                    ${customFonts.length?`<optgroup label="Vos polices importées">${customFonts.map(f=>`<option value="${f.id}">${f.label}</option>`).join('')}</optgroup>`:''}
                 </select></div>
                 <div style="flex:1;min-width:70px"><label style="font-size:.8em">Taille (pt)</label><input type="number" min="6" max="96" step="1" data-id="${b.id}" class="edit-block-size"></div>
             </div>
@@ -1390,7 +1443,7 @@ function renderEditBlocksList(){
         inp.addEventListener('input',()=>{
             b.color=inp.value;
             const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);
-            if(span){span.style.color=inkColor(b.inkIntensity,b.color);if((b.strokeWidth||0)>0)span.style.webkitTextStroke=`${relThickness(b.strokeWidth,getBlockFontSizePx(b))}px ${inkColor(b.inkIntensity,b.color)}`;}
+            if(span){span.style.color=inkColor(b.inkIntensity,b.color);span.style.webkitTextFillColor=inkColor(b.inkIntensity,b.color);if((b.strokeWidth||0)>0)span.style.webkitTextStroke=`${relThickness(b.strokeWidth,getBlockFontSizePx(b))}px ${inkColor(b.inkIntensity,b.color)}`;}
         });
     });
     c.querySelectorAll('.edit-block-align').forEach(radio=>{
@@ -1441,7 +1494,8 @@ function renderEditBlocksList(){
         const b=blocks.find(x=>x.id===rng.dataset.id);rng.value=b.inkIntensity!=null?b.inkIntensity:0;
         rng.addEventListener('input',()=>{
             b.inkIntensity=parseInt(rng.value);
-            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);if(span)span.style.color=inkColor(b.inkIntensity,b.color);
+            const span=document.querySelector(`.edit-block[data-id="${b.id}"] .edit-block-text-span`);
+            if(span){span.style.color=inkColor(b.inkIntensity,b.color);span.style.webkitTextFillColor=inkColor(b.inkIntensity,b.color);if((b.strokeWidth||0)>0)span.style.webkitTextStroke=`${relThickness(b.strokeWidth,getBlockFontSizePx(b))}px ${inkColor(b.inkIntensity,b.color)}`;}
             const valEl=rng.closest('.option-row').querySelector('.edit-block-ink-value');if(valEl)valEl.textContent=b.inkIntensity;
         });
     });
