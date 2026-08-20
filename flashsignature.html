@@ -289,6 +289,12 @@ input[type=color]{height:40px;padding:3px;cursor:pointer;border-radius:8px;}
           <input type="color" id="resultColor" value="#1a1a2e" oninput="applySkew()">
         </div>
       </div>
+      <div class="row">
+        <div class="fld">
+          <label>Fluidité du tracé</label>
+          <input type="range" id="smoothSlider" min="0.5" max="5" value="2.2" step="0.1" oninput="reprocessSmoothing()">
+        </div>
+      </div>
     </div>
 
     <!-- Aperçu rendu final -->
@@ -309,7 +315,7 @@ input[type=color]{height:40px;padding:3px;cursor:pointer;border-radius:8px;}
     </div>
 
     <div class="note v" style="margin-top:12px;">
-      Geste lent = trait épais · Geste rapide = trait fin · Utilisez le curseur Inclinaison pour redresser ou pencher l'ensemble. La couleur résultat suit l'encre par défaut — changez-la séparément si vous voulez harmoniser tous les traits en une seule teinte.
+      Geste lent = trait épais · Geste rapide = trait fin · Utilisez le curseur Inclinaison pour redresser ou pencher l'ensemble. Le curseur Fluidité arrondit les jonctions ratées entre lettres si votre geste a été hésitant — à pousser doucement, un excès effacerait les détails de votre vraie signature. La couleur résultat suit l'encre par défaut — changez-la séparément si vous voulez harmoniser tous les traits en une seule teinte.
     </div>
   </div>
 
@@ -474,6 +480,7 @@ const D={
   lastX:0, lastY:0, lastT:0,
 };
 const MIN_DIST=3; // distance minimale entre 2 points, en pixels ÉCRAN réels (indépendant de la résolution du canvas)
+let smoothEps=2.2; // épaisseur de lissage Douglas-Peucker, réglable via le curseur Fluidité
 
 function initDraw(){
   const pad=document.getElementById('drawPad');
@@ -643,7 +650,8 @@ function finStroke(p){
     // un paraphe ou le point sur un "i" — au lieu d'être silencieusement ignoré.
     if(D.pts.length===1){
       const pt=D.pts[0];
-      D.strokes.push({pts:[{x:pt.x,y:pt.y,w:pt.w},{x:pt.x+0.01,y:pt.y+0.01,w:pt.w}],color:D.color});
+      const single=[{x:pt.x,y:pt.y,w:pt.w},{x:pt.x+0.01,y:pt.y+0.01,w:pt.w}];
+      D.strokes.push({pts:single,rawPts:single,color:D.color});
     }
     D.pts=[];
     redrawRaw(p);
@@ -651,8 +659,12 @@ function finStroke(p){
     return;
   }
   // Simplification légère : supprimer les points redondants (Douglas-Peucker simplifié)
-  const simplified=simplify(D.pts,2.2);
-  D.strokes.push({pts:simplified,color:D.color});
+  // On conserve rawPts (les points bruts, avant simplification) séparément : c'est ce qui
+  // permet à reprocessSmoothing() de recalculer un lissage différent plus tard, quand
+  // l'utilisateur bouge le curseur Fluidité, sans avoir à redemander le dessin.
+  const rawPts=D.pts;
+  const simplified=simplify(rawPts,smoothEps);
+  D.strokes.push({pts:simplified,rawPts:rawPts,color:D.color});
   D.pts=[];
   redrawRaw(p);
   applySkew(); // Met à jour le preview avec skew
@@ -678,6 +690,20 @@ function pointToSegmentDist(p,a,b){
   if(dx===0&&dy===0) return Math.hypot(p.x-a.x,p.y-a.y);
   const t=Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/(dx*dx+dy*dy)));
   return Math.hypot(p.x-a.x-t*dx,p.y-a.y-t*dy);
+}
+
+// Recalcule le lissage de TOUS les traits déjà dessinés à partir de leurs points
+// bruts (rawPts), avec la nouvelle valeur du curseur Fluidité — sans effacer le
+// dessin ni redemander à l'utilisateur de recommencer. Appelée à chaque déplacement
+// du curseur smoothSlider.
+function reprocessSmoothing(){
+  smoothEps=+(document.getElementById('smoothSlider')?.value||2.2);
+  D.strokes.forEach(s=>{
+    if(s.rawPts) s.pts=simplify(s.rawPts,smoothEps);
+  });
+  const p=document.getElementById('drawPad');
+  redrawRaw(p);
+  applySkew();
 }
 
 // Skew global appliqué sur le canvas PREVIEW
