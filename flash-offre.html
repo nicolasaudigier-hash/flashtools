@@ -24,10 +24,9 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webk
 .brand span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;}
 .brand .ext{color:var(--text-dim);font-weight:600;}
 
-.banner{display:none;align-items:center;gap:8px;text-align:center;justify-content:center;
+.banner{display:flex;align-items:center;gap:8px;text-align:center;justify-content:center;
   background:var(--surface);border:1px solid var(--border-cyan);border-radius:12px;
   padding:12px 16px;margin-bottom:26px;font-size:13.5px;color:var(--text-dim);}
-.banner.show{display:flex;}
 .banner b{color:var(--text);font-weight:600;}
 
 .hero{text-align:center;margin-bottom:30px;}
@@ -51,9 +50,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webk
 
 .trust{text-align:center;font-size:13px;color:var(--text-dim);margin-bottom:28px;}
 
-.altpath{display:none;text-align:center;font-size:13.5px;color:var(--text-dim);
+.altpath{text-align:center;font-size:13.5px;color:var(--text-dim);
   border-top:1px solid var(--border);padding-top:20px;}
-.altpath.show{display:block;}
 .altpath a{color:var(--cyan);font-weight:600;text-decoration:none;}
 
 @media (max-width:420px){
@@ -69,7 +67,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webk
     <span>FlashTools</span><span class="ext">.fr</span>
   </a>
 
-  <div class="banner" id="banner"></div>
+  <div class="banner">🔒 <b>Cet outil fait partie de FlashTools.</b> Un abonnement est nécessaire pour y accéder.</div>
 
   <div class="hero">
     <h1>Choisis ton offre</h1>
@@ -82,7 +80,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webk
         <div class="label">Mensuel</div>
         <div class="price">5€<span>/mois</span></div>
       </div>
-      <a class="cta ghost" href="https://www.flashtools.fr/flashtools-mensuel" target="_blank" rel="noopener">Choisir</a>
+      <a class="cta ghost" href="https://www.flashtools.fr/flashtools-mensuel">Choisir</a>
     </div>
 
     <div class="plan highlight">
@@ -90,7 +88,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webk
         <div class="label">Annuel</div>
         <div class="price">50€<span>/an</span></div>
       </div>
-      <a class="cta primary" href="https://www.flashtools.fr/flashtools-annuel" target="_blank" rel="noopener">Choisir</a>
+      <a class="cta primary" href="https://www.flashtools.fr/flashtools-annuel">Choisir</a>
     </div>
   </div>
 
@@ -98,24 +96,11 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webk
 
   <div class="trust">🔒 Paiement sécurisé · ✅ Résiliation en quelques clics, depuis votre espace</div>
 
-  <div class="altpath" id="altpath">
+  <div class="altpath">
     Pas encore de compte ? <a href="https://www.flashtools.fr/flashtools-inscription">Essaie gratuitement 7 jours, sans carte bancaire</a>.
   </div>
 
 </div>
 
-<script>
-var status = new URLSearchParams(location.search).get('status');
-var banner = document.getElementById('banner');
-
-if (status === 'expired') {
-  banner.innerHTML = '⏳ <b>Ton essai de 7 jours est terminé.</b> Choisis une offre pour continuer.';
-  banner.classList.add('show');
-} else if (status === 'blocked') {
-  banner.innerHTML = '🔒 <b>Cet outil fait partie de FlashTools.</b> Un abonnement est nécessaire pour y accéder.';
-  banner.classList.add('show');
-  document.getElementById('altpath').classList.add('show');
-}
-</script>
 </body>
 </html>
