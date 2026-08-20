@@ -479,6 +479,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
               <div class="logo-pinfo-title">Logo chargé</div>
               <div class="logo-pinfo-sub">Occupe ~22% du centre du QR. Le niveau H garantit la lisibilité même avec le logo masqué.</div>
               <div class="logo-pinfo-name" id="logo-pname">logo.png</div>
+            <div style="font-size:10.5px;color:var(--ink4);margin-top:6px;line-height:1.5;">Si le logo ne s'affiche pas ci-dessus selon votre navigateur, il reste bien présent dans le fichier téléchargé.</div>
             </div>
           </div>
           <button class="logo-rm-btn" onclick="removeLogo()">
@@ -563,39 +564,48 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
       </div>
     </div>
 
-    <!-- GUIDE — accordéon sur mobile -->
-    <div class="card">
-      <div class="acc-head" id="guide-head" onclick="toggleAcc('guide')">
-        <span class="card-title">Guide & Bonnes pratiques</span>
-        <span class="acc-chev">▾</span>
-      </div>
-      <div class="acc-body" id="guide-body">
-        <div class="card-body">
-          <ul class="gl">
-            <li class="gi"><div class="gi-ico">🔗</div><div><div class="gi-name">URL — Site web</div><div class="gi-desc">Le plus universel. Compatible avec tous les téléphones dès l'appareil photo.</div><div class="gi-tags"><span class="gi-tag">Menu PDF</span><span class="gi-tag">Avis Google</span><span class="gi-tag">Formulaire</span><span class="gi-tag">Portfolio</span></div></div></li>
-            <li class="gi"><div class="gi-ico">👤</div><div><div class="gi-name">vCard — Carte de visite</div><div class="gi-desc">Le contact s'enregistre automatiquement dans le téléphone.</div><div class="gi-tags"><span class="gi-tag">Badge salon</span><span class="gi-tag">Signature mail</span><span class="gi-tag">Stand</span></div></div></li>
-            <li class="gi"><div class="gi-ico">📶</div><div><div class="gi-name">WiFi — Connexion auto</div><div class="gi-desc">Sans taper le mot de passe. iOS 11+ et Android 10+.</div><div class="gi-tags"><span class="gi-tag">Restaurant</span><span class="gi-tag">Airbnb</span><span class="gi-tag">Coworking</span></div></div></li>
-            <li class="gi"><div class="gi-ico">💰</div><div><div class="gi-name">Paiement — Encaissement</div><div class="gi-desc">PayPal, Stripe ou Lydia. Scan → paiement immédiat.</div><div class="gi-tags"><span class="gi-tag">Stand marché</span><span class="gi-tag">Pourboire</span><span class="gi-tag">Don</span></div></div></li>
-          </ul>
-          <div class="ibox">
-            <div class="ibox-title">💡 QR statique vs dynamique</div>
-            <div class="ibox-body">Ce générateur crée des QR <strong style="color:rgba(255,255,255,.85)">statiques</strong> : l'information est gravée dans le dessin. Si votre URL change après impression, le QR est mort. Pour un usage intensif, un service de QR dynamiques permet de changer la destination sans réimprimer.</div>
-          </div>
-          <div class="ptips">
-            <div class="ptips-title">Conseils d'impression</div>
-            <div class="pgrid">
-              <div class="pi"><div class="pi-ico">📐</div><div class="pi-txt"><strong>Min. 2×2 cm</strong> pour 30 cm de distance</div></div>
-              <div class="pi"><div class="pi-ico">🎨</div><div class="pi-txt"><strong>Fort contraste</strong> — foncé sur fond clair</div></div>
-              <div class="pi"><div class="pi-ico">⬜</div><div class="pi-txt"><strong>Marge blanche</strong> tout autour du QR</div></div>
-              <div class="pi"><div class="pi-ico">📱</div><div class="pi-txt"><strong>Testez</strong> sur 2 téléphones avant impression</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
   </div><!-- /col-preview -->
 </div><!-- /app -->
+
+<!-- GUIDE — pleine largeur, hors de la grille à 2 colonnes. Auparavant dans
+     col-preview (sticky), ce bloc toujours déplié sur desktop allongeait
+     fortement la colonne de droite par rapport à la colonne de gauche (plus
+     courte) : au-delà de la hauteur de cette dernière, un grand vide apparaissait
+     à gauche pendant que la droite continuait de scroller. En pleine largeur ici,
+     ce problème disparaît. -->
+<div class="app" style="padding-top:0;display:block;">
+  <div class="card">
+    <div class="acc-head" id="guide-head" onclick="toggleAcc('guide')">
+      <span class="card-title">Guide & Bonnes pratiques</span>
+      <span class="acc-chev">▾</span>
+    </div>
+    <div class="acc-body" id="guide-body">
+      <div class="card-body">
+        <ul class="gl">
+          <li class="gi"><div class="gi-ico">🔗</div><div><div class="gi-name">URL — Site web</div><div class="gi-desc">Le plus universel. Compatible avec tous les téléphones dès l'appareil photo.</div><div class="gi-tags"><span class="gi-tag">Menu PDF</span><span class="gi-tag">Avis Google</span><span class="gi-tag">Formulaire</span><span class="gi-tag">Portfolio</span></div></div></li>
+          <li class="gi"><div class="gi-ico">👤</div><div><div class="gi-name">vCard — Carte de visite</div><div class="gi-desc">Le contact s'enregistre automatiquement dans le téléphone.</div><div class="gi-tags"><span class="gi-tag">Badge salon</span><span class="gi-tag">Signature mail</span><span class="gi-tag">Stand</span></div></div></li>
+          <li class="gi"><div class="gi-ico">📶</div><div><div class="gi-name">WiFi — Connexion auto</div><div class="gi-desc">Sans taper le mot de passe. iOS 11+ et Android 10+.</div><div class="gi-tags"><span class="gi-tag">Restaurant</span><span class="gi-tag">Airbnb</span><span class="gi-tag">Coworking</span></div></div></li>
+          <li class="gi"><div class="gi-ico">💰</div><div><div class="gi-name">Paiement — Encaissement</div><div class="gi-desc">PayPal, Stripe ou Lydia. Scan → paiement immédiat.</div><div class="gi-tags"><span class="gi-tag">Stand marché</span><span class="gi-tag">Pourboire</span><span class="gi-tag">Don</span></div></div></li>
+        </ul>
+        <div class="ibox">
+          <div class="ibox-title">💡 QR statique vs dynamique</div>
+          <div class="ibox-body">Ce générateur crée des QR <strong style="color:rgba(255,255,255,.85)">statiques</strong> : l'information est gravée dans le dessin. Si votre URL change après impression, le QR est mort. Pour un usage intensif, un service de QR dynamiques permet de changer la destination sans réimprimer.</div>
+        </div>
+        <div class="ptips">
+          <div class="ptips-title">Conseils d'impression</div>
+          <div class="pgrid">
+            <div class="pi"><div class="pi-ico">📐</div><div class="pi-txt"><strong>Min. 2×2 cm</strong> pour 30 cm de distance</div></div>
+            <div class="pi"><div class="pi-ico">🎨</div><div class="pi-txt"><strong>Fort contraste</strong> — foncé sur fond clair</div></div>
+            <div class="pi"><div class="pi-ico">⬜</div><div class="pi-txt"><strong>Marge blanche</strong> tout autour du QR</div></div>
+            <div class="pi"><div class="pi-ico">📱</div><div class="pi-txt"><strong>Testez</strong> sur 2 téléphones avant impression</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
