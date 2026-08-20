@@ -5,8 +5,8 @@
 <meta name="robots" content="noindex">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Générateur QR Code Gratuit — FlashTools</title>
-<meta name="description" content="Créez votre QR Code en quelques secondes. URL, vCard, WiFi, Email, SMS, Paiement. Export PNG & SVG. 100% gratuit, aucune donnée envoyée.">
+<title>Générateur QR Code — FlashTools</title>
+<meta name="description" content="Créez votre QR Code en quelques secondes. URL, vCard, WiFi, Email, SMS, Paiement. Export PNG & SVG. Aucune donnée envoyée.">
 <meta name="theme-color" content="#0a0e27">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -38,7 +38,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);line-height:1
 .logo-tool{color:rgba(255,255,255,.55);font-weight:400}
 .badge-free{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:rgba(6,182,212,.18);color:#67e8f9;border:1px solid rgba(6,182,212,.28);white-space:nowrap}
 
-/* LAYOUT DESKTOP — aperçu gauche (sticky), formulaire droite */
+/* LAYOUT DESKTOP — formulaire gauche, aperçu droite (sticky) */
 .app{max-width:1080px;margin:0 auto;padding:20px 18px 60px;display:grid;grid-template-columns:1fr 420px;gap:20px;align-items:start}
 .col-preview{display:flex;flex-direction:column;gap:16px;position:sticky;top:70px}
 .col-form{display:flex;flex-direction:column;gap:16px}
@@ -64,6 +64,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);line-height:1
 #qrwrap{padding:16px;background:#fff;border-radius:12px;box-shadow:0 6px 28px rgba(0,0,0,.17);display:none;position:relative;z-index:1}
 #qrwrap.on{display:block}
 #qrcode canvas,#qrcode img{display:block;border-radius:3px}
+#qrwrap.rendering{opacity:.55}
 .qr-badge{position:absolute;top:10px;right:10px;background:#fff;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:700;color:var(--p);box-shadow:0 2px 8px rgba(0,0,0,.1);display:none;z-index:2}
 .qr-badge.on{display:block}
 .qr-ts{font-size:11px;font-family:var(--mono);color:var(--ink4);text-align:center;display:none;padding:6px 0 0}
@@ -105,6 +106,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);line-height:1
 .btn-dl:active{transform:scale(.97)}
 .btn-dl.pri{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 3px 12px rgba(6,182,212,.35)}
 .btn-dl.pri:hover{box-shadow:0 6px 18px rgba(6,182,212,.45);transform:translateY(-1px);color:#fff}
+.btn-dl:disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
 .btn-copy{width:100%;padding:10px;border-radius:var(--rs);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;background:var(--sur);border:1.5px solid var(--bd);color:var(--ink3);display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s var(--ease)}
 .btn-copy:hover{border-color:var(--p);color:var(--p)}
 .btn-copy.copied{background:var(--ok);color:#fff;border-color:var(--ok)}
@@ -113,6 +115,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);line-height:1
 .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px}
 .pill.idle{background:var(--sur2);color:var(--ink4)}
 .pill.ready{background:rgba(16,185,129,.1);color:var(--ok)}
+.pill.busy{background:rgba(245,158,11,.1);color:var(--warn)}
 .pill-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
 
 /* TYPE SELECTOR */
@@ -281,7 +284,6 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     </div>
     <span class="logo-name">FlashTools<span class="logo-sep"> / </span><span class="logo-tool">QR Code</span></span>
   </a>
-  <span class="badge-free">100% local</span>
 </header>
 
 <div class="app">
@@ -394,6 +396,11 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 
         <div class="fsec" id="form-phone">
           <div class="ctx-tip"><div class="ctx-tip-title">📞 Appel direct</div><div class="ctx-tip-body">Un scan lance immédiatement l'appel. Pratique sur une affiche pour joindre un service client.</div></div>
+          <div class="ex-lbl">Exemples rapides</div>
+          <div class="ex-row">
+            <button class="chip" onclick="fillPH('+33 1 23 45 67 89')">☎️ Service client</button>
+            <button class="chip" onclick="fillPH('+33 6 12 34 56 78')">📱 Mobile pro</button>
+          </div>
           <div class="fg"><label for="ph-num">Numéro <span class="req">*</span></label><input type="tel" id="ph-num" placeholder="+33 1 XX XX XX XX" oninput="dgen()"><p class="fhint">Format international : <strong>+33</strong> puis le numéro sans le 0.</p></div>
         </div>
 
@@ -491,10 +498,10 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 
         <div class="dl-wrap" id="dl-wrap">
           <div class="dl-grid">
-            <button class="btn-dl pri" onclick="dlPNG()">
+            <button class="btn-dl pri" id="btn-dl-png" onclick="dlPNG()">
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v7M6.5 8l-2.5-2.5M6.5 8l2.5-2.5M1 11h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>PNG
             </button>
-            <button class="btn-dl" onclick="dlSVG()">
+            <button class="btn-dl" id="btn-dl-svg" onclick="dlSVG()">
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v7M6.5 8l-2.5-2.5M6.5 8l2.5-2.5M1 11h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>SVG
             </button>
           </div>
@@ -595,6 +602,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 <script>
 let cType='url',cCorr='L',logoData=null,debT=null,qrInst=null;
 const LABELS={url:'URL',vcard:'vCard',wifi:'WiFi',email:'Email',sms:'SMS',phone:'Tél',text:'Texte',payment:'Paiement'};
+const LOGO_MAX_BYTES=1024*1024; // 1 Mo — cohérent avec le texte affiché dans l'UI
 function utf8(s){return unescape(encodeURIComponent(s));}
 function escWifi(s){return s.replace(/([\\;,"])/g,'\\$1');}
 
@@ -656,6 +664,7 @@ function fillVC(fn,ln,co,ti,ph,em,ws){
 function fillWF(s,p,e){document.getElementById('wf-ssid').value=s;document.getElementById('wf-pw').value=p;document.getElementById('wf-enc').value=e;dgen();}
 function fillEM(a,s,b){document.getElementById('em-addr').value=a;document.getElementById('em-subj').value=s;document.getElementById('em-body').value=b;dgen();}
 function fillSM(p,m){document.getElementById('sm-ph').value=p;document.getElementById('sm-msg').value=m;dgen();}
+function fillPH(p){document.getElementById('ph-num').value=p;dgen();}
 function fillTX(t){document.getElementById('tx-cnt').value=t;dgen();}
 
 /* VALIDATION */
@@ -726,19 +735,52 @@ function renderQ(data){
   itms.innerHTML=q.items.map(i=>`<span class="qi ${i.c}"><span class="qi-dot"></span>${i.l}</span>`).join('');
 }
 
-/* GENERATE */
+/* GENERATE — attend désormais que le logo (s'il y en a un) soit réellement peint
+   sur le canvas avant d'afficher l'aperçu comme "prêt". Auparavant, applyLogo()
+   chargeait l'image de façon asynchrone (img.onload) pendant que showPreview()
+   s'exécutait déjà juste après, sans attendre — l'aperçu pouvait donc s'afficher
+   une fraction de seconde avant que le logo soit peint, donnant l'impression qu'il
+   manquait, alors qu'il finissait par apparaître (et était bien présent à l'export,
+   puisque le téléchargement a lieu forcément après, une fois l'image chargée). */
 function genQR(){
   const data=getQRData();
   if(!data)return;
   const color=document.getElementById('qr-color').value,bg=document.getElementById('qr-bg').value,size=parseInt(document.getElementById('qr-size').value);
   document.getElementById('qrcode').innerHTML='';
   qrInst=new QRCode(document.getElementById('qrcode'),{text:utf8(data),width:size,height:size,colorDark:color,colorLight:bg,correctLevel:QRCode.CorrectLevel[cCorr],useSVG:false});
+
+  setDlEnabled(false);
+  document.getElementById('qrwrap').classList.add('rendering');
+  setStatus('busy','Génération…');
+
   setTimeout(()=>{
-    if(logoData)applyLogo(size);
-    showPreview();
-    renderQ(data);
-    if(window.innerWidth<=860)document.getElementById('preview-card').scrollIntoView({behavior:'smooth',block:'start'});
+    const finish=()=>{
+      document.getElementById('qrwrap').classList.remove('rendering');
+      setDlEnabled(true);
+      showPreview();
+      renderQ(data);
+      setStatus('ready','Généré');
+      if(window.innerWidth<=860)document.getElementById('preview-card').scrollIntoView({behavior:'smooth',block:'start'});
+    };
+    if(logoData){
+      applyLogo(size).then(finish).catch(finish); // même en cas d'échec du logo, on débloque l'UI
+    }else{
+      finish();
+    }
   },60);
+}
+
+function setDlEnabled(enabled){
+  document.getElementById('btn-dl-png').disabled=!enabled;
+  document.getElementById('btn-dl-svg').disabled=!enabled;
+}
+
+function setStatus(state,label){
+  ['status-pill','preview-pill'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.className='pill '+state;
+    el.innerHTML='<span class="pill-dot"></span>'+label;
+  });
 }
 
 function showPreview(){
@@ -753,60 +795,68 @@ function showPreview(){
   document.getElementById('scan-tip').classList.add('on');
   document.getElementById('dl-wrap').classList.add('on');
   document.getElementById('static-warn').classList.remove('on');
-  document.getElementById('preview-pill').className='pill ready';
-  document.getElementById('preview-pill').innerHTML='<span class="pill-dot"></span>Prêt';
-  document.getElementById('status-pill').className='pill ready';
-  document.getElementById('status-pill').innerHTML='<span class="pill-dot"></span>Généré';
 }
 
-/* LOGO */
+/* LOGO — retourne désormais une Promise, résolue une fois le logo réellement
+   peint sur le canvas (ou en cas d'échec de chargement/dessin), pour que genQR()
+   puisse attendre cette étape avant d'afficher l'aperçu comme terminé. */
 function applyLogo(size){
-  const canvas=document.querySelector('#qrcode canvas');
-  if(!canvas||!logoData)return;
-  const ctx=canvas.getContext('2d'),ls=size*.22,x=(size-ls)/2,y=(size-ls)/2,img=new Image();
-  img.onload=()=>{
-    try{
-      ctx.fillStyle=document.getElementById('qr-bg').value;
-      const rx=x-5,ry=y-5,rw=ls+10,rh=ls+10,rr=8;
-      ctx.beginPath();
-      ctx.moveTo(rx+rr,ry);
-      ctx.lineTo(rx+rw-rr,ry);
-      ctx.arcTo(rx+rw,ry,rx+rw,ry+rr,rr);
-      ctx.lineTo(rx+rw,ry+rh-rr);
-      ctx.arcTo(rx+rw,ry+rh,rx+rw-rr,ry+rh,rr);
-      ctx.lineTo(rx+rr,ry+rh);
-      ctx.arcTo(rx,ry+rh,rx,ry+rh-rr,rr);
-      ctx.lineTo(rx,ry+rr);
-      ctx.arcTo(rx,ry,rx+rr,ry,rr);
-      ctx.closePath();
-      ctx.fill();
-      ctx.drawImage(img,x,y,ls,ls);
-    }catch(e){
+  return new Promise((resolve)=>{
+    const canvas=document.querySelector('#qrcode canvas');
+    if(!canvas||!logoData){resolve();return;}
+    const ctx=canvas.getContext('2d'),ls=size*.22,x=(size-ls)/2,y=(size-ls)/2,img=new Image();
+    img.onload=()=>{
       try{
         ctx.fillStyle=document.getElementById('qr-bg').value;
-        ctx.fillRect(x-5,y-5,ls+10,ls+10);
+        const rx=x-5,ry=y-5,rw=ls+10,rh=ls+10,rr=8;
+        ctx.beginPath();
+        ctx.moveTo(rx+rr,ry);
+        ctx.lineTo(rx+rw-rr,ry);
+        ctx.arcTo(rx+rw,ry,rx+rw,ry+rr,rr);
+        ctx.lineTo(rx+rw,ry+rh-rr);
+        ctx.arcTo(rx+rw,ry+rh,rx+rw-rr,ry+rh,rr);
+        ctx.lineTo(rx+rr,ry+rh);
+        ctx.arcTo(rx,ry+rh,rx,ry+rh-rr,rr);
+        ctx.lineTo(rx,ry+rr);
+        ctx.arcTo(rx,ry,rx+rr,ry,rr);
+        ctx.closePath();
+        ctx.fill();
         ctx.drawImage(img,x,y,ls,ls);
-      }catch(e2){
-        toast('Logo non appliqué — réessayez ou changez de navigateur');
+      }catch(e){
+        try{
+          ctx.fillStyle=document.getElementById('qr-bg').value;
+          ctx.fillRect(x-5,y-5,ls+10,ls+10);
+          ctx.drawImage(img,x,y,ls,ls);
+        }catch(e2){
+          toast('Logo non appliqué — réessayez ou changez de navigateur');
+        }
       }
-    }
-  };
-  img.onerror=()=>{toast('Logo illisible — réessayez avec un autre fichier');};
-  img.src=logoData;
+      resolve();
+    };
+    img.onerror=()=>{toast('Logo illisible — réessayez avec un autre fichier');resolve();};
+    img.src=logoData;
+  });
 }
+
 function handleLogo(input){
   if(!input.files||!input.files[0])return;
+  const file=input.files[0];
+  if(file.size>LOGO_MAX_BYTES){
+    toast('Logo trop lourd — 1 Mo maximum');
+    input.value='';
+    return;
+  }
   const reader=new FileReader();
   reader.onload=e=>{
     logoData=e.target.result;
     document.getElementById('logo-pimg').src=logoData;
-    document.getElementById('logo-pname').textContent=input.files[0].name;
+    document.getElementById('logo-pname').textContent=file.name;
     document.getElementById('logo-pzone').classList.add('on');
     if(cCorr!=='H')setCorr('H',document.querySelector('.ci:last-child'));
     else genQR();
     toast('Logo chargé — visible au centre du QR · Niveau H activé');
   };
-  reader.readAsDataURL(input.files[0]);
+  reader.readAsDataURL(file);
 }
 function removeLogo(){
   logoData=null;
