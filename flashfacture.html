@@ -393,8 +393,11 @@
                     <select id="vatMention" onchange="updatePreview()">
                         <option value="">Aucune mention spéciale</option>
                         <option value="article293b">TVA non applicable, article 293B CGI</option>
-                        <option value="autoliquidation">Autoliquidation — article 242 nonies A CGI</option>
+                        <option value="autoliquidation_intracom">Autoliquidation intracommunautaire (art. 283-2 CGI)</option>
+                        <option value="autoliquidation_btp">Autoliquidation sous-traitance BTP (art. 283-2 nonies CGI)</option>
+                        <option value="hors_ue">TVA non applicable, client hors UE (art. 259-1 CGI)</option>
                     </select>
+                    <small><a href="https://www.economie.gouv.fr/entreprises/gerer-son-entreprise-au-quotidien/gerer-sa-comptabilite-et-ses-demarches/mentions-obligatoires-dune-facture-tout-savoir" target="_blank" rel="noopener" style="color:var(--text2);">Mentions obligatoires sur une facture — economie.gouv.fr</a></small>
                 </div>
                 <div class="form-group">
                     <label>Acompte versé (optionnel)</label>
@@ -817,7 +820,9 @@ function updatePreview(){
     var vm=document.getElementById('vatMention').value;
     var vt='';
     if(vm==='article293b')vt="TVA non applicable, selon l'article 293B du code général des impôts.";
-    else if(vm==='autoliquidation')vt="TVA due par le preneur assujetti ; autoliquidation en application de l'article 242 nonies A, I-13° de l'annexe II au CGI.";
+    else if(vm==='autoliquidation_intracom')vt="Autoliquidation. TVA due par le preneur, conformément à l'article 283-2 du code général des impôts (article 196 de la directive 2006/112/CE).";
+    else if(vm==='autoliquidation_btp')vt="Autoliquidation. TVA due par le preneur, conformément à l'article 283-2 nonies du code général des impôts (sous-traitance BTP).";
+    else if(vm==='hors_ue')vt="TVA non applicable, prestation réalisée pour un preneur assujetti établi hors de l'Union européenne, conformément à l'article 259-1 du code général des impôts.";
     document.getElementById('previewVatMention').textContent=vt;
     if(isInv&&document.getElementById('markAsPaid').checked)document.getElementById('stampPaid').style.display='block';
     else document.getElementById('stampPaid').style.display='none';
@@ -1058,7 +1063,9 @@ function generatePDF(){
         if(notes){footY+=2;doc.setTextColor(0);doc.setFontSize(7);var nl=doc.splitTextToSize(notes,180);doc.text(nl,14,footY);footY+=nl.length*3;doc.setTextColor(100);}
         var vm=document.getElementById('vatMention').value;
         if(vm==='article293b'){footY+=2;doc.setFont(undefined,'bold');doc.text(doc.splitTextToSize("TVA non applicable, selon l'article 293B du code général des impôts.",180),14,footY);doc.setFont(undefined,'normal');}
-        else if(vm==='autoliquidation'){footY+=2;doc.setFont(undefined,'bold');doc.text(doc.splitTextToSize("TVA due par le preneur assujetti ; autoliquidation en application de l'article 242 nonies A, I-13° de l'annexe II au CGI.",180),14,footY);doc.setFont(undefined,'normal');}
+        else if(vm==='autoliquidation_intracom'){footY+=2;doc.setFont(undefined,'bold');doc.text(doc.splitTextToSize("Autoliquidation. TVA due par le preneur, conformément à l'article 283-2 du CGI (article 196 de la directive 2006/112/CE).",180),14,footY);doc.setFont(undefined,'normal');}
+        else if(vm==='autoliquidation_btp'){footY+=2;doc.setFont(undefined,'bold');doc.text(doc.splitTextToSize("Autoliquidation. TVA due par le preneur, conformément à l'article 283-2 nonies du CGI (sous-traitance BTP).",180),14,footY);doc.setFont(undefined,'normal');}
+        else if(vm==='hors_ue'){footY+=2;doc.setFont(undefined,'bold');doc.text(doc.splitTextToSize("TVA non applicable, prestation réalisée pour un preneur assujetti établi hors de l'Union européenne, article 259-1 du CGI.",180),14,footY);doc.setFont(undefined,'normal');}
 
         // Téléchargement
         var fname=(isInv?'Facture-':'Devis-')+dn+'.pdf';
