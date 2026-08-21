@@ -89,6 +89,7 @@ input:focus,select:focus{outline:none;border-color:var(--cyan);}
 .b-row .v.up{color:var(--success);}
 .b-row .v.down{color:var(--error);}
 
+.b-row .sub-hint{display:block;font-size:11px;color:var(--text-dim);opacity:.75;font-weight:400;margin-top:2px;}
 .bars{display:flex;flex-direction:column;gap:10px;margin-top:6px;}
 .bar-row{display:flex;align-items:center;gap:10px;}
 .bar-row .bl{font-size:12.5px;color:var(--text-dim);width:110px;flex-shrink:0;}
@@ -199,12 +200,6 @@ footer a{color:var(--text-dim);text-decoration:none;font-size:12.5px;}
       </div>
     </div>
 
-    <div class="result-hero" id="duree-block" style="display:none;margin-bottom:14px;">
-      <div class="label">Durée de cumul estimée avec ce chiffre d'affaires</div>
-      <div class="num"><span id="duree-mois-cumul">0</span><span> mois</span></div>
-      <div class="sub" id="duree-gain">contre 0 mois sans activité, à droits égaux</div>
-    </div>
-
     <div class="result-hero">
       <div class="label">Total perçu ce mois-ci</div>
       <div class="num"><span id="r-total">0</span><span> € /mois</span></div>
@@ -212,11 +207,21 @@ footer a{color:var(--text-dim);text-decoration:none;font-size:12.5px;}
     </div>
 
     <div class="breakdown">
-      <div class="b-row"><span class="l">Jours neutralisés dans le mois</span><span class="v" id="r-jours-neutr">0</span></div>
+      <div class="b-row"><span class="l">Jours indemnisés ce mois<br><span class="sub-hint">consomment vos droits restants</span></span><span class="v" id="r-jours-indem">0 / 30</span></div>
+      <div class="b-row"><span class="l">Jours neutralisés ce mois<br><span class="sub-hint">non consommés, ils repoussent la fin de vos droits</span></span><span class="v up" id="r-jours-neutr">0 / 30</span></div>
       <div class="b-row"><span class="l">ARE versée ce mois</span><span class="v" id="r-are-versee">0 €</span></div>
       <div class="b-row"><span class="l">Revenu net micro (après abattement)</span><span class="v" id="r-net-micro">0 €</span></div>
       <div class="b-row"><span class="l">Cotisations sociales estimées sur ce CA</span><span class="v down" id="r-cotis">0 €</span></div>
       <div class="b-row total"><span class="l">Total mensuel (ARE + activité)</span><span class="v up" id="r-total-2">0 €</span></div>
+    </div>
+
+    <div class="breakdown" id="duree-block" style="display:none;">
+      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#fff;margin-bottom:14px;">Décompte de vos droits restants</h2>
+      <div class="b-row"><span class="l">Jours de droits restants (saisis)</span><span class="v" id="duree-jours-restants">0</span></div>
+      <div class="b-row"><span class="l">Consommés ce mois-ci</span><span class="v down" id="duree-jours-consommes">0 jours</span></div>
+      <div class="b-row"><span class="l">Restant après ce mois</span><span class="v" id="duree-jours-apres">0</span></div>
+      <div class="b-row total"><span class="l">Durée de cumul possible à ce rythme</span><span class="v up"><span id="duree-mois-cumul">0</span> mois</span></div>
+      <div class="sub" id="duree-gain" style="margin-top:8px;">contre 0 mois sans activité, à droits égaux</div>
     </div>
 
     <div class="breakdown">
@@ -377,6 +382,7 @@ function calcCumul(){
   document.getElementById('r-total-2').textContent = euro(totalMensuel) + ' €';
   document.getElementById('r-gain').textContent = (gain >= 0 ? '+' : '') + euro(gain) + ' € par rapport à l\'ARE seule';
   document.getElementById('r-gain').className = 'sub' + (gain < 0 ? ' neg' : '');
+  document.getElementById('r-jours-indem').textContent = joursIndemnises + ' / ' + joursMois;
   document.getElementById('r-jours-neutr').textContent = joursNeutralises + ' / ' + joursMois;
   document.getElementById('r-are-versee').textContent = euro(areVersee) + ' €';
   document.getElementById('r-net-micro').textContent = euro(netMicro) + ' €';
@@ -388,14 +394,18 @@ function calcCumul(){
   document.getElementById('bv-are-seule').textContent = euro(areSeule) + ' €';
   document.getElementById('bv-total').textContent = euro(totalMensuel) + ' €';
 
-  // Durée de cumul (les jours neutralisés ne sont pas perdus : ils repoussent la date de fin de droits)
+  // Décompte des droits (les jours neutralisés ne sont pas perdus : ils repoussent la date de fin de droits)
   var joursRestants = parseFloat(document.getElementById('jours-restants').value) || 0;
   var dureeBlock = document.getElementById('duree-block');
   if(joursRestants > 0 && joursIndemnises > 0){
     var moisCumul = joursRestants / joursIndemnises;
     var moisSansActivite = joursRestants / joursMois;
+    var joursApres = Math.max(0, joursRestants - joursIndemnises);
+    document.getElementById('duree-jours-restants').textContent = Math.round(joursRestants) + ' jours';
+    document.getElementById('duree-jours-consommes').textContent = '- ' + joursIndemnises + ' jours';
+    document.getElementById('duree-jours-apres').textContent = Math.round(joursApres) + ' jours';
     document.getElementById('duree-mois-cumul').textContent = moisCumul.toFixed(1);
-    document.getElementById('duree-gain').textContent = 'contre ' + moisSansActivite.toFixed(1) + ' mois sans activité, à droits égaux (+' + (moisCumul - moisSansActivite).toFixed(1) + ' mois)';
+    document.getElementById('duree-gain').textContent = 'contre ' + moisSansActivite.toFixed(1) + ' mois sans activité, à droits égaux (+' + (moisCumul - moisSansActivite).toFixed(1) + ' mois grâce aux jours neutralisés)';
     dureeBlock.style.display = 'block';
   } else {
     dureeBlock.style.display = 'none';
