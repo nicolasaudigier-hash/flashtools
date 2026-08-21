@@ -602,7 +602,7 @@
             <div class="field-hint" id="un-prod-hint">Combien d'unités (m² ou mètres linéaires) tu réalises en moyenne par heure de travail effectif</div>
           </div>
           <div class="field" id="un-temps-field" style="display:none">
-            <label for="un-temps" id="un-temps-label">Durée d'une prestation (heures)</label>
+            <label for="un-temps" id="un-temps-label">Pour combien de temps ?</label>
             <input type="number" id="un-temps" min="0" step="0.1" placeholder="Ex : 1" inputmode="decimal" onchange="calcUniteDirect()">
             <div class="field-hint">Combien de temps prend UNE intervention chez un client — différent de ta capacité quotidienne saisie plus haut</div>
             <div class="method-toggle" id="un-temps-unit-group" style="margin-top:8px">
@@ -611,7 +611,7 @@
             </div>
           </div>
           <div class="field">
-            <label for="un-marche" id="un-marche-label">Prix marché observé (par m², optionnel)</label>
+            <label for="un-marche" id="un-marche-label">Prix du marché observé (par m², optionnel)</label>
             <input type="number" id="un-marche" min="0" step="0.1" placeholder="Ex : 18" inputmode="decimal" onchange="calcUniteDirect()">
             <div class="field-hint">Laisse vide si tu ne le connais pas encore — l'outil reste utile sans cette donnée</div>
           </div>
@@ -632,7 +632,7 @@
             </div>
           </div>
           <div class="field">
-            <label for="inv-prixmarche" id="inv-prixmarche-label">Prix marché connu (par m²)</label>
+            <label for="inv-prixmarche" id="inv-prixmarche-label">Prix du marché connu (par m²)</label>
             <input type="number" id="inv-prixmarche" min="0" step="0.1" placeholder="Ex : 18" inputmode="decimal" onchange="calcUniteInverse()">
           </div>
           <div class="field" id="inv-granularite-field">
@@ -647,7 +647,7 @@
             <input type="number" id="inv-prod" min="0" step="0.1" placeholder="Ex : 1.2" inputmode="decimal" onchange="calcUniteInverse()">
           </div>
           <div class="field" id="inv-temps-field" style="display:none">
-            <label for="inv-temps" id="inv-temps-label">Temps moyen par prestation (heures)</label>
+            <label for="inv-temps" id="inv-temps-label">Pour combien de temps ?</label>
             <input type="number" id="inv-temps" min="0" step="0.1" placeholder="Ex : 1" inputmode="decimal" onchange="calcUniteInverse()">
             <div class="method-toggle" id="inv-temps-unit-group" style="margin-top:8px">
               <div class="pill active" data-val="h" onclick="setTempsUniteInv('h')">En heures</div>
@@ -1059,7 +1059,7 @@
       label.textContent = 'Ta productivité réelle (' + unitName(uniteActive,false) + '/jour)';
       hint.textContent = 'Combien de ' + u + ' tu réalises en moyenne par jour de travail effectif';
     }
-    document.getElementById('un-marche-label').textContent = 'Prix marché observé (par ' + unitName(uniteActive,false) + ', optionnel)';
+    document.getElementById('un-marche-label').textContent = 'Prix du marché observé (par ' + unitName(uniteActive,false) + ', optionnel)';
   }
 
   function setUnite(u){
@@ -1085,7 +1085,7 @@
   function setTempsUnite(u){
     tempsUniteActive = u;
     document.querySelectorAll('#un-temps-unit-group .pill').forEach(p => p.classList.toggle('active', p.dataset.val === u));
-    document.getElementById('un-temps-label').textContent = 'Durée d\'une prestation (' + (u === 'h' ? 'heures' : 'jours') + ')';
+    document.getElementById('un-temps-label').textContent = 'Pour combien de temps ?';
     calcUniteDirect();
   }
 
@@ -1156,7 +1156,7 @@
     if (label){
       label.textContent = 'Ta productivité réelle (' + unitName(uniteActiveInv,false) + (granulariteActiveInv === 'heure' ? '/heure)' : '/jour)');
     }
-    document.getElementById('inv-prixmarche-label').textContent = 'Prix marché connu (par ' + unitName(uniteActiveInv,false) + ')';
+    document.getElementById('inv-prixmarche-label').textContent = 'Prix du marché connu (par ' + unitName(uniteActiveInv,false) + ')';
   }
 
   function setUniteInv(u){
@@ -1182,7 +1182,7 @@
   function setTempsUniteInv(u){
     tempsUniteActiveInv = u;
     document.querySelectorAll('#inv-temps-unit-group .pill').forEach(p => p.classList.toggle('active', p.dataset.val === u));
-    document.getElementById('inv-temps-label').textContent = 'Temps moyen par prestation (' + (u === 'h' ? 'heures' : 'jours') + ')';
+    document.getElementById('inv-temps-label').textContent = 'Pour combien de temps ?';
     calcUniteInverse();
   }
 
@@ -1303,8 +1303,8 @@
     tempsUniteActiveInv = 'h';
     document.querySelectorAll('#un-temps-unit-group .pill').forEach(p => p.classList.toggle('active', p.dataset.val === 'h'));
     document.querySelectorAll('#inv-temps-unit-group .pill').forEach(p => p.classList.toggle('active', p.dataset.val === 'h'));
-    document.getElementById('un-temps-label').textContent = 'Durée d\'une prestation (heures)';
-    document.getElementById('inv-temps-label').textContent = 'Temps moyen par prestation (heures)';
+    document.getElementById('un-temps-label').textContent = 'Pour combien de temps ?';
+    document.getElementById('inv-temps-label').textContent = 'Pour combien de temps ?';
     updateUnLabels();
     updateInvLabels();
     document.getElementById('acre-check').checked = false;
