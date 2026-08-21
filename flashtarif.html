@@ -198,6 +198,21 @@
   }
   .btn-secondary:hover{border-color:var(--cyan); color:var(--text);}
 
+  .mini-box{
+    background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--cyan);
+    border-radius:10px; padding:14px 16px; margin-top:10px;
+  }
+  .mini-box.violet{border-left-color:var(--violet);}
+  .mini-box .mini-label{font-size:0.72rem; color:var(--text3); text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px;}
+  .mini-box .mini-value{font-family:'Syne',sans-serif; font-weight:800; font-size:1.3rem; color:var(--cyan);}
+  .mini-box.violet .mini-value{color:var(--violet);}
+  .mini-box .mini-detail{font-size:0.82rem; color:var(--text2); margin-top:8px; line-height:1.5;}
+  .badge-outcome{display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:20px; font-size:0.78rem; font-weight:600;}
+  .badge-outcome.good{background:rgba(16,185,129,0.12); color:var(--success); border:1px solid rgba(16,185,129,0.3);}
+  .badge-outcome.warn{background:rgba(245,158,11,0.12); color:var(--warning); border:1px solid rgba(245,158,11,0.3);}
+  .badge-outcome.bad{background:rgba(239,68,68,0.12); color:var(--danger); border:1px solid rgba(239,68,68,0.3);}
+  .badge-outcome.info{background:rgba(6,182,212,0.12); color:var(--cyan); border:1px solid rgba(6,182,212,0.3);}
+
   details{
     background:var(--surface); border:1px solid var(--border-v); border-radius:var(--radius);
     margin-bottom:12px; overflow:hidden;
@@ -766,8 +781,8 @@
     if (acreOn) extras.push('ACRE');
     if (vflOn) extras.push('VFL');
     const extraTxt = extras.length ? ' (' + extras.join(' + ') + ')' : '';
-    document.getElementById('conservation-note').textContent =
-      'Sur 100 € facturés en ' + categorieLabel + extraTxt + ', il te reste ' + conservation.toFixed(1).replace('.', ',') + ' € après cotisations + CFP' + (vflOn ? ' + impôt (VFL)' : '') + '.';
+    document.getElementById('conservation-note').innerHTML =
+      'Sur 100 € facturés en ' + categorieLabel + extraTxt + ', il te reste <strong style="color:var(--cyan)">' + conservation.toFixed(1).replace('.', ',') + ' €</strong> après cotisations + CFP' + (vflOn ? ' + impôt (VFL)' : '') + '.';
   }
 
   function toggleVfl(){
@@ -831,7 +846,7 @@
       key = 'bnc'; label = 'BNC (hors Cipav)';
     }
     if (key === null){ out.innerHTML = ''; return; }
-    out.innerHTML = 'Catégorie probable : <strong style="color:var(--cyan)">' + label + '</strong>. À confirmer sur ton certificat d\'inscription ou sur <a href="https://www.autoentrepreneur.urssaf.fr" target="_blank" rel="noopener">autoentrepreneur.urssaf.fr</a> — ceci est une orientation, pas une qualification officielle.' +
+    out.innerHTML = 'Catégorie probable : <span class="badge-outcome info">' + label + '</span>. À confirmer sur ton certificat d\'inscription ou sur <a href="https://www.autoentrepreneur.urssaf.fr" target="_blank" rel="noopener">autoentrepreneur.urssaf.fr</a> — ceci est une orientation, pas une qualification officielle.' +
       '<button type="button" class="btn-secondary" style="width:100%;margin-top:8px" onclick="appliquerCategorieHelper(\'' + key + '\')">Utiliser cette catégorie</button>';
   }
 
@@ -868,7 +883,7 @@
     const joursFacturablesMois = joursFacturablesAnnuels / 12;
     document.getElementById('jh-result').innerHTML =
       semaines + ' semaines × ' + joursem + ' j = ' + Math.round(joursAnnuelsBruts) + ' jours travaillés/an.<br>' +
-      'Avec ' + (nonfact || 0) + ' % de temps non facturable : <strong style="color:var(--text)">' + Math.round(joursFacturablesAnnuels) + ' jours facturables/an</strong>, soit <strong style="color:var(--cyan)">' + joursFacturablesMois.toFixed(1).replace('.', ',') + ' jours/mois</strong>.';
+      'Avec ' + (nonfact || 0) + ' % de temps non facturable : ' + Math.round(joursFacturablesAnnuels) + ' jours facturables/an, soit <strong style="font-family:\'Syne\',sans-serif;color:var(--cyan);font-size:1.05rem">' + joursFacturablesMois.toFixed(1).replace('.', ',') + ' jours/mois</strong>.';
     return joursFacturablesMois;
   }
 
@@ -911,13 +926,13 @@
     if (actuel > 0){
       const gapMin = actuel - min;
       if (gapMin < 0){
-        compEl.innerHTML = '<strong style="color:var(--danger)">À ' + Math.round(actuel) + ' €/jour, tu es ' + Math.round(Math.abs(gapMin)) + ' € sous ton plancher</strong> — soit environ ' + Math.round(Math.abs(gapMin) * jours) + ' €/mois de manque à gagner par rapport à ton minimum vital.';
+        compEl.innerHTML = '<div class="mini-box" style="border-left-color:var(--danger)"><span class="badge-outcome bad">✕ ' + Math.round(Math.abs(gapMin)) + ' € sous ton plancher</span><div class="mini-detail">À ' + Math.round(actuel) + ' €/jour, ça représente environ ' + Math.round(Math.abs(gapMin) * jours) + ' €/mois de manque à gagner par rapport à ton minimum vital.</div></div>';
       } else {
         const gapCib = actuel - cib;
         if (gapCib < 0){
-          compEl.innerHTML = 'À ' + Math.round(actuel) + ' €/jour, tu es au-dessus de ton plancher mais ' + Math.round(Math.abs(gapCib)) + ' € sous ta cible — soit environ ' + Math.round(Math.abs(gapCib) * jours) + ' €/mois en dessous de ton objectif.';
+          compEl.innerHTML = '<div class="mini-box" style="border-left-color:var(--warning)"><span class="badge-outcome warn">△ ' + Math.round(Math.abs(gapCib)) + ' € sous ta cible</span><div class="mini-detail">À ' + Math.round(actuel) + ' €/jour, tu es au-dessus de ton plancher mais en dessous de ta cible — environ ' + Math.round(Math.abs(gapCib) * jours) + ' €/mois en dessous de ton objectif.</div></div>';
         } else {
-          compEl.innerHTML = '<strong style="color:var(--success)">À ' + Math.round(actuel) + ' €/jour, tu couvres déjà ta cible.</strong>';
+          compEl.innerHTML = '<div class="mini-box" style="border-left-color:var(--success)"><span class="badge-outcome good">✓ Cible couverte</span><div class="mini-detail">À ' + Math.round(actuel) + ' €/jour, tu couvres déjà ta cible.</div></div>';
         }
       }
     } else {
@@ -928,14 +943,14 @@
     const pctPlafond = (caAnnuelApprox / categorieSeuil * 100);
     const catKey = document.querySelector('#categorie-group .regime-pill.active')?.dataset.key;
     const tvaSeuil = (catKey === 'vente') ? 85000 : 37500;
-    let plafondTxt = 'À ce rythme (' + jours + ' j/mois sur 12 mois, à ta cible), tu factures environ ' + Math.round(caAnnuelApprox).toLocaleString('fr-FR') + ' €/an, soit ' + pctPlafond.toFixed(0) + ' % du plafond de ta catégorie (' + categorieSeuil.toLocaleString('fr-FR') + ' €).';
+    let plafondTxt = 'À ce rythme (' + jours + ' j/mois sur 12 mois, à ta cible), tu factures environ <strong style="color:var(--text)">' + Math.round(caAnnuelApprox).toLocaleString('fr-FR') + ' €/an</strong>, soit ' + pctPlafond.toFixed(0) + ' % du plafond de ta catégorie (' + categorieSeuil.toLocaleString('fr-FR') + ' €).';
     if (caAnnuelApprox > tvaSeuil){
-      plafondTxt += ' Ce montant dépasse aussi le seuil de franchise TVA (' + tvaSeuil.toLocaleString('fr-FR') + ' €) — anticipe la facturation de la TVA si ce n\'est pas déjà fait.';
+      plafondTxt += ' <span class="badge-outcome warn" style="margin:6px 0;display:inline-flex">△ Dépasse le seuil TVA (' + tvaSeuil.toLocaleString('fr-FR') + ' €)</span> — anticipe la facturation de la TVA si ce n\'est pas déjà fait.';
     } else {
       plafondTxt += ' Tu restes sous le seuil de franchise TVA (' + tvaSeuil.toLocaleString('fr-FR') + ' €).';
     }
     plafondTxt += ' Une estimation à affiner avec ton activité réelle.';
-    document.getElementById('plafond-note').textContent = plafondTxt;
+    document.getElementById('plafond-note').innerHTML = plafondTxt;
 
     document.getElementById('result').classList.add('show');
     document.getElementById('result').scrollIntoView({behavior:'smooth', block:'nearest'});
@@ -981,7 +996,12 @@
     const aFacturer = montant / (1 - taux);
     const netSiReel = montant * (1 - taux);
     const manque = montant - netSiReel;
-    out.innerHTML = 'Pour récupérer l\'intégralité de tes <strong>' + Math.round(montant) + ' €</strong>, facture <strong>' + Math.round(aFacturer) + ' €</strong>.<br>Si tu factures le montant réel, il ne te reste que ' + Math.round(netSiReel) + ' € — tu perds ' + Math.round(manque) + ' €.';
+    out.innerHTML =
+      '<div class="mini-box">' +
+        '<div class="mini-label">Montant à facturer pour récupérer tes ' + Math.round(montant) + ' €</div>' +
+        '<div class="mini-value">' + Math.round(aFacturer) + ' €</div>' +
+        '<div class="mini-detail">Si tu factures le montant réel, il ne t\'en reste que <strong style="color:var(--danger)">' + Math.round(netSiReel) + ' €</strong> — un manque à gagner de ' + Math.round(manque) + ' €.</div>' +
+      '</div>';
   }
 
   // ── Prix à l'unité — mode direct ────────────────────────────────────────
@@ -1089,19 +1109,22 @@
       prixUnite = tarifHoraire / prod;
     }
 
-    let html = 'Prix implicite par ' + label + ' : <strong style="color:var(--text)">' + prixUnite.toFixed(2) + ' €</strong>';
+    let html = '<div class="mini-box">' +
+      '<div class="mini-label">Prix implicite par ' + label + '</div>' +
+      '<div class="mini-value">' + prixUnite.toFixed(2) + ' €</div>';
 
     if (marche > 0){
       const diffPct = (prixUnite - marche) / marche * 100;
       const ecart = Math.abs(Math.round(diffPct));
       if (diffPct <= -15){
-        html += '<br><span style="color:var(--success);font-weight:600">Ton prix est ' + ecart + ' % en dessous du marché observé.</span> C\'est cohérent avec un début d\'activité ou la construction de ton réseau — pas un problème à corriger dans l\'immédiat. Le tarif progresse avec l\'expérience et la réputation, pas par anticipation.';
+        html += '<div class="mini-detail"><span class="badge-outcome good">✓ ' + ecart + ' % sous le marché</span><br>Cohérent avec un début d\'activité ou la construction de ton réseau — pas un problème à corriger dans l\'immédiat.</div>';
       } else if (diffPct >= 15){
-        html += '<br><span style="color:var(--warning);font-weight:600">Ton prix est ' + ecart + ' % au-dessus du marché observé.</span> À questionner sans alarme : est-ce que tes références, ta qualité ou ta rapidité justifient déjà cet écart ? Si oui, c\'est cohérent. Sinon, vise ce niveau comme prochaine étape plutôt que point de départ.';
+        html += '<div class="mini-detail"><span class="badge-outcome warn">△ ' + ecart + ' % au-dessus du marché</span><br>À questionner sans alarme : tes références justifient-elles déjà cet écart ?</div>';
       } else {
-        html += '<br><span style="color:var(--success);font-weight:600">Cohérent avec le marché observé</span> (écart de ' + ecart + ' %).';
+        html += '<div class="mini-detail"><span class="badge-outcome good">✓ Cohérent avec le marché</span> (écart de ' + ecart + ' %)</div>';
       }
     }
+    html += '</div>';
     out.innerHTML = html;
   }
 
@@ -1163,19 +1186,22 @@
       tarifJourImplicite = prixMarche * prod * heures;
     }
 
-    let html = 'À ce prix marché, ton tarif/jour implicite serait de <strong style="color:var(--text)">' + Math.round(tarifJourImplicite) + ' €</strong>.';
+    let html = '<div class="mini-box violet">' +
+      '<div class="mini-label">Tarif/jour implicite à ce prix marché</div>' +
+      '<div class="mini-value">' + Math.round(tarifJourImplicite) + ' €</div>';
 
     if (lastResult.min > 0){
       if (tarifJourImplicite < lastResult.min){
-        html += '<br><span style="color:var(--danger);font-weight:600">C\'est sous ton plancher (' + Math.round(lastResult.min) + ' €/jour)</span> — à ce prix, tu ne couvrirais pas ton minimum vital.';
+        html += '<div class="mini-detail"><span class="badge-outcome bad">✕ Sous ton plancher (' + Math.round(lastResult.min) + ' €)</span><br>À ce prix, tu ne couvrirais pas ton minimum vital.</div>';
       } else if (lastResult.cib > 0 && tarifJourImplicite < lastResult.cib){
-        html += '<br>C\'est au-dessus de ton plancher (' + Math.round(lastResult.min) + ' €) mais sous ta cible (' + Math.round(lastResult.cib) + ' €) — viable, sans marge de confort.';
+        html += '<div class="mini-detail"><span class="badge-outcome warn">△ Entre plancher et cible</span><br>Au-dessus de ton plancher mais sous ta cible (' + Math.round(lastResult.cib) + ' €) — viable, sans marge de confort.</div>';
       } else {
-        html += '<br><span style="color:var(--success);font-weight:600">C\'est au-dessus de ta cible</span> (' + Math.round(lastResult.cib) + ' €/jour) — un prix qui dépasse ton objectif.';
+        html += '<div class="mini-detail"><span class="badge-outcome good">✓ Au-dessus de ta cible</span> (' + Math.round(lastResult.cib) + ' €/jour)</div>';
       }
     } else {
-      html += ' Calcule ton tarif plus haut pour comparer à ton plancher et ta cible.';
+      html += '<div class="mini-detail">Calcule ton tarif plus haut pour comparer à ton plancher et ta cible.</div>';
     }
+    html += '</div>';
     out.innerHTML = html;
   }
 
