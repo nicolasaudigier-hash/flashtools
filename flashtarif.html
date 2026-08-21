@@ -213,6 +213,14 @@
   .badge-outcome.bad{background:rgba(239,68,68,0.12); color:var(--danger); border:1px solid rgba(239,68,68,0.3);}
   .badge-outcome.info{background:rgba(6,182,212,0.12); color:var(--cyan); border:1px solid rgba(6,182,212,0.3);}
 
+  .calc-chain{display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:12px 0;}
+  .calc-chain .chain-step{background:var(--surface2); border:1px solid var(--border-v); border-radius:9px; padding:8px 12px; text-align:center; min-width:78px;}
+  .calc-chain .chain-step .cs-label{font-size:0.6rem; color:var(--text3); text-transform:uppercase; letter-spacing:.03em; margin-bottom:3px;}
+  .calc-chain .chain-step .cs-value{font-family:'JetBrains Mono',monospace; font-weight:700; font-size:0.95rem; color:var(--cyan);}
+  .calc-chain .chain-step.final{border-color:var(--violet); background:rgba(139,92,246,0.08);}
+  .calc-chain .chain-step.final .cs-value{color:var(--violet); font-size:1.1rem;}
+  .calc-chain .chain-arrow{color:var(--text3); font-size:1rem; flex-shrink:0;}
+
   details{
     background:var(--surface); border:1px solid var(--border-v); border-radius:var(--radius);
     margin-bottom:12px; overflow:hidden;
@@ -518,10 +526,11 @@
     </div>
   </div>
 
-  <details id="outils">
-    <summary>Aller plus loin — frais & prix à l'unité <span class="chev">▾</span></summary>
-    <div class="details-body">
-      <p>Deux outils complémentaires, utiles selon ton métier et la façon dont tu factures.</p>
+  <div class="step-tag"><span class="num">3</span> FRAIS & PRIX À L'UNITÉ</div>
+
+  <div class="card" id="outils">
+    <h2>Deux outils complémentaires</h2>
+    <div class="card-sub">Utiles selon ton métier et la façon dont tu factures — pas obligatoires pour fixer ton tarif de base.</div>
 
       <div class="method-toggle" id="outil-group">
         <div class="pill active" data-val="frais" onclick="setOutil('frais')">Frais & défraiements</div>
@@ -565,8 +574,9 @@
               <input type="number" id="un-tarifjour" min="0" step="1" placeholder="Ex : 150" inputmode="numeric" onchange="calcUniteDirect()">
             </div>
             <div class="field" id="un-heures-wrap">
-              <label for="un-heures">Heures facturables / jour</label>
+              <label for="un-heures">Heures facturables / jour <span style="color:var(--text3);font-weight:400">(ta capacité quotidienne)</span></label>
               <input type="number" id="un-heures" min="0" step="0.5" placeholder="Ex : 7" inputmode="decimal" onchange="calcUniteDirect()">
+              <div class="field-hint">Sert à convertir ton tarif/jour en tarif horaire — pas la durée d'une prestation</div>
             </div>
           </div>
           <div id="un-horaire-live" style="font-size:0.82rem;color:var(--text2);margin:-4px 0 14px"></div>
@@ -592,8 +602,9 @@
             <div class="field-hint" id="un-prod-hint">Combien d'unités (m² ou mètres linéaires) tu réalises en moyenne par heure de travail effectif</div>
           </div>
           <div class="field" id="un-temps-field" style="display:none">
-            <label for="un-temps" id="un-temps-label">Temps moyen par prestation (heures)</label>
+            <label for="un-temps" id="un-temps-label">Durée d'une prestation (heures)</label>
             <input type="number" id="un-temps" min="0" step="0.1" placeholder="Ex : 1" inputmode="decimal" onchange="calcUniteDirect()">
+            <div class="field-hint">Combien de temps prend UNE intervention chez un client — différent de ta capacité quotidienne saisie plus haut</div>
             <div class="method-toggle" id="un-temps-unit-group" style="margin-top:8px">
               <div class="pill active" data-val="h" onclick="setTempsUnite('h')">En heures</div>
               <div class="pill" data-val="j" onclick="setTempsUnite('j')">En jours</div>
@@ -651,7 +662,6 @@
         </div>
       </div>
     </div>
-  </details>
 
   <details id="approfondir">
     <summary>Comprendre le calcul en détail <span class="chev">▾</span></summary>
@@ -1075,7 +1085,7 @@
   function setTempsUnite(u){
     tempsUniteActive = u;
     document.querySelectorAll('#un-temps-unit-group .pill').forEach(p => p.classList.toggle('active', p.dataset.val === u));
-    document.getElementById('un-temps-label').textContent = 'Temps moyen par prestation (' + (u === 'h' ? 'heures' : 'jours') + ')';
+    document.getElementById('un-temps-label').textContent = 'Durée d\'une prestation (' + (u === 'h' ? 'heures' : 'jours') + ')';
     calcUniteDirect();
   }
 
@@ -1088,28 +1098,39 @@
     const live = document.getElementById('un-horaire-live');
     const out = document.getElementById('un-result');
 
-    if (tarifJour <= 0){ live.textContent = ''; out.innerHTML = ''; return; }
+    if (tarifJour <= 0){ live.innerHTML = ''; out.innerHTML = ''; return; }
 
     const tarifHoraire = tarifJour / heures;
     const label = uniteActive === 'm2' ? 'm²' : (uniteActive === 'ml' ? 'mètre linéaire' : 'prestation');
     let prixUnite = 0;
+    let chainSteps = '<div class="chain-step"><div class="cs-label">Tarif/jour</div><div class="cs-value">' + Math.round(tarifJour) + ' €</div></div>' +
+      '<div class="chain-arrow">→</div>' +
+      '<div class="chain-step"><div class="cs-label">Tarif/heure</div><div class="cs-value">' + tarifHoraire.toFixed(2) + ' €</div></div>';
 
     if (uniteActive === 'forfait'){
-      live.innerHTML = '→ Tarif horaire : <strong style="color:var(--text)">' + tarifHoraire.toFixed(2) + ' €/h</strong>';
-      if (temps <= 0){ out.innerHTML = '<em>Indique le temps moyen par prestation pour continuer.</em>'; return; }
+      live.innerHTML = '';
+      if (temps <= 0){ out.innerHTML = '<div class="calc-chain">' + chainSteps + '</div><em style="font-size:0.82rem">Indique la durée d\'une prestation pour continuer.</em>'; return; }
       const tempsH = (tempsUniteActive === 'j') ? temps * heures : temps;
       prixUnite = tarifHoraire * tempsH;
+      chainSteps += '<div class="chain-arrow">×</div><div class="chain-step"><div class="cs-label">Durée</div><div class="cs-value">' + tempsH.toFixed(1) + ' h</div></div>';
     } else if (granulariteActive === 'jour'){
-      live.textContent = '';
-      if (prod <= 0){ out.innerHTML = '<em>Indique ta productivité pour continuer.</em>'; return; }
+      live.innerHTML = '';
+      if (prod <= 0){ out.innerHTML = '<em style="font-size:0.82rem">Indique ta productivité pour continuer.</em>'; return; }
       prixUnite = tarifJour / prod;
+      chainSteps = '<div class="chain-step"><div class="cs-label">Tarif/jour</div><div class="cs-value">' + Math.round(tarifJour) + ' €</div></div>' +
+        '<div class="chain-arrow">÷</div>' +
+        '<div class="chain-step"><div class="cs-label">Productivité</div><div class="cs-value">' + prod + '/j</div></div>';
     } else {
-      live.innerHTML = '→ Tarif horaire : <strong style="color:var(--text)">' + tarifHoraire.toFixed(2) + ' €/h</strong>';
-      if (prod <= 0){ out.innerHTML = '<em>Indique ta productivité pour continuer.</em>'; return; }
+      live.innerHTML = '';
+      if (prod <= 0){ out.innerHTML = '<div class="calc-chain">' + chainSteps + '</div><em style="font-size:0.82rem">Indique ta productivité pour continuer.</em>'; return; }
       prixUnite = tarifHoraire / prod;
+      chainSteps += '<div class="chain-arrow">÷</div><div class="chain-step"><div class="cs-label">Productivité</div><div class="cs-value">' + prod + '/h</div></div>';
     }
 
-    let html = '<div class="mini-box">' +
+    chainSteps += '<div class="chain-arrow">=</div><div class="chain-step final"><div class="cs-label">Par ' + label + '</div><div class="cs-value">' + prixUnite.toFixed(2) + ' €</div></div>';
+
+    let html = '<div class="calc-chain">' + chainSteps + '</div>';
+    html += '<div class="mini-box">' +
       '<div class="mini-label">Prix implicite par ' + label + '</div>' +
       '<div class="mini-value">' + prixUnite.toFixed(2) + ' €</div>';
 
@@ -1282,7 +1303,7 @@
     tempsUniteActiveInv = 'h';
     document.querySelectorAll('#un-temps-unit-group .pill').forEach(p => p.classList.toggle('active', p.dataset.val === 'h'));
     document.querySelectorAll('#inv-temps-unit-group .pill').forEach(p => p.classList.toggle('active', p.dataset.val === 'h'));
-    document.getElementById('un-temps-label').textContent = 'Temps moyen par prestation (heures)';
+    document.getElementById('un-temps-label').textContent = 'Durée d\'une prestation (heures)';
     document.getElementById('inv-temps-label').textContent = 'Temps moyen par prestation (heures)';
     updateUnLabels();
     updateInvLabels();
