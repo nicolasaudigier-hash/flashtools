@@ -139,7 +139,7 @@
     .cb input{accent-color:var(--cyan);width:15px;height:15px;}
 
     /* FOLDER INPUT */
-    .folder-input-row{display:flex;gap:7px;width:230px;flex-shrink:0;}
+    .folder-input-row{display:flex;gap:7px;margin-bottom:14px;}
     .folder-input{flex:1;padding:10px 12px;border-radius:10px;border:2px solid var(--cyan);background:var(--surface);color:var(--text);outline:none;font-size:14px;font-family:inherit;}
 
     /* TOUCH GHOST */
@@ -267,17 +267,20 @@
 
   <div class="toolbar" style="flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px">
     <button class="btn btn-grad" id="btnNewFolder" style="flex-shrink:0;white-space:nowrap" onclick="toggleFolderInput()">➕ <span id="newFolderLabel">Dossier</span></button>
-    <div id="folderInputRow" style="display:none;flex-shrink:0" class="folder-input-row">
-      <input type="text" class="folder-input" id="folderNameInput" placeholder="Nom du dossier" onkeydown="if(event.key==='Enter')createFolder()">
-      <button class="btn btn-grad" style="padding:10px 14px" onclick="createFolder()">✓</button>
-      <button class="btn btn-ghost" style="padding:10px 14px" onclick="toggleFolderInput()">✕</button>
-    </div>
     <button class="btn btn-ghost" id="btnClearInbox" style="display:none;flex-shrink:0;white-space:nowrap" onclick="clearInbox()">🧹 Vider réception</button>
     <label class="cb" style="margin-left:12px;flex-shrink:0;white-space:nowrap">
       <input type="checkbox" id="cbNumber" checked onchange="renderAll()">
       <span>Numéroter</span>
     </label>
     <div class="trash-drop" id="trashDrop" style="flex-shrink:0;white-space:nowrap;cursor:pointer" title="Voir la corbeille" onclick="scrollToTrash()">🗑️ <span id="trashCount"></span></div>
+  </div>
+
+  <!-- Ligne indépendante, hors de la barre d'outils : ne peut chevaucher
+       aucun autre bouton puisqu'elle n'est plus dans le même conteneur flex. -->
+  <div id="folderInputRow" style="display:none" class="folder-input-row">
+    <input type="text" class="folder-input" id="folderNameInput" placeholder="Nom du dossier" onkeydown="if(event.key==='Enter')createFolder()">
+    <button class="btn btn-grad" style="padding:10px 14px;flex-shrink:0" onclick="createFolder()">✓</button>
+    <button class="btn btn-ghost" style="padding:10px 14px;flex-shrink:0" onclick="toggleFolderInput()">✕</button>
   </div>
 
   <div id="welcomeHint" style="display:none;padding:16px 20px;background:var(--surface);border:1px solid var(--border2);border-radius:12px;text-align:center;margin-bottom:16px">
