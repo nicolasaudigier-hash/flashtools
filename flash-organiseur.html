@@ -72,7 +72,13 @@
     .folder-actions{display:flex;gap:6px;}
 
     /* FILES DANS DOSSIER */
-    .files-wrap{display:flex;flex-wrap:wrap;gap:9px;min-height:60px;align-content:flex-start;overflow-y:auto;max-height:260px;}
+    .files-wrap{display:flex;flex-wrap:wrap;gap:9px;min-height:60px;align-content:flex-start;overflow-y:auto;max-height:260px;padding-right:14px;}
+    .files-wrap::-webkit-scrollbar{width:6px;transition:width .15s;}
+    .files-wrap:hover::-webkit-scrollbar{width:11px;}
+    .files-wrap::-webkit-scrollbar-track{background:transparent;}
+    .files-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:6px;}
+    .files-wrap:hover::-webkit-scrollbar-thumb{background:var(--cyan);}
+    .files-wrap{scrollbar-width:thin;scrollbar-color:var(--border2) transparent;}
     .empty-hint{width:100%;text-align:center;padding:16px;color:var(--text3);font-size:12px;}
 
     /* FILE CARD */
@@ -233,8 +239,8 @@
 
 <!-- APP -->
 <div id="screen-app" style="display:none">
-  <div class="header">
-    <h1>
+  <div class="header" style="flex-wrap:nowrap">
+    <h1 style="flex-shrink:0">
       <svg viewBox="0 0 300 32" width="100%" style="max-width:260px;display:block" aria-label="FlashOrganiseur">
         <defs>
           <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -245,10 +251,10 @@
         <text x="150" y="24" text-anchor="middle" font-family="Syne,sans-serif" font-size="22" font-weight="800" fill="url(#g2)">FlashOrganiseur</text>
       </svg>
     </h1>
-    <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">
-      <button class="btn btn-ghost" style="padding:10px 12px" onclick="document.getElementById('modalHelp').style.display='flex'">💡</button>
-      <button class="btn btn-ghost" style="padding:10px 12px" onclick="document.getElementById('modalReset').style.display='flex'">🔄</button>
-      <button class="btn btn-grad" id="btnExportAll" onclick="exportZip(null)" disabled>📦 <span id="exportLabel">Tout exporter</span></button>
+    <div style="display:flex;gap:7px;align-items:center;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:2px">
+      <button class="btn btn-ghost" style="padding:10px 12px;flex-shrink:0" onclick="document.getElementById('modalHelp').style.display='flex'">💡</button>
+      <button class="btn btn-ghost" style="padding:10px 12px;flex-shrink:0" onclick="document.getElementById('modalReset').style.display='flex'">🔄</button>
+      <button class="btn btn-grad" id="btnExportAll" style="flex-shrink:0;white-space:nowrap" onclick="exportZip(null)" disabled>📦 <span id="exportLabel">Tout exporter</span></button>
     </div>
   </div>
 
@@ -259,19 +265,19 @@
     <div style="font-size:11px;color:var(--text3);margin-top:5px">Tous types de fichiers acceptés</div>
   </div>
 
-  <div class="toolbar">
-    <button class="btn btn-grad" id="btnNewFolder" onclick="toggleFolderInput()">➕ <span id="newFolderLabel">Dossier</span></button>
-    <div id="folderInputRow" style="display:none" class="folder-input-row">
+  <div class="toolbar" style="flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px">
+    <button class="btn btn-grad" id="btnNewFolder" style="flex-shrink:0;white-space:nowrap" onclick="toggleFolderInput()">➕ <span id="newFolderLabel">Dossier</span></button>
+    <div id="folderInputRow" style="display:none;flex-shrink:0" class="folder-input-row">
       <input type="text" class="folder-input" id="folderNameInput" placeholder="Nom du dossier" onkeydown="if(event.key==='Enter')createFolder()">
       <button class="btn btn-grad" style="padding:10px 14px" onclick="createFolder()">✓</button>
       <button class="btn btn-ghost" style="padding:10px 14px" onclick="toggleFolderInput()">✕</button>
     </div>
-    <button class="btn btn-ghost" id="btnClearInbox" style="display:none" onclick="clearInbox()">🧹 Vider réception</button>
-    <label class="cb" style="margin-left:auto">
+    <button class="btn btn-ghost" id="btnClearInbox" style="display:none;flex-shrink:0;white-space:nowrap" onclick="clearInbox()">🧹 Vider réception</button>
+    <label class="cb" style="margin-left:auto;flex-shrink:0;white-space:nowrap">
       <input type="checkbox" id="cbNumber" checked onchange="renderAll()">
       <span>Numéroter</span>
     </label>
-    <div class="trash-drop" id="trashDrop">🗑️ <span id="trashCount"></span></div>
+    <div class="trash-drop" id="trashDrop" style="flex-shrink:0;white-space:nowrap;cursor:pointer" title="Voir la corbeille" onclick="scrollToTrash()">🗑️ <span id="trashCount"></span></div>
   </div>
 
   <div id="welcomeHint" style="display:none;padding:16px 20px;background:var(--surface);border:1px solid var(--border2);border-radius:12px;text-align:center;margin-bottom:16px">
@@ -356,11 +362,8 @@ function setProcessing(on, msg='') {
 function showApp() {
   document.getElementById('screen-onboarding').style.display = 'none';
   document.getElementById('screen-app').style.display = 'block';
-  // Mobile : adapter labels
   if(isMobile()) {
     document.getElementById('importLabel').textContent = 'Appuyer pour importer';
-    document.getElementById('exportLabel').textContent = '';
-    document.getElementById('newFolderLabel').textContent = '';
   }
   setupDropZones();
   renderAll();
@@ -442,24 +445,53 @@ async function processFiles(fileList) {
 }
 
 // ── FOLDER ACTIONS ──────────────────────────────────────
-function toggleFolderInput() {
+let folderInputOpen = false;
+
+function applyFolderInputState(){
   const row = document.getElementById('folderInputRow');
   const btn = document.getElementById('btnNewFolder');
-  const visible = row.style.display !== 'none';
-  row.style.display = visible ? 'none' : 'flex';
-  btn.style.display = visible ? 'inline-flex' : 'none';
-  if(!visible) setTimeout(()=>document.getElementById('folderNameInput').focus(),50);
+  row.style.display = folderInputOpen ? 'flex' : 'none';
+  btn.style.display = folderInputOpen ? 'none' : 'inline-flex';
+  if(folderInputOpen){
+    // requestAnimationFrame plutôt qu'un délai fixe : attend que le
+    // navigateur ait vraiment fini d'afficher le champ avant de lui donner
+    // le focus — plus fiable qu'un setTimeout arbitraire face au clavier
+    // virtuel mobile, qui pouvait ignorer un focus() déclenché trop tôt.
+    requestAnimationFrame(()=>{
+      const input=document.getElementById('folderNameInput');
+      input.focus();
+      input.scrollIntoView({behavior:'smooth',block:'nearest'});
+    });
+  }
+}
+
+function toggleFolderInput() {
+  folderInputOpen = !folderInputOpen;
+  applyFolderInputState();
 }
 
 function createFolder() {
   const name = document.getElementById('folderNameInput').value.trim();
   if(!name) return;
   if(folders.length>=CFG.MAX_FOLDERS){showAlert('Max '+CFG.MAX_FOLDERS+' dossiers','error');return;}
-  folders.push({id:genId(),name,locked:false,files:[]});
+  const newId = genId();
+  folders.push({id:newId,name,locked:false,files:[]});
   document.getElementById('folderNameInput').value='';
-  toggleFolderInput();
+  folderInputOpen = false;
+  applyFolderInputState();
   showAlert('Dossier créé','success');
   renderAll();
+  // Confirmation visuelle explicite que le dossier est bien apparu, pour ne
+  // plus jamais donner l'impression qu'il faut réessayer.
+  requestAnimationFrame(()=>{
+    const card=document.querySelector(`.folder-card[data-folderid="${newId}"]`);
+    if(card){
+      card.scrollIntoView({behavior:'smooth',block:'center'});
+      card.style.transition='box-shadow .3s';
+      card.style.boxShadow='0 0 0 3px var(--cyan)';
+      setTimeout(()=>{card.style.boxShadow='';},1200);
+    }
+  });
 }
 
 function deleteFolder(id) {
@@ -487,13 +519,29 @@ function confirmReset() {
   renderAll();
 }
 
-function emptyTrash() { trash=[]; renderAll(); }
+function scrollToTrash(){
+  if(!trash.length){
+    showAlert('La corbeille est vide','info');
+    return;
+  }
+  const section=document.getElementById('trashSection');
+  if(section) section.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function emptyTrash() {
+  if(!trash.length) return;
+  if(!confirm(`Supprimer définitivement ${trash.length} fichier${trash.length>1?'s':''} de la corbeille ? Cette action est irréversible.`)) return;
+  trash=[];
+  showAlert('Corbeille vidée définitivement','info');
+  renderAll();
+}
 
 function restoreFile(id) {
   const item = trash.find(f=>f.id===id);
   if(!item) return;
   trash = trash.filter(f=>f.id!==id);
   folders = folders.map(f=>f.id==='inbox'?{...f,files:[item,...f.files]}:f);
+  showAlert('Fichier restauré vers Réception','success');
   renderAll();
 }
 
@@ -598,6 +646,68 @@ function touchTargetsAt(clientX, clientY) {
   return { trashEl: el.closest('#trashDrop'), folderEl: el.closest('.folder-card') };
 }
 
+// Position courante du doigt pendant un glisser — utilisée à la fois par le
+// déplacement normal et par la boucle de défilement automatique près des bords.
+let lastDragClientX = null, lastDragClientY = null;
+
+function updateDragOverVisuals(clientX, clientY) {
+  const { trashEl, folderEl } = touchTargetsAt(clientX, clientY);
+
+  document.querySelectorAll('.folder-card.drag-over').forEach(c=>c.classList.remove('drag-over'));
+  document.getElementById('trashDrop').classList.remove('drag-over');
+
+  if(trashEl) {
+    trashEl.classList.add('drag-over');
+    if(dragOverState){ dragOverState=null; renderInsertIndicators(); }
+    return;
+  }
+
+  if(folderEl) {
+    folderEl.classList.add('drag-over');
+    const targetFolderId = folderEl.getAttribute('data-folderid');
+    const wrap = folderEl.querySelector('.files-wrap');
+    const insertIndex = computeInsertIndex(wrap, clientX, clientY);
+    const changed = !dragOverState || dragOverState.folderId !== targetFolderId || dragOverState.insertIndex !== insertIndex;
+    if(changed) {
+      dragOverState = { folderId: targetFolderId, insertIndex };
+      renderInsertIndicators();
+    }
+  } else if(dragOverState) {
+    dragOverState = null;
+    renderInsertIndicators();
+  }
+}
+
+// ── DÉFILEMENT AUTOMATIQUE PRÈS DES BORDS PENDANT LE GLISSER ─────────────
+// Sans ça, impossible d'atteindre un dossier situé plus bas que l'écran
+// visible : le glisser tactile bloque le défilement natif (nécessaire pour
+// repositionner précisément), donc rien ne permettait de faire défiler la
+// page pendant qu'on maintient un fichier. On fait défiler automatiquement
+// dès que le doigt approche du haut ou du bas de l'écran, vitesse
+// proportionnelle à la proximité du bord.
+let autoScrollRAF = null;
+const AUTO_SCROLL_EDGE = 90;
+const AUTO_SCROLL_MAX_SPEED = 16;
+
+function autoScrollTick() {
+  if(!touchDragging || lastDragClientY == null) { autoScrollRAF = null; return; }
+  const vh = window.innerHeight;
+  let speed = 0;
+  if(lastDragClientY < AUTO_SCROLL_EDGE) {
+    speed = -Math.ceil(((AUTO_SCROLL_EDGE - lastDragClientY) / AUTO_SCROLL_EDGE) * AUTO_SCROLL_MAX_SPEED);
+  } else if(lastDragClientY > vh - AUTO_SCROLL_EDGE) {
+    speed = Math.ceil(((lastDragClientY - (vh - AUTO_SCROLL_EDGE)) / AUTO_SCROLL_EDGE) * AUTO_SCROLL_MAX_SPEED);
+  }
+  if(speed !== 0) {
+    window.scrollBy(0, speed);
+    // Le fantôme suit le doigt en position fixe (ne bouge pas avec le défilement),
+    // mais les dossiers eux se déplacent à l'écran — on recalcule donc le
+    // survol/indicateur à chaque frame de défilement pour rester exact.
+    if(lastDragClientX != null) updateDragOverVisuals(lastDragClientX, lastDragClientY);
+  }
+  autoScrollRAF = requestAnimationFrame(autoScrollTick);
+}
+
 document.addEventListener('touchmove', e => {
   if(!pendingTouch && !touchDragging) return;
   const t = e.touches[0];
@@ -616,37 +726,19 @@ document.addEventListener('touchmove', e => {
   touchGhost.style.left = (t.clientX - parseInt(touchGhost.style.width)/2)+'px';
   touchGhost.style.top = (t.clientY - parseInt(touchGhost.style.height)/2)+'px';
 
-  const { trashEl, folderEl } = touchTargetsAt(t.clientX, t.clientY);
+  lastDragClientX = t.clientX;
+  lastDragClientY = t.clientY;
+  if(autoScrollRAF == null) autoScrollRAF = requestAnimationFrame(autoScrollTick);
 
-  document.querySelectorAll('.folder-card.drag-over').forEach(c=>c.classList.remove('drag-over'));
-  document.getElementById('trashDrop').classList.remove('drag-over');
-
-  if(trashEl) {
-    trashEl.classList.add('drag-over');
-    if(dragOverState){ dragOverState=null; renderInsertIndicators(); }
-    return;
-  }
-
-  if(folderEl) {
-    folderEl.classList.add('drag-over');
-    const targetFolderId = folderEl.getAttribute('data-folderid');
-    const wrap = folderEl.querySelector('.files-wrap');
-    const insertIndex = computeInsertIndex(wrap, t.clientX, t.clientY);
-    const changed = !dragOverState || dragOverState.folderId !== targetFolderId || dragOverState.insertIndex !== insertIndex;
-    if(changed) {
-      dragOverState = { folderId: targetFolderId, insertIndex };
-      renderInsertIndicators();
-    }
-  } else if(dragOverState) {
-    dragOverState = null;
-    renderInsertIndicators();
-  }
+  updateDragOverVisuals(t.clientX, t.clientY);
 }, {passive:false});
 
 document.addEventListener('touchcancel', () => {
   pendingTouch = null;
   if(touchGhost) touchGhost.remove();
   touchGhost = null;
+  if(autoScrollRAF != null){cancelAnimationFrame(autoScrollRAF);autoScrollRAF=null;}
+  lastDragClientX = null; lastDragClientY = null;
   document.querySelectorAll('.folder-card.drag-over').forEach(c=>c.classList.remove('drag-over'));
   document.getElementById('trashDrop').classList.remove('drag-over');
   document.querySelectorAll('.drop-indicator').forEach(el=>el.remove());
@@ -664,6 +756,8 @@ document.addEventListener('touchend', e => {
   if(!touchGhost||!touchDragging) return;
   const t = e.changedTouches[0];
   touchGhost.remove(); touchGhost=null;
+  if(autoScrollRAF != null){cancelAnimationFrame(autoScrollRAF);autoScrollRAF=null;}
+  lastDragClientX = null; lastDragClientY = null;
   document.querySelectorAll('.folder-card.drag-over').forEach(c=>c.classList.remove('drag-over'));
   document.getElementById('trashDrop').classList.remove('drag-over');
 
