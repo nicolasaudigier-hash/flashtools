@@ -22,7 +22,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webk
 .wrap{max-width:880px;margin:0 auto;padding:0 20px 64px;}
 a{color:var(--cyan);}
 
-header{display:flex;align-items:center;justify-content:space-between;padding:22px 0;flex-wrap:wrap;gap:10px;}
+header{display:flex;align-items:center;justify-content:flex-end;padding:22px 0;flex-wrap:wrap;gap:10px;}
 .brand{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;}
 .back{font-size:13px;color:var(--text-dim);text-decoration:none;border:1px solid var(--border);padding:7px 13px;border-radius:20px;}
 .back:hover{border-color:var(--border-cyan);color:var(--text);}
@@ -30,7 +30,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:22p
 .eyebrow{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
   color:var(--violet);background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.35);
   padding:5px 12px;border-radius:20px;margin-bottom:16px;}
-h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(26px,6vw,36px);color:#fff;line-height:1.15;margin-bottom:14px;}
+h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(21px,4.5vw,28px);color:#fff;line-height:1.2;margin-bottom:14px;}
 .lede{color:var(--text-dim);font-size:15.5px;max-width:66ch;margin:0 auto 8px;}
 .lede b{color:var(--text);font-weight:600;}
 .hero{margin-bottom:32px;text-align:center;}
@@ -165,13 +165,11 @@ footer a{color:var(--text-dim);text-decoration:none;font-size:12.5px;}
 <div class="wrap">
 
   <header>
-    <div class="brand">FlashStatut</div>
     <a class="back" href="https://www.flashtools.fr/lesoutils">← Retour aux outils</a>
   </header>
 
   <div class="hero">
-    <div class="eyebrow">Statut juridique</div>
-    <h1>Comparateur de statut — micro-entreprise, EI ou société</h1>
+    <h1>Comparer micro-entreprise, EI et société</h1>
     <p class="lede">Vous approchez des plafonds de la micro-entreprise, ou vos charges réelles dépassent l'abattement forfaitaire ? Ce comparateur estime votre <b>revenu net</b> selon trois statuts (micro-entreprise, entreprise individuelle au régime réel, société EURL ou SASU) pour une même activité.</p>
   </div>
 
@@ -417,7 +415,7 @@ function calc(){
 
   // Micro
   var microCotis = ca * act.cotis;
-  var microNet = ca - microCotis;
+  var microNet = ca - microCotis - charges;
 
   // EI au reel
   var beneficeReel = Math.max(0, ca - charges);
