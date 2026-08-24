@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<style>html{visibility:hidden}</style>
+<meta name="robots" content="noindex">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlashRelance | FlashTools</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0E27; --surface:#111827; --card:#1E293B; --card2:#0F172A;
+  --border:rgba(255,255,255,.08); --border-cyan:rgba(6,182,212,.35);
+  --cyan:#06B6D4; --violet:#8B5CF6; --text:#E2E8F0; --text-hi:#F1F5F9; --text-dim:#94A3B8;
+  --success:#10B981; --warning:#F59E0B; --error:#EF4444;
+  --grad: linear-gradient(135deg, var(--cyan), var(--violet));
+  --mono: 'JetBrains Mono', monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.55;font-size:16px;}
+.wrap{max-width:880px;margin:0 auto;padding:0 20px 64px;}
+a{color:var(--cyan);}
+
+header{display:flex;align-items:center;justify-content:flex-end;padding:22px 0;flex-wrap:wrap;gap:10px;}
+.back{font-size:13px;color:var(--text-dim);text-decoration:none;border:1px solid var(--border);padding:7px 13px;border-radius:20px;}
+.back:hover{border-color:var(--border-cyan);color:var(--text);}
+
+.hero{margin-bottom:32px;text-align:center;}
+h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(21px,4.5vw,28px);color:#fff;line-height:1.2;margin-bottom:14px;}
+.lede{color:var(--text-dim);font-size:15.5px;max-width:66ch;margin:0 auto 8px;}
+.lede b{color:var(--text);font-weight:600;}
+
+.tabs{display:flex;gap:8px;margin-bottom:20px;background:var(--card2);border:1px solid var(--border);
+  border-radius:14px;padding:5px;flex-wrap:wrap;}
+.tab{flex:1;min-width:140px;text-align:center;padding:12px 10px;border-radius:10px;font-size:13.5px;font-weight:600;
+  color:var(--text-dim);cursor:pointer;transition:.2s;border:none;background:transparent;font-family:'Inter',sans-serif;}
+.tab.active{background:var(--grad);color:#fff;}
+.tab .tab-sub{display:block;font-size:10.5px;font-weight:400;opacity:.8;margin-top:2px;}
+
+.card{background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px;}
+.card h2{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#fff;margin-bottom:16px;}
+.field{margin-bottom:16px;}
+.field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:13px;color:var(--text-dim);margin-bottom:6px;font-weight:500;}
+.field label .hint{display:block;font-size:11.5px;color:var(--text-dim);opacity:.75;font-weight:400;margin-top:2px;}
+input[type=number],input[type=text],input[type=date],textarea{
+  width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:12px 14px;color:var(--text-hi);font-size:16px;font-family:var(--mono);
+}
+textarea{font-family:'Inter',sans-serif;font-size:14.5px;min-height:64px;resize:vertical;}
+input:focus,textarea:focus{outline:none;border-color:var(--cyan);}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.unit{color:var(--text-dim);font-size:13px;}
+
+.result-hero{text-align:center;padding:22px 20px;background:linear-gradient(180deg,rgba(6,182,212,.08),transparent);
+  border:1px solid var(--border-cyan);border-radius:16px;margin-bottom:14px;}
+.result-hero .label{font-size:12.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.result-hero .num{font-family:var(--mono);font-weight:700;font-size:clamp(28px,7vw,38px);color:#fff;}
+.result-hero .num span{font-size:15px;color:var(--text-dim);font-weight:500;}
+
+.breakdown{background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:20px 22px;margin-bottom:20px;}
+.b-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;}
+.b-row:last-child{border-bottom:none;}
+.b-row.total{padding-top:14px;font-weight:700;font-size:15px;color:#fff;}
+.b-row .l{color:var(--text-dim);}
+.b-row.total .l{color:var(--text);}
+.b-row .v{font-family:var(--mono);font-weight:600;color:var(--text-hi);}
+
+.note{display:flex;gap:10px;background:rgba(6,182,212,.06);border:1px solid var(--border-cyan);
+  border-radius:12px;padding:14px 16px;font-size:13px;color:var(--text-dim);margin-bottom:20px;}
+.note.warn{background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.3);}
+.note b{color:var(--cyan);}
+.note.warn b{color:var(--warning);}
+
+.preview-wrap{background:#fff;color:#1a1a1a;border-radius:12px;padding:0;margin-bottom:16px;
+  max-height:640px;overflow-y:auto;box-shadow:0 4px 20px rgba(0,0,0,.3);}
+.letter-page{font-family:'Inter',sans-serif;font-size:12.5px;line-height:1.55;color:#1a1a1a;padding:38px 44px;min-height:600px;}
+.letter-top{display:flex;justify-content:flex-start;align-items:flex-start;margin-bottom:40px;}
+.letter-sender{font-size:12px;line-height:1.6;color:#111827;}
+.letter-sender .name{font-weight:700;margin-bottom:2px;}
+.letter-refs-top{font-size:11px;color:#4b5563;margin:26px 0 32px;}
+.letter-dest-row{text-align:right;margin-bottom:30px;}
+.letter-dest{display:inline-block;text-align:left;font-size:12px;line-height:1.6;color:#111827;min-width:220px;}
+.letter-dest .name{font-weight:700;margin-bottom:2px;}
+.letter-date{margin-top:16px;color:#111827;}
+.letter-lrar-line{font-size:12.5px;color:#1a1a1a;margin-bottom:8px;text-decoration:underline;}
+.letter-pj-line{font-size:11.5px;color:#4b5563;margin:-14px 0 22px;}
+.letter-object{font-size:12.5px;margin-bottom:24px;}
+.letter-object b{font-weight:700;}
+.letter-body p{margin-bottom:14px;text-align:justify;}
+.letter-body ul{margin:10px 0 14px 0;padding-left:0;list-style:none;}
+.letter-body li{margin-bottom:5px;}
+.letter-sign{margin-top:36px;text-align:right;}
+
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
+.btn{padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;}
+.btn-primary{background:var(--grad);color:#fff;flex:1;min-width:160px;}
+.btn-primary:hover{opacity:.9;}
+.btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border);}
+.btn-secondary:hover{border-color:var(--border-cyan);}
+
+section.block{margin:44px 0;}
+h2.st{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#fff;margin-bottom:16px;}
+
+.mech{background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px;}
+.mech h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:8px;}
+.mech p{font-size:13.5px;color:var(--text-dim);margin-bottom:10px;}
+.mech p:last-child{margin-bottom:0;}
+
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:14px;}
+.step{display:flex;gap:14px;background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:16px 18px;}
+.step .n{counter-increment:step;flex-shrink:0;width:30px;height:30px;border-radius:50%;background:var(--grad);
+  display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:13px;color:#fff;}
+.step .n::before{content:counter(step);}
+.step .txt h3{font-size:14.5px;color:var(--text-hi);margin-bottom:3px;font-weight:600;}
+.step .txt p{font-size:13.5px;color:var(--text-dim);}
+
+.faq-item{border-bottom:1px solid var(--border);}
+.faq-q{width:100%;text-align:left;background:none;border:none;padding:16px 0;color:var(--text-hi);
+  font-size:14.5px;font-weight:600;display:flex;justify-content:space-between;align-items:center;cursor:pointer;
+  font-family:'Inter',sans-serif;}
+.faq-q .icon{color:var(--cyan);font-size:18px;flex-shrink:0;margin-left:12px;transition:transform .2s;}
+.faq-item.open .faq-q .icon{transform:rotate(45deg);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .25s ease;}
+.faq-item.open .faq-a{max-height:300px;}
+.faq-a p{padding-bottom:16px;font-size:13.5px;color:var(--text-dim);}
+
+.sources{display:flex;flex-wrap:wrap;gap:10px;}
+.src-link{display:inline-flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--border);
+  border-radius:10px;padding:10px 14px;font-size:13px;color:var(--text);text-decoration:none;}
+.src-link:hover{border-color:var(--border-cyan);}
+
+.disclaimer{font-size:13.5px;line-height:1.6;color:var(--text-dim);opacity:.9;border-top:1px solid var(--border);padding-top:18px;margin-top:36px;}
+
+footer{text-align:center;padding:40px 0 10px;border-top:1px solid var(--border);margin-top:20px;}
+footer a{color:var(--text-dim);text-decoration:none;font-size:14px;}
+
+@media(max-width:560px){
+  .grid2{grid-template-columns:1fr;}
+  .tab{min-width:100%;}
+}
+</style>
+</head>
+<body>
+<script src="https://nicolasaudigier-hash.github.io/flashtools/flashtools-guard.js?v=2"></script>
+<div class="wrap">
+
+  <header>
+    <a class="back" href="https://www.flashtools.fr/lesoutils">← Retour aux outils</a>
+  </header>
+
+  <div class="hero">
+    <h1>Relancer un impayé, jusqu'à la mise en demeure</h1>
+    <p class="lede">Trois niveaux de courrier, du rappel cordial à la mise en demeure juridique. <b>Les pénalités de retard et l'indemnité forfaitaire sont calculées automatiquement</b> et insérées dans le texte, conformément au Code de commerce.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-level="1">Relance amiable<span class="tab-sub">Premier rappel, ton cordial</span></button>
+    <button class="tab" data-level="2">Relance ferme<span class="tab-sub">Pénalités mentionnées</span></button>
+    <button class="tab" data-level="3">Mise en demeure<span class="tab-sub">Valeur juridique, LRAR</span></button>
+  </div>
+
+  <div class="card">
+    <h2>Votre entreprise (émetteur)</h2>
+    <div class="field">
+      <label>Nom / raison sociale *</label>
+      <input type="text" id="em-nom" placeholder="Jean Dupont — Menuiserie Dupont" oninput="update()">
+    </div>
+    <div class="field">
+      <label>Adresse *</label>
+      <textarea id="em-adresse" placeholder="12 rue des Artisans, 75011 Paris" oninput="update()"></textarea>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label>SIRET <span class="hint">Optionnel, renforce le sérieux du courrier</span></label>
+        <input type="text" id="em-siret" placeholder="123 456 789 00012" oninput="update()">
+      </div>
+      <div class="field">
+        <label>Email <span class="hint">Pour permettre au client de vous répondre</span></label>
+        <input type="text" id="em-email" placeholder="contact@monentreprise.fr" oninput="update()">
+      </div>
+    </div>
+    <div class="field">
+      <label>Téléphone <span class="hint">Optionnel</span></label>
+      <input type="text" id="em-tel" placeholder="06 12 34 56 78" oninput="update()">
+    </div>
+    <div class="field">
+      <label>Ville d'émission
+        <span class="hint">Pour la formule "Fait à [Ville], le [date]". Laisse vide pour n'afficher que la date</span>
+      </label>
+      <input type="text" id="em-ville" placeholder="Paris" oninput="update()">
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label>Nom du signataire *
+          <span class="hint">Une lettre est signée par une personne, pas par une raison sociale</span>
+        </label>
+        <input type="text" id="em-signataire" placeholder="Jean Dupont" oninput="update()">
+      </div>
+      <div class="field">
+        <label>Fonction <span class="hint">Optionnel</span></label>
+        <input type="text" id="em-fonction" placeholder="Gérant, Auto-entrepreneur..." oninput="update()">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Client concerné</h2>
+    <div class="field">
+      <label>Nom / raison sociale *</label>
+      <input type="text" id="cl-nom" placeholder="Société Martin SARL" oninput="update()">
+    </div>
+    <div class="field">
+      <label>Adresse *</label>
+      <textarea id="cl-adresse" placeholder="8 avenue du Commerce, 69002 Lyon" oninput="update()"></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Facture impayée</h2>
+    <div class="grid2">
+      <div class="field">
+        <label>Numéro de facture *</label>
+        <input type="text" id="fa-numero" placeholder="FA-2026-014" oninput="update()">
+      </div>
+      <div class="field">
+        <label>Montant dû *
+          <span class="hint">Le montant total facturé. En franchise de TVA (non assujetti), TTC = HT, indiquez simplement le total de la facture</span>
+        </label>
+        <div style="display:flex;align-items:center;gap:8px;"><input type="number" id="fa-montant" value="1200" min="0" step="0.01" oninput="update()"><span class="unit">€</span></div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label>Date d'échéance (déjà dépassée) *</label>
+        <input type="date" id="fa-echeance" oninput="update()">
+      </div>
+      <div class="field">
+        <label>Taux de pénalités annuel
+          <span class="hint">Prérempli au taux légal BCE + 10 pts, modifiable si vos CGV prévoient autre chose</span>
+        </label>
+        <div style="display:flex;align-items:center;gap:8px;"><input type="number" id="fa-taux" value="12.15" min="0" step="0.01" oninput="update()"><span class="unit">%/an</span></div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Pièce jointe <span class="hint">Optionnel — ex. "Copie de la facture n° 858"</span></label>
+      <input type="text" id="fa-pj" placeholder="Copie de la facture" oninput="update()">
+    </div>
+  </div>
+
+  <div class="result-hero">
+    <div class="label">Montant total réclamable aujourd'hui</div>
+    <div class="num"><span id="r-total">0</span><span> €</span></div>
+  </div>
+
+  <div class="breakdown">
+    <div class="b-row"><span class="l">Facture impayée</span><span class="v" id="r-facture">0 €</span></div>
+    <div class="b-row"><span class="l">Jours de retard</span><span class="v" id="r-jours">0 jours</span></div>
+    <div class="b-row"><span class="l">Pénalités de retard (<span id="r-taux-lbl">12,15</span>%/an)</span><span class="v" id="r-penalites">0 €</span></div>
+    <div class="b-row"><span class="l">Indemnité forfaitaire de recouvrement</span><span class="v" id="r-indemnite">40 €</span></div>
+    <div class="b-row total"><span class="l">Total dû</span><span class="v" id="r-total-2">0 €</span></div>
+  </div>
+
+  <div class="note" id="note-1">
+    <div><b>À envoyer entre J+3 et J+8 après l'échéance.</b> Ce niveau ne mentionne pas encore les pénalités. L'objectif est de rester cordial en supposant un simple oubli. Envoi par email ou courrier simple.</div>
+  </div>
+  <div class="note" id="note-2" style="display:none">
+    <div><b>À envoyer 15 à 20 jours après la relance amiable, si toujours sans réponse.</b> Les pénalités légales sont mentionnées : elles sont dues de plein droit entre professionnels, sans qu'il soit nécessaire de les réclamer au préalable. Envoi par email avec accusé de lecture ou courrier.</div>
+  </div>
+  <div class="note warn" id="note-3" style="display:none">
+    <div><b>À envoyer à partir de 30 jours de retard, si les relances précédentes sont restées sans effet. Obligatoirement en LRAR.</b> Pour avoir une vraie valeur probante, ce courrier doit être envoyé en <b>lettre recommandée avec accusé de réception</b> (ou lettre recommandée électronique). C'est la date de réception par le client qui fait courir le délai fixé.</div>
+  </div>
+
+  <div class="preview-wrap"><div class="letter-page" id="preview"></div></div>
+
+  <div class="actions">
+    <button class="btn btn-primary" onclick="copyText()">Copier le texte</button>
+    <button class="btn btn-secondary" onclick="downloadPDF()">Télécharger en PDF</button>
+  </div>
+
+  <section class="block">
+    <div class="mech">
+      <h3>Relance ou mise en demeure : quelle différence ?</h3>
+      <p>Une <b style="color:var(--text-hi)">relance</b> est commerciale : elle rappelle une échéance, sans conséquence juridique immédiate. Une <b style="color:var(--text-hi)">mise en demeure</b> est un acte juridique : elle constate formellement le manquement, fixe un délai impératif et fait courir les intérêts moratoires (article 1344-1 du Code civil), même sans avoir à prouver de préjudice.</p>
+      <p>C'est ce basculement de ton et de portée juridique qui distingue les deux, pas seulement le fait d'envoyer en recommandé.</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2 class="st">Comment ça marche</h2>
+    <div class="steps">
+      <div class="step"><div class="n"></div><div class="txt"><h3>Vous envoyez la relance amiable dès quelques jours de retard</h3><p>Un simple rappel, sans mention de pénalités. Souvent suffisant, la plupart des retards sont de vrais oublis.</p></div></div>
+      <div class="step"><div class="n"></div><div class="txt"><h3>Sans réponse, la relance ferme mentionne les pénalités déjà dues</h3><p>Ce n'est pas une menace : entre professionnels, les pénalités courent automatiquement dès le lendemain de l'échéance, que vous les réclamiez ou non.</p></div></div>
+      <div class="step"><div class="n"></div><div class="txt"><h3>Toujours sans effet, la mise en demeure fixe un ultimatum</h3><p>Envoyée en LRAR, elle donne un délai précis (souvent 8 à 15 jours) et annonce explicitement une procédure judiciaire à défaut de paiement.</p></div></div>
+      <div class="step"><div class="n"></div><div class="txt"><h3>Sans paiement dans le délai, l'injonction de payer devient possible</h3><p>Une condition légale s'applique ici : le délai fixé dans la mise en demeure doit être <b style="color:var(--text-hi)">entièrement écoulé</b> avant de pouvoir déposer une requête. Procédure judiciaire simplifiée auprès du tribunal compétent, la mise en demeure sert alors de preuve de votre diligence.</p></div></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2 class="st">Questions fréquentes</h2>
+    <div class="faq">
+      <div class="faq-item open">
+        <button class="faq-q">Dois-je vraiment réclamer les 40€ d'indemnité ?<span class="icon">+</span></button>
+        <div class="faq-a"><p>Elle est due de plein droit dès le premier jour de retard, par facture impayée, vous n'avez pas à la justifier. Ne pas la réclamer est un choix commercial possible, mais elle reste légalement acquise.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">La mise en demeure doit-elle vraiment être en recommandé ?<span class="icon">+</span></button>
+        <div class="faq-a"><p>Le Code civil n'impose pas la lettre recommandée. Mais sans elle, vous ne pourrez pas prouver la date de réception, ce qui affaiblit fortement une éventuelle procédure judiciaire ultérieure.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Le taux de pénalités change-t-il souvent ?<span class="icon">+</span></button>
+        <div class="faq-a"><p>Le taux BCE + 10 points est révisé deux fois par an (chaque semestre). Vérifiez le taux en vigueur avant l'envoi si votre facture est ancienne, le champ ci-dessus reste modifiable.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Que faire si le client conteste la facture ?<span class="icon">+</span></button>
+        <div class="faq-a"><p>Une contestation sérieuse et documentée change la donne, ce n'est plus un simple impayé mais un litige. Dans ce cas, la relance seule ne suffit pas, un accompagnement juridique devient pertinent.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Que se passe-t-il après la mise en demeure si rien ne bouge ?<span class="icon">+</span></button>
+        <div class="faq-a"><p>Vous pouvez engager une injonction de payer (procédure simplifiée) ou un référé provision auprès du tribunal compétent. La mise en demeure, envoyée en LRAR, sert alors de preuve de votre bonne foi et de votre diligence.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Combien de temps attendre avant d'envoyer la mise en demeure ?<span class="icon">+</span></button>
+        <div class="faq-a"><p>Aucun délai n'est fixé par la loi, mais la jurisprudence exige un délai raisonnable. En pratique : si vous avez déjà envoyé des relances, 8 à 15 jours de plus suffisent. Si c'est un envoi direct, sans relance préalable, un délai de 30 jours est recommandé pour rester prudent.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Jusqu'à quand puis-je réclamer une facture impayée ?<span class="icon">+</span></button>
+        <div class="faq-a"><p>La créance se prescrit au bout de 5 ans (article 2224 du Code civil et article L110-4 du Code de commerce). Passé ce délai, elle n'est plus récupérable en justice, même si elle reste due en théorie.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2 class="st">Sources officielles</h2>
+    <div class="sources">
+      <a class="src-link" href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000038414392" target="_blank" rel="noopener">Legifrance — art. L441-10 Code de commerce</a>
+      <a class="src-link" href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000032042162" target="_blank" rel="noopener">Legifrance — art. 1344 Code civil</a>
+      <a class="src-link" href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000019017112" target="_blank" rel="noopener">Legifrance — art. 2224 Code civil (prescription)</a>
+      <a class="src-link" href="https://www.service-public.gouv.fr/particuliers/vosdroits/F1746" target="_blank" rel="noopener">service-public.fr — Injonction de payer</a>
+      <a class="src-link" href="https://www.flashtools.fr/lesoutils" target="_blank" rel="noopener">FlashFacture →</a>
+    </div>
+    <p class="disclaimer">Taux de pénalités par défaut (12,15%/an) basé sur le taux BCE + 10 points au 1er semestre 2026, révisé chaque semestre. Vérifiez le taux en vigueur au moment de l'envoi. L'indemnité forfaitaire de 40€ est fixée par l'article D441-5 du Code de commerce. Ces courriers sont des modèles génériques : ils ne remplacent pas les conseils d'un avocat en cas de litige contesté ou de montants importants.</p>
+  </section>
+
+  <footer>
+    <a href="https://www.flashtools.fr/lesoutils">← Voir tous les outils</a>
+  </footer>
+
+</div>
+
+<script>
+document.querySelectorAll('.faq-q').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var item = btn.closest('.faq-item');
+    var wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(function(i){i.classList.remove('open');});
+    if(!wasOpen) item.classList.add('open');
+  });
+});
+
+var currentLevel = 1;
+document.querySelectorAll('.tab').forEach(function(t){
+  t.addEventListener('click', function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});
+    t.classList.add('active');
+    currentLevel = parseInt(t.dataset.level);
+    ['note-1','note-2','note-3'].forEach(function(id,i){
+      document.getElementById(id).style.display = (i+1===currentLevel) ? 'flex' : 'none';
+    });
+    update();
+  });
+});
+
+function euro(n){ return Math.round(n*100)/100; }
+function euroFmt(n){ return euro(n).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €'; }
+// Formateur dédié au PDF : toLocaleString('fr-FR') insère une espace fine insécable (U+202F) comme
+// séparateur de milliers. La police standard de jsPDF n'a pas ce glyphe et le remplace par un caractère
+// aléatoire (d'où le "8 /535,32 €" au lieu de "8 535,32 €") — on construit donc le format à la main,
+// avec une espace normale, uniquement pour tout ce qui part dans le PDF.
+function euroFmtPdf(n){
+  var v = euro(n);
+  var parts = v.toFixed(2).split('.');
+  var intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  return intPart + ',' + parts[1] + ' €';
+}
+function fmtDate(d){ if(!d) return '---'; var parts=d.split('-'); return parts[2]+'/'+parts[1]+'/'+parts[0]; }
+function today(){ var d=new Date(); return d.toISOString().split('T')[0]; }
+function todayFmt(){ var d=new Date(); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
+
+function calc(){
+  var montant = parseFloat(document.getElementById('fa-montant').value) || 0;
+  var echeance = document.getElementById('fa-echeance').value;
+  var taux = parseFloat(document.getElementById('fa-taux').value) || 0;
+  var jours = 0;
+  if(echeance){
+    var d1 = new Date(echeance+'T00:00:00');
+    var d2 = new Date();
+    jours = Math.max(0, Math.floor((d2 - d1) / 86400000));
+  }
+  var penalites = montant * (taux/100) * jours / 365;
+  var indemnite = 40;
+  var total = montant + penalites + indemnite;
+  return { montant: montant, jours: jours, taux: taux, penalites: penalites, indemnite: indemnite, total: total, echeance: echeance };
+}
+
+function buildLetterData(level, c, fmt){
+  fmt = fmt || euroFmt;
+  var numero = document.getElementById('fa-numero').value || '[Numéro de facture]';
+  var echeanceFmt = fmtDate(c.echeance);
+  var tauxFmt = c.taux.toFixed(2).replace('.',',');
+  var data = { numero: numero, lrar: level===3, objet:'', paras:[], list:null, closingParas:[], politesse:'' };
+
+  if(level === 1){
+    data.objet = 'Rappel : facture n° ' + numero;
+    data.paras = [
+      'Sauf erreur ou omission de notre part, nous n\'avons pas encore reçu le règlement de la facture n° ' + numero + ', d\'un montant de ' + fmt(c.montant) + ', échue le ' + echeanceFmt + '.',
+      'Il s\'agit peut-être d\'un simple oubli. Nous vous remercions de bien vouloir procéder au règlement dans les meilleurs délais, ou de nous contacter si un point nécessite d\'être clarifié.',
+      'Nous restons à votre disposition pour toute question.'
+    ];
+    data.politesse = 'Cordialement,';
+  }
+  else if(level === 2){
+    data.objet = 'Deuxième rappel : facture n° ' + numero + ' toujours impayée';
+    data.paras = [
+      'Malgré notre précédent rappel, nous constatons que la facture n° ' + numero + ', d\'un montant de ' + fmt(c.montant) + ', échue depuis le ' + echeanceFmt + ' (' + c.jours + ' jours de retard), demeure impayée à ce jour.',
+      'Nous vous rappelons que conformément à l\'article L441-10 du Code de commerce, des pénalités de retard sont dues de plein droit depuis le lendemain de l\'échéance, ainsi qu\'une indemnité forfaitaire de 40 € pour frais de recouvrement (article D441-5 du même code).',
+      'Montant actuellement dû :'
+    ];
+    data.list = [
+      'Facture : ' + fmt(c.montant),
+      'Pénalités de retard (' + tauxFmt + '%/an, ' + c.jours + ' jours) : ' + fmt(c.penalites),
+      'Indemnité forfaitaire de recouvrement : ' + fmt(c.indemnite),
+      'Total : ' + fmt(c.total)
+    ];
+    data.closingParas = [
+      'Nous vous invitons à régulariser cette situation sous 8 jours.',
+      'Passé ce délai et sans nouvelle de votre part, les pénalités de retard continueront de s\'accumuler chaque jour, et nous nous réservons le droit d\'engager les démarches nécessaires au recouvrement de cette créance.'
+    ];
+    data.politesse = 'Cordialement,';
+  }
+  else {
+    data.objet = 'MISE EN DEMEURE DE PAYER : facture n° ' + numero;
+    data.paras = [
+      'En dépit de plusieurs relances restées à ce jour infructueuses, nous constatons que la somme de ' + fmt(c.total) + ' demeure impayée, au titre de :'
+    ];
+    data.list = [
+      'Facture n° ' + numero + ' du ' + echeanceFmt + ' : ' + fmt(c.montant),
+      'Pénalités de retard (' + tauxFmt + '%/an, ' + c.jours + ' jours de retard) : ' + fmt(c.penalites),
+      'Indemnité forfaitaire de recouvrement (art. D441-5 du Code de commerce) : ' + fmt(c.indemnite)
+    ];
+    data.closingParas = [
+      'Par la présente, nous vous mettons en demeure de régler la somme totale de ' + fmt(c.total) + ' dans un délai de 15 jours à compter de la réception de ce courrier.',
+      'Conformément à l\'article 1344-1 du Code civil, des intérêts moratoires continueront de courir sur cette somme jusqu\'à complet paiement, y compris au-delà de la présente mise en demeure, tant que la facture reste impayée.',
+      'À défaut de règlement dans le délai imparti, nous nous verrons contraints d\'engager une procédure de recouvrement judiciaire (injonction de payer) à votre encontre, sans autre préavis.',
+      'Nous restons naturellement à votre disposition pour tout règlement amiable avant cette échéance.'
+    ];
+    data.politesse = 'Veuillez agréer, Madame, Monsieur, l\'expression de nos salutations distinguées.';
+  }
+  return data;
+}
+
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function contactLine(siret, email, tel){
+  var parts = [];
+  if(siret) parts.push('SIRET : ' + siret);
+  if(email) parts.push(email);
+  if(tel) parts.push('Tél : ' + tel);
+  return parts;
+}
+
+function renderPreviewHTML(data, em, cl){
+  var h = '';
+  h += '<div class="letter-top">';
+  h += '<div class="letter-sender"><div class="name">' + esc(em.nom) + '</div>' + esc(em.adr).replace(/\n/g,'<br>') + (em.contact.length ? '<br><span style="color:#6b7280;font-size:10.5px">' + em.contact.map(esc).join('<br>') + '</span>' : '') + '</div>';
+  h += '</div>';
+  h += '<div class="letter-refs-top">Nos réf. : facture n° ' + esc(data.numero) + '</div>';
+  h += '<div class="letter-dest-row"><div class="letter-dest"><div class="name">' + esc(cl.nom) + '</div>' + esc(cl.adr).replace(/\n/g,'<br>') + '<div class="letter-date">' + (em.ville ? 'Fait à ' + esc(em.ville) + ', ' : '') + 'le ' + todayFmt() + '</div></div></div>';
+  if(data.lrar) h += '<div class="letter-lrar-line">Lettre recommandée avec accusé de réception</div>';
+  h += '<div class="letter-object"><b>Objet : ' + esc(data.objet) + '</b></div>';
+  var pj = document.getElementById('fa-pj').value;
+  if(pj) h += '<div class="letter-pj-line">PJ : ' + esc(pj) + '</div>';
+  h += '<div class="letter-body">';
+  h += '<p>Madame, Monsieur,</p>';
+  data.paras.forEach(function(p){ h += '<p>' + esc(p) + '</p>'; });
+  if(data.list){
+    h += '<ul>';
+    data.list.forEach(function(li,i){
+      var isLast = (i === data.list.length-1) && (li.indexOf('Total') === 0);
+      h += '<li>' + (isLast ? '<b>' + esc(li) + '</b>' : esc(li)) + '</li>';
+    });
+    h += '</ul>';
+  }
+  data.closingParas.forEach(function(p){ h += '<p>' + esc(p) + '</p>'; });
+  h += '<p>' + esc(data.politesse) + '</p>';
+  h += '</div>';
+  h += '<div class="letter-sign">' + esc(em.signataire) + (em.fonction ? '<br><span style="font-size:11px;color:#4b5563">' + esc(em.fonction) + '</span>' : '') + '</div>';
+  return h;
+}
+
+function renderPlainText(data, em, cl){
+  var lines = [];
+  lines.push(em.nom); if(em.adr) lines.push(em.adr); em.contact.forEach(function(l){ lines.push(l); });
+  lines.push('');
+  lines.push('Nos réf. : facture n° ' + data.numero);
+  lines.push('');
+  lines.push(cl.nom); if(cl.adr) lines.push(cl.adr);
+  lines.push((em.ville ? 'Fait à ' + em.ville + ', ' : '') + 'le ' + todayFmt());
+  lines.push('');
+  if(data.lrar) lines.push('Lettre recommandée avec accusé de réception', '');
+  lines.push('Objet : ' + data.objet);
+  var pjText = document.getElementById('fa-pj').value;
+  if(pjText) lines.push('PJ : ' + pjText);
+  lines.push('');
+  lines.push('Madame, Monsieur,');
+  lines.push('');
+  data.paras.forEach(function(p){ lines.push(p, ''); });
+  if(data.list){
+    data.list.forEach(function(li){ lines.push('- ' + li); });
+    lines.push('');
+  }
+  data.closingParas.forEach(function(p){ lines.push(p, ''); });
+  lines.push(data.politesse);
+  lines.push('');
+  lines.push(em.signataire);
+  if(em.fonction) lines.push(em.fonction);
+  return lines.join('\n');
+}
+
+function getSenderFields(){
+  var siret = document.getElementById('em-siret').value || '';
+  var email = document.getElementById('em-email').value || '';
+  var tel = document.getElementById('em-tel').value || '';
+  return {
+    nom: document.getElementById('em-nom').value || '[Votre nom / entreprise]',
+    adr: document.getElementById('em-adresse').value || '',
+    siret: siret,
+    email: email,
+    tel: tel,
+    ville: document.getElementById('em-ville').value || '',
+    contact: contactLine(siret, email, tel),
+    signataire: document.getElementById('em-signataire').value || document.getElementById('em-nom').value || '[Signataire]',
+    fonction: document.getElementById('em-fonction').value || ''
+  };
+}
+function getClientFields(){
+  return {
+    nom: document.getElementById('cl-nom').value || '[Nom du client]',
+    adr: document.getElementById('cl-adresse').value || ''
+  };
+}
+
+function update(){
+  var c = calc();
+  document.getElementById('r-total').textContent = euro(c.total).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('r-facture').textContent = euroFmt(c.montant);
+  document.getElementById('r-jours').textContent = c.jours + ' jours';
+  document.getElementById('r-taux-lbl').textContent = c.taux.toFixed(2).replace('.',',');
+  document.getElementById('r-penalites').textContent = euroFmt(c.penalites);
+  document.getElementById('r-indemnite').textContent = euroFmt(c.indemnite);
+  document.getElementById('r-total-2').textContent = euroFmt(c.total);
+
+  var em = getSenderFields(), cl = getClientFields();
+  var data = buildLetterData(currentLevel, c, euroFmt);
+  document.getElementById('preview').innerHTML = renderPreviewHTML(data, em, cl);
+}
+
+function copyText(){
+  var c = calc();
+  var em = getSenderFields(), cl = getClientFields();
+  var data = buildLetterData(currentLevel, c, euroFmt);
+  var txt = renderPlainText(data, em, cl);
+  navigator.clipboard.writeText(txt).then(function(){
+    var btn = document.querySelector('.btn-primary');
+    var orig = btn.textContent;
+    btn.textContent = 'Copié !';
+    setTimeout(function(){ btn.textContent = orig; }, 1500);
+  });
+}
+
+function downloadPDF(){
+  if(typeof window.jspdf === 'undefined'){ alert('Bibliothèque PDF non chargée'); return; }
+  var jsPDF = window.jspdf.jsPDF;
+  var doc = new jsPDF();
+  var c = calc();
+  var em = getSenderFields(), cl = getClientFields();
+  var data = buildLetterData(currentLevel, c, euroFmtPdf);
+
+  var LX = 20, RX = 135, y = 20;
+
+  // Bloc expediteur seul, en haut a gauche
+  doc.setFont(undefined,'bold'); doc.setFontSize(10.5);
+  doc.text(em.nom, LX, y);
+  doc.setFont(undefined,'normal'); doc.setFontSize(9);
+  var emLines = em.adr ? doc.splitTextToSize(em.adr, 90) : [];
+  var ey = y + 5;
+  emLines.forEach(function(l){ doc.text(l, LX, ey); ey += 4.2; });
+  if(em.contact.length){
+    doc.setFontSize(8); doc.setTextColor(100);
+    em.contact.forEach(function(l){ doc.text(l, LX, ey); ey += 4; });
+    doc.setFontSize(9); doc.setTextColor(0);
+  }
+
+  y = ey + 14;
+
+  // Nos ref, juste sous le bloc expediteur, avec un espacement net
+  doc.setFontSize(9); doc.setTextColor(80);
+  doc.text('Nos réf. : facture n° ' + data.numero, LX, y);
+  doc.setTextColor(0);
+
+  y += 24;
+
+  // Bloc destinataire + date, cale a droite, en ligne propre
+  doc.setFont(undefined,'bold'); doc.setFontSize(10);
+  doc.text(cl.nom, RX, y);
+  doc.setFont(undefined,'normal'); doc.setFontSize(9);
+  var clLines = cl.adr ? doc.splitTextToSize(cl.adr, 60) : [];
+  var cy = y + 5;
+  clLines.forEach(function(l){ doc.text(l, RX, cy); cy += 4.2; });
+  cy += 3;
+  var dateStr = (em.ville ? 'Fait à ' + em.ville + ', ' : '') + 'le ' + todayFmt();
+  doc.text(dateStr, RX, cy);
+
+  y = cy + 18;
+
+  // Mention LRAR, le cas echeant : meme taille que l'objet, sans gras, soulignee
+  if(data.lrar){
+    doc.setFont(undefined,'normal'); doc.setFontSize(10.5);
+    var lrarText = 'Lettre recommandée avec accusé de réception';
+    doc.text(lrarText, LX, y);
+    var lrarWidth = doc.getTextWidth(lrarText);
+    doc.setDrawColor(0); doc.setLineWidth(0.2);
+    doc.line(LX, y + 1, LX + lrarWidth, y + 1);
+    y += 9;
+  }
+
+  // Objet
+  doc.setFont(undefined,'bold'); doc.setFontSize(10.5);
+  var objetLines = doc.splitTextToSize('Objet : ' + data.objet, 170);
+  objetLines.forEach(function(l){ doc.text(l, LX, y); y += 5.5; });
+
+  // PJ, le cas echeant, juste sous l'objet
+  var pjPdf = document.getElementById('fa-pj').value;
+  if(pjPdf){
+    doc.setFont(undefined,'normal'); doc.setFontSize(9); doc.setTextColor(80);
+    var pjLines = doc.splitTextToSize('PJ : ' + pjPdf, 170);
+    pjLines.forEach(function(l){ doc.text(l, LX, y); y += 4.2; });
+    doc.setTextColor(0);
+  }
+  y += 10;
+
+  // Corps
+  doc.setFont(undefined,'normal'); doc.setFontSize(10.5);
+  function writePara(text, bold){
+    doc.setFont(undefined, bold ? 'bold' : 'normal');
+    var lines = doc.splitTextToSize(text, 170);
+    lines.forEach(function(l){
+      if(y > 275){ doc.addPage(); y = 20; }
+      doc.text(l, LX, y); y += 5.2;
+    });
+    y += 4;
+  }
+  writePara('Madame, Monsieur,');
+  data.paras.forEach(function(p){ writePara(p); });
+  if(data.list){
+    data.list.forEach(function(li, i){
+      var isTotal = li.indexOf('Total') === 0;
+      writePara('- ' + li, isTotal);
+    });
+  }
+  data.closingParas.forEach(function(p){ writePara(p); });
+  writePara(data.politesse);
+
+  // Signature : nom du signataire (personne physique), pas la raison sociale
+  y += 6;
+  doc.setFont(undefined,'normal'); doc.setFontSize(10.5);
+  doc.text(em.signataire, RX, y);
+  if(em.fonction){
+    y += 5;
+    doc.setFontSize(9); doc.setTextColor(80);
+    doc.text(em.fonction, RX, y);
+    doc.setTextColor(0);
+  }
+
+  // Nom de fichier : Type-F{numéro}, le F rappelle qu'il s'agit du numéro de la facture concernée
+  var levelNames = {1:'Relance-amiable', 2:'Relance-ferme', 3:'Mise-en-demeure'};
+  var numeroRaw = document.getElementById('fa-numero').value || 'sans-numero';
+  var numeroClean = numeroRaw.replace(/[^a-zA-Z0-9]/g,'');
+  doc.save(levelNames[currentLevel] + '-F' + numeroClean + '.pdf');
+}
+
+document.getElementById('fa-echeance').value = (function(){ var d=new Date(); d.setDate(d.getDate()-20); return d.toISOString().split('T')[0]; })();
+update();
+</script>
+</body>
+</html>
