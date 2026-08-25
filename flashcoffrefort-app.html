@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlashCoffreFort — Créez votre coffre</title>
+<script src="https://coffrefort.flashtools.fr/flashcoffrefort-guard.js"></script>
+<style>
+  /* Page cachée par défaut : révélée uniquement par flashcoffrefort-guard.js
+     une fois l'accès vérifié (tag flashcoffrefort-unique/famille/pro actif).
+     Ne concerne QUE cette page outil — le fichier .flashcoffrefort.html
+     généré plus bas dans ce script reste, lui, sans guard, ouvrable hors
+     ligne pour toujours. */
+  html { visibility: hidden; }
+  :root {
+    --bg: #0A0E27;
+    --surface: #1E293B;
+    --surface2: #111827;
+    --text: #F1F5F9;
+    --text-dim: #94A3B8;
+    --cyan: #06B6D4;
+    --violet: #8B5CF6;
+    --success: #10B981;
+    --warning: #F59E0B;
+    --error: #EF4444;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    margin: 0;
+    padding: 24px 16px 80px;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .tagline { color: var(--text-dim); font-size: 14px; margin-bottom: 28px; }
+  .stepbar { display: flex; gap: 4px; margin-bottom: 24px; }
+  .stepbar div { flex: 1; height: 3px; border-radius: 2px; background: var(--surface); }
+  .stepbar div.done { background: linear-gradient(90deg, var(--cyan), var(--violet)); }
+  .card {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  h2 { font-size: 18px; margin: 0 0 16px; }
+  label { display: block; font-size: 13px; color: var(--text-dim); margin-bottom: 6px; }
+  input[type=text], input[type=password], textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid #2A3548;
+    color: var(--text);
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 14px;
+    font-family: inherit;
+  }
+  input:focus, textarea:focus { outline: 2px solid var(--cyan); border-color: transparent; }
+  textarea { resize: vertical; min-height: 60px; }
+  .btn {
+    background: linear-gradient(90deg, var(--cyan), var(--violet));
+    color: #fff;
+    border: none;
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn.secondary {
+    background: transparent;
+    border: 1px solid #2A3548;
+    color: var(--text);
+  }
+  .btn.small { padding: 6px 12px; font-size: 12px; }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 20px; }
+  .doors-choice { display: flex; gap: 6px; flex-wrap: wrap; }
+  .doors-choice button {
+    flex: 1;
+    min-width: 56px;
+    padding: 12px 4px;
+    background: var(--surface2);
+    border: 1px solid #2A3548;
+    color: var(--text);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    overflow: hidden;
+  }
+  .doors-choice button.selected { border-color: var(--cyan); background: rgba(6,182,212,0.12); }
+  .doors-choice button .rec { display: block; font-size: 8px; color: var(--cyan); font-weight: 400; margin-top: 3px; line-height: 1.2; white-space: normal; word-break: break-word; }
+  .cats { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .cats button {
+    background: var(--surface2);
+    border: 1px solid #2A3548;
+    color: var(--text-dim);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .cats button.active { background: var(--violet); color: #fff; border-color: var(--violet); }
+  .qlist { max-height: 260px; overflow-y: auto; border: 1px solid #2A3548; border-radius: 8px; padding: 8px; }
+  .qitem { display: flex; align-items: center; gap: 8px; padding: 8px 6px; border-radius: 6px; font-size: 13px; cursor: pointer; }
+  .qitem:hover { background: var(--surface2); }
+  .qitem input { margin: 0; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot.g { background: var(--success); }
+  .dot.y { background: var(--warning); }
+  .dot.r { background: var(--error); }
+  .selected-list { margin-top: 16px; }
+  .selected-list .qitem { background: var(--surface2); margin-bottom: 4px; justify-content: space-between; }
+  .badge { font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: 600; }
+  .badge.g { background: rgba(16,185,129,0.15); color: var(--success); }
+  .badge.y { background: rgba(245,158,11,0.15); color: var(--warning); }
+  .badge.r { background: rgba(239,68,68,0.15); color: var(--error); }
+  .warn-box {
+    background: rgba(245,158,11,0.1);
+    border: 1px solid rgba(245,158,11,0.35);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+    margin-top: 14px;
+    color: #FCD34D;
+  }
+  .ok-box {
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.35);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+    margin-top: 14px;
+    color: #6EE7B7;
+  }
+  .file-drop {
+    border: 2px dashed #2A3548;
+    border-radius: 10px;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 13px;
+    cursor: pointer;
+    margin-bottom: 14px;
+  }
+  .file-drop:hover { border-color: var(--cyan); }
+  .item-row { display: flex; justify-content: space-between; align-items: center; background: var(--surface2); padding: 8px 12px; border-radius: 8px; margin-bottom: 6px; font-size: 13px; }
+  .item-row button { background: none; border: none; color: var(--error); cursor: pointer; font-size: 12px; }
+  .progress-label { font-size: 13px; color: var(--cyan); margin-bottom: 6px; font-weight: 600; }
+  .hint-warn { font-size: 12px; color: var(--warning); margin: -8px 0 14px; }
+  .check-row { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text-dim); margin: 16px 0; }
+  .check-row input { margin-top: 3px; }
+  .recap-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #2A3548; font-size: 13px; }
+  .recap-item:last-child { border-bottom: none; }
+  .recovery-choice { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .radio-card { display: flex; gap: 10px; padding: 14px; border: 1px solid #2A3548; border-radius: 10px; cursor: pointer; font-size: 13px; }
+  .radio-card.selected { border-color: var(--violet); background: rgba(139,92,246,0.08); }
+  .key-display {
+    background: var(--surface2);
+    border: 1px solid var(--violet);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    font-family: monospace;
+    font-size: 16px;
+    letter-spacing: 1px;
+    margin: 14px 0;
+    color: var(--cyan);
+  }
+  .footer-note { font-size: 12px; color: var(--text-dim); text-align: center; margin-top: 24px; }
+  code { color: var(--violet); }
+  .info-link { background:none; border:1px solid #2A3548; color:var(--text-dim); font-size:12px; padding:6px 12px; border-radius:20px; cursor:pointer; margin-bottom:20px; }
+  .info-link:hover { border-color:var(--cyan); color:var(--cyan); }
+  .info-panel { background:var(--surface2); border:1px solid var(--violet); border-radius:12px; padding:18px 20px; margin-bottom:20px; font-size:13px; line-height:1.6; }
+  .info-panel h3 { font-size:14px; margin:14px 0 6px; color:var(--cyan); }
+  .info-panel h3:first-child { margin-top:0; }
+  .info-panel ul { margin:6px 0; padding-left:18px; }
+  .offline-box { background: rgba(139,92,246,0.1); border:1px solid rgba(139,92,246,0.35); border-radius:8px; padding:12px 14px; font-size:13px; margin-top:14px; color:#C4B5FD; }
+  .answer-tip { font-size:12px; color:var(--text-dim); margin:-8px 0 14px; }
+  .custom-q-box { margin-top: 14px; }
+  .custom-q-inner { background: var(--surface2); border: 1px dashed #2A3548; border-radius: 10px; padding: 14px; }
+  .custom-q-inner input { margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🔐 FlashCoffreFort</h1>
+  <div class="tagline">Un coffre numérique que vous ouvrez avec vos propres souvenirs.</div>
+  <button class="info-link" id="infoToggle">ℹ️ Comment ça marche, et ce que ça protège vraiment</button>
+  <div class="info-panel" id="infoPanel" style="display:none">
+    <h3>Comment ça fonctionne</h3>
+    Vos réponses à 5-9 questions personnelles sont combinées pour produire une clé de chiffrement AES-256 — la norme utilisée pour protéger des données bancaires et gouvernementales. Aucune réponse n'est jamais enregistrée telle quelle : seul le résultat chiffré est stocké dans le fichier.
+    <h3>Pourquoi c'est solide</h3>
+    Pour ouvrir le coffre, il faut retrouver <strong>toutes les réponses en même temps</strong> — jamais une par une. Entre les mains de quelqu'un qui ne vous connaît pas, ce fichier est extrêmement difficile à ouvrir, y compris pour un professionnel.
+    <h3>Ce que ça ne protège pas</h3>
+    Un proche qui connaît déjà vos réponses, ou un appareil déjà compromis par un logiciel espion au moment où vous tapez — aucun système, aucune marque, ne peut promettre une protection totale contre ça. C'est une limite honnête, pas un défaut caché.
+    <h3>Combien de fichiers puis-je protéger ?</h3>
+    Jusqu'à 100 Mo au total par coffre — une limite technique liée à la mémoire de votre navigateur, pas une restriction sur vos documents. Largement suffisant pour des scans, contrats ou photos de documents. Si vos fichiers sont trop lourds (PDF scannés en haute résolution, par exemple), <span id="flashpdfMention">vous pouvez les compresser avant de les ajouter</span>.
+    <h3>En résumé</h3>
+    Pour l'immense majorité des usages — protéger des documents des regards extérieurs, d'un vol ou d'un piratage classique — c'est largement suffisant, et nettement plus solide qu'une question secrète isolée.
+  </div>
+  <div class="stepbar" id="stepbar"></div>
+  <div id="app"></div>
+</div>
+
+<script>
+/* ==================== BANQUE DE QUESTIONS ==================== */
+const BANK = {
+  enfance: { label: "Enfance", questions: [
+    "Prénom du meilleur ami d'enfance",
+    "Prénom du premier instituteur",
+    "Nom de la première école",
+    "Nom de l'école maternelle",
+    "Prénom d'un professeur marquant en primaire",
+    "Prénom d'un professeur marquant au lycée",
+    "Lieu de la première colonie de vacances",
+    "Jeu pratiqué le plus souvent enfant",
+    "Nom de la première peluche",
+    "Prénom du premier animal de compagnie",
+    "Nom de l'animal de compagnie",
+    "Plat mangé particulièrement souvent chez les grands-parents",
+    "Dessin animé associé à un souvenir précis",
+    "Livre que vous relisiez sans cesse enfant",
+    "Personnage de fiction que vous imitiez enfant",
+    "Prénom d'un camarade de classe particulièrement mémorable",
+    "Nom du parc où vous jouiez le plus souvent",
+    "Lieu fréquenté régulièrement les mercredis ou week-ends enfant"
+  ]},
+  famille: { label: "Famille", questions: [
+    "Meilleur ami du père",
+    "Meilleure amie de la mère",
+    "Grand-parent dont vous étiez le plus proche",
+    "Oncle ou tante que vous voyiez le plus souvent enfant",
+    "Cousin avec lequel vous jouiez souvent",
+    "Prénom de l'arrière-grand-parent dont vous vous souvenez le mieux",
+    "Surnom donné par la famille",
+    "Surnom donné à votre frère",
+    "Surnom donné à votre sœur",
+    "Baby-sitter",
+    "Personne qui vous gardait régulièrement",
+    "Voisin proche de la famille",
+    "Meilleur ami de la famille",
+    "Personne qui vous accompagnait régulièrement à l'école",
+    "Membre de la famille qui habitait loin",
+    "Premier correspondant ou correspondante",
+    "Rituel familial du dimanche",
+    "Plat que seul un membre de la famille savait préparer",
+    "Prénom du parrain",
+    "Prénom de la marraine"
+  ]},
+  ecole: { label: "École", questions: [
+    "Prénom du professeur de mathématiques dont vous vous souvenez le plus",
+    "Prénom du professeur de français dont vous vous souvenez le plus",
+    "Prénom du professeur d'histoire dont vous vous souvenez le plus",
+    "Prénom du professeur de musique dont vous vous souvenez le plus",
+    "Prénom du professeur d'anglais dont vous vous souvenez le plus",
+    "Premier collège",
+    "Premier lycée",
+    "Meilleur ami au collège",
+    "Meilleur ami au lycée",
+    "Professeur de conduite",
+    "Matière où vous aviez les meilleures notes au collège",
+    "Matière où vous aviez les meilleures notes au lycée",
+    "Premier établissement après le lycée",
+    "Sortie scolaire mémorable"
+  ]},
+  lieux: { label: "Lieux", questions: [
+    "Rue où vous avez grandi",
+    "Premier quartier",
+    "Village ou ville de l'enfance",
+    "Rue du meilleur ami d'enfance",
+    "Parc où vous alliez jouer",
+    "Plage fréquentée régulièrement",
+    "Village ou ville de vacances",
+    "Camping mémorable",
+    "Hôtel marquant",
+    "Lieu de la maison de vacances",
+    "Restaurant familial le plus fréquenté",
+    "Lieu du marché fréquenté en famille",
+    "Coiffeur ou coiffeuse fréquenté(e) enfant"
+  ]},
+  premieres: { label: "Premières fois", questions: [
+    "Premier jeu vidéo",
+    "Marque de la première console",
+    "Marque du premier ordinateur",
+    "Marque du premier téléphone portable",
+    "Prénom de la personne qui vous a offert votre premier téléphone",
+    "Marque de la première voiture",
+    "Premier emploi",
+    "Premier responsable professionnel",
+    "Ville du premier emploi",
+    "Premier employeur",
+    "Première association",
+    "Marque du premier instrument de musique",
+    "Premier club sportif",
+    "Premier entraîneur",
+    "Première chanson apprise par cœur",
+    "Premier surnom donné par des amis (pas la famille)"
+  ]},
+  objets: { label: "Objets & marques", questions: [
+    "Marque du premier vélo",
+    "Marque du premier appareil photo",
+    "Marque de la première télévision personnelle",
+    "Marque de la première chaîne hi-fi",
+    "Marque de la première montre",
+    "Marque du premier ordinateur portable",
+    "Marque du premier appareil photo numérique",
+    "Marque de la première imprimante",
+    "Marque du premier véhicule à deux roues motorisé"
+  ]},
+  voyages: { label: "Voyages", questions: [
+    "Pays étranger visité le plus de fois",
+    "Premier lieu de vacances dont vous vous souvenez",
+    "Ville étrangère visitée le plus de fois",
+    "Lieu de vacances mémorable",
+    "Hôtel marquant",
+    "Camping mémorable",
+    "Restaurant découvert en voyage dont vous vous souvenez le plus",
+    "Monument qui vous a le plus marqué",
+    "Plus beau site naturel visité",
+    "Personne rencontrée en voyage devenue amie",
+    "Objet rapporté d'un voyage que vous gardez encore"
+  ]},
+  culture: { label: "Culture & goûts", questions: [
+    "Gâteau ou friandise préféré(e) enfant",
+    "Film préféré jeune",
+    "Livre préféré jeune",
+    "Groupe musical préféré adolescent",
+    "Chanteur/chanteuse préféré(e) adolescent",
+    "Acteur/actrice préféré(e) adolescent",
+    "Magazine préféré adolescent",
+    "Émission regardée régulièrement enfant",
+    "Jeu vidéo préféré adolescent",
+    "Chanson jouée à votre mariage",
+    "Chanson que quelqu'un vous chantait pour vous endormir",
+    "Titre d'une chanson entendue à un moment précis dont vous vous souvenez exactement où vous étiez",
+    "Nom d'un objet culturel (livre, disque, VHS) emprunté à quelqu'un et jamais rendu"
+  ]},
+  loisirs: { label: "Loisirs", questions: [
+    "Instrument qu'on aurait aimé apprendre",
+    "Club ou association fréquenté le plus longtemps pendant la jeunesse",
+    "Spectacle ou concert qui vous a le plus marqué",
+    "Premier concert",
+    "Premier spectacle dont on se souvient",
+    "Jeu de société auquel vous jouiez le plus en famille",
+    "Activité manuelle pratiquée avec un grand-parent",
+    "Endroit où vous alliez pour être seul(e)"
+  ]},
+  viepro: { label: "Vie pro", questions: [
+    "Premier bureau ou lieu de travail",
+    "Première entreprise",
+    "Première activité indépendante",
+    "Premier produit ou service vendu",
+    "Personne ayant aidé au début de la carrière",
+    "Lieu de travail particulièrement important",
+    "Projet professionnel mémorable",
+    "Entreprise dans laquelle on a particulièrement aimé travailler",
+    "Prénom du premier stagiaire encadré ou du premier collègue formé",
+    "Lieu du tout premier entretien d'embauche",
+    "Objet resté sur votre premier bureau professionnel"
+  ]},
+  details: { label: "Détails de vie", questions: [
+    "Prénom donné à votre premier animal en peluche/imaginaire",
+    "Mot ou expression que vous employiez enfant et que la famille trouvait drôle",
+    "Prénom du premier enfant que vous avez gardé ou dont vous vous êtes occupé",
+    "Prénom de la personne qui vous a appris à nager",
+    "Prénom de votre voisin de classe le plus mémorable en primaire",
+    "Objet que vous avez perdu et jamais retrouvé, dont vous vous souvenez encore",
+    "Prénom du premier amoureux/première amoureuse (collège)",
+    "Prénom de la personne qui vous a offert votre tout premier vélo",
+    "Endroit où vous avez appris à faire du vélo",
+    "Prénom du médecin ou dentiste de famille de votre enfance",
+    "Nom du jeu inventé avec des amis d'enfance (règles maison)",
+    "Lieu du premier souvenir de vacances sans les parents",
+    "Prénom du/de la cadet(te) de votre meilleur(e) ami(e)",
+    "Prénom de l'aîné(e) de votre meilleur(e) ami(e)"
+  ]},
+};
+const CAT_DEFAULT_SCORE = { enfance:3, famille:3, ecole:2, lieux:3, premieres:2, objets:2, voyages:2, culture:1, loisirs:2, viepro:2, details:3 };
+
+/* ANNOTATION — passe de reformulation du 24/08/2026 :
+   Les questions ci-dessous ont été retirées de la logique "préféré → 🔴"
+   ou du score par défaut de leur catégorie, parce qu'elles portent sur un
+   souvenir précis et personnel plutôt qu'un classement de préférence
+   publique/culturelle partagée. Contrairement aux reformulations directes
+   dans BANK (ex. "préféré" → "le plus fréquenté"), ces 3 questions restent
+   dans la catégorie "Culture & goûts" (par défaut 🔴 car goûts culturels
+   souvent publics) mais méritent individuellement mieux : elles ne
+   demandent pas un classement mais un souvenir vécu, beaucoup plus
+   difficile à deviner de l'extérieur. D'où cette liste d'exceptions
+   ponctuelles plutôt qu'un changement du score par défaut de la catégorie
+   entière, qui resterait globalement fondé (la plupart des questions de
+   "Culture & goûts" restent effectivement des classements publics). */
+const SCORE_OVERRIDES = {
+  "Chanson que quelqu'un vous chantait pour vous endormir": 2,
+  "Titre d'une chanson entendue à un moment précis dont vous vous souvenez exactement où vous étiez": 2,
+  "Nom d'un objet culturel (livre, disque, VHS) emprunté à quelqu'un et jamais rendu": 2
+};
+
+function scoreForQuestion(catKey, text) {
+  if (SCORE_OVERRIDES.hasOwnProperty(text)) return SCORE_OVERRIDES[text];
+  if (/préféré|préférée|préférés|préférées/i.test(text)) return 1;
+  return CAT_DEFAULT_SCORE[catKey];
+}
+
+function scoreForCustomQuestion(text) {
+  if (/préféré|préférée|actuel|actuelle|aujourd.?hui|métier|profession|\bville\b(?!.{0,20}(enfance|grandi))/i.test(text)) return 1;
+  return 2; // jamais 🟢 automatiquement pour une question inventée par l'utilisateur
+}
+function scoreLabel(s) { return s >= 2.5 ? 'g' : s >= 1.9 ? 'y' : 'r'; }
+function scoreText(s) { return s >= 2.5 ? '🟢 Coffre solide' : s >= 1.9 ? '🟡 Coffre correct — peut être renforcé' : '🔴 Combinaison peu recommandée'; }
+
+/* ==================== CONFIGURATION SITE ====================
+   À renseigner lors du déploiement sur le site dédié : l'URL de la page
+   de vente/commande Systeme.io. Un coffre = un achat — ce lien redirige
+   vers un nouvel achat plutôt que de permettre une recréation gratuite.
+   Laisser vide en développement/test : aucun bouton "nouveau coffre"
+   n'apparaît alors après la génération. */
+const NOUVELLE_COMMANDE_URL = 'https://coffrefort.flashtools.fr/coffre-fort-numerique-sans-mot-de-passe';
+
+/* À renseigner : URL de FlashPDF (outil de compression déjà existant dans
+   l'écosystème FlashTools), suggéré quand le volume de fichiers devient
+   important plutôt que de dupliquer un outil de compression ici. */
+const FLASHPDF_URL = 'https://www.flashtools.fr/flashpdf';
+
+/* ==================== ÉTAT ==================== */
+const state = {
+  step: 1,
+  name: '',
+  doorsCount: 7,
+  activeCat: 'enfance',
+  selected: [],
+  files: [],
+  notes: [],
+  answerIndex: 0,
+  answers: {},
+  answersConfirm: {},
+  hints: {},
+  recoveryEnabled: true,
+  recoveryKey: null
+};
+
+const TOTAL_STEPS = 8;
+
+function setStep(n) { state.step = n; render(); window.scrollTo(0,0); }
+
+/* ==================== RENDU ==================== */
+function render() {
+  document.getElementById('stepbar').innerHTML =
+    Array.from({length: TOTAL_STEPS}, (_,i) => '<div class="' + (i < state.step ? 'done' : '') + '"></div>').join('');
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+  const renderers = [null, step1, step2, step3, step4, step5, step6, step7, step8];
+  renderers[state.step]();
+}
+
+function card(html) {
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.innerHTML = html;
+  document.getElementById('app').appendChild(div);
+  return div;
+}
+
+function navRow(backFn, nextLabel, nextFn, nextDisabled) {
+  const row = document.createElement('div');
+  row.className = 'row';
+  row.innerHTML =
+    '<button class="btn secondary" ' + (backFn ? '' : 'style="visibility:hidden"') + '>← Retour</button>' +
+    '<button class="btn" ' + (nextDisabled ? 'disabled' : '') + '>' + nextLabel + '</button>';
+  if (backFn) row.children[0].onclick = backFn;
+  row.children[1].onclick = nextFn;
+  document.getElementById('app').appendChild(row);
+}
+
+/* ---- Étape 1 : Nom ---- */
+function step1() {
+  card(
+    '<h2>Nom de votre coffre</h2>' +
+    '<label>Comment voulez-vous l\'appeler ?</label>' +
+    '<input type="text" id="vaultName" placeholder="ex. Documents importants" value="' + state.name + '">' +
+    '<div class="offline-box">🔌 Recommandé : coupez votre connexion internet avant de continuer, surtout si vous comptez charger des documents sensibles. FlashCoffreFort fonctionne entièrement hors ligne — vous pouvez le vérifier vous-même.</div>'
+  );
+  document.getElementById('vaultName').oninput = function(e) { state.name = e.target.value; updateNextBtn(); };
+  navRow(null, 'Commencer →', function() { if(state.name.trim()) setStep(2); }, !state.name.trim());
+  function updateNextBtn(){ var btns = document.querySelectorAll('.btn'); btns[btns.length-1].disabled = !state.name.trim(); }
+}
+
+/* ---- Étape 2 : Nombre de portes ---- */
+function step2() {
+  var html = '<h2>Combien de portes pour votre coffre ?</h2><div class="doors-choice" id="doorsChoice">';
+  [5,6,7,8,9].forEach(function(n) {
+    html += '<button data-n="' + n + '" class="' + (state.doorsCount===n?'selected':'') + '">' + n + (n===7?'<span class="rec">recommandé</span>':'') + '</button>';
+  });
+  html += '</div><p style="font-size:13px;color:var(--text-dim);margin-top:16px">Plus de portes = coffre plus solide, mais plus de souvenirs à retenir dans la durée. 7 est le meilleur équilibre pour la plupart des gens.</p>';
+  card(html);
+  document.querySelectorAll('#doorsChoice button').forEach(function(b) {
+    b.onclick = function() { state.doorsCount = parseInt(b.dataset.n); render(); };
+  });
+  navRow(function(){setStep(1);}, 'Continuer →', function(){setStep(3);});
+}
+
+/* ---- Étape 3 : Choix des questions ---- */
+function step3() {
+  const catKeys = Object.keys(BANK);
+  var catsHtml = catKeys.map(function(k) {
+    return '<button data-c="' + k + '" class="' + (state.activeCat===k?'active':'') + '">' + BANK[k].label + '</button>';
+  }).join('');
+  card(
+    '<h2>Choisissez vos ' + state.doorsCount + ' portes</h2>' +
+    '<p style="font-size:13px;color:var(--text-dim);margin-top:-10px">Piochez dans plusieurs catégories différentes.</p>' +
+    '<div class="cats" id="cats">' + catsHtml + '</div>' +
+    '<div class="qlist" id="qlist"></div>' +
+    '<div class="custom-q-box" id="customQBox"></div>' +
+    '<div class="selected-list" id="selList"></div>' +
+    '<div id="warnBox"></div>'
+  );
+  document.querySelectorAll('#cats button').forEach(function(b) {
+    b.onclick = function() { state.activeCat = b.dataset.c; render(); };
+  });
+  renderQList();
+  renderCustomQBox();
+  renderSelectedList();
+
+  function renderCustomQBox() {
+    const customCount = state.selected.filter(function(s){return s.cat==='custom';}).length;
+    const box = document.getElementById('customQBox');
+    if (customCount >= 3) {
+      box.innerHTML = '<div class="warn-box">✍️ Limite atteinte : maximum 3 questions personnalisées par coffre, pour garder l\'essentiel de vos portes sur des questions dont la solidité est connue.</div>';
+      return;
+    }
+    box.innerHTML =
+      '<div class="custom-q-inner">' +
+      '<label>✍️ Ou écrivez votre propre question (' + customCount + '/3 utilisées)</label>' +
+      '<input type="text" id="customQInput" placeholder="ex : Le nom que je donnais à mon vélo">' +
+      '<button class="btn secondary small" id="addCustomQ">+ Ajouter cette question</button>' +
+      '<div class="hint-warn" style="margin-top:8px">⚠️ Vous êtes seul(e) juge de la solidité de cette question. Évitez les préférences actuelles, les informations visibles sur vos réseaux sociaux, ou tout ce qui est facilement retrouvable (ville, métier, date de naissance). Privilégiez un souvenir précis, ancien, que personne d\'autre ne pourrait deviner.</div>' +
+      '</div>';
+    document.getElementById('addCustomQ').onclick = function() {
+      const input = document.getElementById('customQInput');
+      const text = input.value.trim();
+      if (!text) return;
+      if (state.selected.length >= state.doorsCount) return;
+      state.selected.push({ cat: 'custom', text: text, score: scoreForCustomQuestion(text), custom: true });
+      renderCustomQBox();
+      renderSelectedList();
+      navRow2();
+    };
+  }
+
+  function renderQList() {
+    const cat = state.activeCat;
+    document.getElementById('qlist').innerHTML = BANK[cat].questions.map(function(q) {
+      const isSel = state.selected.some(function(s){return s.cat===cat && s.text===q;});
+      const score = scoreForQuestion(cat, q);
+      return '<label class="qitem"><input type="checkbox" ' + (isSel?'checked':'') + ' data-cat="' + cat + '" data-text="' + encodeURIComponent(q) + '"><span class="dot ' + scoreLabel(score) + '"></span> ' + q + '</label>';
+    }).join('');
+    document.querySelectorAll('#qlist input').forEach(function(inp) {
+      inp.onchange = function() {
+        const cat = inp.dataset.cat, text = decodeURIComponent(inp.dataset.text);
+        if (inp.checked) {
+          if (state.selected.length >= state.doorsCount) { inp.checked = false; return; }
+          state.selected.push({ cat: cat, text: text, score: scoreForQuestion(cat, text) });
+        } else {
+          state.selected = state.selected.filter(function(s){return !(s.cat===cat && s.text===text);});
+        }
+        renderSelectedList();
+        navRow2();
+      };
+    });
+  }
+
+  function renderSelectedList() {
+    var listHtml = '<div style="font-size:13px;color:var(--text-dim);margin-bottom:8px">Portes choisies (' + state.selected.length + '/' + state.doorsCount + ')</div>';
+    listHtml += state.selected.map(function(s, i) {
+      var removeBtn = s.cat === 'custom' ? ' <button class="remove-custom" data-i="' + i + '" style="background:none;border:none;color:var(--error);cursor:pointer;font-size:11px;margin-left:6px">Retirer</button>' : '';
+      return '<div class="qitem"><span class="dot ' + scoreLabel(s.score) + '"></span> ' + s.text + ' <span style="margin-left:auto;color:var(--text-dim);font-size:11px">' + (s.cat==='custom' ? '✍️ Personnalisée' : BANK[s.cat].label) + '</span>' + removeBtn + '</div>';
+    }).join('');
+    document.getElementById('selList').innerHTML = listHtml;
+    document.querySelectorAll('.remove-custom').forEach(function(btn) {
+      btn.onclick = function() {
+        state.selected.splice(parseInt(btn.dataset.i), 1);
+        renderCustomQBox();
+        renderSelectedList();
+        navRow2();
+      };
+    });
+
+    const catCounts = {};
+    state.selected.forEach(function(s){ catCounts[s.cat] = (catCounts[s.cat]||0)+1; });
+    const maxCat = Math.max.apply(null, [0].concat(Object.values(catCounts)));
+    const prefCount = state.selected.filter(function(s){return s.score === 1;}).length;
+    const prefRatio = state.selected.length ? prefCount / state.selected.length : 0;
+    var warn = '';
+    if (maxCat >= 3 || prefRatio > 0.4) {
+      warn = '<div class="warn-box">⚠️ Diversifiez vos portes<br>' +
+        (maxCat>=3 ? 'Plusieurs de vos portes viennent de la même catégorie. ' : '') +
+        (prefRatio>0.4 ? 'Trop de questions de type "préférence" — plus faciles à deviner par un proche. ' : '') +
+        'Essayez une catégorie "Détails de vie" ou "Famille" pour une porte supplémentaire.</div>';
+    }
+    document.getElementById('warnBox').innerHTML = warn;
+  }
+
+  function navRow2() {
+    const existing = document.querySelector('#app > .row');
+    if (existing) existing.remove();
+    navRow(function(){setStep(2);}, 'Continuer (' + state.selected.length + '/' + state.doorsCount + ') →', function(){setStep(4);}, state.selected.length !== state.doorsCount);
+  }
+  navRow2();
+}
+
+/* ---- Étape 4 : Contenu (fichiers + notes) ---- */
+const SIZE_WARN_THRESHOLD = 20 * 1024 * 1024; // 20 Mo — avertissement
+const SIZE_HARD_LIMIT = 100 * 1024 * 1024; // 100 Mo — blocage technique (mémoire navigateur)
+
+function step4() {
+  card(
+    '<h2>Que voulez-vous protéger ?</h2>' +
+    '<div class="offline-box">🔌 Vous chargez peut-être des documents sensibles — c\'est le bon moment pour vérifier que votre connexion est coupée si vous voulez une garantie visible que rien ne peut être transmis.</div>' +
+    '<div class="file-drop" id="dropZone">📎 Glissez vos fichiers ici, ou cliquez pour parcourir<br><input type="file" id="fileInput" multiple style="display:none"></div>' +
+    '<div id="sizeInfo" style="font-size:12px;color:var(--text-dim);margin:-8px 0 10px"></div>' +
+    '<div id="filesList"></div>' +
+    '<label style="margin-top:10px">Ajouter une note (optionnel)</label>' +
+    '<input type="text" id="noteTitle" placeholder="Titre de la note">' +
+    '<textarea id="noteText" placeholder="Contenu..."></textarea>' +
+    '<button class="btn secondary small" id="addNoteBtn">+ Ajouter la note</button>' +
+    '<div id="notesList" style="margin-top:12px"></div>'
+  );
+  const drop = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  drop.onclick = function() { fileInput.click(); };
+  fileInput.onchange = function() { handleFiles(fileInput.files); };
+  drop.ondragover = function(e) { e.preventDefault(); };
+  drop.ondrop = function(e) { e.preventDefault(); handleFiles(e.dataTransfer.files); };
+
+  // Le contenu passe par deux encodages base64 successifs (lecture du fichier,
+  // puis intégration du contenu chiffré dans le fichier final) : environ
+  // ×1,78 le volume brut chargé. La limite de 100 Mo doit porter sur le poids
+  // réel du fichier final, pas sur le volume brut, sous peine de laisser
+  // passer des coffres bien plus lourds que prévu (bug constaté le 24/08/2026).
+  const ENCODING_OVERHEAD = 1.8;
+
+  function totalSize() { return state.files.reduce(function(sum,f){ return sum + (f.size||0); }, 0); }
+  function estimatedFinalSize() { return totalSize() * ENCODING_OVERHEAD; }
+  function fmtSize(bytes) { return (bytes / (1024*1024)).toFixed(1) + ' Mo'; }
+
+  function handleFiles(fileList) {
+    Array.from(fileList).forEach(function(f) {
+      if ((totalSize() + f.size) * ENCODING_OVERHEAD > SIZE_HARD_LIMIT) {
+        alert('"' + f.name + '" ferait dépasser 100 Mo au fichier coffre final (le fichier chiffré pèse environ 1,8× le volume chargé). Limite technique liée à la mémoire du navigateur. Créez un second coffre pour ce fichier si besoin.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function() {
+        state.files.push({ name: f.name, type: f.type || 'application/octet-stream', dataB64: reader.result.split(',')[1], size: f.size });
+        renderFiles();
+      };
+      reader.readAsDataURL(f);
+    });
+  }
+  function renderFiles() {
+    document.getElementById('filesList').innerHTML = state.files.map(function(f,i) {
+      return '<div class="item-row">📎 ' + f.name + ' <span style="color:var(--text-dim);font-size:11px;margin-left:6px">' + fmtSize(f.size||0) + '</span> <button data-i="' + i + '">Retirer</button></div>';
+    }).join('');
+    document.querySelectorAll('#filesList button').forEach(function(b) {
+      b.onclick = function() { state.files.splice(parseInt(b.dataset.i),1); renderFiles(); };
+    });
+    const finalSize = estimatedFinalSize();
+    const sizeInfo = document.getElementById('sizeInfo');
+    let msg = 'Poids estimé du coffre final : ' + fmtSize(finalSize) + ' / 100 Mo max (fichiers chargés : ' + fmtSize(totalSize()) + ')';
+    if (finalSize > SIZE_WARN_THRESHOLD) {
+      msg += ' — ⚠️ volume important, le fichier coffre sera lourd à ouvrir et à transmettre';
+      if (FLASHPDF_URL) msg += '. <a href="' + FLASHPDF_URL + '" target="_blank" style="color:var(--cyan)">Compresser vos PDF avec FlashPDF avant de les ajouter →</a>';
+    }
+    sizeInfo.innerHTML = msg;
+  }
+  renderFiles();
+
+  document.getElementById('addNoteBtn').onclick = function() {
+    const t = document.getElementById('noteTitle').value.trim();
+    const x = document.getElementById('noteText').value.trim();
+    if (!t && !x) return;
+    state.notes.push({ titre: t || 'Sans titre', texte: x });
+    document.getElementById('noteTitle').value = '';
+    document.getElementById('noteText').value = '';
+    renderNotes();
+  };
+  function renderNotes() {
+    document.getElementById('notesList').innerHTML = state.notes.map(function(n,i) {
+      return '<div class="item-row">📝 ' + n.titre + ' <button data-i="' + i + '">Retirer</button></div>';
+    }).join('');
+    document.querySelectorAll('#notesList button').forEach(function(b) {
+      b.onclick = function() { state.notes.splice(parseInt(b.dataset.i),1); renderNotes(); };
+    });
+  }
+  renderNotes();
+
+  navRow(function(){setStep(3);}, 'Continuer →', function(){setStep(5);});
+}
+
+/* ---- Étape 5 : Saisie des réponses (double saisie + indice) ---- */
+function normalizeAnswer(s) {
+  return (s||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/\s+/g,' ').replace(/[.,'\u2019\-_"]/g,'');
+}
+
+function placeholderFor(text) {
+  if (/marque/i.test(text)) return 'ex : Nokia, Peugeot — juste la marque';
+  if (/prénom|meilleur ami|voisin|professeur|instituteur|patron|témoin|entraîneur/i.test(text)) return 'ex : Michel — juste le prénom';
+  if (/ville|rue|quartier|lieu|camping|plage|village|hôtel|parc|restaurant|magasin|marché/i.test(text)) return 'ex : Les Pins — sans "le camping de"';
+  return 'Un mot ou deux, sans article ni phrase complète';
+}
+
+function step5() {
+  const idx = state.answerIndex;
+  const q = state.selected[idx];
+  card(
+    '<div class="progress-label">Porte ' + (idx+1) + ' sur ' + state.selected.length + '</div>' +
+    '<h2>' + q.text + '</h2>' +
+    '<label>Votre réponse</label>' +
+    '<input type="text" id="ans" placeholder="' + placeholderFor(q.text) + '" value="' + (state.answers[idx]||'') + '" autocomplete="off">' +
+    '<div class="answer-tip">💬 Donnez la réponse la plus évidente et la plus courte possible — c\'est ce que vous retaperez dans 10 ans, pas une phrase.</div>' +
+    '<label>Confirmez votre réponse</label>' +
+    '<input type="text" id="ansConfirm" value="' + (state.answersConfirm[idx]||'') + '" autocomplete="off">' +
+    '<div id="matchMsg" style="font-size:12px;margin:-8px 0 14px"></div>' +
+    '<label>💡 Indice personnel (facultatif)</label>' +
+    '<input type="text" id="hint" value="' + (state.hints[idx]||'') + '" autocomplete="off">' +
+    '<div class="hint-warn">⚠️ Votre indice sera lisible par toute personne ayant accès à votre fichier coffre. N\'y écrivez jamais la réponse elle-même.</div>' +
+    '<p style="font-size:12px;color:var(--text-dim)">Astuce : majuscules, accents et espaces n\'ont pas d\'importance. L\'orthographe du mot, elle, doit être exacte.</p>'
+  );
+  const ans = document.getElementById('ans');
+  const ansC = document.getElementById('ansConfirm');
+  function sync() {
+    state.answers[idx] = ans.value;
+    state.answersConfirm[idx] = ansC.value;
+    const msg = document.getElementById('matchMsg');
+    if (ansC.value && normalizeAnswer(ans.value) !== normalizeAnswer(ansC.value)) {
+      msg.innerHTML = '<span style="color:var(--error)">Les deux réponses ne correspondent pas.</span>';
+    } else if (ansC.value) {
+      msg.innerHTML = '<span style="color:var(--success)">✓ Réponses identiques</span>';
+    } else msg.innerHTML='';
+    updateNav();
+  }
+  ans.oninput = sync; ansC.oninput = sync;
+  document.getElementById('hint').oninput = function(e) { state.hints[idx] = e.target.value; };
+
+  function canProceed() {
+    return ans.value.trim() && normalizeAnswer(ans.value) === normalizeAnswer(ansC.value);
+  }
+  function updateNav() {
+    const existing = document.querySelector('#app > .row');
+    if (existing) existing.remove();
+    const isLast = idx === state.selected.length - 1;
+    navRow(
+      idx > 0 ? function(){ state.answerIndex--; setStep(5); } : function(){ setStep(4); },
+      isLast ? 'Voir le récapitulatif →' : 'Porte suivante →',
+      function(){ if (isLast) setStep(6); else { state.answerIndex++; setStep(5); } },
+      !canProceed()
+    );
+  }
+  updateNav();
+}
+
+/* ---- Étape 6 : Récapitulatif ---- */
+function step6() {
+  const catCounts = {};
+  state.selected.forEach(function(s){ catCounts[s.cat] = (catCounts[s.cat]||0)+1; });
+  const maxCat = Math.max.apply(null, [0].concat(Object.values(catCounts)));
+  const prefCount = state.selected.filter(function(s){return s.score === 1;}).length;
+  const prefRatio = state.selected.length ? prefCount / state.selected.length : 0;
+  var avg = state.selected.reduce(function(a,s){return a+s.score;},0) / state.selected.length;
+  if (state.selected.length > 7) avg += 0.1 * (state.selected.length - 7);
+  if (maxCat >= 3) avg -= 0.4;
+  if (prefRatio > 0.4) avg -= 0.4;
+  avg = Math.max(1, Math.min(3, avg));
+
+  var itemsHtml = state.selected.map(function(s) {
+    var icon = scoreLabel(s.score)==='g'?'🟢':scoreLabel(s.score)==='y'?'🟡':'🔴';
+    return '<div class="recap-item"><span>' + s.text + '</span><span class="badge ' + scoreLabel(s.score) + '">' + icon + '</span></div>';
+  }).join('');
+
+  card(
+    '<h2>Vérifiez votre coffre</h2>' +
+    '<div style="font-size:14px;color:var(--text-dim);margin-bottom:10px">🔐 "' + state.name + '" — ' + state.selected.length + ' portes, ' + state.files.length + ' fichier(s), ' + state.notes.length + ' note(s)</div>' +
+    itemsHtml +
+    '<div class="' + (avg>=2.5?'ok-box':'warn-box') + '" style="margin-top:16px">' + scoreText(avg) + (avg<2.5?'<br>Remplacez une porte faible par une question "Détails de vie" pour renforcer votre coffre.':'') + '</div>' +
+    '<div class="warn-box" style="margin-top:12px">⚠️ Avant de continuer<br>Choisissez uniquement des réponses dont vous êtes certain de vous souvenir dans plusieurs années. Toutes les portes devront être franchies pour ouvrir le coffre. FlashCoffreFort ne pourra jamais récupérer une réponse oubliée.</div>' +
+    '<div class="check-row"><input type="checkbox" id="confirmLoss"><label for="confirmLoss" style="margin:0">J\'ai compris que la perte de mes réponses peut rendre mon coffre définitivement inaccessible.</label></div>'
+  );
+  const chk = document.getElementById('confirmLoss');
+  chk.onchange = function() { document.querySelectorAll('.btn')[1].disabled = !chk.checked; };
+  navRow(function(){ state.answerIndex = state.selected.length-1; setStep(5); }, 'Continuer →', function(){setStep(7);}, true);
+}
+
+/* ---- Étape 7 : Clé de récupération ---- */
+function step7() {
+  card(
+    '<h2>🔑 Clé de récupération</h2>' +
+    '<p style="font-size:13px;color:var(--text-dim)">C\'est la seule méthode pour récupérer l\'accès à votre coffre si vous oubliez une réponse. Fortement recommandé.</p>' +
+    '<div class="recovery-choice">' +
+    '<div class="radio-card ' + (state.recoveryEnabled?'selected':'') + '" id="optYes">⚫ Oui, générer ma clé de récupération — recommandé</div>' +
+    '<div class="radio-card ' + (!state.recoveryEnabled?'selected':'') + '" id="optNo">⚪ Non, sécurité maximale sans filet de secours</div>' +
+    '</div>' +
+    '<div id="keyZone"></div>'
+  );
+  document.getElementById('optYes').onclick = function() { state.recoveryEnabled = true; render(); };
+  document.getElementById('optNo').onclick = function() { state.recoveryEnabled = false; state.recoveryKey = null; render(); };
+
+  if (state.recoveryEnabled) {
+    if (!state.recoveryKey) {
+      const bytes = crypto.getRandomValues(new Uint8Array(16));
+      const hex = Array.from(bytes).map(function(b){return b.toString(16).padStart(2,'0');}).join('').toUpperCase();
+      state.recoveryKey = hex.match(/.{1,4}/g).join('-');
+    }
+    document.getElementById('keyZone').innerHTML =
+      '<div class="key-display">' + state.recoveryKey + '</div>' +
+      '<div class="warn-box">⚠️ Ne la stockez jamais au même endroit que votre fichier coffre. Cette clé ne s\'affichera plus jamais.</div>' +
+      '<div class="check-row"><input type="checkbox" id="confirmKey"><label for="confirmKey" style="margin:0">J\'ai sauvegardé ma clé de récupération en lieu sûr.</label></div>';
+    const chk = document.getElementById('confirmKey');
+    chk.onchange = function() { document.querySelectorAll('.btn')[1].disabled = !chk.checked; };
+    navRow(function(){setStep(6);}, 'Créer mon coffre →', function(){setStep(8);}, true);
+  } else {
+    navRow(function(){setStep(6);}, 'Créer mon coffre →', function(){setStep(8);}, false);
+  }
+}
+
+/* ---- Étape 8 : Génération ---- */
+async function step8() {
+  card('<h2>🔐 Génération de votre coffre…</h2><div id="genStatus" style="font-size:13px;color:var(--text-dim)">Dérivation de la clé en cours (peut prendre 1 à 2 secondes)…</div>');
+
+  try {
+    await generateVault();
+  } catch (err) {
+    document.getElementById('app').innerHTML = '';
+    card(
+      '<h2>⚠️ La génération a échoué</h2>' +
+      '<p style="font-size:14px;color:var(--text-dim)">Une erreur inattendue s\'est produite (' + (err && err.message ? err.message : 'erreur inconnue') + '). Vos réponses n\'ont pas été perdues.</p>' +
+      '<button class="btn" id="retryGen" style="margin-top:14px">Réessayer</button>'
+    );
+    document.getElementById('retryGen').onclick = function() { setStep(8); };
+    console.error('FlashCoffreFort — échec de génération :', err);
+  }
+}
+
+async function generateVault() {
+
+  function b64(buf) {
+    // Encodage par blocs pour éviter "Maximum call stack size exceeded"
+    // avec String.fromCharCode.apply sur de gros volumes (bug réel identifié
+    // le 24/08/2026 : plantait silencieusement dès qu'un fichier réel de
+    // quelques Mo était chargé, laissant l'écran de génération bloqué sans
+    // jamais afficher d'erreur à l'utilisateur).
+    const bytes = new Uint8Array(buf);
+    const CHUNK = 0x8000;
+    let binary = '';
+    for (let i = 0; i < bytes.length; i += CHUNK) {
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+    }
+    return btoa(binary);
+  }
+
+  const enc = new TextEncoder();
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+
+  const answersOrdered = state.selected.map(function(_, i) { return normalizeAnswer(state.answers[i]); });
+  const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(answersOrdered.join('\x1F')), 'PBKDF2', false, ['deriveKey']);
+  const masterKey = await crypto.subtle.deriveKey(
+    { name:'PBKDF2', salt: salt, iterations: 600000, hash:'SHA-256' },
+    keyMaterial, { name:'AES-GCM', length:256 }, true, ['encrypt','decrypt']
+  );
+
+  const contentObj = { files: state.files, notes: state.notes };
+  const nonce = crypto.getRandomValues(new Uint8Array(12));
+  const ciphertext = await crypto.subtle.encrypt({ name:'AES-GCM', iv: nonce }, masterKey, enc.encode(JSON.stringify(contentObj)));
+
+  let envelope = null;
+  if (state.recoveryEnabled) {
+    const recBytes = state.recoveryKey.replace(/-/g,'');
+    const recKeyRaw = new Uint8Array(recBytes.match(/.{1,2}/g).map(function(h){return parseInt(h,16);}));
+    const recKey = await crypto.subtle.importKey('raw', recKeyRaw, 'AES-GCM', false, ['encrypt']);
+    const envNonce = crypto.getRandomValues(new Uint8Array(12));
+    const masterKeyRaw = await crypto.subtle.exportKey('raw', masterKey);
+    const envCiphertext = await crypto.subtle.encrypt({ name:'AES-GCM', iv: envNonce }, recKey, masterKeyRaw);
+    envelope = { nonce: b64(envNonce), ciphertext: b64(envCiphertext) };
+  }
+
+  const vaultData = {
+    version: 1,
+    name: state.name,
+    salt: b64(salt),
+    kdf: { name:'PBKDF2', iterations: 600000, hash:'SHA-256' },
+    questions: state.selected.map(function(s,i) { return { text: s.text, hint: state.hints[i] || '' }; }),
+    nonce: b64(nonce),
+    ciphertext: b64(ciphertext),
+    envelope: envelope
+  };
+
+  const vaultHtml = buildVaultHtml(vaultData);
+  const blob = new Blob([vaultHtml], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const filename = (state.name.replace(/[^a-z0-9]+/gi,'_') || 'MonCoffre') + '.flashcoffrefort.html';
+
+  document.getElementById('app').innerHTML = '';
+  card(
+    '<h2>🔐 Votre coffre est prêt</h2>' +
+    '<p style="font-size:14px">' + filename + ' — ' + state.selected.length + ' portes, ' + (state.recoveryEnabled ? 'clé de récupération activée' : 'sans clé de récupération') + '</p>' +
+    '<a href="' + url + '" download="' + filename + '"><button class="btn" style="width:100%">Télécharger mon coffre</button></a>' +
+    '<p style="font-size:12px;color:var(--text-dim);margin-top:16px">Placez ce fichier où vous voulez : votre PC, une clé USB, un disque externe. FlashCoffreFort n\'en garde aucune copie et ne connaît aucune de vos réponses.</p>'
+  );
+  if (NOUVELLE_COMMANDE_URL) {
+    const restartRow = document.createElement('div');
+    restartRow.className = 'row';
+    restartRow.innerHTML = '<a href="' + NOUVELLE_COMMANDE_URL + '" style="width:100%"><button class="btn secondary" style="width:100%">Créer un nouveau coffre (nouvel achat)</button></a>';
+    document.getElementById('app').appendChild(restartRow);
+  }
+}
+
+function escapeHtml(s) {
+  const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
+}
+
+/* ==================== TEMPLATE DU COFFRE AUTONOME ==================== */
+function buildVaultHtml(data) {
+  const dataJson = JSON.stringify(data).replace(/</g, '\\u003c');
+  const openerScript = [
+    'const DATA = ' + dataJson + ';',
+    'let idx = 0;',
+    'const answers = {};',
+    'let attempts = 0;',
+    '',
+    'function norm(s){return (s||"").normalize("NFKD").replace(/[\\u0300-\\u036f]/g,"").toLowerCase().trim().replace(/\\s+/g," ").replace(/[.,\\u2019\\-_"]/g,"");}',
+    'function b64d(s){return Uint8Array.from(atob(s), function(c){return c.charCodeAt(0);});}',
+    'function esc(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML;}',
+    'const app = function(){ return document.getElementById("app"); };',
+    '',
+    'function renderAnswer(){',
+    '  const q = DATA.questions[idx];',
+    '  const filled = DATA.questions.filter(function(_,i){return answers[i];}).length;',
+    '  app().innerHTML = ',
+    '    "<div class=\\"card\\">" +',
+    '    "<div class=\\"progress\\">" + filled + " sur " + DATA.questions.length + " renseignées</div>" +',
+    '    "<label style=\\"font-size:16px;color:var(--text);margin-bottom:12px\\">" + esc(q.text) + "</label>" +',
+    '    "<input type=\\"text\\" id=\\"ans\\" autocomplete=\\"off\\" value=\\"" + esc(answers[idx]||"") + "\\">" +',
+    '    (q.hint ? "<div class=\\"hintbox\\">💡 " + esc(q.hint) + "</div>" : "") +',
+    '    "<div class=\\"row\\">" +',
+    '    "<button class=\\"btn secondary\\" id=\\"prev\\" " + (idx===0?"disabled":"") + ">← Précédent</button>" +',
+    '    "<button class=\\"btn\\" id=\\"next\\">" + (idx===DATA.questions.length-1?"Vérifier mes réponses →":"Suivant →") + "</button>" +',
+    '    "</div></div>";',
+    '  const ans = document.getElementById("ans");',
+    '  ans.focus();',
+    '  ans.oninput = function(){ answers[idx] = ans.value; };',
+    '  document.getElementById("prev").onclick = function(){ idx--; renderAnswer(); };',
+    '  document.getElementById("next").onclick = function(){',
+    '    answers[idx] = ans.value;',
+    '    if (idx < DATA.questions.length-1) { idx++; renderAnswer(); }',
+    '    else renderRecap();',
+    '  };',
+    '}',
+    '',
+    'function renderRecap(){',
+    '  var lines = DATA.questions.map(function(q,i){',
+    '    return "<div class=\\"recap-line\\"><span>" + esc(q.text) + "</span><span style=\\"color:var(--text-dim)\\">" + esc(answers[i]||"") + "</span></div>";',
+    '  }).join("");',
+    '  app().innerHTML =',
+    '    "<div class=\\"card\\">" +',
+    '    "<h2 style=\\"font-size:16px\\">Vérifiez vos réponses</h2>" + lines +',
+    '    "<p style=\\"font-size:12px;color:var(--text-dim);margin-top:12px\\">Aucune réponse n\'est vérifiée avant l\'ouverture complète — c\'est ce qui protège votre coffre.</p>" +',
+    '    "<div class=\\"row\\"><button class=\\"btn secondary\\" id=\\"back\\">← Modifier</button><button class=\\"btn\\" id=\\"open\\">🔓 Ouvrir mon coffre</button></div>" +',
+    '    "</div>";',
+    '  document.getElementById("back").onclick = function(){ idx=0; renderAnswer(); };',
+    '  document.getElementById("open").onclick = tryOpen;',
+    '}',
+    '',
+    'async function tryOpen(){',
+    '  attempts++;',
+    '  app().innerHTML = "<div class=\\"card\\">Ouverture en cours…</div>";',
+    '  try {',
+    '    const normalized = DATA.questions.map(function(_,i){ return norm(answers[i]); });',
+    '    const enc = new TextEncoder();',
+    '    const keyMaterial = await crypto.subtle.importKey("raw", enc.encode(normalized.join("\\x1F")), "PBKDF2", false, ["deriveKey"]);',
+    '    const key = await crypto.subtle.deriveKey(',
+    '      { name:"PBKDF2", salt: b64d(DATA.salt), iterations: DATA.kdf.iterations, hash: DATA.kdf.hash },',
+    '      keyMaterial, { name:"AES-GCM", length:256 }, false, ["decrypt"]',
+    '    );',
+    '    const plaintext = await crypto.subtle.decrypt({ name:"AES-GCM", iv: b64d(DATA.nonce) }, key, b64d(DATA.ciphertext));',
+    '    const content = JSON.parse(new TextDecoder().decode(plaintext));',
+    '    renderSuccess(content);',
+    '  } catch(e) {',
+    '    renderFailure();',
+    '  }',
+    '}',
+    '',
+    'function renderSuccess(content){',
+    '  var filesHtml = content.files.length ? content.files.map(function(f){',
+    '    return "<div class=\\"item-row\\">📎 " + esc(f.name) + " <a download=\\"" + esc(f.name) + "\\" href=\\"data:" + f.type + ";base64," + f.dataB64 + "\\">Télécharger</a></div>";',
+    '  }).join("") : "<p style=\\"font-size:13px;color:var(--text-dim)\\">Aucun fichier.</p>";',
+    '  var downloadAllBtn = content.files.length > 1 ? "<button class=\\"btn secondary\\" id=\\"dlAll\\" style=\\"margin-bottom:10px\\">⬇️ Tout télécharger</button>" : "";',
+    '  var notesHtml = content.notes.length ? "<h2 style=\\"font-size:16px;margin-top:16px\\">Notes</h2>" + content.notes.map(function(n){',
+    '    return "<div class=\\"item-row\\" style=\\"display:block\\"><strong>" + esc(n.titre) + "</strong><br><span style=\\"color:var(--text-dim)\\">" + esc(n.texte) + "</span></div>";',
+    '  }).join("") : "";',
+    '  app().innerHTML =',
+    '    "<div class=\\"card\\"><div class=\\"ok-box\\">🔓 Coffre déverrouillé</div></div>" +',
+    '    "<div class=\\"card\\"><h2 style=\\"font-size:16px\\">Fichiers</h2>" + downloadAllBtn + filesHtml + notesHtml + "</div>";',
+    '  if (content.files.length > 1) {',
+    '    document.getElementById("dlAll").onclick = function(){',
+    '      content.files.forEach(function(f, i){',
+    '        setTimeout(function(){',
+    '          var a = document.createElement("a");',
+    '          a.href = "data:" + f.type + ";base64," + f.dataB64;',
+    '          a.download = f.name;',
+    '          document.body.appendChild(a);',
+    '          a.click();',
+    '          document.body.removeChild(a);',
+    '        }, i * 300);',
+    '      });',
+    '    };',
+    '  }',
+    '}',
+    '',
+    'function renderFailure(){',
+    '  app().innerHTML =',
+    '    "<div class=\\"card\\">" +',
+    '    "<div class=\\"err-box\\">🔒 Une ou plusieurs réponses sont incorrectes</div>" +',
+    '    "<p style=\\"font-size:12px;color:var(--text-dim);margin-top:10px\\">FlashCoffreFort ne peut pas indiquer laquelle — c\'est ce qui rend votre coffre difficile à forcer. Tentative n°" + attempts + ".</p>" +',
+    '    "<div class=\\"row\\"><button class=\\"btn secondary\\" id=\\"retry\\">Revoir mes réponses</button>" +',
+    '    (DATA.envelope ? "<button class=\\"btn secondary\\" id=\\"recover\\">Clé de récupération</button>" : "") + "</div></div>";',
+    '  document.getElementById("retry").onclick = function(){ idx=0; renderAnswer(); };',
+    '  if (DATA.envelope) document.getElementById("recover").onclick = renderRecovery;',
+    '}',
+    '',
+    'function renderRecovery(){',
+    '  app().innerHTML =',
+    '    "<div class=\\"card\\">" +',
+    '    "<h2 style=\\"font-size:16px\\">🔑 Ouvrir avec votre clé de récupération</h2>" +',
+    '    "<input type=\\"text\\" id=\\"recKey\\" placeholder=\\"XXXX-XXXX-XXXX-XXXX-XXXX-XXXX\\">" +',
+    '    "<button class=\\"btn\\" id=\\"recOpen\\">🔓 Ouvrir mon coffre</button>" +',
+    '    "<div id=\\"recErr\\" style=\\"font-size:12px;color:var(--error);margin-top:8px\\"></div></div>";',
+    '  document.getElementById("recOpen").onclick = async function(){',
+    '    try {',
+    '      const raw = document.getElementById("recKey").value.replace(/-/g,"").trim();',
+    '      const bytes = new Uint8Array(raw.match(/.{1,2}/g).map(function(h){return parseInt(h,16);}));',
+    '      const recKey = await crypto.subtle.importKey("raw", bytes, "AES-GCM", false, ["decrypt"]);',
+    '      const masterKeyRaw = await crypto.subtle.decrypt({ name:"AES-GCM", iv: b64d(DATA.envelope.nonce) }, recKey, b64d(DATA.envelope.ciphertext));',
+    '      const key = await crypto.subtle.importKey("raw", masterKeyRaw, "AES-GCM", false, ["decrypt"]);',
+    '      const plaintext = await crypto.subtle.decrypt({ name:"AES-GCM", iv: b64d(DATA.nonce) }, key, b64d(DATA.ciphertext));',
+    '      const content = JSON.parse(new TextDecoder().decode(plaintext));',
+    '      renderSuccess(content);',
+    '    } catch(e) {',
+    '      document.getElementById("recErr").textContent = "Clé de récupération invalide.";',
+    '    }',
+    '  };',
+    '}',
+    '',
+    'renderAnswer();'
+  ].join('\n');
+
+  return '<!DOCTYPE html>\n<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+    '<title>🔐 ' + escapeHtml(data.name) + ' — FlashCoffreFort</title>\n' +
+    '<style>\n' +
+    ':root{--bg:#0A0E27;--surface:#1E293B;--surface2:#111827;--text:#F1F5F9;--text-dim:#94A3B8;--cyan:#06B6D4;--violet:#8B5CF6;--success:#10B981;--warning:#F59E0B;--error:#EF4444;}\n' +
+    '*{box-sizing:border-box}body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;margin:0;padding:24px 16px 80px;line-height:1.5}\n' +
+    '.wrap{max-width:560px;margin:0 auto}h1{font-size:20px;margin:0 0 20px}\n' +
+    '.card{background:var(--surface);border-radius:14px;padding:24px;margin-bottom:16px}\n' +
+    'label{display:block;font-size:13px;color:var(--text-dim);margin-bottom:6px}\n' +
+    'input[type=text]{width:100%;background:var(--surface2);border:1px solid #2A3548;color:var(--text);padding:10px 12px;border-radius:8px;font-size:14px;margin-bottom:14px}\n' +
+    'input:focus{outline:2px solid var(--cyan);border-color:transparent}\n' +
+    '.btn{background:linear-gradient(90deg,var(--cyan),var(--violet));color:#fff;border:none;padding:11px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;width:100%}\n' +
+    '.btn:disabled{opacity:.4;cursor:not-allowed}\n' +
+    '.btn.secondary{background:transparent;border:1px solid #2A3548;color:var(--text)}\n' +
+    '.row{display:flex;gap:10px;margin-top:20px}.row>*{flex:1}\n' +
+    '.progress{font-size:13px;color:var(--cyan);margin-bottom:8px;font-weight:600}\n' +
+    '.hintbox{font-size:12px;color:var(--text-dim);background:var(--surface2);padding:8px 10px;border-radius:6px;margin:-8px 0 14px}\n' +
+    '.warn-box{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35);border-radius:8px;padding:12px 14px;font-size:13px;margin-top:14px;color:#FCD34D}\n' +
+    '.ok-box{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.35);border-radius:8px;padding:16px;font-size:14px;color:#6EE7B7}\n' +
+    '.err-box{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.35);border-radius:8px;padding:16px;font-size:14px;color:#FCA5A5}\n' +
+    '.item-row{display:flex;justify-content:space-between;align-items:center;background:var(--surface2);padding:10px 12px;border-radius:8px;margin-bottom:6px;font-size:13px}\n' +
+    '.item-row a{color:var(--cyan)}\n' +
+    '.recap-line{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid #2A3548}\n' +
+    '</style></head>\n' +
+    '<body><div class="wrap"><h1>🔐 ' + escapeHtml(data.name) + '</h1><div id="app"></div></div>\n' +
+    '<script>\n' + openerScript + '\n</' + 'script></body></html>';
+}
+
+/* ==================== INIT ==================== */
+document.getElementById('infoToggle').onclick = function() {
+  const panel = document.getElementById('infoPanel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+};
+render();
+</script>
+</body>
+</html>
