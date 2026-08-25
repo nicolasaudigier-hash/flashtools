@@ -5,11 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FlashCoffreFort — Créez votre coffre</title>
 <style>
-  /* Page cachée par défaut : révélée uniquement par flashcoffrefort-guard.js
-     une fois l'accès vérifié (tag flashcoffrefort-unique/famille/pro actif).
-     Ne concerne QUE cette page outil — le fichier .flashcoffrefort.html
-     généré plus bas dans ce script reste, lui, sans guard, ouvrable hors
-     ligne pour toujours. */
   html { visibility: hidden; }
   :root {
     --bg: #0A0E27;
@@ -208,7 +203,6 @@
 </div>
 
 <script>
-/* ==================== BANQUE DE QUESTIONS ==================== */
 const BANK = {
   enfance: { label: "Enfance", questions: [
     "Prénom du meilleur ami d'enfance",
@@ -382,19 +376,6 @@ const BANK = {
 };
 const CAT_DEFAULT_SCORE = { enfance:3, famille:3, ecole:2, lieux:3, premieres:2, objets:2, voyages:2, culture:1, loisirs:2, viepro:2, details:3 };
 
-/* ANNOTATION — passe de reformulation du 24/08/2026 :
-   Les questions ci-dessous ont été retirées de la logique "préféré → 🔴"
-   ou du score par défaut de leur catégorie, parce qu'elles portent sur un
-   souvenir précis et personnel plutôt qu'un classement de préférence
-   publique/culturelle partagée. Contrairement aux reformulations directes
-   dans BANK (ex. "préféré" → "le plus fréquenté"), ces 3 questions restent
-   dans la catégorie "Culture & goûts" (par défaut 🔴 car goûts culturels
-   souvent publics) mais méritent individuellement mieux : elles ne
-   demandent pas un classement mais un souvenir vécu, beaucoup plus
-   difficile à deviner de l'extérieur. D'où cette liste d'exceptions
-   ponctuelles plutôt qu'un changement du score par défaut de la catégorie
-   entière, qui resterait globalement fondé (la plupart des questions de
-   "Culture & goûts" restent effectivement des classements publics). */
 const SCORE_OVERRIDES = {
   "Chanson que quelqu'un vous chantait pour vous endormir": 2,
   "Titre d'une chanson entendue à un moment précis dont vous vous souvenez exactement où vous étiez": 2,
@@ -414,20 +395,10 @@ function scoreForCustomQuestion(text) {
 function scoreLabel(s) { return s >= 2.5 ? 'g' : s >= 1.9 ? 'y' : 'r'; }
 function scoreText(s) { return s >= 2.5 ? '🟢 Coffre solide' : s >= 1.9 ? '🟡 Coffre correct — peut être renforcé' : '🔴 Combinaison peu recommandée'; }
 
-/* ==================== CONFIGURATION SITE ====================
-   À renseigner lors du déploiement sur le site dédié : l'URL de la page
-   de vente/commande Systeme.io. Un coffre = un achat — ce lien redirige
-   vers un nouvel achat plutôt que de permettre une recréation gratuite.
-   Laisser vide en développement/test : aucun bouton "nouveau coffre"
-   n'apparaît alors après la génération. */
 const NOUVELLE_COMMANDE_URL = 'https://coffrefort.flashtools.fr/coffre-fort-numerique-sans-mot-de-passe';
 
-/* À renseigner : URL de FlashPDF (outil de compression déjà existant dans
-   l'écosystème FlashTools), suggéré quand le volume de fichiers devient
-   important plutôt que de dupliquer un outil de compression ici. */
 const FLASHPDF_URL = 'https://www.flashtools.fr/flashpdf';
 
-/* ==================== ÉTAT ==================== */
 const state = {
   step: 1,
   name: '',
@@ -448,7 +419,6 @@ const TOTAL_STEPS = 8;
 
 function setStep(n) { state.step = n; render(); window.scrollTo(0,0); }
 
-/* ==================== RENDU ==================== */
 function render() {
   document.getElementById('stepbar').innerHTML =
     Array.from({length: TOTAL_STEPS}, (_,i) => '<div class="' + (i < state.step ? 'done' : '') + '"></div>').join('');
@@ -477,7 +447,6 @@ function navRow(backFn, nextLabel, nextFn, nextDisabled) {
   document.getElementById('app').appendChild(row);
 }
 
-/* ---- Étape 1 : Nom ---- */
 function step1() {
   card(
     '<h2>Nom de votre coffre</h2>' +
@@ -490,7 +459,6 @@ function step1() {
   function updateNextBtn(){ var btns = document.querySelectorAll('.btn'); btns[btns.length-1].disabled = !state.name.trim(); }
 }
 
-/* ---- Étape 2 : Nombre de portes ---- */
 function step2() {
   var html = '<h2>Combien de portes pour votre coffre ?</h2><div class="doors-choice" id="doorsChoice">';
   [5,6,7,8,9].forEach(function(n) {
@@ -504,7 +472,6 @@ function step2() {
   navRow(function(){setStep(1);}, 'Continuer →', function(){setStep(3);});
 }
 
-/* ---- Étape 3 : Choix des questions ---- */
 function step3() {
   const catKeys = Object.keys(BANK);
   var catsHtml = catKeys.map(function(k) {
@@ -613,7 +580,6 @@ function step3() {
   navRow2();
 }
 
-/* ---- Étape 4 : Contenu (fichiers + notes) ---- */
 const SIZE_WARN_THRESHOLD = 20 * 1024 * 1024; // 20 Mo — avertissement
 const SIZE_HARD_LIMIT = 100 * 1024 * 1024; // 100 Mo — blocage technique (mémoire navigateur)
 
@@ -637,11 +603,6 @@ function step4() {
   drop.ondragover = function(e) { e.preventDefault(); };
   drop.ondrop = function(e) { e.preventDefault(); handleFiles(e.dataTransfer.files); };
 
-  // Le contenu passe par deux encodages base64 successifs (lecture du fichier,
-  // puis intégration du contenu chiffré dans le fichier final) : environ
-  // ×1,78 le volume brut chargé. La limite de 100 Mo doit porter sur le poids
-  // réel du fichier final, pas sur le volume brut, sous peine de laisser
-  // passer des coffres bien plus lourds que prévu (bug constaté le 24/08/2026).
   const ENCODING_OVERHEAD = 1.8;
 
   function totalSize() { return state.files.reduce(function(sum,f){ return sum + (f.size||0); }, 0); }
@@ -702,7 +663,6 @@ function step4() {
   navRow(function(){setStep(3);}, 'Continuer →', function(){setStep(5);});
 }
 
-/* ---- Étape 5 : Saisie des réponses (double saisie + indice) ---- */
 function normalizeAnswer(s) {
   return (s||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/\s+/g,' ').replace(/[.,'\u2019\-_"]/g,'');
 }
@@ -764,7 +724,6 @@ function step5() {
   updateNav();
 }
 
-/* ---- Étape 6 : Récapitulatif ---- */
 function step6() {
   const catCounts = {};
   state.selected.forEach(function(s){ catCounts[s.cat] = (catCounts[s.cat]||0)+1; });
@@ -795,7 +754,6 @@ function step6() {
   navRow(function(){ state.answerIndex = state.selected.length-1; setStep(5); }, 'Continuer →', function(){setStep(7);}, true);
 }
 
-/* ---- Étape 7 : Clé de récupération ---- */
 function step7() {
   card(
     '<h2>🔑 Clé de récupération</h2>' +
@@ -827,7 +785,6 @@ function step7() {
   }
 }
 
-/* ---- Étape 8 : Génération ---- */
 async function step8() {
   card('<h2>🔐 Génération de votre coffre…</h2><div id="genStatus" style="font-size:13px;color:var(--text-dim)">Dérivation de la clé en cours (peut prendre 1 à 2 secondes)…</div>');
 
@@ -848,11 +805,6 @@ async function step8() {
 async function generateVault() {
 
   function b64(buf) {
-    // Encodage par blocs pour éviter "Maximum call stack size exceeded"
-    // avec String.fromCharCode.apply sur de gros volumes (bug réel identifié
-    // le 24/08/2026 : plantait silencieusement dès qu'un fichier réel de
-    // quelques Mo était chargé, laissant l'écran de génération bloqué sans
-    // jamais afficher d'erreur à l'utilisateur).
     const bytes = new Uint8Array(buf);
     const CHUNK = 0x8000;
     let binary = '';
@@ -922,7 +874,6 @@ function escapeHtml(s) {
   const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
 }
 
-/* ==================== TEMPLATE DU COFFRE AUTONOME ==================== */
 function buildVaultHtml(data) {
   const dataJson = JSON.stringify(data).replace(/</g, '\\u003c');
   const openerScript = [
@@ -1084,7 +1035,6 @@ function buildVaultHtml(data) {
     '<script>\n' + openerScript + '\n</' + 'script></body></html>';
 }
 
-/* ==================== INIT ==================== */
 document.getElementById('infoToggle').onclick = function() {
   const panel = document.getElementById('infoPanel');
   panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
