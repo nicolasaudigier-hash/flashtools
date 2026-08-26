@@ -128,7 +128,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webk
     </div>
   </div>
   <div class="recovery">
-    <p>Déjà abonné mais bloqué par erreur ? <a href="#" onclick="clearAndRetry(event)">Vérifier avec une autre adresse</a></p>
+    <p>Déjà abonné mais bloqué par erreur ? <a href="#" onclick="localStorage.removeItem('flashtools_email'); window.location.href='https://www.flashtools.fr/lesoutils'; return false;">Vérifier avec une autre adresse</a></p>
   </div>
 
 </div>
