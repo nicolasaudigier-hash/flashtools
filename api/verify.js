@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 
   try {
     const response = await fetch(
-      `https://api.systeme.io/api/contacts?email=${encodeURIComponent(email)}&limit=10`,
+      `https://api.systeme.io/api/contacts?email=${encodeURIComponent(email)}&limit=100`,
       { headers: { 'X-API-Key': apiKey } }
     );
     const data = await response.json();
@@ -35,9 +35,9 @@ export default async function handler(req, res) {
     // On se contente de vérifier la présence d'un des 3 tags.
     if (product === 'flashcoffrefort') {
       const tierTags = {
-        pro: 'flashcoffrefort-pro',
-        famille: 'flashcoffrefort-famille',
-        unique: 'flashcoffrefort-unique',
+        annuel: 'flashcoffrefort-annuel',
+        '30j': 'flashcoffrefort-30j',
+        '7j': 'flashcoffrefort-unique',
       };
       for (const [tier, tagName] of Object.entries(tierTags)) {
         if (tagNames.includes(tagName)) {
