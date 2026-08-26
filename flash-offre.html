@@ -62,6 +62,11 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webk
 .badge svg{flex-shrink:0;width:16px;height:16px;color:var(--violet);}
 .badge b{color:var(--text);font-weight:600;}
 
+.recovery{text-align:center;margin-top:22px;padding-top:18px;border-top:1px solid var(--border);}
+.recovery p{font-size:12px;color:var(--text-dim);}
+.recovery a{color:var(--cyan);font-weight:600;text-decoration:none;cursor:pointer;}
+.recovery a:hover{text-decoration:underline;}
+
 @media (max-width:420px){
   .plan{flex-direction:column;align-items:flex-start;gap:10px;}
   .plan .cta{align-self:stretch;text-align:center;}
@@ -122,8 +127,19 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webk
       <span>Résiliation en quelques clics, depuis votre espace</span>
     </div>
   </div>
+  <div class="recovery">
+    <p>Déjà abonné mais bloqué par erreur ? <a href="#" onclick="clearAndRetry(event)">Vérifier avec une autre adresse</a></p>
+  </div>
 
 </div>
+
+<script>
+function clearAndRetry(e){
+  e.preventDefault();
+  try{ window.localStorage.removeItem('flashtools_email'); }catch(err){}
+  window.location.href = 'https://www.flashtools.fr/lesoutils';
+}
+</script>
 
 </body>
 </html>
