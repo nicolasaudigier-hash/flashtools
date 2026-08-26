@@ -9,7 +9,7 @@
    ============================================================ */
 (function () {
   var VERIFY_API = "https://flashtools.vercel.app/api/verify";
-  var REDIRECT_URL = "https://coffrefort.flashtools.fr/coffre-fort-numerique-sans-mot-de-passe?status=blocked";
+  var REDIRECT_URL = "https://coffrefort.flashtools.fr/?status=blocked";
   var STORAGE_KEY = "flashcoffrefort_email";
 
   function isValidEmail(value) {
