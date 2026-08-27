@@ -995,6 +995,24 @@ function backToSelection() {
     window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
+// ===== SÉLECTION AUTO AU FOCUS =====
+// Un champ texte/textarea déjà rempli (restauré depuis localStorage ou pré-rempli
+// par la fiche de marque) peut piéger l'utilisateur : coller du nouveau texte
+// s'insère au niveau du curseur au lieu de remplacer le contenu, produisant un
+// texte corrompu illisible pour l'IA (cas réel observé en test). En sélectionnant
+// tout le contenu au focus, un collage ou une frappe remplace systématiquement
+// l'existant — comportement standard et sans risque pour ce type de formulaire.
+function initSelectOnFocus() {
+    document.querySelectorAll('input[type="text"], textarea').forEach(function(el) {
+        el.addEventListener('focus', function() {
+            var field = this;
+            // Léger délai : certains navigateurs mobiles ignorent select() appelé
+            // de façon synchrone pendant l'événement focus lui-même.
+            setTimeout(function() { field.select(); }, 0);
+        });
+    });
+}
+
 // ===== CHAR COUNTERS =====
 function initCharCounters() {
     document.querySelectorAll('[maxlength]').forEach(function(el) {
@@ -1340,6 +1358,7 @@ window.addEventListener('load', function() {
     loadBrand();
     renderHistory();
     initCharCounters();
+    initSelectOnFocus();
 });
 </script>
 </body>
