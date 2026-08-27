@@ -17,17 +17,23 @@
    au chargement (surtout en navigation privée), ce qui laissait la
    page bloquée indéfiniment sans aucun retour visible pour la personne.
    REDIRECT_URL mise à jour vers la page Systeme.io actuelle.
+   v5 : ne redirige plus automatiquement et silencieusement vers
+   REDIRECT_URL en cas d'échec (email en mémoire sans accès valide).
+   À la place, réaffiche la fenêtre de saisie avec un message d'erreur
+   et la possibilité de retaper une autre adresse. La redirection vers
+   la page d'offre ne se déclenche plus que si la personne clique
+   explicitement sur le lien "Pas encore abonné ? Voir les offres"
+   à l'intérieur de cette même fenêtre. Corrige le cas où une adresse
+   de test restée en mémoire redirigeait sans jamais laisser la
+   personne corriger l'adresse saisie.
    ============================================================ */
 (function () {
   var VERIFY_API = "https://flashtools.vercel.app/api/verify";
-  var REDIRECT_URL = "https://www.flashtools.fr/flash-offre?status=blocked";
+  var REDIRECT_URL = "https://www.flashtools.fr/flash-offre";
   var STORAGE_KEY = "flashtools_email";
 
   function isValidEmail(value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-  }
-  function block() {
-    window.location.replace(REDIRECT_URL);
   }
   function reveal() {
     document.documentElement.style.visibility = "visible";
@@ -47,6 +53,11 @@
       // sans mémorisation, l'email sera redemandé à chaque visite.
     }
   }
+  function clearStoredEmail() {
+    try {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } catch (e) {}
+  }
   function publishStatus(data) {
     window.flashToolsStatus = data;
     try {
@@ -56,7 +67,7 @@
       // window.flashToolsStatus reste consultable directement.
     }
   }
-  function checkAccess(email) {
+  function checkAccess(email, onDenied) {
     var url = VERIFY_API + "?email=" + encodeURIComponent(email);
     fetch(url)
       .then(function (res) { return res.json(); })
@@ -65,17 +76,17 @@
         if (data && data.access === true) {
           reveal();
         } else {
-          block();
+          onDenied();
         }
       })
       .catch(function () {
         publishStatus({ access: false, status: "erreur" });
-        block();
+        onDenied();
       });
   }
 
-  // ── Fenêtre email maison (remplace window.prompt) ──
-  function showEmailModal(onSubmit) {
+  // ── Fenêtre email maison ──
+  function showEmailModal(prefillEmail, errorMessage, onSubmit) {
     var style = document.createElement("style");
     style.textContent =
       "#ft-guard-overlay{position:fixed;inset:0;z-index:999999;display:flex;" +
@@ -90,10 +101,14 @@
       "margin-bottom:10px;}" +
       "#ft-guard-input:focus{border-color:#06B6D4;}" +
       "#ft-guard-error{font-size:12.5px;color:#F87171;margin:0 0 10px;display:none;}" +
+      "#ft-guard-error.show{display:block;}" +
       "#ft-guard-submit{width:100%;padding:12px;border:none;border-radius:9px;cursor:pointer;" +
       "font-size:14.5px;font-weight:600;color:#fff;" +
-      "background:linear-gradient(135deg,#06B6D4,#8B5CF6);}" +
-      "#ft-guard-submit:active{opacity:0.85;}";
+      "background:linear-gradient(135deg,#06B6D4,#8B5CF6);margin-bottom:14px;}" +
+      "#ft-guard-submit:active{opacity:0.85;}" +
+      "#ft-guard-offer{display:block;text-align:center;font-size:12.5px;color:#94A3B8;" +
+      "text-decoration:none;border-top:1px solid #252d42;padding-top:14px;}" +
+      "#ft-guard-offer:hover{color:#06B6D4;}";
     document.head.appendChild(style);
 
     var overlay = document.createElement("div");
@@ -102,9 +117,10 @@
       '<div id="ft-guard-box">' +
       '<p id="ft-guard-title">Accès FlashTools</p>' +
       '<p id="ft-guard-sub">Entrez l\'email associé à votre compte pour accéder à cet outil.</p>' +
-      '<input id="ft-guard-input" type="email" inputmode="email" autocomplete="email" placeholder="vous@exemple.fr">' +
-      '<p id="ft-guard-error">Merci d\'entrer un email valide.</p>' +
+      '<input id="ft-guard-input" type="email" inputmode="email" autocomplete="email" placeholder="vous@exemple.fr" value="' + (prefillEmail || "").replace(/"/g, "&quot;") + '">' +
+      '<p id="ft-guard-error">' + (errorMessage || "Merci d'entrer un email valide.") + '</p>' +
       '<button id="ft-guard-submit" type="button">Continuer</button>' +
+      '<a id="ft-guard-offer" href="' + REDIRECT_URL + '">Pas encore abonné ? Voir les offres →</a>' +
       "</div>";
     document.body.appendChild(overlay);
 
@@ -112,10 +128,13 @@
     var errorEl = overlay.querySelector("#ft-guard-error");
     var submitBtn = overlay.querySelector("#ft-guard-submit");
 
+    if (errorMessage) errorEl.classList.add("show");
+
     function submit() {
       var value = (input.value || "").trim();
       if (!isValidEmail(value)) {
-        errorEl.style.display = "block";
+        errorEl.textContent = "Merci d'entrer un email valide.";
+        errorEl.classList.add("show");
         input.focus();
         return;
       }
@@ -128,21 +147,28 @@
     input.addEventListener("keydown", function (e) {
       if (e.key === "Enter") submit();
     });
-    // Petit délai avant le focus : certains navigateurs mobiles ignorent
-    // un focus() déclenché dans la même frame que l'insertion du DOM.
     setTimeout(function () { input.focus(); }, 50);
   }
 
-  function promptForEmail() {
-    showEmailModal(function (email) {
+  function promptForEmail(prefillEmail, errorMessage) {
+    showEmailModal(prefillEmail, errorMessage, function (email) {
       storeEmail(email);
-      checkAccess(email);
+      checkAccess(email, function () {
+        // Accès refusé pour cette adresse : on réaffiche la fenêtre
+        // avec un message clair, jamais de redirection automatique.
+        promptForEmail(email, "Aucun accès actif trouvé pour cette adresse. Vérifiez l'orthographe, ou essayez une autre adresse.");
+      });
     });
   }
 
   var storedEmail = getStoredEmail();
   if (storedEmail && isValidEmail(storedEmail)) {
-    checkAccess(storedEmail);
+    checkAccess(storedEmail, function () {
+      // L'email en mémoire n'a plus d'accès valide : on la vide et on
+      // redemande, plutôt que de rediriger silencieusement.
+      clearStoredEmail();
+      promptForEmail(storedEmail, "L'accès associé à cette adresse a expiré, ou ne correspond pas à un compte actif. Vérifiez l'adresse, ou essayez-en une autre.");
+    });
   } else {
     promptForEmail();
   }
