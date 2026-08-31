@@ -26,6 +26,15 @@
    à l'intérieur de cette même fenêtre. Corrige le cas où une adresse
    de test restée en mémoire redirigeait sans jamais laisser la
    personne corriger l'adresse saisie.
+   v6 : le script est chargé dans <head>, avant que <body> existe.
+   Le code précédent appelait document.body.appendChild(...) sans
+   vérifier que document.body était bien construit, ce qui pouvait
+   provoquer une erreur silencieuse selon le navigateur (Firefox
+   mobile en particulier) — la page restait alors indéfiniment
+   invisible (écran blanc), sans aucun message d'erreur visible.
+   Toute la logique d'initialisation attend désormais que le DOM
+   soit prêt (DOMContentLoaded, ou immédiatement si déjà chargé)
+   avant de toucher au document.
    ============================================================ */
 (function () {
   var VERIFY_API = "https://flashtools.vercel.app/api/verify";
@@ -161,15 +170,26 @@
     });
   }
 
-  var storedEmail = getStoredEmail();
-  if (storedEmail && isValidEmail(storedEmail)) {
-    checkAccess(storedEmail, function () {
-      // L'email en mémoire n'a plus d'accès valide : on la vide et on
-      // redemande, plutôt que de rediriger silencieusement.
-      clearStoredEmail();
-      promptForEmail(storedEmail, "L'accès associé à cette adresse a expiré, ou ne correspond pas à un compte actif. Vérifiez l'adresse, ou essayez-en une autre.");
-    });
+  function init() {
+    var storedEmail = getStoredEmail();
+    if (storedEmail && isValidEmail(storedEmail)) {
+      checkAccess(storedEmail, function () {
+        // L'email en mémoire n'a plus d'accès valide : on la vide et on
+        // redemande, plutôt que de rediriger silencieusement.
+        clearStoredEmail();
+        promptForEmail(storedEmail, "L'accès associé à cette adresse a expiré, ou ne correspond pas à un compte actif. Vérifiez l'adresse, ou essayez-en une autre.");
+      });
+    } else {
+      promptForEmail();
+    }
+  }
+
+  // ── Point clé v6 : ne jamais toucher au DOM (document.body) tant
+  // qu'il n'existe pas. Le script est chargé dans <head>, donc <body>
+  // n'existe pas forcément encore au moment où ce fichier s'exécute.
+  if (document.body) {
+    init();
   } else {
-    promptForEmail();
+    document.addEventListener("DOMContentLoaded", init);
   }
 })();
