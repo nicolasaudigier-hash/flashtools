@@ -253,7 +253,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
 
 <!-- PROFIL -->
 <section class="section active" id="tab-profil">
-  <div class="section-header"><h1>VOTRE PROFIL FISCAL</h1><p>Renseignez vos informations pour générer un calendrier 100% personnalisé — profil sauvegardé automatiquement</p></div>
+  <div class="section-header"><h1>VOTRE PROFIL FISCAL</h1><p>Renseignez vos informations pour générer un calendrier 100% personnalisé. Profil sauvegardé automatiquement</p></div>
   <div class="sources-bar">
     <span>Sources :</span>
     <a class="source-link" href="https://www.autoentrepreneur.urssaf.fr" target="_blank">autoentrepreneur.urssaf.fr</a>
@@ -279,7 +279,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
         </select></div>
       <div class="field" id="mixte-row">
         <div class="toggle-row" style="border:none;padding:4px 0 0">
-          <div><div class="toggle-label">Activité secondaire ?</div><div class="toggle-sub">Cumul légal — cotisations et abattements ventilés</div></div>
+          <div><div class="toggle-label">Activité secondaire ?</div><div class="toggle-sub">Cumul légal, cotisations et abattements ventilés</div></div>
           <label class="toggle"><input type="checkbox" id="mixte" onchange="onMixteChange();saveProfile()"><span class="toggle-slider"></span></label>
         </div>
         <div id="mixte-ca-row" style="display:none;margin-top:14px;padding:14px;background:var(--surface2);border:1px solid var(--border);border-radius:4px">
@@ -310,7 +310,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
         </select></div>
       <div class="field">
         <div class="toggle-row" style="border:none;padding:4px 0 0">
-          <div><div class="toggle-label">Première année d'activité</div><div class="toggle-sub">CFE exonérée — ACRE disponible</div></div>
+          <div><div class="toggle-label">Première année d'activité</div><div class="toggle-sub">CFE exonérée, ACRE disponible</div></div>
           <label class="toggle"><input type="checkbox" id="premiere_annee" onchange="saveProfile()"><span class="toggle-slider"></span></label>
         </div>
       </div>
@@ -348,12 +348,12 @@ main{max-width:1300px;margin:0 auto;padding:32px}
 
 <!-- CALENDRIER -->
 <section class="section" id="tab-calendrier">
-  <div class="section-header"><h1>CALENDRIER FISCAL <span id="cal-year-title">2026</span></h1><p>Zones de sécurité recommandées — déclarez en avance, provisionnez sans stress</p></div>
+  <div class="section-header"><h1>CALENDRIER FISCAL <span id="cal-year-title">2026</span></h1><p>Zones de sécurité recommandées : déclarez en avance, provisionnez sans stress</p></div>
   <div id="summary-bar" class="summary-bar" style="display:none"></div>
   <div class="export-bar" id="export-bar">
     <button class="btn-export dark" onclick="exportDoc('dark',this)">🌑 Thème Sombre</button>
     <button class="btn-export light" onclick="exportDoc('light',this)">☀️ Thème Clair</button>
-    <span class="export-label">↓ Télécharge un fichier — ouvrir puis Ctrl+P → Destination → Enregistrer en PDF</span>
+    <span class="export-label">↓ Télécharge un fichier : ouvrir puis Ctrl+P → Destination → Enregistrer en PDF</span>
   </div>
   <div class="legend">
     <div class="legend-item"><div class="legend-dot" style="background:var(--cyan)"></div>TVA</div>
@@ -369,7 +369,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
 
 <!-- PROVISIONS -->
 <section class="section" id="tab-provisions">
-  <div class="section-header"><h1>PROVISIONS À CONSTITUER</h1><p>Ce que vous devez mettre de côté sur chaque encaissement — taux 2026 validés</p></div>
+  <div class="section-header"><h1>PROVISIONS À CONSTITUER</h1><p>Ce que vous devez mettre de côté sur chaque encaissement (taux 2026 validés)</p></div>
   <div class="sources-bar">
     <span>Sources :</span>
     <a class="source-link" href="https://www.autoentrepreneur.urssaf.fr/portail/accueil/une-question/questions-frequentes.html" target="_blank">URSSAF — taux officiels</a>
@@ -386,9 +386,9 @@ main{max-width:1300px;margin:0 auto;padding:32px}
     <div class="card-title">💡 La Règle des 3 Enveloppes</div>
     <div style="font-size:13px;line-height:1.9;color:var(--muted)">
       <p>À chaque encaissement, provisionnez <strong style="color:var(--text)">immédiatement</strong> sur des sous-comptes dédiés :</p><br>
-      <p><strong style="color:var(--cyan)">Enveloppe 1 — TVA</strong> : Ce n'est pas votre argent. Virez le montant exact de TVA collecté vers un sous-compte "TVA — NE PAS TOUCHER".</p><br>
-      <p><strong style="color:var(--violet)">Enveloppe 2 — URSSAF + Versement Libératoire</strong> : Pour un artisan BIC services avec VFL, provisionnez ~23,7% du CA HT (cotisations 21,2% + CFP 0,3% + CMA 0,48% + VFL IR 1,7%).</p><br>
-      <p><strong style="color:var(--amber)">Enveloppe 3 — CFE + Divers</strong> : CFE annuelle, abonnements pro, imprévus. Environ 2 à 3% du CA.</p><br>
+      <p><strong style="color:var(--cyan)">Enveloppe 1 · TVA</strong> : Ce n'est pas votre argent. Virez le montant exact de TVA collecté vers un sous-compte "TVA — NE PAS TOUCHER".</p><br>
+      <p><strong style="color:var(--violet)">Enveloppe 2 · URSSAF + Versement Libératoire</strong> : Pour un artisan BIC services avec VFL, provisionnez ~23,7% du CA HT (cotisations 21,2% + CFP 0,3% + CMA 0,48% + VFL IR 1,7%).</p><br>
+      <p><strong style="color:var(--amber)">Enveloppe 3 · CFE + Divers</strong> : CFE annuelle, abonnements pro, imprévus. Environ 2 à 3% du CA.</p><br>
       <p style="color:var(--text);font-weight:600">Le reste = votre revenu net réellement disponible.</p>
     </div>
   </div></div>
@@ -433,7 +433,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
         <span class="tag tr">Majoration mensuelle</span> 5% des cotisations dues<br>
         <span class="tag tr">Majoration trimestrielle</span> 15% des cotisations dues<br>
         <span class="tag ta">Intérêts de retard</span> 0,20% par mois supplémentaire<br><br>
-        <span class="tag tc">Taxation d'office</span> Au-delà de 3 mois sans déclaration, l'URSSAF calcule elle-même vos cotisations sur une base forfaitaire majorée — souvent bien supérieure à votre CA réel.<br><br>
+        <span class="tag tc">Taxation d'office</span> Au-delà de 3 mois sans déclaration, l'URSSAF calcule elle-même vos cotisations sur une base forfaitaire majorée, souvent bien supérieure à votre CA réel.<br><br>
         <strong>CA = 0 ?</strong> Déclarez quand même "néant". 2 minutes sur autoentrepreneur.urssaf.fr = zéro risque.<br><br>
         <span class="tag tg">Droit à l'erreur (loi ESSOC 2018)</span> Première erreur de bonne foi : remise possible des majorations si régularisation dans les 30 jours et aucune défaillance similaire dans les 24 derniers mois.
       </div>
@@ -452,7 +452,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
       <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 Dates de déclaration — zones de sécurité</span><span>▼</span></button>
       <div class="guide-block-body">
         <strong>Mensuel :</strong> Déclarez le CA du mois précédent dès le 1er du mois suivant.<br>
-        Zone de sécurité : <span class="hl">déclarez dès le 1er — ne repoussez pas à la fin du mois</span><br><br>
+        Zone de sécurité : <span class="hl">déclarez dès le 1er, ne repoussez pas à la fin du mois</span><br><br>
         <strong>Trimestriel :</strong><br>
         <span class="tag tv">T1 (jan-mar)</span> → dès le 1er avril, avant le 30 avril<br>
         <span class="tag tv">T2 (avr-jun)</span> → dès le 1er juillet, avant le 31 juillet<br>
@@ -474,37 +474,45 @@ main{max-width:1300px;margin:0 auto;padding:32px}
         <div style="background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:4px;padding:14px">
           <div style="font-family:var(--mono);font-size:11px;color:var(--amber);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">2 · Seuil de base TVA</div>
           <div style="font-size:13px;color:var(--text);font-weight:600;margin-bottom:6px">85 000 € ventes · 37 500 € services</div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.6">Franchise <strong style="color:var(--text)">maintenue jusqu'au 31/12</strong>. TVA obligatoire seulement au <strong style="color:var(--text)">1er janvier N+1</strong>. Ex. : dépassement le 15 juin → vous facturez encore sans TVA jusqu'au 31 décembre.</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6"><strong style="color:var(--text)">Si vous dépassez ce seuil sans franchir le seuil majoré</strong> : franchise maintenue jusqu'au 31/12 de l'année du dépassement, TVA obligatoire dès le <strong style="color:var(--text)">1er janvier suivant</strong>. Ex. : CA 2025 dépasse 37 500 € (reste sous 41 250 €) → sans TVA jusqu'au 31/12/2025, TVA obligatoire dès le 1/1/2026, même si le CA 2026 redescend en cours d'année. Depuis 2025, ce basculement est automatique dès le premier dépassement, il n'existe plus de tolérance calculée sur plusieurs années. <strong style="color:var(--amber)">Entre ce seuil et le seuil majoré, ce n'est pas une zone neutre</strong> : chaque euro facturé vous rapproche du basculement immédiat décrit ci-contre.</div>
         </div>
         <div style="background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--red);border-radius:4px;padding:14px">
           <div style="font-family:var(--mono);font-size:11px;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">3 · Seuil majoré TVA</div>
           <div style="font-size:13px;color:var(--text);font-weight:600;margin-bottom:6px">93 500 € ventes · 41 250 € services</div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.6">Assujettissement <strong style="color:#fca5a5">immédiat et rétroactif</strong> dès le 1er jour du mois de dépassement. Ex. : dépassement le 15 juin → TVA due <strong style="color:#fca5a5">dès le 1er juin</strong>, toutes les factures du mois à régulariser.</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">Assujettissement dès le <strong style="color:#fca5a5">jour exact du dépassement</strong>, pas depuis le 1er jour du mois (ancienne règle, remplacée depuis le 1er janvier 2025). Ex. : seuil dépassé le 20 juin 2026 → les factures émises du 1er au 19 juin restent sans TVA, seule la facture qui fait franchir le seuil et les suivantes doivent l'inclure. Aucune facture antérieure à régulariser.</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:4px;padding:14px">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">4 · Retour en franchise — c'est réversible</div>
+          <div style="font-size:13px;color:var(--text);font-weight:600;margin-bottom:6px">Redescendre sous le seuil de base</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">Aucun des deux dépassements n'est définitif. Le chemin de retour est le même dans les deux cas : si le CA d'une année complète redescend <strong style="color:var(--text)">sous le seuil de base</strong>, la franchise reprend au 1er janvier suivant. Ex. : seuil dépassé en 2025 (base ou majoré) → assujetti tant que le CA annuel reste au-dessus de 37 500 €. Le CA 2026 redescend sous 37 500 € → franchise récupérée au 1/1/2027. Démarche à effectuer auprès du SIE avant le 1er février de l'année de retour.</div>
         </div>
       </div>
       <div style="margin-top:14px;padding:10px 14px;background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.15);border-radius:4px;font-size:12px;color:var(--muted);line-height:1.6">
-        <strong style="color:var(--text)">Ces 3 plafonds sont indépendants</strong> — on peut très bien rester micro-entrepreneur (mécanisme 1) tout en étant assujetti à la TVA (mécanisme 2 ou 3). Le franchissement de l'un n'a aucun effet sur les deux autres.
+        <strong style="color:var(--text)">Ces plafonds sont indépendants</strong> : on peut très bien rester micro-entrepreneur (mécanisme 1) tout en étant assujetti à la TVA (mécanisme 2 ou 3). Le franchissement de l'un n'a aucun effet sur les deux autres.
+      </div>
+      <div style="margin-top:10px;padding:10px 14px;background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15);border-radius:4px;font-size:12px;color:var(--muted);line-height:1.6">
+        <strong style="color:#fca5a5">Impact concurrentiel pour les clients particuliers :</strong> un client professionnel récupère la TVA que vous facturez, donc le passage à la TVA lui est souvent neutre. Un <strong style="color:var(--text)">particulier</strong>, lui, subit l'intégralité de la hausse (+20 % en général) : soit vous répercutez le prix et devenez moins compétitif face à des concurrents encore en franchise, soit vous absorbez la TVA sur votre marge. Pour une activité B2C, ce basculement peut être décisif dans la stratégie de prix, à anticiper bien avant d'approcher le seuil de base.
       </div>
     </div>
     <div class="guide-block">
       <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 Franchise TVA — seuils 2026 confirmés</span><span>▼</span></button>
       <div class="guide-block-body">
-        Source officielle : <a href="https://www.impots.gouv.fr/professionnel/questions/pour-rester-micro-entrepreneur-quel-montant-de-chiffre-daffaires-ou-de" target="_blank" style="color:var(--cyan)">impots.gouv.fr</a> · <a href="https://www.legifiscal.fr/actualites-fiscales/4436-nouveaux-seuils-micro-entreprises-annee-2026.html" target="_blank" style="color:var(--cyan)">LégiFiscal</a><br><br>
+        Source officielle : <a href="https://entreprendre.service-public.gouv.fr/vosdroits/F21746" target="_blank" style="color:var(--cyan)">service-public.gouv.fr</a> · <a href="https://www.legifiscal.fr/actualites-fiscales/4436-nouveaux-seuils-micro-entreprises-annee-2026.html" target="_blank" style="color:var(--cyan)">LégiFiscal</a><br><br>
         <span class="tag tc">Services (BIC/BNC)</span> Seuil de base <strong>37 500 €</strong> · Seuil majoré <strong>41 250 €</strong><br>
         <span class="tag tv">Ventes / livraisons / hébergement</span> Seuil de base <strong>85 000 €</strong> · Seuil majoré <strong>93 500 €</strong><br><br>
         <strong>Règle du dépassement :</strong><br>
-        Dépassement seuil de base uniquement → franchise maintenue jusqu'au 31/12, TVA obligatoire au <strong>1er janvier N+1</strong>.<br>
-        Dépassement seuil majoré → assujettissement TVA <strong>dès le 1er jour du mois du dépassement</strong>, rétroactivement — toutes les factures du mois sont à régulariser.<br><br>
+        Si vous dépassez uniquement le seuil de base (sans franchir le seuil majoré) → franchise maintenue jusqu'au 31/12, TVA obligatoire dès le <strong>1er janvier de l'année suivante</strong>.<br>
+        Si vous dépassez le seuil majoré → assujettissement dès le <strong>jour exact du dépassement</strong> (et non plus depuis le 1er jour du mois, règle en vigueur jusqu'en 2024). Seules les factures émises à partir de ce jour précis doivent inclure la TVA, les factures antérieures, même émises dans le même mois, restent valables sans TVA.<br><br>
         <strong>Une fois assujetti, peut-on revenir en franchise ?</strong><br>
-        <span class="tag tg">✓ Oui, mais pas avant le 1er janvier suivant</span> Si votre CA de l'année N redescend sous le seuil de base (37 500 € services / 85 000 € ventes), vous pouvez retrouver la franchise au <strong>1er janvier N+1</strong>. En cours d'année, même si votre CA chute, vous continuez à facturer la TVA jusqu'au 31 décembre. Le retour n'est jamais automatique — il faut le signaler à votre SIE (Service des Impôts des Entreprises). Source : <a href="https://www.impots.gouv.fr/professionnel/questions/en-tant-que-micro-entrepreneur-puis-je-etre-redevable-de-la-tva" target="_blank" style="color:var(--cyan)">impots.gouv.fr — micro-entrepreneur et TVA</a><br><br>
-        <strong>Déclaration TVA à zéro — obligatoire même sans CA</strong><br>
-        Si vous êtes assujetti à la TVA (régime réel mensuel ou trimestriel) et que vous n'avez encaissé <strong>aucun CA</strong> sur la période, vous devez quand même déposer votre déclaration CA3. Le formulaire 3310-CA3 dispose d'une <strong>case "néant" dédiée</strong> en haut du formulaire : <em>"Si vous n'avez à remplir aucune case de ce formulaire, veuillez cocher la case à droite"</em>. Cochez-la et validez — 2 minutes, zéro risque. Ne pas déclarer = pénalité automatique, même si vous ne deviez rien.<br><br>
+        <span class="tag tg">✓ Oui, mais pas avant le 1er janvier suivant</span> Si votre CA de l'année N redescend sous le seuil de base (37 500 € services / 85 000 € ventes), vous pouvez retrouver la franchise au <strong>1er janvier N+1</strong>. En cours d'année, même si votre CA chute, vous continuez à facturer la TVA jusqu'au 31 décembre. Le retour n'est jamais automatique. Il faut le signaler à votre SIE (Service des Impôts des Entreprises). Source : <a href="https://www.impots.gouv.fr/professionnel/questions/en-tant-que-micro-entrepreneur-puis-je-etre-redevable-de-la-tva" target="_blank" style="color:var(--cyan)">impots.gouv.fr — micro-entrepreneur et TVA</a><br><br>
+        <strong>Déclaration TVA à zéro : obligatoire même sans CA</strong><br>
+        Si vous êtes assujetti à la TVA (régime réel mensuel ou trimestriel) et que vous n'avez encaissé <strong>aucun CA</strong> sur la période, vous devez quand même déposer votre déclaration CA3. Le formulaire 3310-CA3 dispose d'une <strong>case "néant" dédiée</strong> en haut du formulaire : <em>"Si vous n'avez à remplir aucune case de ce formulaire, veuillez cocher la case à droite"</em>. Cochez-la et validez : 2 minutes, zéro risque. Ne pas déclarer = pénalité automatique, même si vous ne deviez rien.<br><br>
         <strong>Choisir mensuel ou trimestriel (régime réel) :</strong><br>
-        <span class="tag tc">Mensuel</span> Déclaration chaque mois. Recommandé si CA régulier — paiements lissés, meilleure visibilité trésorerie.<br>
+        <span class="tag tc">Mensuel</span> Déclaration chaque mois. Recommandé si CA régulier : paiements lissés, meilleure visibilité trésorerie.<br>
         <span class="tag tv">Trimestriel</span> Déclaration tous les 3 mois. Moins de démarches mais 3 gros paiements. Risque de confondre la TVA collectée avec votre trésorerie disponible.<br>
-        <span class="tag ta">⚠</span> Option modifiable chaque année avant le 31 décembre pour l'année suivante — contact SIE ou impots.gouv.fr → Espace Pro → Messagerie.<br><br>
+        <span class="tag ta">⚠</span> Option modifiable chaque année avant le 31 décembre pour l'année suivante. Contact SIE ou impots.gouv.fr → Espace Pro → Messagerie.<br><br>
         <span class="tag tg">ℹ️ Réforme abandonnée</span> Le projet de seuil unique à 25 000 € (PLF 2025) et à 37 500 € (PLF 2026) ont tous deux été abandonnés par le Parlement. Les seuils actuels sont confirmés pour 2026. Source : <a href="https://www.indy.fr/blog/unification-seuils-tva-2026/" target="_blank" style="color:var(--cyan)">Indy.fr — analyse PLF 2026</a><br><br>
-        Mention obligatoire en franchise : <em>"TVA non applicable — article 293 B du CGI"</em>
+        Mention obligatoire en franchise : <em>"TVA non applicable, article 293 B du CGI"</em>
       </div>
     </div>
     <div class="guide-block">
@@ -514,7 +522,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
         <span class="tag tc">Vente de marchandises</span> <strong>203 100 €</strong> CA HT<br>
         <span class="tag tv">Prestations de services BIC/BNC</span> <strong>83 600 €</strong> CA HT<br>
         <span class="tag ta">Activité mixte</span> Max 203 100 € dont max 83 600 € services<br><br>
-        <strong>Règle des 2 ans — comment ça fonctionne exactement :</strong><br>
+        <strong>Règle des 2 ans, comment ça fonctionne exactement :</strong><br>
         Vous pouvez dépasser les seuils micro <strong>une année sans perdre le statut</strong>. C'est seulement si vous les dépassez <strong>deux années consécutives</strong> que vous sortez automatiquement du régime micro au 1er janvier de l'année N+2. Source : <a href="https://entreprendre.service-public.gouv.fr/vosdroits/F23267" target="_blank" style="color:var(--cyan)">service-public.fr — régime fiscal micro</a><br><br>
         <span class="tag tg">ℹ️ Historique</span> Avant 2018, il existait un seuil majoré en pourcentage (~10% au-dessus du plafond) au-delà duquel la sortie était immédiate. Ce mécanisme a été <strong>supprimé au 1er janvier 2018</strong> et remplacé par la règle des 2 ans, plus souple.<br><br>
         <strong>Exemple standard :</strong><br>
@@ -522,14 +530,14 @@ main{max-width:1300px;margin:0 auto;padding:32px}
         CA 2026 repasse sous 83 600 € → année 2025 "effacée", statut micro conservé.<br>
         CA 2026 dépasse à nouveau → sortie du micro au 1er janvier 2027.<br><br>
         <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:4px;padding:12px 14px;margin:8px 0">
-        <strong style="color:var(--amber)">⚠ Cas particulier — dépassement exceptionnel important</strong><br>
+        <strong style="color:var(--amber)">⚠ Cas particulier : dépassement exceptionnel important</strong><br>
         <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-top:6px">
-        Peu importe <em>de combien</em> vous dépassez <strong style="color:var(--text)">le seuil micro</strong> (83 600 € services) — la règle des 2 ans s'applique de la même façon que vous fassiez 84 000 € ou 100 000 €.<br><br>
+        Peu importe <em>de combien</em> vous dépassez <strong style="color:var(--text)">le seuil micro</strong> (83 600 € services), la règle des 2 ans s'applique de la même façon que vous fassiez 84 000 € ou 100 000 €.<br><br>
         Exemple : CA 2025 = 75 000 € (sous le seuil) → CA 2026 = 100 000 € (dépassement de ~20%) → CA 2027 = 75 000 € (sous le seuil).<br>
         Résultat : vous restez micro toute la période. L'année 2026 est tolérée car 2025 était sous le seuil, et 2027 repasse sous le seuil donc 2026 est "effacée".<br><br>
-        <strong style="color:var(--text)">Attention cependant :</strong> même si le régime micro social reste applicable, la TVA suit ses propres règles, avec son propre seuil, totalement indépendant de celui du micro — dès le mois où vous dépassez le <strong>seuil majoré de la franchise TVA</strong> (41 250 € pour les services, 93 500 € pour les ventes), vous êtes assujetti TVA immédiatement, quel que soit votre statut vis-à-vis de la règle des 2 ans. Les deux mécanismes utilisent des seuils différents et ne s'influencent pas l'un l'autre.
+        <strong style="color:var(--text)">Attention cependant :</strong> même si le régime micro social reste applicable, la TVA suit ses propres règles, avec son propre seuil, totalement indépendant de celui du micro. Dès le mois où vous dépassez le <strong>seuil majoré de la franchise TVA</strong> (41 250 € pour les services, 93 500 € pour les ventes), vous êtes assujetti TVA immédiatement, quel que soit votre statut vis-à-vis de la règle des 2 ans. Les deux mécanismes utilisent des seuils différents et ne s'influencent pas l'un l'autre.
         </div></div><br>
-        <span class="tag ta">⚠</span> Seuils TVA et seuils micro sont <strong>indépendants</strong> — vous pouvez être assujetti TVA tout en restant micro. Ce sont deux mécanismes distincts avec des seuils différents.
+        <span class="tag ta">⚠</span> Seuils TVA et seuils micro sont <strong>indépendants</strong>. Vous pouvez être assujetti TVA tout en restant micro. Ce sont deux mécanismes distincts avec des seuils différents.
       </div>
     </div>
     <div class="guide-block">
@@ -545,8 +553,8 @@ main{max-width:1300px;margin:0 auto;padding:32px}
         1. impots.gouv.fr → Espace Professionnel<br>
         2. Rubrique <strong>"Mes contrats de prélèvement"</strong><br>
         3. "Éditer le mandat" → SIREN + IBAN + signature<br>
-        4. Transmettez à votre banque — délai activation : 15 jours<br>
-        5. DGFiP prélève automatiquement après chaque déclaration — zéro risque d'oubli
+        4. Transmettez à votre banque (délai activation : 15 jours)<br>
+        5. DGFiP prélève automatiquement après chaque déclaration, zéro risque d'oubli
       </div>
     </div>
     <div class="guide-block">
@@ -608,7 +616,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
     <div class="guide-block">
       <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 Archivage et organisation des justificatifs</span><span>▼</span></button>
       <div class="guide-block-body">
-        Après chaque déclaration ou paiement — URSSAF ou impôts — <strong>téléchargez immédiatement le justificatif</strong>.<br><br>
+        Après chaque déclaration ou paiement (URSSAF ou impôts), <strong>téléchargez immédiatement le justificatif</strong>.<br><br>
         <span class="tag tc">Sur autoentrepreneur.urssaf.fr</span> → Tableau de bord → "Mes déclarations" → accusé de déclaration + reçu de paiement<br>
         <span class="tag tv">Sur impots.gouv.fr</span> → Espace Professionnel → "Mes paiements" ou "Mes déclarations"<br><br>
         <strong>Organisation recommandée :</strong><br>
@@ -638,7 +646,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
     <div class="tip-card">
       <div class="tip-icon">📊</div>
       <div class="tip-title">SEUIL TVA : SURVEILLER CHAQUE MOIS</div>
-      <div class="tip-body">Suivez votre CA cumulé depuis le 1er janvier. Dépassement du seuil majoré (41 250 € services / 93 500 € ventes) → assujettissement TVA <strong>dès le 1er jour du mois</strong>, rétroactivement.<br><br>
+      <div class="tip-body">Suivez votre CA cumulé depuis le 1er janvier. Si vous dépassez le seuil majoré (41 250 € services / 93 500 € ventes) → assujettissement TVA <strong>dès le jour exact du dépassement</strong>, pas depuis le 1er jour du mois (règle assouplie depuis le 1er janvier 2025).<br><br>
       <strong style="color:var(--amber)">Clients particuliers</strong> → impact direct sur vos prix : +20% TTC ou baisse de marge de 16,7%. Anticipez 2 à 3 mois avant.<br><br>
       <strong style="color:var(--green)">Clients professionnels assujettis</strong> → impact quasi nul. Le client pro récupère la TVA. Vous retirez la mention "TVA non applicable" et ajoutez taux + montant + n° TVA intracommunautaire.<div class="alert">⛔ Anticipez 2 à 3 mois avant pour mettre à jour vos factures et informer vos clients particuliers.</div></div>
     </div>
@@ -662,7 +670,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
       <div class="tip-title">ACRE 2026 — DEUX RÉGIMES SELON DATE DE CRÉATION</div>
       <div class="tip-body">Source : <a href="https://entreprendre.service-public.gouv.fr/actualites/A18795" target="_blank" style="color:var(--cyan)">Décret du 6 février 2026 — service-public.fr</a><br><br>
       <strong>Créé avant le 1er juillet 2026 :</strong> exonération de 50% pendant 12 mois (ancien taux conservé).<br>
-      <strong>Créé à partir du 1er juillet 2026 :</strong> exonération de 25% seulement — vous payez 75% du taux normal.<br><br>
+      <strong>Créé à partir du 1er juillet 2026 :</strong> exonération de 25% seulement : vous payez 75% du taux normal.<br><br>
       Exemple artisan BIC services (taux 21,2%) créé en août 2026 : cotisations réduites à <strong>15,9%</strong> au lieu de 10,6% sous l'ancien régime.<div class="alert">⚠ Demande ACRE à déposer dans les 60 jours suivant la création sur autoentrepreneur.urssaf.fr.</div></div>
     </div>
     <div class="tip-card">
@@ -673,7 +681,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
     <div class="tip-card">
       <div class="tip-icon">📂</div>
       <div class="tip-title">ARCHIVAGE &amp; JUSTIFICATIFS</div>
-      <div class="tip-body">Conservez tous vos justificatifs <strong>minimum 6 ans</strong> (délai légal). <strong>10 ans recommandé par prudence.</strong> Numérisez immédiatement — les factures papier s'effacent.<br><br>Téléchargez systématiquement les accusés de déclaration après chaque échéance sur autoentrepreneur.urssaf.fr et impots.gouv.fr.<div class="success">✓ Deux dossiers clés : URSSAF 2026/ et IMPOTS ENTREPRISE 2026/ — détail dans le Guide Fiscal.</div></div>
+      <div class="tip-body">Conservez tous vos justificatifs <strong>minimum 6 ans</strong> (délai légal). <strong>10 ans recommandé par prudence.</strong> Numérisez immédiatement, les factures papier s'effacent.<br><br>Téléchargez systématiquement les accusés de déclaration après chaque échéance sur autoentrepreneur.urssaf.fr et impots.gouv.fr.<div class="success">✓ Deux dossiers clés : URSSAF 2026/ et IMPOTS ENTREPRISE 2026/ (détail dans le Guide Fiscal).</div></div>
     </div>
     <div class="tip-card">
       <div class="tip-icon">📧</div>
@@ -688,14 +696,14 @@ main{max-width:1300px;margin:0 auto;padding:32px}
     <div class="tip-card">
       <div class="tip-icon">📞</div>
       <div class="tip-title">CONTACTER LES SERVICES — FACILE ET RECOMMANDÉ</div>
-      <div class="tip-body"><strong>URSSAF :</strong> <a href="https://www.autoentrepreneur.urssaf.fr" target="_blank" style="color:var(--cyan)">autoentrepreneur.urssaf.fr</a> → Messagerie, ou <strong>3698</strong>. Réponse sous 48-72h.<br><br><strong>Impôts :</strong> <a href="https://www.impots.gouv.fr" target="_blank" style="color:var(--cyan)">impots.gouv.fr</a> → Espace Pro → Messagerie sécurisée, ou <strong>0809 401 401</strong> (gratuit).<div class="success">✓ Poser une question par écrit crée une trace — utile en cas de litige ultérieur.</div></div>
+      <div class="tip-body"><strong>URSSAF :</strong> <a href="https://www.autoentrepreneur.urssaf.fr" target="_blank" style="color:var(--cyan)">autoentrepreneur.urssaf.fr</a> → Messagerie, ou <strong>3698</strong>. Réponse sous 48-72h.<br><br><strong>Impôts :</strong> <a href="https://www.impots.gouv.fr" target="_blank" style="color:var(--cyan)">impots.gouv.fr</a> → Espace Pro → Messagerie sécurisée, ou <strong>0809 401 401</strong> (gratuit).<div class="success">✓ Poser une question par écrit crée une trace, utile en cas de litige ultérieur.</div></div>
     </div>
   </div>
 </section>
 
 <!-- E-FACTURATION -->
 <section class="section" id="tab-efact">
-  <div class="section-header"><h1>📧 FACTURATION ÉLECTRONIQUE</h1><p>Guide complet — obligations 2026-2027, plateformes agréées, checklist de mise en conformité</p></div>
+  <div class="section-header"><h1>📧 FACTURATION ÉLECTRONIQUE</h1><p>Guide complet : obligations 2026-2027, plateformes agréées, checklist de mise en conformité</p></div>
   <div class="sources-bar">
     <span>Sources :</span>
     <a class="source-link" href="https://www.impots.gouv.fr/professionnel/la-facturation-electronique" target="_blank">impots.gouv.fr — facturation élec.</a>
@@ -709,7 +717,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
     <div style="font-size:28px;flex-shrink:0">⚠️</div>
     <div>
       <div style="font-family:var(--display);font-size:18px;letter-spacing:1px;color:var(--cyan);margin-bottom:6px">PREMIÈRE ÉCHÉANCE : 1ER SEPTEMBRE 2026</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.7">Toutes les entreprises — y compris les micro-entrepreneurs en franchise de TVA — doivent être capables de <strong style="color:var(--text)">recevoir</strong> des factures électroniques via une plateforme agréée dès le 1er septembre 2026. <strong style="color:var(--text)">L'obligation d'émission</strong> arrive le 1er septembre 2027. Ce calendrier a été reporté à deux reprises mais est désormais en vigueur — vérifiez la dernière version sur <a href="https://www.impots.gouv.fr" target="_blank" style="color:var(--cyan)">impots.gouv.fr</a>.</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7">Toutes les entreprises (y compris les micro-entrepreneurs en franchise de TVA) doivent être capables de <strong style="color:var(--text)">recevoir</strong> des factures électroniques via une plateforme agréée dès le 1er septembre 2026. <strong style="color:var(--text)">L'obligation d'émission</strong> arrive le 1er septembre 2027. Ce calendrier a été reporté à deux reprises mais est désormais en vigueur. Vérifiez la dernière version sur <a href="https://www.impots.gouv.fr" target="_blank" style="color:var(--cyan)">impots.gouv.fr</a>.</div>
     </div>
   </div>
 
@@ -763,7 +771,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
       <p><span class="tag tc">Factur-X</span> Format franco-allemand hybride : PDF lisible par l'humain + données XML structurées intégrées. Recommandé pour les micro-entrepreneurs.</p>
       <p><span class="tag tv">UBL (Universal Business Language)</span> Format XML international, courant pour les échanges avec des entreprises étrangères.</p>
       <p><span class="tag ta">CII (Cross Industry Invoice)</span> Format XML normé ISO, utilisé par certains logiciels comptables.<br><br></p>
-      <p><strong style="color:var(--text)">Nouvelle terminologie :</strong> Le terme <em>PDP (Plateforme de Dématérialisation Partenaire)</em> a été remplacé par <em>PA (Plateforme Agréée)</em> — même réalité, nouveau nom officiel depuis 2025.</p>
+      <p><strong style="color:var(--text)">Nouvelle terminologie :</strong> Le terme <em>PDP (Plateforme de Dématérialisation Partenaire)</em> a été remplacé par <em>PA (Plateforme Agréée)</em> : même réalité, nouveau nom officiel depuis 2025.</p>
     </div>
   </div>
 
@@ -777,14 +785,14 @@ main{max-width:1300px;margin:0 auto;padding:32px}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0">
         <div style="background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.15);border-radius:4px;padding:14px">
           <div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--cyan);margin-bottom:8px">🏢 VOTRE CLIENT EST PROFESSIONNEL</div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.6">S'il est raccordé à une PA, la facture lui arrive directement via sa PA. S'il ne l'est pas encore, elle transite par le PPF (boîte universelle de l'État) — il peut aller la récupérer là. Pas de blocage, mais il doit s'y connecter.</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">S'il est raccordé à une PA, la facture lui arrive directement via sa PA. S'il ne l'est pas encore, elle transite par le PPF (boîte universelle de l'État), il peut aller la récupérer là. Pas de blocage, mais il doit s'y connecter.</div>
         </div>
         <div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);border-radius:4px;padding:14px">
           <div style="font-family:var(--mono);font-size:12px;font-weight:600;color:var(--green);margin-bottom:10px">👤 VOTRE CLIENT EST PARTICULIER</div>
           <div style="font-size:13px;color:var(--muted);line-height:1.7">Pas de SIRET → pas de facture électronique. Vous continuez à envoyer un PDF par email ou papier normalement. Seul l'e-reporting vous concerne : votre PA transmet les données de vos transactions aux impôts en arrière-plan, sans que votre client le voie.</div>
         </div>
       </div>
-      <p><strong style="color:var(--text)">Côté réception (dès sept. 2026) :</strong> vos fournisseurs (téléphonie, électricité, logiciels SaaS…) envoient leurs factures avec votre SIRET comme destinataire. Votre PA les récupère automatiquement et vous les affiche. Vous n'avez rien à faire manuellement — c'est pour ça que <strong style="color:var(--text)">s'inscrire avant septembre 2026 est important</strong> : votre SIRET doit être enregistré dans le système pour recevoir ces flux.</p>
+      <p><strong style="color:var(--text)">Côté réception (dès sept. 2026) :</strong> vos fournisseurs (téléphonie, électricité, logiciels SaaS…) envoient leurs factures avec votre SIRET comme destinataire. Votre PA les récupère automatiquement et vous les affiche. Vous n'avez rien à faire manuellement, c'est pour ça que <strong style="color:var(--text)">s'inscrire avant septembre 2026 est important</strong> : votre SIRET doit être enregistré dans le système pour recevoir ces flux.</p>
     </div>
   </div>
   <div class="card" style="margin-bottom:20px">
@@ -792,7 +800,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
     <div style="font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:16px">
       <strong style="color:var(--text)">La majorité des PA proposent leur propre logiciel de facturation intégré.</strong> Concrètement, vous créez vos factures directement dans l'interface de la PA (comme vous le feriez dans Word ou un outil en ligne), et la plateforme se charge automatiquement de les transmettre au format structuré (Factur-X) à votre client et à la DGFiP. Pas besoin d'un logiciel séparé.<br><br>
       <strong style="color:var(--text)">Si vous utilisez déjà un logiciel de facturation</strong> (Freebe, Indy, Sellsy, etc.), vérifiez s'il est lui-même PA agréée ou s'il se connecte à une PA partenaire. Dans ce cas, la transmission est automatique depuis votre outil habituel.<br><br>
-      <span class="tag tc">151 PA agréées au total</span> — parmi celles-ci, plusieurs proposent des offres gratuites adaptées aux micro-entrepreneurs. Les offres évoluent régulièrement, vérifiez les conditions au moment de votre inscription. À titre indicatif, voici quelques solutions connues début 2026. Source : <a href="https://www.comparatif-facture-electronique.fr/meilleurs-logiciels-facturation-electronique-gratuits/" target="_blank" style="color:var(--cyan)">comparatif-facture-electronique.fr — mai 2026</a>
+      <span class="tag tc">151 PA agréées au total</span>, parmi celles-ci, plusieurs proposent des offres gratuites adaptées aux micro-entrepreneurs. Les offres évoluent régulièrement, vérifiez les conditions au moment de votre inscription. À titre indicatif, voici quelques solutions connues début 2026. Source : <a href="https://www.comparatif-facture-electronique.fr/meilleurs-logiciels-facturation-electronique-gratuits/" target="_blank" style="color:var(--cyan)">comparatif-facture-electronique.fr — mai 2026</a>
     </div>
     <div class="pa-grid">
       <div class="pa-card" style="border-color:var(--green)">
@@ -800,7 +808,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
         <div class="pa-type">PA agréée ✅ — Logiciel de facturation intégré</div>
         <div class="pa-desc">
           <span class="tag tg">100% gratuit, illimité</span><br>
-          Émission, réception, e-reporting, validation Factur-X — sans limite de volume, sans frais cachés. Logiciel de facturation intégré (devis, factures, avoir). Application mobile. 300 000+ utilisateurs.<br><br>
+          Émission, réception, e-reporting, validation Factur-X, sans limite de volume, sans frais cachés. Logiciel de facturation intégré (devis, factures, avoir). Application mobile. 300 000+ utilisateurs.<br><br>
           Modèle économique : revenus via les experts-comptables partenaires (optionnel).<br><br>
           <a href="https://www.tiime.fr/facturation-electronique" target="_blank" style="color:var(--cyan);font-size:11px;font-family:var(--mono)">→ tiime.fr</a>
         </div>
@@ -811,7 +819,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
         <div class="pa-desc">
           <span class="tag tg">Gratuit jusqu'à un certain volume</span> puis <span class="tag ta">8 €/mois</span><br>
           Spécialement conçu pour les micro-entrepreneurs. Logiciel de facturation intégré + conformité e-facturation + déclarations URSSAF. Interface très simple.<br><br>
-          Gratuit pour un usage modéré — plan premium si volume élevé ou fonctionnalités avancées.<br><br>
+          Gratuit pour un usage modéré, plan premium si volume élevé ou fonctionnalités avancées.<br><br>
           <a href="https://abby.fr/facturation-electronique" target="_blank" style="color:var(--cyan);font-size:11px;font-family:var(--mono)">→ abby.fr</a>
         </div>
       </div>
@@ -819,7 +827,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
         <div class="pa-name">Indy</div>
         <div class="pa-type">PA agréée ✅ — Logiciel de facturation intégré</div>
         <div class="pa-desc">
-          <span class="tag tg">Facturation gratuite illimitée</span> — comptabilité <span class="tag ta">32 €/mois</span><br>
+          <span class="tag tg">Facturation gratuite illimitée</span> · comptabilité <span class="tag ta">32 €/mois</span><br>
           PA officielle ciblée sur les professions libérales (BNC) et indépendants BIC. UX très soignée, facturation illimitée gratuite. La comptabilité complète est payante.<br><br>
           Idéal si vous êtes BNC et cherchez un outil tout-en-un.<br><br>
           <a href="https://www.indy.fr" target="_blank" style="color:var(--cyan);font-size:11px;font-family:var(--mono)">→ indy.fr</a>
@@ -830,7 +838,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
         <div class="pa-type">Portail Public de Facturation — État</div>
         <div class="pa-desc">
           <span class="tag tg">100% gratuit</span><br>
-          Solution de l'État. Obligatoire pour les factures aux clients du secteur public. Interface basique, pas de logiciel de facturation intégré — vous importez vos factures. Suffisant si vous facturez peu de clients B2B.<br><br>
+          Solution de l'État. Obligatoire pour les factures aux clients du secteur public. Interface basique, pas de logiciel de facturation intégré, vous importez vos factures. Suffisant si vous facturez peu de clients B2B.<br><br>
           <a href="https://chorus-pro.gouv.fr" target="_blank" style="color:var(--cyan);font-size:11px;font-family:var(--mono)">→ chorus-pro.gouv.fr</a>
         </div>
       </div>
@@ -854,7 +862,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
       </div>
     </div>
     <div style="margin-top:14px;padding:12px 16px;background:rgba(139,92,246,.08);border-left:3px solid var(--violet);border-radius:2px;font-size:12px;color:#c4b5fd;line-height:1.6">
-      <strong>Franchise TVA — êtes-vous concerné ?</strong> Oui. La réforme s'applique même si vous êtes en franchise de TVA. Votre obligation de réception (sept. 2026) concerne les factures que vous recevez de vos fournisseurs. Votre obligation d'émission (sept. 2027) concerne vos factures à vos clients professionnels, même sans TVA. La mention "TVA non applicable — art. 293 B CGI" reste obligatoire.
+      <strong>Franchise TVA : êtes-vous concerné ?</strong> Oui. La réforme s'applique même si vous êtes en franchise de TVA. Votre obligation de réception (sept. 2026) concerne les factures que vous recevez de vos fournisseurs. Votre obligation d'émission (sept. 2027) concerne vos factures à vos clients professionnels, même sans TVA. La mention "TVA non applicable, art. 293 B CGI" reste obligatoire.
     </div>
   </div>
 
@@ -863,7 +871,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
     <div class="card-title" style="color:var(--cyan)">✅ Checklist de mise en conformité</div>
     <div style="font-size:13px;color:var(--muted);line-height:2">
       <p><span class="tag tg">Avant sept. 2026</span></p>
-      <p>☐ <strong style="color:var(--text)">Choisir une PA</strong> — jefacture.com (gratuit) ou une autre selon vos besoins</p>
+      <p>☐ <strong style="color:var(--text)">Choisir une PA</strong> : jefacture.com (gratuit) ou une autre selon vos besoins</p>
       <p>☐ <strong style="color:var(--text)">Créer votre compte</strong> sur la PA choisie</p>
       <p>☐ <strong style="color:var(--text)">Mettre à jour votre logiciel de facturation</strong> si vous en utilisez un</p>
       <p>☐ <strong style="color:var(--text)">Vérifier que vos fournisseurs</strong> peuvent vous envoyer des e-factures<br><br></p>
@@ -901,7 +909,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
       </label>
     </div>
     <div id="vfl-mode-avis">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">Saisissez le <strong style="color:var(--text)">RFR (Revenu Fiscal de Référence)</strong> indiqué page 1 de votre avis d'imposition N-2 (2024 pour 2026), rubrique "Revenu fiscal de référence". Ce chiffre intègre déjà votre CA après abattement, les revenus du foyer, les déductions — c'est le seul chiffre nécessaire pour vérifier votre éligibilité.</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">Saisissez le <strong style="color:var(--text)">RFR (Revenu Fiscal de Référence)</strong> indiqué page 1 de votre avis d'imposition N-2 (2024 pour 2026), rubrique "Revenu fiscal de référence". Ce chiffre intègre déjà votre CA après abattement, les revenus du foyer, les déductions : c'est le seul chiffre nécessaire pour vérifier votre éligibilité.</p>
       <div class="vfl-inputs">
         <div class="vfl-input-group"><label>RFR N-2 — page 1 de votre avis d'imposition (€)</label><input type="number" id="vfl_rfr_a" value="35000" placeholder="ex: 32000"></div>
         <div class="vfl-input-group"><label>Nombre de parts fiscales</label>
@@ -918,7 +926,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
       </div>
     </div>
     <div id="vfl-mode-estimation" style="display:none">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">Sans avis disponible, on <strong style="color:var(--text)">estime</strong> votre RFR à partir de votre CA et de l'abattement forfaitaire. <strong style="color:var(--amber)">Résultat indicatif</strong> — des déductions supplémentaires peuvent réduire votre RFR réel.</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">Sans avis disponible, on <strong style="color:var(--text)">estime</strong> votre RFR à partir de votre CA et de l'abattement forfaitaire. <strong style="color:var(--amber)">Résultat indicatif</strong> : des déductions supplémentaires peuvent réduire votre RFR réel.</p>
       <div class="vfl-inputs" style="margin-bottom:0">
         <div class="vfl-input-group"><label>CA total annuel HT (€)</label><input type="number" id="vfl_ca_b" value="40000" min="0" oninput="onVflBChange()"></div>
         <div class="vfl-input-group"><label>Activité principale</label>
@@ -981,7 +989,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
         <tr><th>Situation</th><th>Parts</th><th>Conditions / Précisions</th></tr>
         <tr class="section-row"><td colspan="3">— Situation de base —</td></tr>
         <tr><td>Célibataire sans enfant</td><td class="parts-val">1</td><td>Situation de référence</td></tr>
-        <tr><td>Couple marié ou pacsé sans enfant</td><td class="parts-val">2</td><td>Mariage ou PACS — pas le concubinage</td></tr>
+        <tr><td>Couple marié ou pacsé sans enfant</td><td class="parts-val">2</td><td>Mariage ou PACS (pas le concubinage)</td></tr>
         <tr><td>Concubins sans enfant</td><td class="parts-val">1 + 1</td><td>Deux déclarations séparées</td></tr>
         <tr class="section-row"><td colspan="3">— Enfants à charge —</td></tr>
         <tr><td>1er et 2ème enfant à charge</td><td class="parts-val">+0,5 chacun</td><td>Enfant mineur, ou majeur rattaché</td></tr>
@@ -993,7 +1001,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
         <tr><td>Parent isolé (2 enfants)</td><td class="parts-val">2,5</td><td>1 + 0,5 + 0,5 + 0,5</td></tr>
         <tr class="section-row"><td colspan="3">— Enfants majeurs —</td></tr>
         <tr><td>Enfant majeur étudiant rattaché (18-25 ans)</td><td class="parts-val">+0,5</td><td>Sur demande annuelle obligatoire</td></tr>
-        <tr><td>Après 25 ans</td><td class="parts-val">0</td><td>Fin de rattachement définitive — ou déduction pension alimentaire</td></tr>
+        <tr><td>Après 25 ans</td><td class="parts-val">0</td><td>Fin de rattachement définitive, ou déduction pension alimentaire</td></tr>
       </table>
     </div>
   </div>
@@ -1016,7 +1024,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
 
 <!-- JE DÉMARRE -->
 <section class="section" id="tab-demarrage">
-  <div class="section-header"><h1>🏁 JE DÉMARRE</h1><p>Tout ce qu'il faut savoir et faire la première année — dans l'ordre</p></div>
+  <div class="section-header"><h1>🏁 JE DÉMARRE</h1><p>Tout ce qu'il faut savoir et faire la première année, dans l'ordre</p></div>
   <div class="sources-bar">
     <span>Sources :</span>
     <a class="source-link" href="https://formalites.entreprises.gouv.fr" target="_blank">Guichet Unique URSSAF</a>
@@ -1027,16 +1035,16 @@ main{max-width:1300px;margin:0 auto;padding:32px}
   <div class="card" style="margin-bottom:24px">
     <div class="card-title" style="color:var(--cyan)">✅ Checklist lancement — les 10 premières démarches</div>
     <div style="font-size:13px;color:var(--muted);line-height:1.9">
-      <p><span class="tag tg">1</span> <strong style="color:var(--text)">Immatriculation</strong> — via <a href="https://formalites.entreprises.gouv.fr" target="_blank" style="color:var(--cyan)">formalites.entreprises.gouv.fr</a>. SIRET sous 24-72h.</p>
-      <p><span class="tag tg">2</span> <strong style="color:var(--text)">Numéro de TVA intracommunautaire</strong> — attribué automatiquement avec le SIRET.</p>
-      <p><span class="tag tg">3</span> <strong style="color:var(--text)">Compte bancaire dédié</strong> — obligatoire si CA &gt; 10 000 € sur 2 ans. Un simple compte courant personnel dédié suffit légalement.</p>
-      <p><span class="tag tg">4</span> <strong style="color:var(--text)">Espace professionnel impots.gouv.fr</strong> — créez-le dès réception du SIRET.</p>
-      <p><span class="tag tg">5</span> <strong style="color:var(--text)">Compte autoentrepreneur.urssaf.fr</strong> — pour vos déclarations CA et cotisations.</p>
-      <p><span class="tag tg">6</span> <strong style="color:var(--text)">Option VFL si éligible</strong> — à cocher à la création ou dans les 3 mois. Vérifiez votre RFR N-2 d'abord → onglet VFL &amp; Famille.</p>
-      <p><span class="tag tg">7</span> <strong style="color:var(--text)">ACRE</strong> — demande dans les 60 jours après création sur autoentrepreneur.urssaf.fr. <strong>Attention :</strong> exonération 50% si créé avant juillet 2026, 25% si créé après. Source : <a href="https://entreprendre.service-public.gouv.fr/actualites/A18795" target="_blank" style="color:var(--cyan)">Décret 6 février 2026</a></p>
-      <p><span class="tag tg">8</span> <strong style="color:var(--text)">Modèle de facture conforme</strong> — préparez un template avec toutes les mentions obligatoires (voir ci-dessous).</p>
-      <p><span class="tag tg">9</span> <strong style="color:var(--text)">PA e-facturation</strong> — choisir et créer votre compte sur une plateforme agréée avant septembre 2026. → Onglet 📧 E-Facturation</p>
-      <p><span class="tag tg">10</span> <strong style="color:var(--text)">Organisation comptable</strong> — créez vos dossiers URSSAF 2026/, IMPOTS ENTREPRISE 2026/, FACTURES 2026/.</p>
+      <p><span class="tag tg">1</span> <strong style="color:var(--text)">Immatriculation</strong> : via <a href="https://formalites.entreprises.gouv.fr" target="_blank" style="color:var(--cyan)">formalites.entreprises.gouv.fr</a>. SIRET sous 24-72h.</p>
+      <p><span class="tag tg">2</span> <strong style="color:var(--text)">Numéro de TVA intracommunautaire</strong> : attribué automatiquement avec le SIRET.</p>
+      <p><span class="tag tg">3</span> <strong style="color:var(--text)">Compte bancaire dédié</strong> : obligatoire si CA &gt; 10 000 € sur 2 ans. Un simple compte courant personnel dédié suffit légalement.</p>
+      <p><span class="tag tg">4</span> <strong style="color:var(--text)">Espace professionnel impots.gouv.fr</strong> : créez-le dès réception du SIRET.</p>
+      <p><span class="tag tg">5</span> <strong style="color:var(--text)">Compte autoentrepreneur.urssaf.fr</strong> : pour vos déclarations CA et cotisations.</p>
+      <p><span class="tag tg">6</span> <strong style="color:var(--text)">Option VFL si éligible</strong> : à cocher à la création ou dans les 3 mois. Vérifiez votre RFR N-2 d'abord → onglet VFL &amp; Famille.</p>
+      <p><span class="tag tg">7</span> <strong style="color:var(--text)">ACRE</strong> : demande dans les 60 jours après création sur autoentrepreneur.urssaf.fr. <strong>Attention :</strong> exonération 50% si créé avant juillet 2026, 25% si créé après. Source : <a href="https://entreprendre.service-public.gouv.fr/actualites/A18795" target="_blank" style="color:var(--cyan)">Décret 6 février 2026</a></p>
+      <p><span class="tag tg">8</span> <strong style="color:var(--text)">Modèle de facture conforme</strong> : préparez un template avec toutes les mentions obligatoires (voir ci-dessous).</p>
+      <p><span class="tag tg">9</span> <strong style="color:var(--text)">PA e-facturation</strong> : choisir et créer votre compte sur une plateforme agréée avant septembre 2026. → Onglet 📧 E-Facturation</p>
+      <p><span class="tag tg">10</span> <strong style="color:var(--text)">Organisation comptable</strong> : créez vos dossiers URSSAF 2026/, IMPOTS ENTREPRISE 2026/, FACTURES 2026/.</p>
     </div>
   </div>
 
@@ -1072,18 +1080,18 @@ main{max-width:1300px;margin:0 auto;padding:32px}
       </div>
       <div style="font-size:13px;color:var(--muted);line-height:1.9">
         <span class="tag tv">Selon situation</span><br>
-        • <strong style="color:var(--text)">Si franchise TVA :</strong> <em>"TVA non applicable — art. 293 B CGI"</em><br>
+        • <strong style="color:var(--text)">Si franchise TVA :</strong> <em>"TVA non applicable, art. 293 B CGI"</em><br>
         • <strong style="color:var(--text)">Si assujetti TVA :</strong> taux + montant + n° TVA intracommunautaire<br>
         • <strong style="color:var(--text)">Si artisan :</strong> numéro au registre des métiers
       </div>
     </div>
     <div style="margin-top:14px;padding:12px 14px;background:rgba(6,182,212,.06);border-left:3px solid var(--cyan);border-radius:2px;font-size:12px;color:var(--muted);line-height:1.6">
-      <strong style="color:var(--cyan)">Autoliquidation — 2 cas :</strong><br>
-      <strong style="color:var(--text)">Sous-traitance BTP :</strong> <em>"TVA due par le preneur assujetti — autoliquidation, art. 242 nonies A, I-13° annexe II CGI"</em><br>
-      <strong style="color:var(--text)">Prestation client UE hors France :</strong> <em>"TVA due par le preneur — art. 283-2 CGI"</em> ou <em>"art. 44 Directive 2006/112/CE"</em>
+      <strong style="color:var(--cyan)">Autoliquidation, 2 cas :</strong><br>
+      <strong style="color:var(--text)">Sous-traitance BTP :</strong> <em>"TVA due par le preneur assujetti (autoliquidation), art. 242 nonies A, I-13° annexe II CGI"</em><br>
+      <strong style="color:var(--text)">Prestation client UE hors France :</strong> <em>"TVA due par le preneur, art. 283-2 CGI"</em> ou <em>"art. 44 Directive 2006/112/CE"</em>
     </div>
     <div style="margin-top:10px;padding:10px 14px;background:rgba(239,68,68,.08);border-left:3px solid var(--red);border-radius:2px;font-size:12px;color:#fca5a5">
-      ⚠ Numérotation continue et chronologique obligatoire. Ne jamais supprimer une facture — émettez un avoir pour annuler.
+      ⚠ Numérotation continue et chronologique obligatoire. Ne jamais supprimer une facture, émettez un avoir pour annuler.
     </div>
   </div>
 </section>
@@ -1237,15 +1245,15 @@ function updateProvisions(){
   const lblPrinc={'bic_vente':'Vente','bic_service':'Services','bnc_ssi':'BNC SSI','bnc_cipav':'BNC Cipav','location_meuble':'Loc. meublée','location_tourisme':'Loc. tourisme'};
   const items=[];
   if(rt!=='franchise')items.push({l:'TVA à reverser',p:tv+'%',a:tvaA,c:'var(--cyan)',b:tv,d:tv+'% du CA HT'});
-  const urssafNote=rates.mixte?'Mixte : '+Math.round(rates.fPrinc*100)+'% '+(lblPrinc[rates.actPrinc]||'')+' + '+Math.round(rates.fSec*100)+'% '+(lblPrinc[rates.actSec]||''):'Taux 2026 — source URSSAF';
+  const urssafNote=rates.mixte?'Mixte : '+Math.round(rates.fPrinc*100)+'% '+(lblPrinc[rates.actPrinc]||'')+' + '+Math.round(rates.fSec*100)+'% '+(lblPrinc[rates.actSec]||''):'Taux 2026, source URSSAF';
   items.push({l:'URSSAF cotisations',p:Math.round(rates.urssaf*1000)/10+'%',a:uA,c:'var(--violet)',b:rates.urssaf*100,d:urssafNote});
   if(rates.cfp>0)items.push({l:'CFP Formation',p:Math.round(rates.cfp*1000)/10+'%',a:cfpA,c:'#a78bfa',b:rates.cfp*500,d:'Incluse dans chaque prélèvement URSSAF mensuel'});
   if(rates.cma>0)items.push({l:'Taxe CMA',p:Math.round(rates.cma*10000)/100+'%',a:cmaA,c:'#818cf8',b:rates.cma*1000,d:'Chambre des Métiers'});
-  if(rates.hasVFL)items.push({l:'IR (Vers. Libératoire)',p:Math.round(rates.vfl*1000)/10+'%',a:vflA,c:'var(--amber)',b:rates.vfl*400,d:'Payé avec URSSAF — IR soldé | seuil RFR 29 315 €/part'});
-  else items.push({l:'IR estimé (provision)',p:'~5-15%',a:m*.08,c:'var(--amber)',b:8,d:'Variable selon TMI — sans VFL'});
+  if(rates.hasVFL)items.push({l:'IR (Vers. Libératoire)',p:Math.round(rates.vfl*1000)/10+'%',a:vflA,c:'var(--amber)',b:rates.vfl*400,d:'Payé avec URSSAF, IR soldé | seuil RFR 29 315 €/part'});
+  else items.push({l:'IR estimé (provision)',p:'~5-15%',a:m*.08,c:'var(--amber)',b:8,d:'Variable selon TMI, sans VFL'});
   const cfeLabel=annual<=5000?'Exonéré (CA ≤ 5 000 €)':'~350€/an (provision)';
   const safeM=m||1;
-  items.push({l:'CFE — provision',p:cfeLabel,a:cfeA,c:'var(--red)',b:(cfeA/safeM)*100,d:'Variable selon commune + CA N-2 — voir avis octobre'});
+  items.push({l:'CFE — provision',p:cfeLabel,a:cfeA,c:'var(--red)',b:(cfeA/safeM)*100,d:'Variable selon commune + CA N-2, voir avis octobre'});
   items.push({l:'✓ NET DISPONIBLE',p:Math.round((net/safeM)*100)+'%',a:net,c:'var(--green)',b:(net/safeM)*100,d:'Votre revenu réel net estimé'});
   g.innerHTML=items.map(i=>`<div class="provision-card">
     <div class="provision-percent" style="color:${i.c}">${i.p}</div>
@@ -1268,11 +1276,11 @@ function renderTvaSuivi(){
   const z2=Math.round(base*0.8/500)*500;
   const fmt=n=>n.toLocaleString('fr-FR')+' €';
   el.innerHTML=`
-    <div style="grid-column:1/-1;font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:2px">Seuils affichés : <strong style="color:var(--text)">${label}</strong> — changez le type d'activité dans l'onglet Profil pour adapter automatiquement ces seuils</div>
-    <div class="tva-palier"><div class="tva-palier-montant" style="color:var(--green)">0 → ${fmt(z1)}</div><div class="tva-palier-label">Zone sereine</div><div class="tva-palier-desc">Continuez à facturer sans TVA. Mention : <em>"TVA non applicable — art. 293 B CGI"</em></div></div>
+    <div style="grid-column:1/-1;font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:2px">Seuils affichés : <strong style="color:var(--text)">${label}</strong>. Changez le type d'activité dans l'onglet Profil pour adapter automatiquement ces seuils</div>
+    <div class="tva-palier"><div class="tva-palier-montant" style="color:var(--green)">0 → ${fmt(z1)}</div><div class="tva-palier-label">Zone sereine</div><div class="tva-palier-desc">Continuez à facturer sans TVA. Mention : <em>"TVA non applicable, art. 293 B CGI"</em></div></div>
     <div class="tva-palier"><div class="tva-palier-montant" style="color:var(--cyan)">${fmt(z1)} → ${fmt(z2)}</div><div class="tva-palier-label">Attention modérée</div><div class="tva-palier-desc">Suivez votre CA mensuel précisément. Estimez le mois de franchissement éventuel.</div></div>
-    <div class="tva-palier"><div class="tva-palier-montant" style="color:var(--amber)">${fmt(z2)} → ${fmt(base)}</div><div class="tva-palier-label">Seuil de base proche</div><div class="tva-palier-desc">Contactez les impôts. Si vous ne dépassez que ce seuil de base (pas le majoré), la franchise reste acquise jusqu'au 31/12 — TVA obligatoire seulement au 1er janvier suivant.</div></div>
-    <div class="tva-palier"><div class="tva-palier-montant" style="color:var(--red)">${fmt(base)} → ${fmt(maj)}</div><div class="tva-palier-label">Zone rouge — seuil majoré</div><div class="tva-palier-desc">Seuil de base dépassé. Marge jusqu'à ${fmt(maj)}. Si vous franchissez ce seuil majoré, l'assujettissement TVA est immédiat et rétroactif au 1er jour du mois — toutes les factures du mois sont à régulariser. Impôts + expert-comptable en urgence.</div></div>`;
+    <div class="tva-palier"><div class="tva-palier-montant" style="color:var(--amber)">${fmt(z2)} → ${fmt(base)}</div><div class="tva-palier-label">Seuil de base proche</div><div class="tva-palier-desc">Contactez les impôts. Si vous ne dépassez que ce seuil de base (pas le majoré), la franchise reste acquise jusqu'au 31/12. TVA obligatoire seulement au 1er janvier suivant.</div></div>
+    <div class="tva-palier"><div class="tva-palier-montant" style="color:var(--red)">${fmt(base)} → ${fmt(maj)}</div><div class="tva-palier-label">Zone rouge — seuil majoré</div><div class="tva-palier-desc">Seuil de base dépassé. Marge jusqu'à ${fmt(maj)}. Si vous franchissez ce seuil majoré, l'assujettissement TVA est immédiat, dès le jour exact du dépassement, pas depuis le 1er jour du mois. Seules les factures émises à partir de ce jour sont concernées. Impôts + expert-comptable en urgence.</div></div>`;
 }
 function updateJauges(annual){
   const a=document.getElementById('activite')?.value||'bic_service';
@@ -1347,7 +1355,7 @@ function calcVFL(mode){
   if(mode==='avis'){
     rfrEstime=parseFloat(document.getElementById('vfl_rfr_a').value)||0;
     parts=parseFloat(document.getElementById('vfl_parts_a').value)||1;
-    modeLabel="RFR exact — avis d'imposition N-2";
+    modeLabel="RFR exact, avis d'imposition N-2";
     document.getElementById('vfl-synthese').style.display='none';
     // Masquer la carte "impôt VFL" en mode avis (pas de CA saisi)
     document.getElementById('vfl-impot-vfl').textContent='—';
@@ -1366,11 +1374,11 @@ function calcVFL(mode){
     if(mixteB&&caSec>0){
       revMicro=Math.round(caPrinc*(VFL_FRACS[act]||0.50)+caSec*(VFL_FRACS[actSec]||0.29));
       const abatEff=ca>0?Math.round((1-revMicro/ca)*100):0;
-      modeLabel='Mixte — abattement effectif '+abatEff+'% — sous réserve de déductions';
+      modeLabel='Mixte, abattement effectif '+abatEff+'% (sous réserve de déductions)';
     }else{
       const frac=VFL_FRACS[act]||0.50;
       revMicro=Math.round(ca*frac);
-      modeLabel='Estimé : '+Math.round(ca/1000)+'k€ × '+Math.round((1-frac)*100)+'% abat. = '+revMicro.toLocaleString('fr-FR')+' € imposable — sous réserve déductions';
+      modeLabel='Estimé : '+Math.round(ca/1000)+'k€ × '+Math.round((1-frac)*100)+'% abat. = '+revMicro.toLocaleString('fr-FR')+' € imposable (sous réserve déductions)';
     }
     rfrEstime=revMicro+autres;
     document.getElementById('vfl-synthese').style.display='block';
@@ -1391,7 +1399,7 @@ function calcVFL(mode){
   const margeEl=document.getElementById('vfl-marge');
   margeEl.textContent=(marge>=0?'+':'')+Math.round(marge).toLocaleString('fr-FR')+' €';
   margeEl.style.color=marge>5000?'var(--green)':marge>0?'var(--amber)':'var(--red)';
-  const reserve=mode==='estimation'?'<br><br><span style="font-size:12px;opacity:0.8">⚠ Estimation indicative — des déductions peuvent réduire votre RFR réel.</span>':'';
+  const reserve=mode==='estimation'?'<br><br><span style="font-size:12px;opacity:0.8">⚠ Estimation indicative : des déductions peuvent réduire votre RFR réel.</span>':'';
   const v=document.getElementById('vfl-verdict');
   if(rfrEstime<=plafond){
     const ecartPct=Math.round((marge/plafond)*100);
@@ -1478,45 +1486,45 @@ function buildEvents(annee,rt,fu,vfl,pa,sl){
   const add=(m,t,d,ti,de)=>{if(m>=0&&m<12)ev[m].push({type:t,date:d,title:ti,desc:de})};
   // TVA
   if(rt==='mensuel'){
-    for(let m=0;m<12;m++){const prev=m===0?'Déc. N-1':MS[m-1];add(m,'tva','1→15',`Déclarer + payer TVA (${prev})`,`impots.gouv.fr Espace Pro — déclarez et payez en une visite`);}
+    for(let m=0;m<12;m++){const prev=m===0?'Déc. N-1':MS[m-1];add(m,'tva','1→15',`Déclarer + payer TVA (${prev})`,`impots.gouv.fr Espace Pro, déclarez et payez en une visite`);}
   }else if(rt==='trimestriel'){
-    [[0,'T4 N-1'],[3,'T1'],[6,'T2'],[9,'T3']].forEach(([m,l])=>{add(m,'tva','1→15',`Déclarer + payer TVA ${l}`,`impots.gouv.fr Espace Pro — déclarez et payez en une visite`);});
+    [[0,'T4 N-1'],[3,'T1'],[6,'T2'],[9,'T3']].forEach(([m,l])=>{add(m,'tva','1→15',`Déclarer + payer TVA ${l}`,`impots.gouv.fr Espace Pro, déclarez et payez en une visite`);});
   }else if(rt==='annuel_acomptes'){
     add(6,'tva','15','Acompte TVA 55%','55% de la TVA N-1 (si > 1 000 €)');
     add(11,'tva','15','Acompte TVA 40%','40% de la TVA N-1');
     add(4,'tva','mai','Dépôt CA12','Déclaration annuelle TVA + régularisation');
   }else{
-    add(0,'info','—','Franchise TVA active','Surveiller CA cumulé depuis janvier — seuils : 37 500 € services / 85 000 € ventes');
-    add(5,'info','juin','Vérifier CA cumulé TVA','Seuil limite 37 500 € services — onglet VFL & Famille pour les paliers');
+    add(0,'info','—','Franchise TVA active','Surveiller CA cumulé depuis janvier (seuils : 37 500 € services / 85 000 € ventes)');
+    add(5,'info','juin','Vérifier CA cumulé TVA','Seuil limite 37 500 € services, onglet VFL & Famille pour les paliers');
     add(11,'info','déc','Bilan CA annuel TVA','Vérification avant dépassement éventuel en N+1');
   }
   // URSSAF
   if(fu==='mensuel'){
-    for(let m=0;m<12;m++){const prev=m===0?'Déc. N-1':MS[m-1];add(m,'urssaf','1→fin',`Déclarer CA ${prev}`,'autoentrepreneur.urssaf.fr — déclarer même si CA = 0 (pénalité 60,10 € si oubli)');}
+    for(let m=0;m<12;m++){const prev=m===0?'Déc. N-1':MS[m-1];add(m,'urssaf','1→fin',`Déclarer CA ${prev}`,'autoentrepreneur.urssaf.fr, déclarer même si CA = 0 (pénalité 60,10 € si oubli)');}
   }else{
-    [[2,'T1 (jan-mar)'],[5,'T2 (avr-jun)'],[8,'T3 (jul-sep)'],[11,'T4 (oct-déc)']].forEach(([m,l])=>{add(m,'urssaf','1→fin','Déclarer CA URSSAF',`Trimestriel ${l} — même si CA = 0 — pénalité 60,10 € si oubli`);});
+    [[2,'T1 (jan-mar)'],[5,'T2 (avr-jun)'],[8,'T3 (jul-sep)'],[11,'T4 (oct-déc)']].forEach(([m,l])=>{add(m,'urssaf','1→fin','Déclarer CA URSSAF',`Trimestriel ${l}, même si CA = 0, pénalité 60,10 € si oubli`);});
   }
   // IR
   if(vfl){
-    add(4,'impots','mai→juin','Déclaration revenus annuelle','2042-C-PRO — formalité si VFL actif, pas de paiement supplémentaire');
+    add(4,'impots','mai→juin','Déclaration revenus annuelle','2042-C-PRO, formalité si VFL actif, pas de paiement supplémentaire');
   }else{
-    add(4,'impots','mai→juin','Déclaration revenus 2042-C','Déclaration annuelle — impots.gouv.fr');
+    add(4,'impots','mai→juin','Déclaration revenus 2042-C','Déclaration annuelle, impots.gouv.fr');
     add(8,'impots','sept','Régularisation IR / PAS','Ajustement prélèvement à la source N-1');
-    add(0,'info','jan','Moduler taux PAS','Vérifier/ajuster son taux si besoin — impots.gouv.fr → Gérer mon PAS');
+    add(0,'info','jan','Moduler taux PAS','Vérifier/ajuster son taux si besoin, impots.gouv.fr → Gérer mon PAS');
   }
   // CFE
-  if(!pa){add(4,'cfe','15 juin','Acompte CFE (si > 3 000 €)','50% en acompte si CFE N-1 > 3 000 € — compte 08');}
+  if(!pa){add(4,'cfe','15 juin','Acompte CFE (si > 3 000 €)','50% en acompte si CFE N-1 > 3 000 € (compte 08)');}
   add(9,'info','oct','Consulter avis CFE','Vérifiez le montant sur impots.gouv.fr → Espace Professionnel');
-  if(!pa){add(11,'cfe','15 déc','Paiement CFE annuel','Cotisation Foncière des Entreprises — compte 08');}
-  else{add(11,'info','déc','Première CFE en N+1','Exonéré cette année — provisionnez 25-40 €/mois pour N+1');}
+  if(!pa){add(11,'cfe','15 déc','Paiement CFE annuel','Cotisation Foncière des Entreprises (compte 08)');}
+  else{add(11,'info','déc','Première CFE en N+1','Exonéré cette année, provisionnez 25-40 €/mois pour N+1');}
   // Rappels
-  add(0,'info','jan','Archivage N-1','Télécharger reçus URSSAF et impôts — 10 ans de conservation conseillée');
+  add(0,'info','jan','Archivage N-1','Télécharger reçus URSSAF et impôts (10 ans de conservation conseillée)');
   add(2,'info','mar','Point trésorerie T1','Réviser provisions si CA T1 diffère des prévisions');
-  add(8,'info','sept','Date limite VFL','30 septembre — dernière chance pour modifier l\'option VFL pour N+1');
+  add(8,'info','sept','Date limite VFL','30 septembre, dernière chance pour modifier l\'option VFL pour N+1');
   add(11,'info','déc','Bilan fiscal annuel','Dernière chance pour optimiser avant clôture N');
   // E-facturation
-  if(annee>=2026){add(7,'info','avant sept','E-facturation : inscription PA','Choisir une plateforme agréée (PA) avant le 1er septembre 2026 — onglet E-Facturation');}
-  if(annee>=2027){add(7,'info','1 sept','E-facturation : émission obligatoire','Toutes factures B2B doivent transiter par une PA — PDF par email interdit pour B2B');}
+  if(annee>=2026){add(7,'info','avant sept','E-facturation : inscription PA','Choisir une plateforme agréée (PA) avant le 1er septembre 2026, onglet E-Facturation');}
+  if(annee>=2027){add(7,'info','1 sept','E-facturation : émission obligatoire','Toutes factures B2B doivent transiter par une PA, PDF par email interdit pour B2B');}
   return ev;
 }
 function renderCalendar(events,annee){
@@ -1568,7 +1576,7 @@ function exportDoc(theme,btn){
     +'<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px;padding-bottom:7px;border-bottom:1px solid '+C.bord+'"><div><div style="font-size:22px;font-weight:900;letter-spacing:2px;text-transform:uppercase">FLASHAGENDA FISCAL '+annee+'</div><div style="font-size:9px;color:'+C.mute+';margin-top:3px;font-family:monospace">Calendrier des échéances · micro-entrepreneur · FlashTools.fr</div></div>'
     +'<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">'
     +[['TVA','#06B6D4'],['URSSAF','#8B5CF6'],['Impôts/IR','#F59E0B'],['CFE','#EF4444'],['Conseils','#22C55E']].map(function(l){return'<div style="display:flex;align-items:center;gap:4px;font-size:8px;color:'+C.mute+'"><div style="width:7px;height:7px;border-radius:50%;background:'+l[1]+';flex-shrink:0"></div>'+l[0]+'</div>';}).join('')
-    +'</div></div><div class="grid">'+cardsHTML+'</div><div style="margin-top:10px;font-size:7px;color:'+C.mute+';text-align:center;font-family:monospace">FlashTools.fr — Données : autoentrepreneur.urssaf.fr · impots.gouv.fr · service-public.fr</div></body></html>';
+    +'</div></div><div class="grid">'+cardsHTML+'</div><div style="margin-top:10px;font-size:7px;color:'+C.mute+';text-align:center;font-family:monospace">FlashTools.fr, Données : autoentrepreneur.urssaf.fr · impots.gouv.fr · service-public.fr</div></body></html>';
   const blob=new Blob([html],{type:'text/html;charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download='FlashAgenda-Fiscal-'+annee+'-'+(isDark?'sombre':'clair')+'.html';
