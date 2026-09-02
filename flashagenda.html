@@ -400,7 +400,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
   <div class="sources-bar">
     <span>Sources officielles :</span>
     <a class="source-link" href="https://www.autoentrepreneur.urssaf.fr/portail/accueil/une-question/questions-frequentes.html" target="_blank">URSSAF FAQ</a>
-    <a class="source-link" href="https://www.impots.gouv.fr/professionnel/questions/pour-rester-micro-entrepreneur-quel-montant-de-chiffre-daffaires-ou-de" target="_blank">impots.gouv — seuils micro</a>
+    <a class="source-link" href="https://www.economie.gouv.fr/entreprises/gerer-sa-micro-entreprise/micro-entreprises-quel-est-le-montant-de-vos-cotisations-sociales" target="_blank">economie.gouv.fr — seuils micro 2026</a>
     <a class="source-link" href="https://bofip.impots.gouv.fr" target="_blank">BOFiP</a>
     <a class="source-link" href="https://www.impots.gouv.fr/professionnel/questions/en-tant-que-micro-entrepreneur-puis-je-etre-redevable-de-la-tva" target="_blank">impots.gouv — TVA micro</a>
     <a class="source-link" href="https://gesticompta.com/franchissement-des-seuils-de-tva-retour-a-la-franchise-en-base/" target="_blank">Retour franchise TVA</a>
@@ -463,6 +463,29 @@ main{max-width:1300px;margin:0 auto;padding:32px}
     </div>
 
     <h2>📋 TVA — TAXE SUR LA VALEUR AJOUTÉE</h2>
+    <div class="card" style="margin-bottom:16px;border-color:rgba(6,182,212,.3)">
+      <div class="card-title" style="color:var(--cyan)">⚡ 3 plafonds, 3 conséquences différentes — ne pas confondre</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--violet);border-radius:4px;padding:14px">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--violet);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">1 · Plafond du régime micro</div>
+          <div style="font-size:13px;color:var(--text);font-weight:600;margin-bottom:6px">203 100 € ventes · 83 600 € services</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">Détermine si vous <strong style="color:var(--text)">restez micro-entrepreneur</strong>. Rien d'immédiat : il faut dépasser <strong style="color:var(--text)">2 années de suite</strong> pour perdre le statut, au 1er janvier de l'année N+2.</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:4px;padding:14px">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--amber);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">2 · Seuil de base TVA</div>
+          <div style="font-size:13px;color:var(--text);font-weight:600;margin-bottom:6px">85 000 € ventes · 37 500 € services</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">Franchise <strong style="color:var(--text)">maintenue jusqu'au 31/12</strong>. TVA obligatoire seulement au <strong style="color:var(--text)">1er janvier N+1</strong>. Ex. : dépassement le 15 juin → vous facturez encore sans TVA jusqu'au 31 décembre.</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--red);border-radius:4px;padding:14px">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">3 · Seuil majoré TVA</div>
+          <div style="font-size:13px;color:var(--text);font-weight:600;margin-bottom:6px">93 500 € ventes · 41 250 € services</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">Assujettissement <strong style="color:#fca5a5">immédiat et rétroactif</strong> dès le 1er jour du mois de dépassement. Ex. : dépassement le 15 juin → TVA due <strong style="color:#fca5a5">dès le 1er juin</strong>, toutes les factures du mois à régulariser.</div>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:10px 14px;background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.15);border-radius:4px;font-size:12px;color:var(--muted);line-height:1.6">
+        <strong style="color:var(--text)">Ces 3 plafonds sont indépendants</strong> — on peut très bien rester micro-entrepreneur (mécanisme 1) tout en étant assujetti à la TVA (mécanisme 2 ou 3). Le franchissement de l'un n'a aucun effet sur les deux autres.
+      </div>
+    </div>
     <div class="guide-block">
       <button class="guide-block-header" onclick="toggleGuide(this)"><span>🔹 Franchise TVA — seuils 2026 confirmés</span><span>▼</span></button>
       <div class="guide-block-body">
@@ -987,12 +1010,7 @@ main{max-width:1300px;margin:0 auto;padding:32px}
 
   <div class="card">
     <div class="card-title" style="color:var(--green)">📈 Suivi seuil franchise TVA</div>
-    <div class="tva-suivi-paliers">
-      <div class="tva-palier"><div class="tva-palier-montant" style="color:var(--green)">0 → 20 000 €</div><div class="tva-palier-label">Zone sereine</div><div class="tva-palier-desc">Continuez à facturer sans TVA. Mention : <em>"TVA non applicable — art. 293 B CGI"</em></div></div>
-      <div class="tva-palier"><div class="tva-palier-montant" style="color:var(--cyan)">20 000 → 30 000 €</div><div class="tva-palier-label">Attention modérée</div><div class="tva-palier-desc">Suivez votre CA mensuel précisément. Estimez le mois de franchissement éventuel.</div></div>
-      <div class="tva-palier"><div class="tva-palier-montant" style="color:var(--amber)">30 000 → 37 500 €</div><div class="tva-palier-label">Seuil limite proche</div><div class="tva-palier-desc">Contactez les impôts. Préparez vos clients à recevoir des factures avec TVA.</div></div>
-      <div class="tva-palier"><div class="tva-palier-montant" style="color:var(--red)">37 500 → 41 250 €</div><div class="tva-palier-label">Zone rouge — seuil majoré</div><div class="tva-palier-desc">Seuil limite dépassé. Marge jusqu'à 41 250 €. Dépassement majoré = assujettissement rétroactif au 1er du mois. Impôts + expert-comptable en urgence.</div></div>
-    </div>
+    <div class="tva-suivi-paliers" id="tva-suivi-container"></div>
   </div>
 </section>
 
@@ -1155,6 +1173,7 @@ function onActiviteChange(){
     });
   }
   updateProvisions();
+  renderTvaSuivi();
 }
 function onMixteChange(){
   const checked=document.getElementById('mixte').checked;
@@ -1238,6 +1257,23 @@ function updateProvisions(){
   updateJauges(annual);
 }
 function barColor(p){return p<60?'var(--green)':p<85?'var(--amber)':'var(--red)'}
+function renderTvaSuivi(){
+  const el=document.getElementById('tva-suivi-container');if(!el)return;
+  const a=document.getElementById('activite')?.value||'bic_service';
+  const isV=(a==='bic_vente'||a==='location_tourisme');
+  const base=isV?85000:37500;
+  const maj=isV?93500:41250;
+  const label=isV?'Ventes / marchandises / hébergement':'Prestations de services';
+  const z1=Math.round(base*0.55/500)*500;
+  const z2=Math.round(base*0.8/500)*500;
+  const fmt=n=>n.toLocaleString('fr-FR')+' €';
+  el.innerHTML=`
+    <div style="grid-column:1/-1;font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:2px">Seuils affichés : <strong style="color:var(--text)">${label}</strong> — changez le type d'activité dans l'onglet Profil pour adapter automatiquement ces seuils</div>
+    <div class="tva-palier"><div class="tva-palier-montant" style="color:var(--green)">0 → ${fmt(z1)}</div><div class="tva-palier-label">Zone sereine</div><div class="tva-palier-desc">Continuez à facturer sans TVA. Mention : <em>"TVA non applicable — art. 293 B CGI"</em></div></div>
+    <div class="tva-palier"><div class="tva-palier-montant" style="color:var(--cyan)">${fmt(z1)} → ${fmt(z2)}</div><div class="tva-palier-label">Attention modérée</div><div class="tva-palier-desc">Suivez votre CA mensuel précisément. Estimez le mois de franchissement éventuel.</div></div>
+    <div class="tva-palier"><div class="tva-palier-montant" style="color:var(--amber)">${fmt(z2)} → ${fmt(base)}</div><div class="tva-palier-label">Seuil de base proche</div><div class="tva-palier-desc">Contactez les impôts. Si vous ne dépassez que ce seuil de base (pas le majoré), la franchise reste acquise jusqu'au 31/12 — TVA obligatoire seulement au 1er janvier suivant.</div></div>
+    <div class="tva-palier"><div class="tva-palier-montant" style="color:var(--red)">${fmt(base)} → ${fmt(maj)}</div><div class="tva-palier-label">Zone rouge — seuil majoré</div><div class="tva-palier-desc">Seuil de base dépassé. Marge jusqu'à ${fmt(maj)}. Si vous franchissez ce seuil majoré, l'assujettissement TVA est immédiat et rétroactif au 1er jour du mois — toutes les factures du mois sont à régulariser. Impôts + expert-comptable en urgence.</div></div>`;
+}
 function updateJauges(annual){
   const a=document.getElementById('activite')?.value||'bic_service';
   const rt=document.getElementById('regime_tva')?.value||'franchise';
@@ -1546,6 +1582,7 @@ window.addEventListener('load',function(){
   const el=document.getElementById('ca-provision');
   if(el)el.value=Math.round(a/12);
   updateProvisions();
+  renderTvaSuivi();
 });
 </script>
 </body>
