@@ -295,7 +295,8 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
         <option value="" disabled selected style="color:var(--tx3)">Choisir...</option>
         <option value="services">Prestations de services (BIC)</option>
         <option value="ventes">Vente de marchandises (BIC)</option>
-        <option value="liberal">Profession libérale (BNC)</option>
+        <option value="liberal">Profession libérale (BNC, SSI)</option>
+          <option value="liberal_cipav">Profession libérale (BNC, Cipav)</option>
       </select>
     </div>
     <div class="ig"><div class="il">CA mensuel moyen — activité principale <span>HT</span></div>
@@ -340,7 +341,8 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
           <option value="" disabled selected style="color:var(--tx3)">Choisir...</option>
           <option value="services">Prestations de services (BIC)</option>
           <option value="ventes">Vente de marchandises (BIC)</option>
-          <option value="liberal">Profession libérale (BNC)</option>
+          <option value="liberal">Profession libérale (BNC, SSI)</option>
+          <option value="liberal_cipav">Profession libérale (BNC, Cipav)</option>
         </select>
       </div>
       <div class="ig"><div class="il">CA mensuel moyen — activité secondaire <span>HT</span></div>
@@ -646,7 +648,7 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
   <div class="mc m-in">
     <div style="margin-bottom:10px"><div class="mn2" style="color:var(--cy)">📈 Investissement long terme</div><div class="mr2" style="margin-top:3px">Après les réserves constituées</div></div>
     <div class="inv-bloc">
-      <div class="inv-hdr"><div class="inv-name">Actions — PEA</div><div class="inv-taux" style="color:var(--gr)">~7%/an · Exonéré après 5 ans</div></div>
+      <div class="inv-hdr"><div class="inv-name">Actions — PEA</div><div class="inv-taux" style="color:var(--gr)">~7%/an · Exonéré d'IR après 5 ans</div></div>
       <div class="inv-desc">Plan d'Épargne en Actions · Plafond 150 000€ · <strong>Ouvrir avec 1€ maintenant</strong> · Rendement historique — années négatives possibles</div>
       <div class="inv-row"><span class="inv-lbl">Solde actuel</span><input class="inv-inp" type="number" id="inv-pea-sol" placeholder="0" onblur="dUpdRes()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€</span></div>
       <div class="inv-row"><span class="inv-lbl">Virement mensuel</span><input class="inv-inp" type="number" id="inv-pea-v" placeholder="0" onblur="dUpdRes()" onkeydown="if(event.key==='Enter'){this.blur();}"><span class="vu">€/mois</span></div>
@@ -867,10 +869,10 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
   <div id="proj-invest" style="display:none">
     <div class="card">
       <div class="ct"><span class="dot" style="background:var(--cy)"></span>Taux par enveloppe <span style="font-size:.6rem;font-weight:400;color:var(--tx3);margin-left:4px;text-transform:none;letter-spacing:0">modifiables</span></div>
-      <div class="al a-am" style="margin-bottom:10px"><span class="ai">ℹ️</span><div style="font-size:.7rem">PEA, CTO et assurance-vie peuvent tous investir en ETF — même rendement brut potentiel, fiscalité différente à la sortie. L'assurance-vie en fonds euros est la seule à capital garanti, donc rendement plus faible. La SCPI suit un mécanisme distinct (revenus locatifs mutualisés), moins liquide que les autres enveloppes.</div></div>
+      <div class="al a-am" style="margin-bottom:10px"><span class="ai">ℹ️</span><div style="font-size:.7rem">PEA, CTO et assurance-vie peuvent tous investir en ETF — même rendement brut potentiel, fiscalité différente à la sortie. Les projections sont affichées <strong>avant fiscalité</strong> : au retrait, 18,6 % de prélèvements sociaux sur les gains d'un PEA de plus de 5 ans, 31,4 % (flat tax) sur ceux d'un CTO. L'assurance-vie en fonds euros est la seule à capital garanti, donc rendement plus faible. La SCPI suit un mécanisme distinct (revenus locatifs mutualisés), moins liquide que les autres enveloppes.</div></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <div style="background:var(--bg4);border-radius:9px;padding:10px 11px">
-          <div style="font-size:.65rem;font-weight:700;color:var(--vi);margin-bottom:6px">Actions (PEA) <span style="color:var(--tx3);font-weight:400">Exonéré impôt après 5 ans</span></div>
+          <div style="font-size:.65rem;font-weight:700;color:var(--vi);margin-bottom:6px">Actions (PEA) <span style="color:var(--tx3);font-weight:400">Exonéré d'IR après 5 ans · prélèvements sociaux 18,6 %</span></div>
           <div style="display:flex;align-items:center;gap:6px">
             <input type="number" id="taux-pea" value="7" step="0.5" min="0" max="20" style="width:62px;background:var(--bg5);border:1px solid var(--bo2);border-radius:6px;padding:5px 7px;color:var(--vi);font-family:var(--mn);font-size:.82rem;outline:none;text-align:center" onblur="calcAllProj()" onkeydown="if(event.key==='Enter'){this.blur()}">
             <span style="font-size:.7rem;color:var(--tx3)">%/an · ETF monde</span>
@@ -1041,7 +1043,7 @@ html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
 
 <div class="disclaimer">
   <strong>FlashTréso — outil d'aide à la gestion, ne remplace pas un expert-comptable.</strong><br>
-  Taux fiscaux 2026 · Sources URSSAF, impots.gouv.fr · Taux livrets au 01/08/2026 — révisés 2x/an<br>
+  Taux fiscaux 2026 · Sources URSSAF, impots.gouv.fr · Taux livrets au 01/08/2026 — révisés 2x/an · Projections d'épargne avant fiscalité<br>
   Tes données restent sur ton appareil.
 </div>
 <div class="toast" id="toast"></div>
@@ -1066,8 +1068,9 @@ const TX={
   services_cci:{urssaf:.212,ir:.017,cfp:.003,tfcc:.00044,tfcc_lbl:'CCI',label:'Services BIC · CCI — 21,2% URSSAF + 1,7% IR + 0,3% CFP + 0,044% CCI'},
   services_cma:{urssaf:.212,ir:.017,cfp:.003,tfcc:.0048,tfcc_lbl:'CMA',label:'Services CMA — 21,2% URSSAF + 1,7% IR + 0,3% CFP + 0,48% CMA'},
   ventes_cci:{urssaf:.123,ir:.010,cfp:.001,tfcc:.00015,tfcc_lbl:'CCI',label:'Ventes BIC · CCI — 12,3% URSSAF + 1,0% IR + 0,1% CFP'},
-  ventes_cma:{urssaf:.123,ir:.010,cfp:.001,tfcc:.0022,tfcc_lbl:'CMA',label:'Ventes CMA — 12,3% + 1,0% + 0,1% + 0,22% CMA'},
-  liberal:{urssaf:.256,ir:.022,cfp:.001,tfcc:0,tfcc_lbl:'',label:'Libéral BNC — 25,6% URSSAF + 2,2% IR + 0,1% CFP'},
+  ventes_cma:{urssaf:.123,ir:.010,cfp:.003,tfcc:.0022,tfcc_lbl:'CMA',label:'Ventes CMA — 12,3% + 1,0% + 0,3% CFP + 0,22% CMA'},
+  liberal:{urssaf:.256,ir:.022,cfp:.002,tfcc:0,tfcc_lbl:'',label:'Libéral BNC — 25,6% URSSAF + 2,2% IR + 0,2% CFP'},
+  liberal_cipav:{urssaf:.232,ir:.022,cfp:.002,tfcc:0,tfcc_lbl:'',label:'Libéral BNC Cipav — 23,2% URSSAF + 2,2% IR + 0,2% CFP'},
   mixte_cci:{urssaf:.175,ir:.014,cfp:.002,tfcc:.00020,tfcc_lbl:'CCI',label:'Mixte · CCI — taux pondérés estimés'},
   mixte_cma:{urssaf:.175,ir:.014,cfp:.002,tfcc:.0035,tfcc_lbl:'CMA',label:'Mixte · CMA — taux pondérés estimés'}
 };
@@ -1082,7 +1085,7 @@ function updTaux(){
   TAUX_LIV={lep:t_lep/100,la:t_la/100,ldds:t_ldds/100};
   updLivrets();
 }
-function getTX(){const t=S.type||'services';if(t==='liberal')return TX.liberal;return TX[t+(S.cma?'_cma':'_cci')]||TX.services_cci;}
+function getTX(){const t=S.type||'services';if(t==='liberal'||t==='liberal_cipav')return TX[t];return TX[t+(S.cma?'_cma':'_cci')]||TX.services_cci;}
 function gv(id,d=0){const v=parseFloat(document.getElementById(id)?.value);return isNaN(v)?d:v;}
 function fmt(n){return Math.round(n).toLocaleString('fr-FR');}
 function fmtK(n){if(n>=1e6)return(n/1e6).toFixed(1).replace('.',',')+' M€';if(n>=10000)return(n/1000).toFixed(0)+' k€';if(n>=1000)return(n/1000).toFixed(1).replace('.',',')+' k€';return fmt(n)+'€';}
@@ -1183,7 +1186,7 @@ function gvCA2(){return S.secondaire?gv('s-ca2',0):0;}
 function getType2(){return document.getElementById('s-type2')?.value||'';}
 function getTX2(){
   const t=getType2();if(!t||!S.secondaire)return null;
-  if(t==='liberal')return TX.liberal;
+  if(t==='liberal'||t==='liberal_cipav')return TX[t];
   return TX[t+(S.cma?'_cma':'_cci')]||TX.services_cci;
 }
 function calcObligations(ca,tx){
